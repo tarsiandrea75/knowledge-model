@@ -1,0 +1,384 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/component.schema.json",
+  "title": "RKM Component Schema",
+  "description": "Defines a reusable architectural component entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "component"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Component"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this component to techniques, frameworks, models, databases, tools or other components.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this component.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this component document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this component document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the component but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "component": {
+      "$ref": "#/$defs/componentDetails"
+    }
+  },
+  "$defs": {
+    "componentDetails": {
+      "type": "object",
+      "description": "Component-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "componentType",
+        "ragStages",
+        "abstractionLevel"
+      ],
+      "properties": {
+        "componentType": {
+          "type": "string",
+          "description": "Primary architectural role of the component in a RAG system.",
+          "enum": [
+            "Document Loader",
+            "Parser",
+            "Chunker",
+            "Embedding Generator",
+            "Vector Store",
+            "Graph Store",
+            "Retriever",
+            "Reranker",
+            "Query Transformer",
+            "Prompt Builder",
+            "Context Assembler",
+            "Language Model",
+            "Router",
+            "Memory Store",
+            "Evaluator",
+            "Guardrail",
+            "Orchestrator",
+            "Cache",
+            "Telemetry",
+            "Tool",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages in which this component participates.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Parsing",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "abstractionLevel": {
+          "type": "string",
+          "description": "Level at which the component is modeled.",
+          "enum": [
+            "Conceptual",
+            "Interface",
+            "Implementation",
+            "Service",
+            "Infrastructure",
+            "Workflow"
+          ]
+        },
+        "interfaceRole": {
+          "type": "string",
+          "description": "Role this component plays relative to other components.",
+          "enum": [
+            "Producer",
+            "Consumer",
+            "Transformer",
+            "Store",
+            "Coordinator",
+            "Evaluator",
+            "Adapter",
+            "Observer",
+            "Other"
+          ]
+        },
+        "responsibilities": {
+          "type": "array",
+          "description": "Primary responsibilities of the component.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Inputs consumed by the component.",
+          "items": {
+            "$ref": "#/$defs/componentPort"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Outputs produced by the component.",
+          "items": {
+            "$ref": "#/$defs/componentPort"
+          },
+          "uniqueItems": true
+        },
+        "configurationParameters": {
+          "type": "array",
+          "description": "Important configuration parameters that affect component behavior.",
+          "items": {
+            "$ref": "#/$defs/configurationParameter"
+          },
+          "uniqueItems": true
+        },
+        "qualityAttributes": {
+          "type": "array",
+          "description": "Quality attributes affected by this component.",
+          "items": {
+            "$ref": "#/$defs/qualityAttribute"
+          },
+          "uniqueItems": true
+        },
+        "operationalCharacteristics": {
+          "type": "object",
+          "description": "Operational characteristics relevant to using this component.",
+          "additionalProperties": false,
+          "properties": {
+            "latencySensitivity": {
+              "$ref": "#/$defs/level"
+            },
+            "costSensitivity": {
+              "$ref": "#/$defs/level"
+            },
+            "statefulness": {
+              "type": "string",
+              "enum": [
+                "Stateless",
+                "Stateful",
+                "Depends On Implementation",
+                "Unknown"
+              ]
+            },
+            "scalabilityRequirement": {
+              "$ref": "#/$defs/level"
+            },
+            "observabilityRequirement": {
+              "$ref": "#/$defs/level"
+            }
+          }
+        },
+        "implementationConsiderations": {
+          "type": "array",
+          "description": "Structured implementation considerations for this component.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "commonFailureModes": {
+          "type": "array",
+          "description": "Common failure modes associated with this component.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "componentPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "dataType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Port or artifact name.",
+          "minLength": 1
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Logical data type consumed or produced by the component.",
+          "enum": [
+            "Document",
+            "Chunk",
+            "Embedding",
+            "Vector",
+            "Query",
+            "Prompt",
+            "Context",
+            "Generated Answer",
+            "Score",
+            "Ranking",
+            "Graph",
+            "Metadata",
+            "Evaluation Result",
+            "Telemetry Event",
+            "Other"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether this input or output is required.",
+          "default": true
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "configurationParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "valueType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Enum",
+            "Array",
+            "Object"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "qualityAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "impact"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "Accuracy",
+            "Recall",
+            "Precision",
+            "Latency",
+            "Cost",
+            "Scalability",
+            "Reliability",
+            "Explainability",
+            "Security",
+            "Privacy",
+            "Maintainability",
+            "Portability"
+          ]
+        },
+        "impact": {
+          "$ref": "#/$defs/level"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
