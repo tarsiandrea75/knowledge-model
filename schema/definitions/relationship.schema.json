@@ -1,0 +1,600 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/relationship.schema.json",
+  "title": "RKM Relationship Definition",
+  "description": "Defines first-class relationships between entities in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "sourceId",
+    "targetId"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Stable Relationship Identifier",
+      "description": "Globally unique immutable identifier for a persisted relationship.",
+      "pattern": "^RELATIONSHIP-[0-9]{4,}$",
+      "examples": [
+        "RELATIONSHIP-0001",
+        "RELATIONSHIP-0042"
+      ]
+    },
+    "type": {
+      "$ref": "#/$defs/relationshipType"
+    },
+    "sourceId": {
+      "$ref": "#/$defs/entityId",
+      "description": "Stable identifier of the source entity."
+    },
+    "sourceType": {
+      "$ref": "#/$defs/entityType"
+    },
+    "sourceSlug": {
+      "$ref": "#/$defs/slug",
+      "description": "Optional human-readable source entity slug. The stable sourceId remains authoritative."
+    },
+    "targetId": {
+      "$ref": "#/$defs/entityId",
+      "description": "Stable identifier of the target entity."
+    },
+    "targetType": {
+      "$ref": "#/$defs/entityType"
+    },
+    "targetSlug": {
+      "$ref": "#/$defs/slug",
+      "description": "Optional human-readable target entity slug. The stable targetId remains authoritative."
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "certainty": {
+      "$ref": "#/$defs/certainty"
+    },
+    "scope": {
+      "$ref": "#/$defs/relationshipScope"
+    },
+    "cardinality": {
+      "$ref": "#/$defs/cardinality"
+    },
+    "inverse": {
+      "$ref": "#/$defs/inverseRelationship"
+    },
+    "claims": {
+      "type": "array",
+      "description": "Structured claims represented or supported by this relationship.",
+      "items": {
+        "$ref": "#/$defs/claimReference"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence items or evidence references supporting this relationship.",
+      "items": {
+        "$ref": "#/$defs/evidenceReference"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Source references used to justify or contextualize the relationship.",
+      "items": {
+        "$ref": "#/$defs/sourceReference"
+      },
+      "uniqueItems": true
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Maintainer explanation for why this relationship exists.",
+      "minLength": 10
+    },
+    "qualifiers": {
+      "type": "array",
+      "description": "Structured qualifiers that restrict when or how the relationship applies.",
+      "items": {
+        "$ref": "#/$defs/qualifier"
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "array",
+      "description": "Human-readable notes that do not change the relationship semantics.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "introducedInVersion": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "deprecatedInVersion": {
+      "description": "RKM version in which this relationship was deprecated. Null means it is not deprecated.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/semanticVersion"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "createdAt": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Maintainer, tool or process that created the relationship.",
+      "minLength": 1
+    },
+    "reviewedBy": {
+      "type": "array",
+      "description": "Maintainers, tools or processes that reviewed the relationship.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "relationshipType": {
+      "type": "string",
+      "description": "Semantic predicate connecting the source entity to the target entity. Relationship types use uppercase snake case.",
+      "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$",
+      "examples": [
+        "REQUIRES",
+        "IMPLEMENTS",
+        "INTRODUCES",
+        "EVALUATES",
+        "SUPPORTED_BY",
+        "HAS_LIMITATION"
+      ]
+    },
+    "entityId": {
+      "type": "string",
+      "description": "Globally unique immutable entity identifier.",
+      "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$",
+      "examples": [
+        "TECHNIQUE-0001",
+        "FRAMEWORK-0003",
+        "PAPER-0015",
+        "VECTOR-DATABASE-0002"
+      ]
+    },
+    "entityType": {
+      "type": "string",
+      "description": "RKM entity type participating in a relationship.",
+      "enum": [
+        "Agent",
+        "Artifact",
+        "Author",
+        "Advantage",
+        "Benchmark",
+        "Chunk",
+        "ChunkingStrategy",
+        "Claim",
+        "Component",
+        "Dataset",
+        "DistanceMetric",
+        "Document",
+        "Embedding",
+        "EmbeddingModel",
+        "EvaluationMetric",
+        "Evidence",
+        "Framework",
+        "Glossary",
+        "GraphDatabase",
+        "IndexType",
+        "LLM",
+        "LanguageModel",
+        "Limitation",
+        "MemoryStrategy",
+        "MCPServer",
+        "Organization",
+        "Paper",
+        "Problem",
+        "PromptTechnique",
+        "Provider",
+        "Reference",
+        "Reranker",
+        "Retriever",
+        "SimilarityMetric",
+        "Step",
+        "Technique",
+        "Tool",
+        "Tradeoff",
+        "UseCase",
+        "VectorDatabase",
+        "Venue",
+        "Workflow"
+      ]
+    },
+    "slug": {
+      "type": "string",
+      "description": "Filesystem-safe lowercase kebab-case slug.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "examples": [
+        "hyde",
+        "spring-ai",
+        "self-rag",
+        "vector-database"
+      ]
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "description": "Lifecycle state of the relationship.",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "confidence": {
+      "type": "string",
+      "description": "Maintainer confidence in the correctness of the relationship.",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    },
+    "certainty": {
+      "type": "string",
+      "description": "Whether the relationship is directly stated, inferred or contested.",
+      "enum": [
+        "Direct",
+        "Inferred",
+        "Partially Inferred",
+        "Contested",
+        "Unknown"
+      ]
+    },
+    "relationshipScope": {
+      "type": "object",
+      "description": "Context in which the relationship applies.",
+      "additionalProperties": false,
+      "properties": {
+        "appliesGenerally": {
+          "type": "boolean",
+          "description": "Whether the relationship applies to the source entity in general rather than only in specific configurations."
+        },
+        "implementationSpecific": {
+          "type": "boolean",
+          "description": "Whether the relationship applies only to specific implementations."
+        },
+        "versionSpecific": {
+          "type": "boolean",
+          "description": "Whether the relationship applies only to specific versions of the source or target."
+        },
+        "sourceVersion": {
+          "type": "string",
+          "description": "Version or version range of the source entity for which the relationship applies.",
+          "minLength": 1
+        },
+        "targetVersion": {
+          "type": "string",
+          "description": "Version or version range of the target entity for which the relationship applies.",
+          "minLength": 1
+        },
+        "environment": {
+          "type": "string",
+          "description": "Runtime, deployment, benchmark or domain context for which the relationship applies.",
+          "minLength": 1
+        }
+      }
+    },
+    "cardinality": {
+      "type": "object",
+      "description": "Cardinality constraint for this relationship type or relationship instance.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceMin": {
+          "type": "integer",
+          "description": "Minimum number of source entities expected for the relationship constraint.",
+          "minimum": 0
+        },
+        "sourceMax": {
+          "$ref": "#/$defs/cardinalityBound",
+          "description": "Maximum number of source entities expected for the relationship constraint."
+        },
+        "targetMin": {
+          "type": "integer",
+          "description": "Minimum number of target entities expected for the relationship constraint.",
+          "minimum": 0
+        },
+        "targetMax": {
+          "$ref": "#/$defs/cardinalityBound",
+          "description": "Maximum number of target entities expected for the relationship constraint."
+        },
+        "notation": {
+          "type": "string",
+          "description": "Human-readable cardinality notation.",
+          "pattern": "^(0|1|[1-9][0-9]*|N|\\*)\\.\\.(0|1|[1-9][0-9]*|N|\\*)$",
+          "examples": [
+            "0..N",
+            "1..N",
+            "1..1"
+          ]
+        }
+      }
+    },
+    "cardinalityBound": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "enum": [
+            "N",
+            "*"
+          ]
+        }
+      ]
+    },
+    "inverseRelationship": {
+      "type": "object",
+      "description": "Inverse relationship metadata when an inverse relationship is defined or generated.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "storage"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/relationshipType"
+        },
+        "storage": {
+          "type": "string",
+          "description": "Whether the inverse relationship is generated from the canonical relationship or stored explicitly.",
+          "enum": [
+            "Derived",
+            "Stored"
+          ]
+        },
+        "canonical": {
+          "type": "boolean",
+          "description": "Whether this relationship is the canonical direction.",
+          "default": true
+        }
+      }
+    },
+    "claimReference": {
+      "type": "object",
+      "description": "Reference to a claim entity or inline structured claim.",
+      "additionalProperties": false,
+      "required": [
+        "statement"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable claim identifier when the claim is modeled as a first-class entity.",
+          "pattern": "^CLAIM-[0-9]{4,}$"
+        },
+        "statement": {
+          "type": "string",
+          "description": "Precise claim statement connected to this relationship.",
+          "minLength": 10
+        },
+        "claimType": {
+          "type": "string",
+          "description": "Kind of claim being made.",
+          "enum": [
+            "Factual",
+            "Interpretive",
+            "Comparative",
+            "Evaluative",
+            "Historical",
+            "Implementation Specific",
+            "Version Specific"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/lifecycleStatus"
+        }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "description": "Evidence supporting, weakening, contradicting or contextualizing this relationship.",
+      "additionalProperties": false,
+      "required": [
+        "relationshipToClaim"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable evidence identifier when the evidence is modeled as a first-class entity.",
+          "pattern": "^EVIDENCE-[0-9]{4,}$"
+        },
+        "relationshipToClaim": {
+          "type": "string",
+          "description": "How this evidence relates to the relationship or claim.",
+          "enum": [
+            "Supports",
+            "Weakens",
+            "Contradicts",
+            "Contextualizes"
+          ]
+        },
+        "strength": {
+          "type": "string",
+          "description": "Strength of the evidence.",
+          "enum": [
+            "Very Weak",
+            "Weak",
+            "Moderate",
+            "Strong",
+            "Very Strong"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Short explanation of what the evidence says.",
+          "minLength": 10
+        },
+        "sourceIds": {
+          "type": "array",
+          "description": "Stable reference identifiers used by this evidence item.",
+          "items": {
+            "type": "string",
+            "pattern": "^REFERENCE-[0-9]{4,}$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sourceReference": {
+      "type": "object",
+      "description": "Structured reference to an information source.",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable reference identifier when the source is modeled as a first-class reference.",
+          "pattern": "^REFERENCE-[0-9]{4,}$"
+        },
+        "sourceType": {
+          "type": "string",
+          "description": "Type of source.",
+          "enum": [
+            "Paper",
+            "Official Documentation",
+            "Repository",
+            "Specification",
+            "Standard",
+            "Benchmark",
+            "Dataset",
+            "Book",
+            "Blog Post",
+            "Technical Article",
+            "Conference Talk",
+            "Documentation Page",
+            "Experiment",
+            "Production Report",
+            "Maintainer Analysis",
+            "Other"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable source title.",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "description": "Resolvable source URL.",
+          "format": "uri"
+        },
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier when available.",
+          "minLength": 1
+        },
+        "citation": {
+          "type": "string",
+          "description": "Human-readable citation.",
+          "minLength": 1
+        },
+        "sourcePriority": {
+          "type": "string",
+          "description": "Authority level of the source for this relationship.",
+          "enum": [
+            "Primary",
+            "Secondary",
+            "Tertiary"
+          ]
+        },
+        "accessedAt": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "qualifier": {
+      "type": "object",
+      "description": "Structured condition that qualifies the relationship.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Qualifier name.",
+          "pattern": "^[a-z][a-zA-Z0-9]*$",
+          "examples": [
+            "retrievalMode",
+            "modelFamily",
+            "benchmarkSetting"
+          ]
+        },
+        "value": {
+          "description": "Qualifier value.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of how the qualifier constrains the relationship.",
+          "minLength": 1
+        }
+      }
+    },
+    "semanticVersion": {
+      "type": "string",
+      "description": "Semantic version string.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "examples": [
+        "1.0.0"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

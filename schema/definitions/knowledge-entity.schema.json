@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/knowledge-entity.schema.json",
+  "title": "RKM Knowledge Entity Definition",
+  "description": "Defines the common document envelope for first-class knowledge entities in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description"
+  ],
+  "properties": {
+    "identity": {
+      "$ref": "identity.schema.json"
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    },
+    "description": {
+      "$ref": "description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this entity to other entities.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this entity.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this entity document.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this entity document.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the entity but not necessarily used as evidence.",
+      "items": {
+        "$ref": "#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "externalLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "url"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "linkType": {
+          "type": "string",
+          "enum": [
+            "Documentation",
+            "Repository",
+            "Homepage",
+            "Paper",
+            "Benchmark",
+            "Dataset",
+            "Example",
+            "Other"
+          ]
+        }
+      }
+    }
+  }
+}

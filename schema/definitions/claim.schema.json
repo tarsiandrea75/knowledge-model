@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/claim.schema.json",
+  "title": "RKM Claim Definition",
+  "description": "Defines explicit statements about entities, relationships or sources in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "statement",
+    "claimType",
+    "subject",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable claim identifier.",
+      "pattern": "^CLAIM-[0-9]{4,}$",
+      "examples": [
+        "CLAIM-0001"
+      ]
+    },
+    "statement": {
+      "type": "string",
+      "description": "Precise human-readable statement made by the claim.",
+      "minLength": 10
+    },
+    "claimType": {
+      "$ref": "#/$defs/claimType"
+    },
+    "subject": {
+      "$ref": "#/$defs/claimSubject"
+    },
+    "predicate": {
+      "type": "string",
+      "description": "Optional structured predicate when the claim can be represented as a triple.",
+      "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+    },
+    "object": {
+      "$ref": "#/$defs/claimObject"
+    },
+    "qualifiers": {
+      "type": "array",
+      "description": "Structured conditions that constrain the claim.",
+      "items": {
+        "$ref": "#/$defs/qualifier"
+      },
+      "uniqueItems": true
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "evidenceIds": {
+      "type": "array",
+      "description": "Stable evidence identifiers connected to this claim.",
+      "items": {
+        "type": "string",
+        "pattern": "^EVIDENCE-[0-9]{4,}$"
+      },
+      "uniqueItems": true
+    },
+    "referenceIds": {
+      "type": "array",
+      "description": "Stable reference identifiers used by this claim.",
+      "items": {
+        "type": "string",
+        "pattern": "^REFERENCE-[0-9]{4,}$"
+      },
+      "uniqueItems": true
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Maintainer explanation of why this claim is represented.",
+      "minLength": 10
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    }
+  },
+  "$defs": {
+    "claimType": {
+      "type": "string",
+      "enum": [
+        "Factual",
+        "Interpretive",
+        "Comparative",
+        "Evaluative",
+        "Historical",
+        "Implementation Specific",
+        "Version Specific"
+      ]
+    },
+    "claimSubject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable entity, relationship or reference identifier.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Entity",
+            "Relationship",
+            "Reference",
+            "Evidence"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "claimObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable identifier when the object is modeled as a first-class concept.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "value": {
+          "description": "Literal claim object value.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "qualifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    }
+  }
+}

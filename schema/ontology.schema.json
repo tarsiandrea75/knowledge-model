@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/ontology.schema.json",
+  "title": "RKM Ontology Schema",
+  "description": "Defines a complete ontology document for the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metadata",
+    "ontologyVersion",
+    "entityTypes",
+    "relationshipTypes"
+  ],
+  "properties": {
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "ontologyVersion": {
+      "type": "string",
+      "description": "Semantic version of the ontology.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable ontology name.",
+      "minLength": 1,
+      "default": "RAG Knowledge Model Ontology"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable ontology description.",
+      "minLength": 20
+    },
+    "entityTypes": {
+      "type": "array",
+      "description": "Entity types included in the ontology.",
+      "minItems": 1,
+      "items": {
+        "$ref": "definitions/entity-type.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relationshipTypes": {
+      "type": "array",
+      "description": "Relationship types included in the ontology.",
+      "minItems": 1,
+      "items": {
+        "$ref": "definitions/relationship-type.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Ontology-level semantic constraints not captured by individual type definitions.",
+      "items": {
+        "$ref": "#/$defs/ontologyConstraint"
+      },
+      "uniqueItems": true
+    },
+    "exports": {
+      "type": "array",
+      "description": "Export targets supported by this ontology version.",
+      "items": {
+        "$ref": "#/$defs/exportTarget"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "ontologyConstraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "severity"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable ontology constraint identifier.",
+          "pattern": "^CONSTRAINT-[0-9]{4,}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Error",
+            "Warning",
+            "Information"
+          ]
+        },
+        "appliesTo": {
+          "type": "array",
+          "description": "Entity or relationship types affected by the constraint.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "exportTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format"
+      ],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "Property Graph",
+            "RDF",
+            "OWL",
+            "JSON-LD",
+            "GraphQL",
+            "SQL",
+            "TypeScript",
+            "Java"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Planned",
+            "Supported",
+            "Deprecated"
+          ],
+          "default": "Planned"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

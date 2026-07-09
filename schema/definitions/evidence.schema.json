@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/evidence.schema.json",
+  "title": "RKM Evidence Definition",
+  "description": "Defines structured evidence that supports, contradicts, qualifies or contextualizes claims and relationships.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "role",
+    "strength",
+    "summary",
+    "claimIds",
+    "referenceIds",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable evidence identifier.",
+      "pattern": "^EVIDENCE-[0-9]{4,}$",
+      "examples": [
+        "EVIDENCE-0001"
+      ]
+    },
+    "role": {
+      "$ref": "#/$defs/evidenceRole"
+    },
+    "strength": {
+      "$ref": "#/$defs/evidenceStrength"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short explanation of what the evidence says.",
+      "minLength": 10
+    },
+    "interpretation": {
+      "type": "string",
+      "description": "Maintainer interpretation of the evidence.",
+      "minLength": 10
+    },
+    "claimIds": {
+      "type": "array",
+      "description": "Claims connected to this evidence.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{4,}$"
+      },
+      "uniqueItems": true
+    },
+    "referenceIds": {
+      "type": "array",
+      "description": "References from which this evidence is derived.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^REFERENCE-[0-9]{4,}$"
+      },
+      "uniqueItems": true
+    },
+    "relationshipIds": {
+      "type": "array",
+      "description": "Relationships connected to this evidence.",
+      "items": {
+        "type": "string",
+        "pattern": "^RELATIONSHIP-[0-9]{4,}$"
+      },
+      "uniqueItems": true
+    },
+    "sourceFragments": {
+      "type": "array",
+      "description": "Specific source locations or fragments used as evidence.",
+      "items": {
+        "$ref": "#/$defs/sourceFragment"
+      },
+      "uniqueItems": true
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Limitations of this evidence.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    }
+  },
+  "$defs": {
+    "evidenceRole": {
+      "type": "string",
+      "enum": [
+        "Supports",
+        "Contradicts",
+        "Qualifies",
+        "Motivates",
+        "Illustrates",
+        "Implements",
+        "Evaluates",
+        "Benchmarks",
+        "Defines",
+        "Introduces",
+        "Describes"
+      ]
+    },
+    "evidenceStrength": {
+      "type": "string",
+      "enum": [
+        "Very Weak",
+        "Weak",
+        "Moderate",
+        "Strong",
+        "Very Strong"
+      ]
+    },
+    "sourceFragment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "referenceId"
+      ],
+      "properties": {
+        "referenceId": {
+          "type": "string",
+          "pattern": "^REFERENCE-[0-9]{4,}$"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "figure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "table": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quote": {
+          "type": "string",
+          "description": "Short excerpt only when licensing permits.",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "description": "URL fragment, commit path, heading, timestamp or other source locator.",
+          "minLength": 1
+        }
+      }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/entity-type-registry.schema.json",
+  "title": "RKM Entity Type Registry Schema",
+  "description": "Defines a registry document containing ontology entity type definitions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metadata",
+    "entityTypes"
+  ],
+  "properties": {
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "ontologyVersion": {
+      "type": "string",
+      "description": "Ontology version represented by this registry.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "entityTypes": {
+      "type": "array",
+      "description": "Registered entity type definitions.",
+      "minItems": 1,
+      "items": {
+        "$ref": "definitions/entity-type.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "array",
+      "description": "Registry-level notes.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

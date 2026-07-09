@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/identity.schema.json",
+  "title": "RKM Identity Definition",
+  "description": "Defines the immutable identity of every entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "id",
+    "slug",
+    "name",
+    "entityType"
+  ],
+
+  "properties": {
+
+    "id": {
+      "type": "string",
+      "title": "Stable Identifier",
+      "description": "Globally unique immutable identifier.",
+      "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$",
+      "examples": [
+        "TECHNIQUE-0001",
+        "FRAMEWORK-0003",
+        "PAPER-0015",
+        "COMPONENT-0028"
+      ]
+    },
+
+    "entityType": {
+      "type": "string",
+      "description": "Type of entity represented by this document.",
+      "enum": [
+        "Technique",
+        "Framework",
+        "Paper",
+        "Component",
+        "Pattern",
+        "Glossary",
+        "Dataset",
+        "Benchmark",
+        "EmbeddingModel",
+        "VectorDatabase",
+        "Reranker",
+        "ChunkingStrategy",
+        "EvaluationMetric",
+        "PromptTechnique",
+        "Agent",
+        "Provider"
+      ]
+    },
+
+    "slug": {
+      "type": "string",
+      "description": "Filesystem-safe unique slug.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "examples": [
+        "hyde",
+        "self-rag",
+        "graph-rag",
+        "spring-ai"
+      ]
+    },
+
+    "name": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "official",
+        "display"
+      ],
+
+      "properties": {
+
+        "official": {
+          "type": "string",
+          "description": "Official full name."
+        },
+
+        "display": {
+          "type": "string",
+          "description": "Preferred display name."
+        },
+
+        "short": {
+          "type": "string",
+          "description": "Short name."
+        },
+
+        "acronym": {
+          "type": "string",
+          "description": "Official acronym."
+        },
+
+        "pronunciation": {
+          "type": "string",
+          "description": "Human pronunciation guide."
+        }
+      }
+    },
+
+    "aliases": {
+      "type": "array",
+      "description": "Alternative names used in literature.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "abbreviations": {
+      "type": "array",
+      "description": "Known abbreviations.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "keywords": {
+      "type": "array",
+      "description": "Search keywords.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "tags": {
+      "type": "array",
+      "description": "Free-form tags.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "taxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+
+        "family": {
+          "type": "string"
+        },
+
+        "subFamily": {
+          "type": "string"
+        },
+
+        "category": {
+          "type": "string"
+        },
+
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "Public",
+        "Internal"
+      ],
+      "default": "Public"
+    },
+
+    "language": {
+      "type": "string",
+      "description": "Primary language of the document.",
+      "default": "en"
+    },
+
+    "version": {
+      "type": "string",
+      "description": "Semantic version.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "default": "1.0.0"
+    }
+  }
+}

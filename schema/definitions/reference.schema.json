@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/reference.schema.json",
+  "title": "RKM Reference Definition",
+  "description": "Defines structured source references used by claims, evidence, entities and relationships.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "sourceType",
+    "title"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable reference identifier.",
+      "pattern": "^REFERENCE-[0-9]{4,}$",
+      "examples": [
+        "REFERENCE-0001"
+      ]
+    },
+    "sourceType": {
+      "$ref": "#/$defs/sourceType"
+    },
+    "sourcePriority": {
+      "$ref": "#/$defs/sourcePriority"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable source title.",
+      "minLength": 1
+    },
+    "authors": {
+      "type": "array",
+      "description": "Authors or organizations responsible for the source.",
+      "items": {
+        "$ref": "#/$defs/contributor"
+      },
+      "uniqueItems": true
+    },
+    "publisher": {
+      "type": "string",
+      "description": "Publisher, venue, organization or repository owner.",
+      "minLength": 1
+    },
+    "publishedAt": {
+      "type": "string",
+      "description": "Publication date when available.",
+      "format": "date"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last known update date for the source.",
+      "format": "date"
+    },
+    "accessedAt": {
+      "type": "string",
+      "description": "Date on which the source was accessed.",
+      "format": "date"
+    },
+    "url": {
+      "type": "string",
+      "description": "Resolvable source URL.",
+      "format": "uri"
+    },
+    "canonicalUrl": {
+      "type": "string",
+      "description": "Preferred canonical URL when different from the accessed URL.",
+      "format": "uri"
+    },
+    "doi": {
+      "type": "string",
+      "description": "Digital Object Identifier.",
+      "minLength": 1
+    },
+    "arxivId": {
+      "type": "string",
+      "description": "arXiv identifier when applicable.",
+      "pattern": "^[0-9]{4}\\.[0-9]{4,5}(?:v[0-9]+)?$"
+    },
+    "isbn": {
+      "type": "string",
+      "description": "ISBN when applicable.",
+      "minLength": 10
+    },
+    "repository": {
+      "type": "string",
+      "description": "Source code repository URL when applicable.",
+      "format": "uri"
+    },
+    "version": {
+      "type": "string",
+      "description": "Source version, release tag, commit hash or document version.",
+      "minLength": 1
+    },
+    "citation": {
+      "type": "string",
+      "description": "Human-readable citation.",
+      "minLength": 1
+    },
+    "abstract": {
+      "type": "string",
+      "description": "Source abstract or concise summary.",
+      "minLength": 20
+    },
+    "notes": {
+      "type": "array",
+      "description": "Maintainer notes about the source.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    }
+  },
+  "$defs": {
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "Paper",
+        "Official Documentation",
+        "Repository",
+        "Specification",
+        "Standard",
+        "Benchmark",
+        "Dataset",
+        "Book",
+        "Blog Post",
+        "Technical Article",
+        "Conference Talk",
+        "Documentation Page",
+        "Experiment",
+        "Production Report",
+        "Maintainer Analysis",
+        "Other"
+      ]
+    },
+    "sourcePriority": {
+      "type": "string",
+      "enum": [
+        "Primary",
+        "Secondary",
+        "Tertiary"
+      ]
+    },
+    "contributor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identifier": {
+          "type": "string",
+          "description": "ORCID, organization identifier or repository account when available.",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

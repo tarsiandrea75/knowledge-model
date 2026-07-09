@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/description.schema.json",
+  "title": "RKM Description Definition",
+  "description": "Human-oriented descriptive information for a RAG Knowledge Model entity.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "summary",
+    "description"
+  ],
+
+  "properties": {
+
+    "summary": {
+      "type": "string",
+      "description": "A concise one or two sentence overview.",
+      "minLength": 20,
+      "maxLength": 500
+    },
+
+    "abstract": {
+      "type": "string",
+      "description": "A short technical abstract similar to an academic paper."
+    },
+
+    "description": {
+      "type": "string",
+      "description": "Complete description of the concept."
+    },
+
+    "motivation": {
+      "type": "string",
+      "description": "Why this technique exists and what motivated its introduction."
+    },
+
+    "history": {
+      "type": "string",
+      "description": "Historical background and evolution."
+    },
+
+    "problemStatement": {
+      "type": "string",
+      "description": "Problem addressed by this technique."
+    },
+
+    "coreIdea": {
+      "type": "string",
+      "description": "Single paragraph explaining the fundamental intuition."
+    },
+
+    "intuition": {
+      "type": "string",
+      "description": "High-level explanation understandable by non-experts."
+    },
+
+    "technicalExplanation": {
+      "type": "string",
+      "description": "Detailed technical explanation."
+    },
+
+    "algorithmOverview": {
+      "type": "string",
+      "description": "Algorithmic overview without implementation details."
+    },
+
+    "goals": {
+      "type": "array",
+      "description": "Primary objectives.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "nonGoals": {
+      "type": "array",
+      "description": "Explicitly unsupported objectives.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "problemsSolved": {
+      "type": "array",
+      "description": "Problems addressed.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "limitations": {
+      "type": "array",
+      "description": "Known limitations.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "tradeoffs": {
+      "type": "array",
+      "description": "Trade-offs introduced.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "advantages": {
+      "type": "array",
+      "description": "Benefits.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "disadvantages": {
+      "type": "array",
+      "description": "Weaknesses.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "assumptions": {
+      "type": "array",
+      "description": "Underlying assumptions.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "prerequisites": {
+      "type": "array",
+      "description": "Knowledge required to understand or implement this concept.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "bestUseCases": {
+      "type": "array",
+      "description": "Recommended scenarios.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "antiPatterns": {
+      "type": "array",
+      "description": "Situations where this technique should not be used.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "commonMistakes": {
+      "type": "array",
+      "description": "Frequent implementation mistakes.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "misconceptions": {
+      "type": "array",
+      "description": "Common misconceptions.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "implementationNotes": {
+      "type": "string",
+      "description": "Implementation advice."
+    },
+
+    "optimizationTips": {
+      "type": "array",
+      "description": "Performance or quality recommendations.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "securityConsiderations": {
+      "type": "array",
+      "description": "Security-related considerations.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "privacyConsiderations": {
+      "type": "array",
+      "description": "Privacy-related considerations.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "ethicalConsiderations": {
+      "type": "array",
+      "description": "Ethical implications.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "futureDirections": {
+      "type": "array",
+      "description": "Expected future evolution.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "relatedConcepts": {
+      "type": "array",
+      "description": "Related concepts.",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "seeAlso": {
+      "type": "array",
+      "description": "Cross references.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

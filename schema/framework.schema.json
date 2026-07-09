@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/framework.schema.json",
+  "title": "RKM Framework Schema",
+  "description": "Defines a software framework entity that supports, implements or orchestrates Retrieval-Augmented Generation systems in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "framework"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Framework"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this framework to techniques, components, providers, models, databases, tools or other entities.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this framework.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this framework document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this framework document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the framework but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "framework": {
+      "$ref": "#/$defs/frameworkDetails"
+    }
+  },
+  "$defs": {
+    "frameworkDetails": {
+      "type": "object",
+      "description": "Framework-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "frameworkType",
+        "implementationLanguage"
+      ],
+      "properties": {
+        "frameworkType": {
+          "type": "string",
+          "description": "Primary role of the framework in the RAG ecosystem.",
+          "enum": [
+            "Application Framework",
+            "RAG Framework",
+            "Agent Framework",
+            "LLM Orchestration Framework",
+            "Evaluation Framework",
+            "Data Pipeline Framework",
+            "Vector Search Framework",
+            "Graph RAG Framework",
+            "Serving Framework",
+            "Integration Framework",
+            "Other"
+          ]
+        },
+        "implementationLanguage": {
+          "type": "array",
+          "description": "Programming languages directly supported by the framework implementation or official SDKs.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Python",
+              "Java",
+              "JavaScript",
+              "TypeScript",
+              "Go",
+              "Rust",
+              "C#",
+              "Kotlin",
+              "Scala",
+              "Ruby",
+              "PHP",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier for the framework when known.",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9-.+]*$",
+          "examples": [
+            "Apache-2.0",
+            "MIT"
+          ]
+        },
+        "projectStatus": {
+          "type": "string",
+          "description": "Observed maturity or lifecycle state of the framework project.",
+          "enum": [
+            "Experimental",
+            "Active",
+            "Mature",
+            "Maintenance",
+            "Deprecated",
+            "Archived",
+            "Unknown"
+          ]
+        },
+        "deliveryModel": {
+          "type": "array",
+          "description": "How the framework is delivered or consumed.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Library",
+              "SDK",
+              "Service",
+              "CLI",
+              "Server",
+              "Cloud Platform",
+              "Local Runtime",
+              "Plugin",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedRagStages": {
+          "type": "array",
+          "description": "RAG pipeline stages directly supported by the framework.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "integrationCapabilities": {
+          "type": "array",
+          "description": "Integration capabilities exposed by the framework.",
+          "items": {
+            "$ref": "#/$defs/integrationCapability"
+          },
+          "uniqueItems": true
+        },
+        "deploymentTargets": {
+          "type": "array",
+          "description": "Deployment environments supported or commonly used by the framework.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Local",
+              "Server",
+              "Container",
+              "Kubernetes",
+              "Serverless",
+              "Cloud",
+              "Edge",
+              "Browser",
+              "Mobile",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "operationalCharacteristics": {
+          "type": "object",
+          "description": "Operational characteristics relevant to framework selection and use.",
+          "additionalProperties": false,
+          "properties": {
+            "learningCurve": {
+              "$ref": "#/$defs/level"
+            },
+            "configurationComplexity": {
+              "$ref": "#/$defs/level"
+            },
+            "productionReadiness": {
+              "$ref": "#/$defs/level"
+            },
+            "ecosystemMaturity": {
+              "$ref": "#/$defs/level"
+            },
+            "observabilitySupport": {
+              "$ref": "#/$defs/level"
+            }
+          }
+        },
+        "governance": {
+          "type": "object",
+          "description": "Project governance and ownership information.",
+          "additionalProperties": false,
+          "properties": {
+            "maintainerType": {
+              "type": "string",
+              "enum": [
+                "Individual",
+                "Community",
+                "Company",
+                "Foundation",
+                "Academic",
+                "Unknown"
+              ]
+            },
+            "maintainerName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "homepage": {
+              "type": "string",
+              "format": "uri"
+            },
+            "repository": {
+              "type": "string",
+              "format": "uri"
+            },
+            "documentation": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "implementationConsiderations": {
+          "type": "array",
+          "description": "Structured implementation considerations for using this framework in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "integrationCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityType",
+        "supportLevel"
+      ],
+      "properties": {
+        "capabilityType": {
+          "type": "string",
+          "enum": [
+            "Embedding Model",
+            "Language Model",
+            "Retriever",
+            "Reranker",
+            "Vector Database",
+            "Graph Database",
+            "Document Loader",
+            "Chunking Strategy",
+            "Prompt Template",
+            "Tool Calling",
+            "Agent Workflow",
+            "Evaluation Metric",
+            "Observability",
+            "Caching",
+            "Other"
+          ]
+        },
+        "supportLevel": {
+          "type": "string",
+          "enum": [
+            "Native",
+            "Plugin",
+            "Adapter",
+            "Community",
+            "External",
+            "Unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/rag-technique.schema.json",
+  "title": "RKM RAG Technique Schema",
+  "description": "Defines a Retrieval-Augmented Generation technique entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "technique"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Technique"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "technique": {
+      "$ref": "#/$defs/techniqueDetails"
+    }
+  },
+  "$defs": {
+    "techniqueDetails": {
+      "type": "object",
+      "description": "Technique-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "ragStage",
+        "techniqueFamily"
+      ],
+      "properties": {
+        "techniqueFamily": {
+          "type": "string",
+          "description": "Canonical family or category of the RAG technique.",
+          "enum": [
+            "Naive RAG",
+            "Query Transformation",
+            "Hybrid Retrieval",
+            "Reranking",
+            "Context Compression",
+            "Graph RAG",
+            "Agentic RAG",
+            "Corrective RAG",
+            "Self Reflective RAG",
+            "Iterative Retrieval",
+            "Multi Step Retrieval",
+            "Chunking",
+            "Indexing",
+            "Evaluation",
+            "Prompting",
+            "Other"
+          ]
+        },
+        "ragStage": {
+          "type": "array",
+          "description": "RAG pipeline stages affected by this technique.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "inputRequirements": {
+          "type": "array",
+          "description": "Inputs required to use the technique.",
+          "items": {
+            "$ref": "#/$defs/requirement"
+          },
+          "uniqueItems": true
+        },
+        "outputArtifacts": {
+          "type": "array",
+          "description": "Outputs produced by the technique.",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "uniqueItems": true
+        },
+        "operationalCharacteristics": {
+          "type": "object",
+          "description": "Operational impact of the technique.",
+          "additionalProperties": false,
+          "properties": {
+            "latencyImpact": {
+              "$ref": "#/$defs/impactLevel"
+            },
+            "costImpact": {
+              "$ref": "#/$defs/impactLevel"
+            },
+            "complexityImpact": {
+              "$ref": "#/$defs/impactLevel"
+            },
+            "qualityImpact": {
+              "$ref": "#/$defs/impactLevel"
+            },
+            "scalabilityImpact": {
+              "$ref": "#/$defs/impactLevel"
+            }
+          }
+        },
+        "implementationConsiderations": {
+          "type": "array",
+          "description": "Structured implementation considerations.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evaluationGuidance": {
+          "type": "array",
+          "description": "Metrics, benchmarks or evaluation practices relevant to this technique.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "requirementLevel"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirementLevel": {
+          "type": "string",
+          "enum": [
+            "Required",
+            "Optional",
+            "Conditional"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "impactLevel": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}

@@ -1,0 +1,602 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/relationship-type.schema.json",
+  "title": "RKM Relationship Type Definition",
+  "description": "Defines registered relationship type metadata for the RAG Knowledge Model ontology.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "label",
+    "description",
+    "category",
+    "canonicalDirection",
+    "allowedSources",
+    "allowedTargets",
+    "status"
+  ],
+  "properties": {
+    "type": {
+      "$ref": "#/$defs/relationshipType"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for the relationship type.",
+      "minLength": 1,
+      "examples": [
+        "Requires",
+        "Implements",
+        "Introduces"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Precise semantic definition of the relationship type.",
+      "minLength": 20
+    },
+    "category": {
+      "$ref": "#/$defs/relationshipCategory"
+    },
+    "canonicalDirection": {
+      "$ref": "#/$defs/canonicalDirection"
+    },
+    "allowedSources": {
+      "type": "array",
+      "description": "Entity types that may appear as the source of this relationship type.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entityTypeConstraint"
+      },
+      "uniqueItems": true
+    },
+    "allowedTargets": {
+      "type": "array",
+      "description": "Entity types that may appear as the target of this relationship type.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entityTypeConstraint"
+      },
+      "uniqueItems": true
+    },
+    "inverse": {
+      "$ref": "#/$defs/inverseRelationshipType"
+    },
+    "cardinality": {
+      "$ref": "#/$defs/cardinalityRule"
+    },
+    "transitivity": {
+      "$ref": "#/$defs/transitivityRule"
+    },
+    "symmetry": {
+      "$ref": "#/$defs/symmetryRule"
+    },
+    "evidenceRequirement": {
+      "$ref": "#/$defs/evidenceRequirement"
+    },
+    "claimRequirement": {
+      "$ref": "#/$defs/claimRequirement"
+    },
+    "validationSeverity": {
+      "$ref": "#/$defs/validationSeverity"
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "stability": {
+      "$ref": "#/$defs/stabilityLevel"
+    },
+    "examples": {
+      "type": "array",
+      "description": "Valid examples of this relationship type.",
+      "items": {
+        "$ref": "#/$defs/relationshipExample"
+      },
+      "uniqueItems": true
+    },
+    "counterExamples": {
+      "type": "array",
+      "description": "Invalid or discouraged examples that clarify semantic boundaries.",
+      "items": {
+        "$ref": "#/$defs/relationshipExample"
+      },
+      "uniqueItems": true
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Reason this relationship type belongs in the ontology.",
+      "minLength": 10
+    },
+    "usageNotes": {
+      "type": "array",
+      "description": "Guidance for contributors using this relationship type.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "relatedRelationshipTypes": {
+      "type": "array",
+      "description": "Relationship types with adjacent, overlapping or contrasting semantics.",
+      "items": {
+        "$ref": "#/$defs/relationshipType"
+      },
+      "uniqueItems": true
+    },
+    "introducedInOntologyVersion": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "deprecatedInOntologyVersion": {
+      "description": "Ontology version in which this relationship type was deprecated. Null means it is not deprecated.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/semanticVersion"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "replacementRelationshipType": {
+      "description": "Preferred relationship type to use when this relationship type is deprecated.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/relationshipType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "metadata": {
+      "$ref": "#/$defs/registryMetadata"
+    }
+  },
+  "$defs": {
+    "relationshipType": {
+      "type": "string",
+      "description": "Registered semantic predicate in uppercase snake case.",
+      "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$",
+      "examples": [
+        "REQUIRES",
+        "OPTIONALLY_USES",
+        "IS_IMPLEMENTED_BY",
+        "HAS_LIMITATION"
+      ]
+    },
+    "relationshipCategory": {
+      "type": "string",
+      "description": "Semantic family for this relationship type.",
+      "enum": [
+        "Structural",
+        "Dependency",
+        "Implementation",
+        "Knowledge",
+        "Evaluation",
+        "Compatibility",
+        "Workflow",
+        "Evidence",
+        "Provenance",
+        "Quality",
+        "Lifecycle"
+      ]
+    },
+    "canonicalDirection": {
+      "type": "object",
+      "description": "Defines the preferred stored direction for this relationship type.",
+      "additionalProperties": false,
+      "required": [
+        "sourceRole",
+        "targetRole",
+        "description"
+      ],
+      "properties": {
+        "sourceRole": {
+          "type": "string",
+          "description": "Semantic role played by the source entity.",
+          "minLength": 1,
+          "examples": [
+            "implementer",
+            "dependent",
+            "introducing source"
+          ]
+        },
+        "targetRole": {
+          "type": "string",
+          "description": "Semantic role played by the target entity.",
+          "minLength": 1,
+          "examples": [
+            "implemented concept",
+            "dependency",
+            "introduced concept"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Readable explanation of the canonical direction.",
+          "minLength": 10
+        }
+      }
+    },
+    "entityTypeConstraint": {
+      "type": "object",
+      "description": "Allowed entity type or ontology class for one side of a relationship.",
+      "additionalProperties": false,
+      "required": [
+        "entityType"
+      ],
+      "properties": {
+        "entityType": {
+          "$ref": "#/$defs/entityType"
+        },
+        "includeSubtypes": {
+          "type": "boolean",
+          "description": "Whether subtypes of this entity type are also allowed.",
+          "default": true
+        },
+        "condition": {
+          "type": "string",
+          "description": "Additional semantic condition for this entity type constraint.",
+          "minLength": 1
+        }
+      }
+    },
+    "entityType": {
+      "type": "string",
+      "description": "RKM entity type that can participate in relationships.",
+      "enum": [
+        "Agent",
+        "Advantage",
+        "Artifact",
+        "Author",
+        "Benchmark",
+        "Chunk",
+        "ChunkingStrategy",
+        "Claim",
+        "Component",
+        "Dataset",
+        "DistanceMetric",
+        "Document",
+        "Embedding",
+        "EmbeddingModel",
+        "EvaluationMetric",
+        "Evidence",
+        "Framework",
+        "Glossary",
+        "GraphDatabase",
+        "IndexType",
+        "LanguageModel",
+        "Limitation",
+        "LLM",
+        "MemoryStrategy",
+        "MCPServer",
+        "Organization",
+        "Paper",
+        "Problem",
+        "PromptTechnique",
+        "Provider",
+        "Reference",
+        "Reranker",
+        "Retriever",
+        "SimilarityMetric",
+        "Step",
+        "Technique",
+        "Tool",
+        "Tradeoff",
+        "UseCase",
+        "VectorDatabase",
+        "Venue",
+        "Workflow"
+      ]
+    },
+    "inverseRelationshipType": {
+      "type": "object",
+      "description": "Inverse relationship type metadata.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "storage"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/relationshipType"
+        },
+        "storage": {
+          "type": "string",
+          "description": "Whether inverse relationships are generated or explicitly stored.",
+          "enum": [
+            "Derived",
+            "Stored",
+            "Not Applicable"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of inverse semantics.",
+          "minLength": 10
+        }
+      }
+    },
+    "cardinalityRule": {
+      "type": "object",
+      "description": "Cardinality constraints for this relationship type.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceMin": {
+          "type": "integer",
+          "description": "Minimum number of source entities expected for a valid target-side relationship set.",
+          "minimum": 0
+        },
+        "sourceMax": {
+          "$ref": "#/$defs/cardinalityBound"
+        },
+        "targetMin": {
+          "type": "integer",
+          "description": "Minimum number of target entities expected for a valid source-side relationship set.",
+          "minimum": 0
+        },
+        "targetMax": {
+          "$ref": "#/$defs/cardinalityBound"
+        },
+        "notation": {
+          "type": "string",
+          "description": "Compact cardinality notation for documentation.",
+          "pattern": "^(0|1|[1-9][0-9]*|N|\\*)\\.\\.(0|1|[1-9][0-9]*|N|\\*)$",
+          "examples": [
+            "0..N",
+            "1..N",
+            "1..1"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Readable explanation of the cardinality constraint.",
+          "minLength": 1
+        }
+      }
+    },
+    "cardinalityBound": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "enum": [
+            "N",
+            "*"
+          ]
+        }
+      ]
+    },
+    "transitivityRule": {
+      "type": "string",
+      "description": "Whether the relationship type is transitive for graph reasoning.",
+      "enum": [
+        "Transitive",
+        "Non Transitive",
+        "Conditionally Transitive"
+      ],
+      "default": "Non Transitive"
+    },
+    "symmetryRule": {
+      "type": "string",
+      "description": "Whether the relationship type is symmetric.",
+      "enum": [
+        "Symmetric",
+        "Asymmetric",
+        "Conditionally Symmetric"
+      ],
+      "default": "Asymmetric"
+    },
+    "evidenceRequirement": {
+      "type": "object",
+      "description": "Evidence expectations for this relationship type.",
+      "additionalProperties": false,
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether persisted relationships of this type require evidence."
+        },
+        "minimumStrength": {
+          "$ref": "#/$defs/evidenceStrength"
+        },
+        "preferredSourcePriority": {
+          "type": "string",
+          "description": "Preferred authority level for sources supporting this relationship type.",
+          "enum": [
+            "Primary",
+            "Secondary",
+            "Tertiary"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Evidence guidance for contributors.",
+          "minLength": 1
+        }
+      }
+    },
+    "claimRequirement": {
+      "type": "object",
+      "description": "Claim modeling expectations for this relationship type.",
+      "additionalProperties": false,
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether relationships of this type should be backed by explicit claims."
+        },
+        "claimTypes": {
+          "type": "array",
+          "description": "Allowed or expected claim types.",
+          "items": {
+            "$ref": "#/$defs/claimType"
+          },
+          "uniqueItems": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Claim guidance for contributors.",
+          "minLength": 1
+        }
+      }
+    },
+    "claimType": {
+      "type": "string",
+      "enum": [
+        "Factual",
+        "Interpretive",
+        "Comparative",
+        "Evaluative",
+        "Historical",
+        "Implementation Specific",
+        "Version Specific"
+      ]
+    },
+    "evidenceStrength": {
+      "type": "string",
+      "enum": [
+        "Very Weak",
+        "Weak",
+        "Moderate",
+        "Strong",
+        "Very Strong"
+      ]
+    },
+    "validationSeverity": {
+      "type": "string",
+      "description": "Severity used when validation of this relationship type fails.",
+      "enum": [
+        "Error",
+        "Warning",
+        "Information"
+      ],
+      "default": "Error"
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "description": "Lifecycle state of this relationship type definition.",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "stabilityLevel": {
+      "type": "string",
+      "description": "Expected stability of this relationship type.",
+      "enum": [
+        "Experimental",
+        "Stable",
+        "Deprecated"
+      ],
+      "default": "Experimental"
+    },
+    "relationshipExample": {
+      "type": "object",
+      "description": "Example relationship instance for documentation and validation tests.",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "sourceName",
+        "type",
+        "targetType",
+        "targetName"
+      ],
+      "properties": {
+        "sourceType": {
+          "$ref": "#/$defs/entityType"
+        },
+        "sourceName": {
+          "type": "string",
+          "description": "Readable source entity name.",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/relationshipType"
+        },
+        "targetType": {
+          "$ref": "#/$defs/entityType"
+        },
+        "targetName": {
+          "type": "string",
+          "description": "Readable target entity name.",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Explanation of why the example is valid, invalid or discouraged.",
+          "minLength": 1
+        }
+      }
+    },
+    "registryMetadata": {
+      "type": "object",
+      "description": "Metadata about this relationship type registry entry.",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "$ref": "#/$defs/semanticVersion"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "createdBy": {
+          "type": "array",
+          "description": "Maintainers, tools or processes that created this registry entry.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "reviewers": {
+          "type": "array",
+          "description": "Maintainers, tools or processes that reviewed this registry entry.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language of this registry entry.",
+          "default": "en"
+        },
+        "license": {
+          "type": "string",
+          "description": "License applying to this registry entry.",
+          "default": "Apache-2.0"
+        }
+      }
+    },
+    "semanticVersion": {
+      "type": "string",
+      "description": "Semantic version string.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "examples": [
+        "1.0.0"
+      ]
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

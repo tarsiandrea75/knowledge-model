@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/entity-type.schema.json",
+  "title": "RKM Entity Type Definition",
+  "description": "Defines registered entity type metadata for the RAG Knowledge Model ontology.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "label",
+    "description",
+    "category",
+    "status"
+  ],
+  "properties": {
+    "type": {
+      "$ref": "#/$defs/entityType"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for the entity type.",
+      "minLength": 1
+    },
+    "pluralLabel": {
+      "type": "string",
+      "description": "Human-readable plural label for generated documentation.",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Semantic definition of the entity type.",
+      "minLength": 20
+    },
+    "category": {
+      "type": "string",
+      "description": "High-level entity type category.",
+      "enum": [
+        "Core",
+        "RAG Concept",
+        "Implementation",
+        "Evaluation",
+        "Source",
+        "Evidence",
+        "Workflow",
+        "Infrastructure",
+        "Quality",
+        "Use Context"
+      ]
+    },
+    "parentType": {
+      "$ref": "#/$defs/entityType"
+    },
+    "abstract": {
+      "type": "boolean",
+      "description": "Whether this type is conceptual and should not be instantiated directly.",
+      "default": false
+    },
+    "identifierPrefix": {
+      "type": "string",
+      "description": "Identifier prefix used by entities of this type.",
+      "pattern": "^[A-Z]+(?:-[A-Z]+)*$",
+      "examples": [
+        "TECHNIQUE",
+        "VECTOR-DATABASE"
+      ]
+    },
+    "directory": {
+      "type": "string",
+      "description": "Canonical repository directory for instances of this type.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*/?$",
+      "examples": [
+        "techniques/",
+        "vector-databases/"
+      ]
+    },
+    "schema": {
+      "type": "string",
+      "description": "Repository-relative schema path for instances of this type.",
+      "pattern": "^schema/[a-z0-9/-]+\\.schema\\.json$"
+    },
+    "requiredRelationships": {
+      "type": "array",
+      "description": "Relationship types expected for complete entities of this type.",
+      "items": {
+        "$ref": "#/$defs/relationshipExpectation"
+      },
+      "uniqueItems": true
+    },
+    "recommendedRelationships": {
+      "type": "array",
+      "description": "Relationship types recommended for rich entities of this type.",
+      "items": {
+        "$ref": "#/$defs/relationshipExpectation"
+      },
+      "uniqueItems": true
+    },
+    "requiredFields": {
+      "type": "array",
+      "description": "Entity document fields expected for this type beyond the knowledge entity base.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-zA-Z0-9.]*$"
+      },
+      "uniqueItems": true
+    },
+    "examples": {
+      "type": "array",
+      "description": "Example entities of this type.",
+      "items": {
+        "$ref": "#/$defs/entityExample"
+      },
+      "uniqueItems": true
+    },
+    "usageNotes": {
+      "type": "array",
+      "description": "Contributor guidance for this entity type.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "stability": {
+      "$ref": "#/$defs/stabilityLevel"
+    },
+    "introducedInOntologyVersion": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "deprecatedInOntologyVersion": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/semanticVersion"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "replacementEntityType": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/entityType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    }
+  },
+  "$defs": {
+    "entityType": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*(?:[A-Z][A-Za-z0-9]*)*$",
+      "examples": [
+        "Technique",
+        "Framework",
+        "VectorDatabase",
+        "EvaluationMetric"
+      ]
+    },
+    "relationshipExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "targetType"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+        },
+        "targetType": {
+          "$ref": "#/$defs/entityType"
+        },
+        "minimumCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maximumCount": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "enum": [
+                "N",
+                "*"
+              ]
+            }
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "slug",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "stabilityLevel": {
+      "type": "string",
+      "enum": [
+        "Experimental",
+        "Stable",
+        "Deprecated"
+      ],
+      "default": "Experimental"
+    },
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    }
+  }
+}

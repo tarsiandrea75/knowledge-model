@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/metadata.schema.json",
+  "title": "RKM Metadata Definition",
+  "description": "Defines repository artifact metadata for RAG Knowledge Model documents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "schemaVersion",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "license",
+    "language"
+  ],
+  "properties": {
+    "version": {
+      "$ref": "#/$defs/semanticVersion",
+      "description": "Version of the document or entity artifact."
+    },
+    "schemaVersion": {
+      "$ref": "#/$defs/semanticVersion",
+      "description": "Version of the schema used by this artifact."
+    },
+    "repositoryVersion": {
+      "$ref": "#/$defs/semanticVersion",
+      "description": "RKM repository version with which this artifact is compatible."
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "reviewState": {
+      "type": "string",
+      "description": "Detailed review state for maintainers and automation.",
+      "enum": [
+        "Not Reviewed",
+        "In Review",
+        "Changes Requested",
+        "Approved",
+        "Rejected"
+      ]
+    },
+    "createdAt": {
+      "$ref": "#/$defs/dateTime",
+      "description": "UTC timestamp when the artifact was created."
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/dateTime",
+      "description": "UTC timestamp when the artifact was last updated."
+    },
+    "createdBy": {
+      "$ref": "#/$defs/actorList",
+      "description": "People, organizations or automation that created this artifact."
+    },
+    "updatedBy": {
+      "$ref": "#/$defs/actorList",
+      "description": "People, organizations or automation that last updated this artifact."
+    },
+    "maintainers": {
+      "$ref": "#/$defs/actorList",
+      "description": "People, organizations or automation responsible for maintaining this artifact."
+    },
+    "reviewers": {
+      "$ref": "#/$defs/actorList",
+      "description": "People, organizations or automation that reviewed this artifact."
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier applying to this artifact.",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9-.+]*$",
+      "default": "Apache-2.0",
+      "examples": [
+        "Apache-2.0",
+        "MIT",
+        "CC-BY-4.0"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "description": "Primary language of the artifact as a BCP 47 language tag.",
+      "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]+)?(?:-[A-Z]{2})?$",
+      "default": "en",
+      "examples": [
+        "en",
+        "en-US"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Metadata about how this artifact was created or transformed.",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source artifact, tool or process.",
+          "minLength": 1
+        },
+        "generator": {
+          "type": "string",
+          "description": "Generator name when the artifact is generated.",
+          "minLength": 1
+        },
+        "generatorVersion": {
+          "type": "string",
+          "description": "Generator version when the artifact is generated.",
+          "minLength": 1
+        },
+        "generatedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "description": "Repository-relative files used to create this artifact.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "deprecation": {
+      "type": "object",
+      "description": "Deprecation metadata when the artifact is deprecated.",
+      "additionalProperties": false,
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 10
+        },
+        "deprecatedAt": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "replacement": {
+          "type": "string",
+          "description": "Preferred replacement artifact or entity identifier.",
+          "minLength": 1
+        },
+        "migrationGuidance": {
+          "type": "string",
+          "description": "Guidance for migrating away from this artifact.",
+          "minLength": 10
+        }
+      }
+    }
+  },
+  "$defs": {
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "examples": [
+        "1.0.0"
+      ]
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "actorList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actor"
+      },
+      "uniqueItems": true
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable identifier for the actor when available.",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Maintainer",
+            "Contributor",
+            "Organization",
+            "Automation",
+            "Reviewer"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
