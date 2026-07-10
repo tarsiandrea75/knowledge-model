@@ -1,0 +1,573 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/dataset.schema.json",
+  "title": "RKM Dataset Schema",
+  "description": "Defines a dataset entity used for training, evaluation, benchmarking or knowledge grounding in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "dataset"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Dataset"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this dataset to benchmarks, papers, tasks, licenses, providers, models or other datasets.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this dataset or derived from dataset analysis.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this dataset document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this dataset document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the dataset but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "dataset": {
+      "$ref": "#/$defs/datasetDetails"
+    }
+  },
+  "$defs": {
+    "datasetDetails": {
+      "type": "object",
+      "description": "Dataset-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "datasetType",
+        "dataModalities",
+        "intendedUses"
+      ],
+      "properties": {
+        "datasetType": {
+          "type": "string",
+          "description": "Primary type of dataset represented by this entity.",
+          "enum": [
+            "Knowledge Corpus",
+            "Question Answering Dataset",
+            "Retrieval Dataset",
+            "Reranking Dataset",
+            "Embedding Dataset",
+            "Instruction Dataset",
+            "Conversation Dataset",
+            "Evaluation Dataset",
+            "Benchmark Dataset",
+            "Synthetic Dataset",
+            "Multimodal Dataset",
+            "Other"
+          ]
+        },
+        "dataModalities": {
+          "type": "array",
+          "description": "Modalities represented in the dataset.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Table",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Graph",
+              "Metadata",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "intendedUses": {
+          "type": "array",
+          "description": "Intended RAG-related uses of the dataset.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Training",
+              "Fine Tuning",
+              "Evaluation",
+              "Benchmarking",
+              "Retrieval Testing",
+              "Reranking Testing",
+              "Embedding Evaluation",
+              "Grounding Evaluation",
+              "Faithfulness Evaluation",
+              "Question Answering",
+              "Knowledge Grounding",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "domains": {
+          "type": "array",
+          "description": "Knowledge domains covered by the dataset.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "languages": {
+          "type": "array",
+          "description": "Languages represented in the dataset as BCP 47 language tags.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]+)?(?:-[A-Z]{2})?$"
+          },
+          "uniqueItems": true
+        },
+        "size": {
+          "$ref": "#/$defs/datasetSize"
+        },
+        "splits": {
+          "type": "array",
+          "description": "Named dataset splits.",
+          "items": {
+            "$ref": "#/$defs/datasetSplit"
+          },
+          "uniqueItems": true
+        },
+        "schema": {
+          "$ref": "#/$defs/datasetStructure"
+        },
+        "access": {
+          "$ref": "#/$defs/datasetAccess"
+        },
+        "license": {
+          "$ref": "#/$defs/datasetLicense"
+        },
+        "provenance": {
+          "$ref": "#/$defs/datasetProvenance"
+        },
+        "quality": {
+          "$ref": "#/$defs/datasetQuality"
+        },
+        "privacyAndSafety": {
+          "$ref": "#/$defs/privacyAndSafety"
+        },
+        "versioning": {
+          "$ref": "#/$defs/datasetVersioning"
+        },
+        "knownLimitations": {
+          "type": "array",
+          "description": "Known limitations, biases or coverage gaps in the dataset.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using or interpreting the dataset.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "datasetSize": {
+      "type": "object",
+      "description": "Structured dataset size information.",
+      "additionalProperties": false,
+      "properties": {
+        "records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "queries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "answers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "datasetSplit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "Train",
+            "Validation",
+            "Development",
+            "Test",
+            "Calibration",
+            "Evaluation",
+            "Unspecified",
+            "Other"
+          ]
+        },
+        "records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "datasetStructure": {
+      "type": "object",
+      "description": "Logical structure of records in the dataset.",
+      "additionalProperties": false,
+      "properties": {
+        "recordFormat": {
+          "type": "string",
+          "enum": [
+            "JSON",
+            "JSONL",
+            "CSV",
+            "Parquet",
+            "Text",
+            "XML",
+            "RDF",
+            "Image Files",
+            "Audio Files",
+            "Mixed",
+            "Other"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/datasetField"
+          },
+          "uniqueItems": true
+        },
+        "containsGroundTruth": {
+          "type": "boolean"
+        },
+        "containsNegativeExamples": {
+          "type": "boolean"
+        },
+        "containsCitations": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datasetField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "valueType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9_]*$"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Array",
+            "Object",
+            "URI",
+            "Date",
+            "Other"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "datasetAccess": {
+      "type": "object",
+      "description": "Dataset access and distribution information.",
+      "additionalProperties": false,
+      "properties": {
+        "accessType": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "Restricted",
+            "Commercial",
+            "Research Only",
+            "Unavailable",
+            "Unknown"
+          ]
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri"
+        },
+        "downloadUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "repositoryUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "requiresAuthentication": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datasetLicense": {
+      "type": "object",
+      "description": "License and usage rights for the dataset.",
+      "additionalProperties": false,
+      "properties": {
+        "spdxIdentifier": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9-.+]*$"
+        },
+        "licenseName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowsCommercialUse": {
+          "type": "boolean"
+        },
+        "allowsRedistribution": {
+          "type": "boolean"
+        },
+        "requiresAttribution": {
+          "type": "boolean"
+        },
+        "usageRestrictions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "datasetProvenance": {
+      "type": "object",
+      "description": "Origin and construction process of the dataset.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "Human Created",
+            "Human Annotated",
+            "Web Crawled",
+            "Synthetic",
+            "Generated",
+            "Converted",
+            "Aggregated",
+            "Benchmark Derived",
+            "Unknown"
+          ]
+        },
+        "collectionMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "annotationMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdBy": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "createdYear": {
+          "type": "integer",
+          "minimum": 1900,
+          "maximum": 2100
+        }
+      }
+    },
+    "datasetQuality": {
+      "type": "object",
+      "description": "Quality characteristics relevant to dataset selection and interpretation.",
+      "additionalProperties": false,
+      "properties": {
+        "annotationQuality": {
+          "$ref": "#/$defs/level"
+        },
+        "coverage": {
+          "$ref": "#/$defs/level"
+        },
+        "deduplication": {
+          "$ref": "#/$defs/level"
+        },
+        "noiseLevel": {
+          "$ref": "#/$defs/level"
+        },
+        "reproducibility": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "privacyAndSafety": {
+      "type": "object",
+      "description": "Privacy and safety properties of the dataset.",
+      "additionalProperties": false,
+      "properties": {
+        "containsPersonalData": {
+          "type": "string",
+          "enum": [
+            "Yes",
+            "No",
+            "Possible",
+            "Unknown"
+          ]
+        },
+        "containsSensitiveData": {
+          "type": "string",
+          "enum": [
+            "Yes",
+            "No",
+            "Possible",
+            "Unknown"
+          ]
+        },
+        "hasDataStatement": {
+          "type": "boolean"
+        },
+        "hasEthicsReview": {
+          "type": "boolean"
+        },
+        "safetyNotes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "datasetVersioning": {
+      "type": "object",
+      "description": "Dataset release and version metadata as domain knowledge.",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "releasedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "updateFrequency": {
+          "type": "string",
+          "enum": [
+            "Static",
+            "Periodic",
+            "Continuous",
+            "Irregular",
+            "Unknown"
+          ]
+        },
+        "supersedesVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
