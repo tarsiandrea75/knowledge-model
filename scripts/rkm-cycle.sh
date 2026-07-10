@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 TARGET_ACCEPTED_FILES="${1:-3}"
 CREATOR_PROMPT="Create exactly one next missing RKM architecture or schema file that naturally follows from the current project state. Follow AGENTS.md strictly. Do not commit."
-REVIEWER_PROMPT="Review the current RKM git diff. Follow the Reviewer Protocol in AGENTS.md. Do not modify files. Return ACCEPT, REVISE, or STOP."
+REVIEWER_PROMPT="You are acting as Reviewer only. Review the current RKM git diff. Follow the Reviewer Protocol in AGENTS.md. Do not modify files. Return ACCEPT, REVISE, or STOP."
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -108,9 +108,48 @@ run_creator() {
   codex exec --sandbox workspace-write "$CREATOR_PROMPT" | tee "$CREATOR_OUTPUT"
 }
 
+is_codex_sandbox_runtime_init_error() {
+  local output_file="$1"
+  grep -Eiq \
+    '((sandbox|runtime).*(init|initializ|start|startup|launch|create|setup))|((init|initializ|start|startup|launch|create|setup).*(sandbox|runtime))|Read-only file system|failed to initialize in-process app-server client|could not create PATH aliases|os error 30' \
+    "$output_file"
+}
+
+run_reviewer_with_sandbox() {
+  local sandbox="$1"
+  codex exec --sandbox "$sandbox" "$REVIEWER_PROMPT" 2>&1 | tee "$REVIEWER_OUTPUT"
+}
+
 run_reviewer() {
+  local reviewer_status_before
+  local reviewer_status_after
+  local reviewer_exit
+
   REVIEWER_OUTPUT="$(new_temp_file)"
-  codex exec --sandbox read-only "$REVIEWER_PROMPT" | tee "$REVIEWER_OUTPUT"
+  reviewer_status_before="$(git status --porcelain)"
+
+  if run_reviewer_with_sandbox read-only; then
+    reviewer_exit=0
+  else
+    reviewer_exit=$?
+    if is_codex_sandbox_runtime_init_error "$REVIEWER_OUTPUT"; then
+      : >"$REVIEWER_OUTPUT"
+      printf '\nRetrying Reviewer with workspace-write sandbox after Codex sandbox/runtime initialization failure.\n'
+      if run_reviewer_with_sandbox workspace-write; then
+        reviewer_exit=0
+      else
+        reviewer_exit=$?
+      fi
+    fi
+  fi
+
+  reviewer_status_after="$(git status --porcelain)"
+  if [[ "$reviewer_status_after" != "$reviewer_status_before" ]]; then
+    git status --short
+    fail "Reviewer modified the working tree or index."
+  fi
+
+  return "$reviewer_exit"
 }
 
 require_command codex
