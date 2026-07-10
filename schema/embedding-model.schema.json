@@ -1,0 +1,548 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/embedding-model.schema.json",
+  "title": "RKM Embedding Model Schema",
+  "description": "Defines an embedding model entity used to encode content, queries or other inputs for retrieval and similarity search in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "embeddingModel"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "EmbeddingModel"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this embedding model to providers, frameworks, datasets, benchmarks, vector databases, papers or other models.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this embedding model.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this embedding model document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this embedding model document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the embedding model but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "embeddingModel": {
+      "$ref": "#/$defs/embeddingModelDetails"
+    }
+  },
+  "$defs": {
+    "embeddingModelDetails": {
+      "type": "object",
+      "description": "Embedding-model-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "modelType",
+        "inputModalities",
+        "embeddingDimensions"
+      ],
+      "properties": {
+        "modelType": {
+          "type": "string",
+          "description": "Primary embedding model family or training objective.",
+          "enum": [
+            "Dense Text Embedding",
+            "Sparse Text Embedding",
+            "Hybrid Embedding",
+            "Sentence Embedding",
+            "Document Embedding",
+            "Code Embedding",
+            "Image Embedding",
+            "Multimodal Embedding",
+            "Instruction Tuned Embedding",
+            "Domain Specific Embedding",
+            "Other"
+          ]
+        },
+        "inputModalities": {
+          "type": "array",
+          "description": "Input modalities the model can encode.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Table",
+              "Graph",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "embeddingDimensions": {
+          "type": "integer",
+          "description": "Default output embedding dimensionality.",
+          "minimum": 1
+        },
+        "supportedDimensions": {
+          "type": "array",
+          "description": "Supported output dimensionalities when the model allows dimensionality selection or truncation.",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "uniqueItems": true
+        },
+        "contextWindow": {
+          "$ref": "#/$defs/contextWindow"
+        },
+        "languages": {
+          "type": "array",
+          "description": "Languages supported by the model as BCP 47 language tags.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]+)?(?:-[A-Z]{2})?$"
+          },
+          "uniqueItems": true
+        },
+        "training": {
+          "$ref": "#/$defs/trainingProfile"
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Retrieval-relevant capabilities associated with the model.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Semantic Search",
+              "Asymmetric Retrieval",
+              "Symmetric Similarity",
+              "Query Embedding",
+              "Document Embedding",
+              "Passage Embedding",
+              "Code Search",
+              "Cross Lingual Retrieval",
+              "Multilingual Retrieval",
+              "Multimodal Retrieval",
+              "Clustering",
+              "Classification",
+              "Reranking Feature Generation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "distanceMetrics": {
+          "type": "array",
+          "description": "Similarity or distance metrics commonly used with this model.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Cosine Similarity",
+              "Dot Product",
+              "Euclidean Distance",
+              "Manhattan Distance",
+              "Hamming Distance",
+              "Jaccard Similarity",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "normalization": {
+          "type": "string",
+          "description": "Expected or recommended vector normalization behavior.",
+          "enum": [
+            "Normalized Output",
+            "Requires Normalization",
+            "Normalization Optional",
+            "Not Applicable",
+            "Unknown"
+          ]
+        },
+        "access": {
+          "$ref": "#/$defs/modelAccess"
+        },
+        "deployment": {
+          "$ref": "#/$defs/deploymentProfile"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "ragUsage": {
+          "$ref": "#/$defs/ragUsage"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, biases or operational constraints of the embedding model.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this embedding model in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "contextWindow": {
+      "type": "object",
+      "description": "Input length limits for the model.",
+      "additionalProperties": false,
+      "properties": {
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxCharacters": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tokenizer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "truncationBehavior": {
+          "type": "string",
+          "enum": [
+            "Rejects Oversized Input",
+            "Truncates Input",
+            "Sliding Window",
+            "Provider Dependent",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "trainingProfile": {
+      "type": "object",
+      "description": "Structured training and adaptation information for the model.",
+      "additionalProperties": false,
+      "properties": {
+        "trainingApproach": {
+          "type": "string",
+          "enum": [
+            "Contrastive Learning",
+            "Instruction Tuning",
+            "Supervised Fine Tuning",
+            "Weak Supervision",
+            "Distillation",
+            "Unsupervised",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "trainingDataSummary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "domainAdaptation": {
+          "type": "array",
+          "description": "Domains the model is explicitly adapted for.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "cutoffDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "modelAccess": {
+      "type": "object",
+      "description": "How the embedding model can be accessed or used.",
+      "additionalProperties": false,
+      "properties": {
+        "accessType": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Open Weights",
+              "Hosted API",
+              "Managed Service",
+              "Local Runtime",
+              "Commercial License",
+              "Research License",
+              "Unknown"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "providers": {
+          "type": "array",
+          "description": "Provider names or stable provider identifiers associated with this model.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier or provider license name when known.",
+          "minLength": 1
+        },
+        "modelIdentifier": {
+          "type": "string",
+          "description": "Provider, registry or repository model identifier.",
+          "minLength": 1
+        }
+      }
+    },
+    "deploymentProfile": {
+      "type": "object",
+      "description": "Deployment characteristics relevant to operating the model.",
+      "additionalProperties": false,
+      "properties": {
+        "deploymentTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Hosted API",
+              "Local CPU",
+              "Local GPU",
+              "Server",
+              "Container",
+              "Kubernetes",
+              "Edge",
+              "Browser",
+              "Mobile",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "batchingSupported": {
+          "type": "boolean"
+        },
+        "quantizationSupported": {
+          "type": "boolean"
+        },
+        "latencyClass": {
+          "$ref": "#/$defs/level"
+        },
+        "costClass": {
+          "$ref": "#/$defs/level"
+        },
+        "resourceRequirement": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation information associated with the model.",
+      "additionalProperties": false,
+      "properties": {
+        "benchmarks": {
+          "type": "array",
+          "description": "Benchmarks used to evaluate the model.",
+          "items": {
+            "$ref": "#/$defs/benchmarkResult"
+          },
+          "uniqueItems": true
+        },
+        "reportedMetrics": {
+          "type": "array",
+          "description": "Metrics reported for this model outside a specific benchmark result.",
+          "items": {
+            "$ref": "#/$defs/metricValue"
+          },
+          "uniqueItems": true
+        },
+        "comparisonBaselines": {
+          "type": "array",
+          "description": "Baseline models or systems commonly used for comparison.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragUsage": {
+      "type": "object",
+      "description": "RAG-specific usage characteristics for the model.",
+      "additionalProperties": false,
+      "properties": {
+        "recommendedStages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Clustering",
+              "Evaluation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "recommendedChunkTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Sentence",
+              "Paragraph",
+              "Passage",
+              "Section",
+              "Document",
+              "Code Block",
+              "Table",
+              "Image",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "indexingConsiderations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "retrievalConsiderations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "benchmarkResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmark"
+      ],
+      "properties": {
+        "benchmark": {
+          "type": "string",
+          "description": "Benchmark name or stable benchmark identifier.",
+          "minLength": 1
+        },
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metricValue"
+          },
+          "uniqueItems": true
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evaluatedAt": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "metricValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric",
+        "value"
+      ],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "higherIsBetter": {
+          "type": "boolean"
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
