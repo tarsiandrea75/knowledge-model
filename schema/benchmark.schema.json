@@ -1,0 +1,469 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/benchmark.schema.json",
+  "title": "RKM Benchmark Schema",
+  "description": "Defines an evaluation benchmark entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "benchmark"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Benchmark"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this benchmark to techniques, datasets, metrics, papers, models, systems or evaluation tasks.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this benchmark or derived from benchmark results.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this benchmark document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this benchmark document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the benchmark but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "benchmark": {
+      "$ref": "#/$defs/benchmarkDetails"
+    }
+  },
+  "$defs": {
+    "benchmarkDetails": {
+      "type": "object",
+      "description": "Benchmark-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "benchmarkType",
+        "evaluationScope",
+        "tasks"
+      ],
+      "properties": {
+        "benchmarkType": {
+          "type": "string",
+          "description": "Primary type of benchmark represented by this entity.",
+          "enum": [
+            "Retrieval Benchmark",
+            "RAG Benchmark",
+            "Question Answering Benchmark",
+            "Embedding Benchmark",
+            "Reranking Benchmark",
+            "Long Context Benchmark",
+            "Hallucination Benchmark",
+            "Grounded Generation Benchmark",
+            "Agent Benchmark",
+            "System Benchmark",
+            "Other"
+          ]
+        },
+        "evaluationScope": {
+          "type": "array",
+          "description": "RAG capabilities or lifecycle stages evaluated by the benchmark.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Grounding",
+              "Citation",
+              "Faithfulness",
+              "Evaluation",
+              "Orchestration",
+              "End To End System"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "tasks": {
+          "type": "array",
+          "description": "Evaluation tasks included in the benchmark.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/benchmarkTask"
+          },
+          "uniqueItems": true
+        },
+        "datasets": {
+          "type": "array",
+          "description": "Datasets used by the benchmark.",
+          "items": {
+            "$ref": "#/$defs/datasetUse"
+          },
+          "uniqueItems": true
+        },
+        "metrics": {
+          "type": "array",
+          "description": "Metrics reported by the benchmark.",
+          "items": {
+            "$ref": "#/$defs/metricUse"
+          },
+          "uniqueItems": true
+        },
+        "evaluationProtocol": {
+          "$ref": "#/$defs/evaluationProtocol"
+        },
+        "leaderboard": {
+          "$ref": "#/$defs/leaderboard"
+        },
+        "baselineSystems": {
+          "type": "array",
+          "description": "Baseline systems, models or techniques used for comparison.",
+          "items": {
+            "$ref": "#/$defs/evaluatedSystem"
+          },
+          "uniqueItems": true
+        },
+        "supportedModalities": {
+          "type": "array",
+          "description": "Input or knowledge modalities covered by the benchmark.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Table",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Graph",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "domainCoverage": {
+          "type": "array",
+          "description": "Knowledge domains covered by the benchmark.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "release": {
+          "$ref": "#/$defs/benchmarkRelease"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations of the benchmark design, data, metrics or evaluation protocol.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using or interpreting the benchmark.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "benchmarkTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "taskType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM task identifier when the task is modeled as a first-class entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "Passage Retrieval",
+            "Document Retrieval",
+            "Question Answering",
+            "Open Domain Question Answering",
+            "Multi Hop Question Answering",
+            "Answer Generation",
+            "Citation Generation",
+            "Claim Verification",
+            "Summarization",
+            "Reranking",
+            "Embedding Evaluation",
+            "Agent Task",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "datasetUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM dataset identifier when available.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "Evaluation Data",
+            "Training Data",
+            "Development Data",
+            "Calibration Data",
+            "Negative Corpus",
+            "Knowledge Corpus",
+            "Other"
+          ]
+        },
+        "split": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "metricUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "metricType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM metric identifier when available.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metricType": {
+          "type": "string",
+          "enum": [
+            "Retrieval Quality",
+            "Ranking Quality",
+            "Generation Quality",
+            "Grounding",
+            "Faithfulness",
+            "Citation Quality",
+            "Latency",
+            "Cost",
+            "Robustness",
+            "Human Evaluation",
+            "Other"
+          ]
+        },
+        "higherIsBetter": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evaluationProtocol": {
+      "type": "object",
+      "description": "Rules and procedures used to run the benchmark.",
+      "additionalProperties": false,
+      "properties": {
+        "evaluationMode": {
+          "type": "string",
+          "enum": [
+            "Automatic",
+            "Human",
+            "Model Judged",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "requiresGroundTruth": {
+          "type": "boolean"
+        },
+        "requiresHumanJudgment": {
+          "type": "boolean"
+        },
+        "reproducibilityLevel": {
+          "$ref": "#/$defs/level"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10
+        }
+      }
+    },
+    "leaderboard": {
+      "type": "object",
+      "description": "Leaderboard or result tracking information for the benchmark.",
+      "additionalProperties": false,
+      "properties": {
+        "hasLeaderboard": {
+          "type": "boolean"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "submissionType": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "Restricted",
+            "Closed",
+            "Historical",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "evaluatedSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "systemType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the system is modeled as an entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "systemType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Component",
+            "Retriever",
+            "Reranker",
+            "Embedding Model",
+            "Language Model",
+            "RAG System",
+            "Agent",
+            "Other"
+          ]
+        }
+      }
+    },
+    "benchmarkRelease": {
+      "type": "object",
+      "description": "Release metadata for the benchmark as a domain concept.",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "releasedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier when known.",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9-.+]*$"
+        },
+        "accessType": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "Restricted",
+            "Commercial",
+            "Research Only",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
