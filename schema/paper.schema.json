@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/paper.schema.json",
+  "title": "RKM Paper Schema",
+  "description": "Defines an academic or technical publication entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "paper"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Paper"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this paper to techniques, frameworks, components, authors, venues, datasets, benchmarks or other papers.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about or derived from this paper.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this paper document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this paper document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the paper but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "paper": {
+      "$ref": "#/$defs/paperDetails"
+    }
+  },
+  "$defs": {
+    "paperDetails": {
+      "type": "object",
+      "description": "Paper-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "publicationType",
+        "publicationStatus",
+        "authors"
+      ],
+      "properties": {
+        "publicationType": {
+          "type": "string",
+          "description": "Type of publication represented by this paper entity.",
+          "enum": [
+            "Conference Paper",
+            "Journal Article",
+            "Workshop Paper",
+            "Preprint",
+            "Technical Report",
+            "Thesis",
+            "White Paper",
+            "Specification",
+            "Documentation Paper",
+            "Other"
+          ]
+        },
+        "publicationStatus": {
+          "type": "string",
+          "description": "Publication lifecycle status of the paper.",
+          "enum": [
+            "Published",
+            "Accepted",
+            "Preprint",
+            "Under Review",
+            "Withdrawn",
+            "Superseded",
+            "Unknown"
+          ]
+        },
+        "authors": {
+          "type": "array",
+          "description": "Authors or organizations responsible for the paper.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/author"
+          },
+          "uniqueItems": true
+        },
+        "venue": {
+          "$ref": "#/$defs/venue"
+        },
+        "publicationDate": {
+          "type": "string",
+          "description": "Publication date when known.",
+          "format": "date"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Publication year when a precise date is not available.",
+          "minimum": 1900,
+          "maximum": 2100
+        },
+        "identifiers": {
+          "$ref": "#/$defs/paperIdentifiers"
+        },
+        "sourceAvailability": {
+          "type": "object",
+          "description": "Availability of paper, code, data and supplementary materials.",
+          "additionalProperties": false,
+          "properties": {
+            "paperUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "openAccess": {
+              "type": "boolean"
+            },
+            "repositoryUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "datasetUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "projectUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "supplementaryMaterialUrl": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "researchAreas": {
+          "type": "array",
+          "description": "Research areas or technical areas covered by the paper.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "ragContributions": {
+          "type": "array",
+          "description": "Structured RAG-related contributions made by the paper.",
+          "items": {
+            "$ref": "#/$defs/contribution"
+          },
+          "uniqueItems": true
+        },
+        "introducedConcepts": {
+          "type": "array",
+          "description": "Concepts introduced by the paper before they are modeled as relationships.",
+          "items": {
+            "$ref": "#/$defs/conceptMention"
+          },
+          "uniqueItems": true
+        },
+        "evaluatedArtifacts": {
+          "type": "array",
+          "description": "Techniques, systems, models, datasets or benchmarks evaluated by the paper.",
+          "items": {
+            "$ref": "#/$defs/evaluatedArtifact"
+          },
+          "uniqueItems": true
+        },
+        "methodology": {
+          "type": "object",
+          "description": "Structured summary of the paper methodology.",
+          "additionalProperties": false,
+          "properties": {
+            "studyType": {
+              "type": "string",
+              "enum": [
+                "Theoretical",
+                "Empirical",
+                "Benchmark",
+                "System Design",
+                "Survey",
+                "Case Study",
+                "Mixed"
+              ]
+            },
+            "datasets": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "benchmarks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "evidenceUse": {
+          "type": "string",
+          "description": "How this paper should usually be treated when used as evidence in RKM.",
+          "enum": [
+            "Primary Source",
+            "Secondary Source",
+            "Tertiary Source",
+            "Contextual Source",
+            "Unknown"
+          ]
+        },
+        "reviewNotes": {
+          "type": "array",
+          "description": "Maintainer notes relevant to interpreting this paper.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM author or organization identifier when available.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "orcid": {
+          "type": "string",
+          "description": "ORCID identifier when available.",
+          "pattern": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
+        },
+        "affiliation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "corresponding": {
+          "type": "boolean"
+        }
+      }
+    },
+    "venue": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM venue identifier when available.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "venueType": {
+          "type": "string",
+          "enum": [
+            "Conference",
+            "Journal",
+            "Workshop",
+            "Repository",
+            "Institution",
+            "Publisher",
+            "Other"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "paperIdentifiers": {
+      "type": "object",
+      "description": "External identifiers for the paper.",
+      "additionalProperties": false,
+      "properties": {
+        "doi": {
+          "type": "string",
+          "minLength": 1
+        },
+        "arxivId": {
+          "type": "string",
+          "pattern": "^[0-9]{4}\\.[0-9]{4,5}(?:v[0-9]+)?$"
+        },
+        "aclAnthologyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semanticScholarId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "openReviewId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isbn": {
+          "type": "string",
+          "minLength": 10
+        }
+      }
+    },
+    "contribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contributionType",
+        "description"
+      ],
+      "properties": {
+        "contributionType": {
+          "type": "string",
+          "enum": [
+            "Introduces Technique",
+            "Describes Technique",
+            "Evaluates Technique",
+            "Introduces Dataset",
+            "Introduces Benchmark",
+            "Introduces Model",
+            "Introduces Framework",
+            "Provides Analysis",
+            "Provides Survey",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        }
+      }
+    },
+    "conceptMention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "entityType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the concept already exists as an entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationshipType": {
+          "type": "string",
+          "description": "Recommended relationship type connecting this paper to the concept.",
+          "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+        }
+      }
+    },
+    "evaluatedArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "artifactType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the evaluated artifact already exists as an entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Component",
+            "Dataset",
+            "Benchmark",
+            "Embedding Model",
+            "Language Model",
+            "Retriever",
+            "Reranker",
+            "System",
+            "Other"
+          ]
+        },
+        "evaluationRole": {
+          "type": "string",
+          "enum": [
+            "Baseline",
+            "Proposed Method",
+            "Comparison Target",
+            "Ablation",
+            "Dataset",
+            "Metric",
+            "Other"
+          ]
+        }
+      }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    }
+  }
+}
