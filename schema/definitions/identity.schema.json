@@ -41,6 +41,7 @@
         "Dataset",
         "Benchmark",
         "EmbeddingModel",
+        "LanguageModel",
         "VectorDatabase",
         "Reranker",
         "ChunkingStrategy",
