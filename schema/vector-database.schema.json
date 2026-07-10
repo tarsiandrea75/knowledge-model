@@ -1,0 +1,478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/vector-database.schema.json",
+  "title": "RKM Vector Database Schema",
+  "description": "Defines a vector database entity used to store, index, filter and retrieve vector representations in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "vectorDatabase"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "VectorDatabase"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this vector database to frameworks, embedding models, retrievers, datasets, providers, benchmarks or storage components.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this vector database.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this vector database document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this vector database document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the vector database but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "vectorDatabase": {
+      "$ref": "#/$defs/vectorDatabaseDetails"
+    }
+  },
+  "$defs": {
+    "vectorDatabaseDetails": {
+      "type": "object",
+      "description": "Vector-database-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "databaseType",
+        "deploymentModels",
+        "supportedIndexTypes"
+      ],
+      "properties": {
+        "databaseType": {
+          "type": "string",
+          "description": "Primary product or architecture category of the vector database.",
+          "enum": [
+            "Dedicated Vector Database",
+            "Search Engine With Vector Support",
+            "Relational Database With Vector Extension",
+            "NoSQL Database With Vector Support",
+            "Graph Database With Vector Support",
+            "In Memory Vector Store",
+            "Embedded Vector Store",
+            "Managed Vector Search Service",
+            "Other"
+          ]
+        },
+        "deploymentModels": {
+          "type": "array",
+          "description": "Ways the vector database can be deployed or consumed.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Self Hosted",
+              "Managed Cloud",
+              "Serverless",
+              "Embedded",
+              "Local",
+              "Hybrid",
+              "Edge",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedIndexTypes": {
+          "type": "array",
+          "description": "Vector index structures or retrieval approaches supported by the database.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Flat",
+              "HNSW",
+              "IVF",
+              "IVF Flat",
+              "IVF PQ",
+              "Product Quantization",
+              "Scalar Quantization",
+              "Disk ANN",
+              "Graph Based ANN",
+              "Tree Based ANN",
+              "Hybrid Sparse Dense",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "distanceMetrics": {
+          "type": "array",
+          "description": "Similarity or distance metrics supported for vector search.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Cosine Similarity",
+              "Dot Product",
+              "Euclidean Distance",
+              "Manhattan Distance",
+              "Hamming Distance",
+              "Jaccard Similarity",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedModalities": {
+          "type": "array",
+          "description": "Modalities commonly stored or retrieved through the vector database.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Table",
+              "Graph",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "metadataFiltering": {
+          "$ref": "#/$defs/filteringSupport"
+        },
+        "hybridSearch": {
+          "$ref": "#/$defs/hybridSearchSupport"
+        },
+        "scalability": {
+          "$ref": "#/$defs/scalabilityProfile"
+        },
+        "consistency": {
+          "$ref": "#/$defs/consistencyProfile"
+        },
+        "integration": {
+          "$ref": "#/$defs/integrationProfile"
+        },
+        "operations": {
+          "$ref": "#/$defs/operationsProfile"
+        },
+        "ragUsage": {
+          "$ref": "#/$defs/ragUsage"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, tradeoffs or operational constraints of the vector database.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this vector database in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "filteringSupport": {
+      "type": "object",
+      "description": "Metadata filtering capabilities used to constrain retrieval.",
+      "additionalProperties": false,
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+        "filterTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Exact Match",
+              "Range",
+              "Boolean",
+              "Full Text",
+              "Geo Spatial",
+              "Nested Fields",
+              "Array Contains",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "preFilterSupported": {
+          "type": "boolean"
+        },
+        "postFilterSupported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "hybridSearchSupport": {
+      "type": "object",
+      "description": "Support for combining vector retrieval with lexical, sparse or structured retrieval.",
+      "additionalProperties": false,
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BM25 Plus Vector",
+              "Sparse Dense Fusion",
+              "Reciprocal Rank Fusion",
+              "Weighted Score Fusion",
+              "Keyword Filtered Vector Search",
+              "Graph Plus Vector",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "scoreNormalizationSupported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "scalabilityProfile": {
+      "type": "object",
+      "description": "Scaling and capacity characteristics relevant to RAG retrieval workloads.",
+      "additionalProperties": false,
+      "properties": {
+        "horizontalScaling": {
+          "$ref": "#/$defs/level"
+        },
+        "verticalScaling": {
+          "$ref": "#/$defs/level"
+        },
+        "shardingSupported": {
+          "type": "boolean"
+        },
+        "replicationSupported": {
+          "type": "boolean"
+        },
+        "diskBackedIndexingSupported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "consistencyProfile": {
+      "type": "object",
+      "description": "Consistency and update characteristics for indexed vectors and metadata.",
+      "additionalProperties": false,
+      "properties": {
+        "consistencyModel": {
+          "type": "string",
+          "enum": [
+            "Strong",
+            "Eventual",
+            "Configurable",
+            "Single Node",
+            "Unknown"
+          ]
+        },
+        "upsertsSupported": {
+          "type": "boolean"
+        },
+        "deletesSupported": {
+          "type": "boolean"
+        },
+        "streamingUpdatesSupported": {
+          "type": "boolean"
+        },
+        "transactionSupport": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Limited",
+            "Document Level",
+            "Collection Level",
+            "Full ACID",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "integrationProfile": {
+      "type": "object",
+      "description": "Integration surfaces exposed by the vector database.",
+      "additionalProperties": false,
+      "properties": {
+        "apis": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "REST",
+              "gRPC",
+              "GraphQL",
+              "SQL",
+              "Native SDK",
+              "OpenAI Compatible",
+              "LangChain",
+              "LlamaIndex",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "sdkLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Python",
+              "Java",
+              "JavaScript",
+              "TypeScript",
+              "Go",
+              "Rust",
+              "C#",
+              "Ruby",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "operationsProfile": {
+      "type": "object",
+      "description": "Operational capabilities relevant to production RAG systems.",
+      "additionalProperties": false,
+      "properties": {
+        "accessControl": {
+          "$ref": "#/$defs/level"
+        },
+        "encryption": {
+          "$ref": "#/$defs/level"
+        },
+        "backupAndRestore": {
+          "$ref": "#/$defs/level"
+        },
+        "observability": {
+          "$ref": "#/$defs/level"
+        },
+        "multiTenancy": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "ragUsage": {
+      "type": "object",
+      "description": "RAG-specific usage characteristics for the vector database.",
+      "additionalProperties": false,
+      "properties": {
+        "recommendedStages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Indexing",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Evaluation",
+              "Monitoring",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "retrievalPatterns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Top K Similarity Search",
+              "Filtered Retrieval",
+              "Hybrid Retrieval",
+              "Multi Vector Retrieval",
+              "Parent Document Retrieval",
+              "Semantic Cache",
+              "Long Term Memory",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "indexingConsiderations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "retrievalConsiderations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
