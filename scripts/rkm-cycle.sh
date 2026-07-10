@@ -62,6 +62,7 @@ parse_verdict() {
   local verdict
   verdict="$(
     sed -nE \
+      -e 's/^[[:space:]]*([-*]|•)?[[:space:]]*\*\*[[:space:]]*[Vv][Ee][Rr][Dd][Ii][Cc][Tt]:[[:space:]]*`?(ACCEPT|REVISE|STOP)`?[[:space:]]*\*\*[[:space:]]*$/\2/p' \
       -e 's/^[[:space:]]*([-*]|•)?[[:space:]]*[Vv][Ee][Rr][Dd][Ii][Cc][Tt]:[[:space:]]*`?(ACCEPT|REVISE|STOP)`?[[:space:]]*$/\2/p' \
       -e 's/^[[:space:]]*(ACCEPT|REVISE|STOP)[[:space:]]*$/\1/p' \
       "$output_file" | sed -n '1p'
