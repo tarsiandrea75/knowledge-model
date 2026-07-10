@@ -85,11 +85,15 @@ Unless the user explicitly instructs otherwise:
 3. Do not create IDE configuration files.
 4. Do not create temporary review files.
 5. Do not modify existing files unless the requested task requires it.
-6. Do not commit changes.
-7. Stop immediately after completing the single requested file.
-8. Report which file was created or modified.
-9. Report any validation command that was run.
-10. If the next natural step would require additional files, describe it instead of creating it.
+6. After creating or modifying the single allowed file, run `bash scripts/validate-rkm.sh`.
+7. If validation fails, fix failures only in the file you touched when possible.
+8. If validation fails because of pre-existing issues in other files, report those failures without modifying additional files.
+9. Report which file was created or modified.
+10. Report the validation command that was run and its result.
+11. Report the final `git status --short` output.
+12. Do not commit changes.
+13. Stop immediately after completing the single requested file and validation report.
+14. If the next natural step would require additional files, describe it instead of creating it.
 
 ## Content Rules
 
