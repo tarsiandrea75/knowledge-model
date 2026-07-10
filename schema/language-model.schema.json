@@ -1,0 +1,590 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/language-model.schema.json",
+  "title": "RKM Language Model Schema",
+  "description": "Defines a language model entity used for generation, reasoning, synthesis or tool-mediated workflows in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "languageModel"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "LanguageModel"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this language model to providers, frameworks, techniques, benchmarks, datasets, agents, tools or other models.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this language model.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this language model document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this language model document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the language model but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "languageModel": {
+      "$ref": "#/$defs/languageModelDetails"
+    }
+  },
+  "$defs": {
+    "languageModelDetails": {
+      "type": "object",
+      "description": "Language-model-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "modelFamily",
+        "modelType",
+        "inputModalities",
+        "outputModalities"
+      ],
+      "properties": {
+        "modelFamily": {
+          "type": "string",
+          "description": "Primary family or architecture category of the language model.",
+          "enum": [
+            "Decoder Only Transformer",
+            "Encoder Decoder Transformer",
+            "Mixture Of Experts",
+            "Reasoning Model",
+            "Instruction Tuned Model",
+            "Chat Model",
+            "Code Model",
+            "Multimodal Model",
+            "Domain Specific Model",
+            "Other"
+          ]
+        },
+        "modelType": {
+          "type": "string",
+          "description": "Primary operational role of the model.",
+          "enum": [
+            "Base Model",
+            "Instruction Model",
+            "Chat Model",
+            "Reasoning Model",
+            "Tool Use Model",
+            "Long Context Model",
+            "Multimodal Generation Model",
+            "Code Generation Model",
+            "Domain Specific Model",
+            "Other"
+          ]
+        },
+        "inputModalities": {
+          "type": "array",
+          "description": "Input modalities the model can consume.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Table",
+              "Graph",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "outputModalities": {
+          "type": "array",
+          "description": "Output modalities the model can produce.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Structured Data",
+              "Tool Call",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "contextWindow": {
+          "$ref": "#/$defs/contextWindow"
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameterProfile"
+        },
+        "training": {
+          "$ref": "#/$defs/trainingProfile"
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Generation and reasoning capabilities relevant to RAG systems.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Answer Generation",
+              "Grounded Generation",
+              "Citation Generation",
+              "Summarization",
+              "Question Answering",
+              "Reasoning",
+              "Planning",
+              "Tool Use",
+              "Function Calling",
+              "Structured Output",
+              "Query Rewriting",
+              "Context Compression",
+              "Relevance Judging",
+              "Code Generation",
+              "Multilingual Generation",
+              "Multimodal Understanding",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "ragUsage": {
+          "$ref": "#/$defs/ragUsage"
+        },
+        "access": {
+          "$ref": "#/$defs/modelAccess"
+        },
+        "deployment": {
+          "$ref": "#/$defs/deploymentProfile"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "safety": {
+          "$ref": "#/$defs/safetyProfile"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, biases or operational constraints of the language model.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this language model in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "contextWindow": {
+      "type": "object",
+      "description": "Context window limits for model input and output.",
+      "additionalProperties": false,
+      "properties": {
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "parameterProfile": {
+      "type": "object",
+      "description": "Structured model parameter information when disclosed or estimated.",
+      "additionalProperties": false,
+      "properties": {
+        "parameterCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "activeParameterCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parameterScale": {
+          "type": "string",
+          "enum": [
+            "Small",
+            "Medium",
+            "Large",
+            "Frontier",
+            "Undisclosed",
+            "Unknown"
+          ]
+        },
+        "disclosureStatus": {
+          "type": "string",
+          "enum": [
+            "Disclosed",
+            "Partially Disclosed",
+            "Estimated",
+            "Undisclosed",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "trainingProfile": {
+      "type": "object",
+      "description": "Training and alignment profile relevant to model behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "trainingStage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Pretraining",
+              "Supervised Fine Tuning",
+              "Instruction Tuning",
+              "Preference Optimization",
+              "Reinforcement Learning From Human Feedback",
+              "Constitutional Training",
+              "Tool Use Training",
+              "Domain Adaptation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "knowledgeCutoff": {
+          "type": "string",
+          "format": "date"
+        },
+        "trainingDataModalities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Audio",
+              "Video",
+              "Table",
+              "Graph",
+              "Multimodal",
+              "Unknown",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "disclosureStatus": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "Partially Disclosed",
+            "Closed",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "ragUsage": {
+      "type": "object",
+      "description": "How the language model is commonly used in RAG systems.",
+      "additionalProperties": false,
+      "properties": {
+        "pipelineRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Query Understanding",
+              "Query Rewriting",
+              "Retriever Routing",
+              "Context Compression",
+              "Answer Generation",
+              "Citation Generation",
+              "Grounded Reasoning",
+              "Tool Orchestration",
+              "Relevance Judging",
+              "Evaluation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresRetrievedContext": {
+          "type": "boolean"
+        },
+        "supportsCitations": {
+          "type": "boolean"
+        },
+        "supportsStructuredOutputs": {
+          "type": "boolean"
+        },
+        "recommendedContextStrategies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "modelAccess": {
+      "type": "object",
+      "description": "Access and licensing characteristics for using the model.",
+      "additionalProperties": false,
+      "properties": {
+        "accessType": {
+          "type": "string",
+          "enum": [
+            "Open Weights",
+            "Open Source",
+            "Commercial API",
+            "Managed Service",
+            "Self Hosted",
+            "Research Access",
+            "Restricted",
+            "Unknown"
+          ]
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pricingModel": {
+          "type": "string",
+          "enum": [
+            "Free",
+            "Usage Based",
+            "Subscription",
+            "Enterprise Contract",
+            "Self Hosted Infrastructure",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "deploymentProfile": {
+      "type": "object",
+      "description": "Deployment characteristics for serving or consuming the model.",
+      "additionalProperties": false,
+      "properties": {
+        "deploymentModels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Hosted API",
+              "Managed Cloud",
+              "Self Hosted",
+              "Local",
+              "On Premises",
+              "Edge",
+              "Hybrid",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "hardwareRequirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "latencyProfile": {
+          "$ref": "#/$defs/level"
+        },
+        "costProfile": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation information relevant to the language model.",
+      "additionalProperties": false,
+      "properties": {
+        "benchmarks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evaluationResult"
+          },
+          "uniqueItems": true
+        },
+        "evaluatedCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Answer Quality",
+              "Faithfulness",
+              "Grounding",
+              "Citation Accuracy",
+              "Reasoning",
+              "Tool Use",
+              "Instruction Following",
+              "Long Context Use",
+              "Safety",
+              "Robustness",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evaluationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmarkName"
+      ],
+      "properties": {
+        "benchmarkId": {
+          "type": "string",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "benchmarkName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metricName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "score": {
+          "type": "number"
+        },
+        "evaluationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "safetyProfile": {
+      "type": "object",
+      "description": "Safety and reliability characteristics relevant to using the model.",
+      "additionalProperties": false,
+      "properties": {
+        "alignmentMethods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "knownRiskAreas": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Hallucination",
+              "Prompt Injection",
+              "Data Leakage",
+              "Bias",
+              "Toxicity",
+              "Unsafe Tool Use",
+              "Citation Fabrication",
+              "Context Misuse",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportsSystemInstructions": {
+          "type": "boolean"
+        },
+        "supportsSafetyFilters": {
+          "type": "boolean"
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
