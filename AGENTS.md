@@ -95,6 +95,33 @@ Unless the user explicitly instructs otherwise:
 13. Stop immediately after completing the single requested file and validation report.
 14. If the next natural step would require additional files, describe it instead of creating it.
 
+## Reviewer Protocol
+
+When the user asks Codex to review the current RKM git diff, Codex acts only as a reviewer.
+
+Reviewer rules:
+
+1. Do not create, modify, delete, format or normalize files.
+2. Review only the current git diff.
+3. Do not review unrelated repository content unless it appears in the current git diff.
+4. Do not commit changes.
+5. Return exactly one verdict: `ACCEPT`, `REVISE` or `STOP`.
+
+Use `ACCEPT` when the current git diff is coherent with RKM architecture, follows repository rules, passes required validation or has only non-blocking issues, and is ready to commit.
+
+Use `REVISE` when the current git diff is directionally correct but needs specific fixes before commit. Examples include schema inconsistencies, broken references, invalid naming, incomplete validation, unclear modeling choices, missing required structure, or content that conflicts with RKM architecture.
+
+Use `STOP` when the current git diff should not be repaired as-is. Examples include changes outside the requested scope, multiple unrelated files when only one file was allowed, destructive changes, generated clutter, IDE files, temporary review files, severe architectural drift, or a validation failure that indicates the work should be abandoned and restarted.
+
+Reviewer output must include:
+
+* verdict
+* touched files in the current git diff
+* reasons for the verdict
+* required fixes when the verdict is `REVISE` or `STOP`
+* whether commit is recommended
+* final `git status --short` output
+
 ## Content Rules
 
 * Use English for repository content.
