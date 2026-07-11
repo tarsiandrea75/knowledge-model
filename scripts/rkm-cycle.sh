@@ -13,6 +13,10 @@ fail() {
   exit 1
 }
 
+progress() {
+  printf '[rkm-cycle] %s\n' "$1" >&2
+}
+
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
@@ -106,7 +110,7 @@ commit_message_for_file() {
 
 run_creator() {
   CREATOR_OUTPUT="$(new_temp_file)"
-  codex exec --sandbox workspace-write "$CREATOR_PROMPT" | tee "$CREATOR_OUTPUT"
+  codex exec --sandbox workspace-write "$CREATOR_PROMPT" 2>&1 | tee "$CREATOR_OUTPUT"
 }
 
 is_codex_sandbox_runtime_init_error() {
@@ -173,16 +177,21 @@ accepted_files=0
 
 while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   iteration=$((accepted_files + 1))
-  printf '\nRKM cycle iteration %s of %s\n' "$iteration" "$TARGET_ACCEPTED_FILES"
+  progress "Starting iteration $iteration of $TARGET_ACCEPTED_FILES."
 
+  progress "Running Creator."
   run_creator
+  progress "Creator completed."
   prepare_diff_for_review
+  progress "Running Reviewer."
   run_reviewer
+  progress "Reviewer completed."
 
   verdict="$(parse_verdict "$REVIEWER_OUTPUT")"
-  printf '\nReviewer verdict: %s\n' "$verdict"
+  progress "Reviewer verdict parsed: $verdict."
 
   if [[ "$verdict" == "REVISE" || "$verdict" == "STOP" ]]; then
+    progress "Reviewer requested $verdict; printing Reviewer output before stopping."
     printf '\nReviewer output:\n'
     cat "$REVIEWER_OUTPUT"
     exit 1
@@ -194,16 +203,20 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
     fail "RKM cycle must never modify AGENTS.md."
   fi
 
+  progress "Running validation."
   bash scripts/validate-rkm.sh
 
+  progress "Preparing commit for $changed_file."
   git add -- "$changed_file"
   git diff --cached --check
 
   commit_message="$(commit_message_for_file "$changed_file")"
+  progress "Committing $changed_file."
   git commit -m "$commit_message"
+  progress "Commit completed: $commit_message."
 
   accepted_files=$((accepted_files + 1))
 done
 
-printf '\nRKM cycle completed: %s accepted file(s) committed.\n' "$accepted_files"
+progress "Cycle completed: $accepted_files accepted file(s) committed."
 git status --short
