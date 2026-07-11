@@ -282,12 +282,12 @@ Low Retrieval Confidence TRIGGERS Corrective Retrieval
 Query Router ROUTES_TO Hybrid Retriever
 Evaluation Step BRANCHES_TO Retry Retrieval
 Framework IMPLEMENTS Workflow
-Workflow IS_IMPLEMENTED_BY Framework
+LangChain IMPLEMENTS Retrieval Workflow
 ```
 
 Relationship direction should follow the canonical relationship model whenever a registered relationship type exists.
 
-Predicates such as `INVOKES`, `COORDINATED_BY` and `IMPLEMENTED_BY` are noncanonical in the current relationship model. They may be considered future candidates or rejected examples, but current workflow examples should use canonical relationships such as `EXECUTES`, `TRIGGERS`, `ROUTES_TO`, `BRANCHES_TO`, `IMPLEMENTS` and `IS_IMPLEMENTED_BY`.
+Predicates such as `INVOKES`, `COORDINATED_BY`, `IMPLEMENTED_BY` and `IS_IMPLEMENTED_BY` are noncanonical in the current relationship model. They may be considered future candidates or rejected examples, but current workflow examples should use canonical relationships such as `EXECUTES`, `TRIGGERS`, `ROUTES_TO`, `BRANCHES_TO` and `IMPLEMENTS`.
 
 ---
 

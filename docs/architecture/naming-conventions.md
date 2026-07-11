@@ -630,15 +630,10 @@ Technique OPTIONALLY_USES Reranker
 
 Avoid unclear inverse names unless explicitly defined.
 
-Acceptable inverse relationships may exist, but they must be canonical.
+Avoid modeling the inverse direction when a canonical direction already exists.
 
-Example:
-
-```
-Technique IS_IMPLEMENTED_BY Framework
-```
-
-may be derived from:
+For example, the meaning that a technique has an implementing framework should be
+written in the canonical direction:
 
 ```
 Framework IMPLEMENTS Technique

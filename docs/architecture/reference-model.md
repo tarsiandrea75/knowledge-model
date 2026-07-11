@@ -27,9 +27,10 @@ It does not, by itself, assert that the source supports a claim.
 Support, contradiction, qualification and interpretation belong to evidence.
 
 ```text
-Reference ── IDENTIFIES ── Source
+Reference ── REFERENCES ── Source
 
-Claim ── SUPPORTED_BY ── Evidence ── DERIVED_FROM ── Reference
+Evidence ── SUPPORTS ── Claim
+Evidence ── REFERENCES ── Reference
 ```
 
 ---
@@ -389,11 +390,11 @@ Evidence records connect claims and relationships to references.
 Example:
 
 ```text
-CLAIM-0001
-  └── SUPPORTED_BY
-      └── EVIDENCE-0001
-          └── DERIVED_FROM
-              └── REFERENCE-0001
+EVIDENCE-0001
+  ├── SUPPORTS
+  │   └── CLAIM-0001
+  └── REFERENCES
+      └── REFERENCE-0001
 ```
 
 This preserves traceability while keeping claims, evidence and references independently addressable.

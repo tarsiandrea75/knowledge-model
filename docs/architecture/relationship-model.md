@@ -107,10 +107,9 @@ Avoid storing both:
 
 ```text
 Framework IMPLEMENTS Technique
-Technique IS_IMPLEMENTED_BY Framework
 ```
 
-unless the inverse relationship is explicitly defined as derived.
+and a separate inverse relationship that restates the same meaning from Technique to Framework, unless the inverse relationship is explicitly defined as derived.
 
 ---
 
@@ -124,13 +123,13 @@ Example canonical relationship:
 Framework IMPLEMENTS Technique
 ```
 
-Derived inverse:
+Derived inverse query view:
 
 ```text
-Technique IS_IMPLEMENTED_BY Framework
+Technique <- IMPLEMENTS Framework
 ```
 
-Derived inverse relationships should not be manually duplicated unless required.
+Derived inverse views should be generated from the canonical relationship and should not be manually duplicated unless required.
 
 They may be generated automatically.
 
@@ -1544,7 +1543,7 @@ Framework IMPLEMENTS Technique
 and:
 
 ```text
-Technique IS_IMPLEMENTED_BY Framework
+a separate inverse relationship that restates the same meaning from Technique to Framework
 ```
 
 unless one is explicitly marked as derived.

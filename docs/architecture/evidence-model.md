@@ -32,7 +32,8 @@ Important knowledge should be supported by evidence whenever possible.
 Evidence connects a claim to a source.
 
 ```text
-Claim ── SUPPORTED_BY ── Evidence ── DERIVED_FROM ── Source
+Evidence ── SUPPORTS ── Claim
+Evidence ── REFERENCES ── Source
 ```
 
 ---

@@ -28,8 +28,8 @@ They may be embedded in entity documents, linked to evidence, cited by relations
 
 ```text
 Subject ── Claim ──► Object
-              │
-              └── SUPPORTED_BY ──► Evidence
+
+Evidence ── SUPPORTS ──► Claim
 ```
 
 ---
