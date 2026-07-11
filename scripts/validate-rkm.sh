@@ -185,4 +185,7 @@ fi
 echo "Running JSON Schema validation..."
 "$PYTHON_BIN" scripts/validate-schemas.py
 
+echo "Running registry validation..."
+"$PYTHON_BIN" scripts/validate-registries.py
+
 echo "RKM validation passed."
