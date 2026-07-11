@@ -1,0 +1,516 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/evaluation-metric.schema.json",
+  "title": "RKM Evaluation Metric Schema",
+  "description": "Defines an evaluation metric entity used to measure retrieval, grounding, generation, ranking or system behavior in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "evaluationMetric"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "EvaluationMetric"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this evaluation metric to benchmarks, datasets, papers, techniques, models, components or evaluation tasks.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this evaluation metric.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this evaluation metric document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this evaluation metric document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the evaluation metric but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "evaluationMetric": {
+      "$ref": "#/$defs/evaluationMetricDetails"
+    }
+  },
+  "$defs": {
+    "evaluationMetricDetails": {
+      "type": "object",
+      "description": "Evaluation metric-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "metricType",
+        "evaluationTargets",
+        "measurementScale"
+      ],
+      "properties": {
+        "metricType": {
+          "type": "string",
+          "description": "Primary category of metric represented by this entity.",
+          "enum": [
+            "Retrieval Quality",
+            "Ranking Quality",
+            "Reranking Quality",
+            "Generation Quality",
+            "Grounding Quality",
+            "Faithfulness",
+            "Citation Quality",
+            "Answer Correctness",
+            "Context Quality",
+            "Efficiency",
+            "Cost",
+            "Safety",
+            "User Experience",
+            "System Reliability",
+            "Other"
+          ]
+        },
+        "evaluationTargets": {
+          "type": "array",
+          "description": "Artifacts or behaviors the metric is intended to measure.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Retriever",
+              "Reranker",
+              "Embedding Model",
+              "Language Model",
+              "Generated Answer",
+              "Retrieved Context",
+              "Citation",
+              "Grounding",
+              "Question Answering",
+              "End To End RAG System",
+              "Agent",
+              "Workflow",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "measurementScale": {
+          "type": "string",
+          "description": "Scale or output form produced by the metric.",
+          "enum": [
+            "Binary",
+            "Categorical",
+            "Ordinal",
+            "Integer Count",
+            "Ratio",
+            "Percentage",
+            "Probability",
+            "Score",
+            "Rank",
+            "Latency",
+            "Cost",
+            "Textual Judgment",
+            "Other"
+          ]
+        },
+        "scoreRange": {
+          "$ref": "#/$defs/scoreRange"
+        },
+        "higherIsBetter": {
+          "type": "boolean",
+          "description": "Whether larger metric values normally indicate better performance."
+        },
+        "requiresReferenceAnswer": {
+          "type": "boolean",
+          "description": "Whether the metric normally requires a gold or reference answer."
+        },
+        "requiresRelevanceJudgments": {
+          "type": "boolean",
+          "description": "Whether the metric normally requires relevance labels, graded judgments or qrels."
+        },
+        "requiresRetrievedContext": {
+          "type": "boolean",
+          "description": "Whether the metric requires retrieved passages, chunks, documents or context nodes."
+        },
+        "requiresGeneratedAnswer": {
+          "type": "boolean",
+          "description": "Whether the metric requires a generated answer."
+        },
+        "calculation": {
+          "$ref": "#/$defs/calculationProfile"
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Inputs required or commonly accepted by the metric.",
+          "items": {
+            "$ref": "#/$defs/metricInput"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Outputs produced by the metric.",
+          "items": {
+            "$ref": "#/$defs/metricOutput"
+          },
+          "uniqueItems": true
+        },
+        "aggregation": {
+          "$ref": "#/$defs/aggregationProfile"
+        },
+        "interpretation": {
+          "$ref": "#/$defs/interpretationProfile"
+        },
+        "applicableTasks": {
+          "type": "array",
+          "description": "Evaluation tasks where the metric is commonly applied.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Document Retrieval",
+              "Passage Retrieval",
+              "Reranking",
+              "Question Answering",
+              "Grounded Generation",
+              "Citation Evaluation",
+              "Faithfulness Evaluation",
+              "Hallucination Detection",
+              "Answer Relevance",
+              "Context Relevance",
+              "Long Context Evaluation",
+              "Agent Evaluation",
+              "System Benchmarking",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "automationLevel": {
+          "type": "string",
+          "description": "How the metric is normally computed or judged.",
+          "enum": [
+            "Automatic",
+            "Human Judged",
+            "LLM Judged",
+            "Hybrid",
+            "Manual",
+            "Other"
+          ]
+        },
+        "implementationNotes": {
+          "type": "array",
+          "description": "Important implementation considerations for computing the metric consistently.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, biases or failure modes of the metric.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using or interpreting the metric.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "scoreRange": {
+      "type": "object",
+      "description": "Structured numeric score range when the metric produces numeric values.",
+      "additionalProperties": false,
+      "properties": {
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "inclusiveMinimum": {
+          "type": "boolean",
+          "default": true
+        },
+        "inclusiveMaximum": {
+          "type": "boolean",
+          "default": true
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "calculationProfile": {
+      "type": "object",
+      "description": "Structured description of how the metric is calculated.",
+      "additionalProperties": false,
+      "properties": {
+        "formula": {
+          "type": "string",
+          "description": "Formula or concise computational definition of the metric.",
+          "minLength": 1
+        },
+        "normalization": {
+          "type": "string",
+          "description": "Normalization applied to raw metric values.",
+          "enum": [
+            "None",
+            "Min Max",
+            "Mean",
+            "Z Score",
+            "Length Normalized",
+            "Dataset Normalized",
+            "Task Normalized",
+            "Other"
+          ]
+        },
+        "requiresCutoff": {
+          "type": "boolean",
+          "description": "Whether the metric requires a cutoff such as k in top-k evaluation."
+        },
+        "commonCutoffs": {
+          "type": "array",
+          "description": "Common cutoff values used with the metric.",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "uniqueItems": true
+        },
+        "usesGradedRelevance": {
+          "type": "boolean",
+          "description": "Whether the metric supports graded relevance judgments."
+        }
+      }
+    },
+    "metricInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputType"
+      ],
+      "properties": {
+        "inputType": {
+          "type": "string",
+          "enum": [
+            "Query",
+            "Retrieved Document",
+            "Retrieved Passage",
+            "Retrieved Chunk",
+            "Ranked List",
+            "Relevance Judgment",
+            "Reference Answer",
+            "Generated Answer",
+            "Citation",
+            "Source Document",
+            "Context Window",
+            "Trace",
+            "User Feedback",
+            "Other"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "metricOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outputType"
+      ],
+      "properties": {
+        "outputType": {
+          "type": "string",
+          "enum": [
+            "Scalar Score",
+            "Boolean Judgment",
+            "Label",
+            "Ranked Result",
+            "Per Item Score",
+            "Aggregate Score",
+            "Explanation",
+            "Error Category",
+            "Other"
+          ]
+        },
+        "fieldName": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "aggregationProfile": {
+      "type": "object",
+      "description": "How per-example metric values are combined across queries, datasets or tasks.",
+      "additionalProperties": false,
+      "properties": {
+        "aggregationMethods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Mean",
+              "Median",
+              "Macro Average",
+              "Micro Average",
+              "Weighted Average",
+              "Sum",
+              "Minimum",
+              "Maximum",
+              "Percentile",
+              "Distribution",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "groupingDimensions": {
+          "type": "array",
+          "description": "Dimensions commonly used when reporting grouped metric results.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Dataset",
+              "Task",
+              "Domain",
+              "Language",
+              "Query Type",
+              "Difficulty",
+              "Model",
+              "System",
+              "User Segment",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "interpretationProfile": {
+      "type": "object",
+      "description": "Guidance for interpreting metric values.",
+      "additionalProperties": false,
+      "properties": {
+        "optimalValue": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "baselineMeaning": {
+          "type": "string",
+          "description": "Meaning of a baseline, random or zero value when known.",
+          "minLength": 1
+        },
+        "thresholds": {
+          "type": "array",
+          "description": "Named thresholds used to interpret metric values.",
+          "items": {
+            "$ref": "#/$defs/interpretationThreshold"
+          },
+          "uniqueItems": true
+        },
+        "comparisonGuidance": {
+          "type": "string",
+          "description": "Guidance for comparing this metric across systems, datasets or tasks.",
+          "minLength": 1
+        }
+      }
+    },
+    "interpretationThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "value"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
