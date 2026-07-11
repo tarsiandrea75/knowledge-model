@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "RKM pre-commit validation is running..."
+
+if ! bash scripts/validate-rkm.sh; then
+  echo "RKM pre-commit validation failed. Commit aborted."
+  exit 1
+fi
+
+echo "RKM pre-commit validation passed."
