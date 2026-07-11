@@ -17,6 +17,17 @@ progress() {
   printf '[rkm-discover] %s\n' "$1" >&2
 }
 
+now_seconds() {
+  date +%s
+}
+
+elapsed_seconds() {
+  local start="$1"
+  local end
+  end="$(now_seconds)"
+  printf '%ss' "$((end - start))"
+}
+
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
@@ -161,6 +172,8 @@ if ! [[ "$ATTEMPTS" =~ ^[0-9]+$ ]] || [[ "$ATTEMPTS" -lt 1 ]]; then
   fail "Discovery attempts must be a positive integer."
 fi
 
+total_start="$(now_seconds)"
+
 ensure_clean_main_worktree
 
 REPORT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rkm-discovery-report-XXXXXXXX")"
@@ -168,7 +181,10 @@ WORKTREE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/rkm-discovery-XXXXXXXX")"
 rmdir "$WORKTREE_DIR"
 trap cleanup EXIT
 
+worktree_start="$(now_seconds)"
+progress "Preparing discovery worktree."
 git worktree add --detach "$WORKTREE_DIR" HEAD >/dev/null
+progress "Preparing discovery worktree completed in $(elapsed_seconds "$worktree_start")."
 
 accept_count=0
 revise_count=0
@@ -181,24 +197,31 @@ progress "Report directory: $REPORT_DIR"
 progress "Discovery worktree: $WORKTREE_DIR"
 
 for attempt in $(seq 1 "$ATTEMPTS"); do
+  attempt_start="$(now_seconds)"
   attempt_dir="$REPORT_DIR/attempt-$attempt"
   mkdir -p "$attempt_dir"
   progress "Attempt $attempt of $ATTEMPTS started."
 
+  phase_start="$(now_seconds)"
+  progress "Attempt $attempt: preparing worktree."
   reset_discovery_worktree
+  progress "Attempt $attempt: preparing worktree completed in $(elapsed_seconds "$phase_start")."
 
   cd "$WORKTREE_DIR"
+  phase_start="$(now_seconds)"
+  progress "Attempt $attempt: Creator run started."
   set +e
   run_creator >"$attempt_dir/creator-output.txt" 2>&1
   creator_status="$?"
   set -e
+  progress "Attempt $attempt: Creator run completed in $(elapsed_seconds "$phase_start") with exit status $creator_status."
 
   if [[ "$creator_status" -ne 0 ]]; then
     git status --short >"$attempt_dir/git-status.txt"
     git diff --binary >"$attempt_dir/diff.patch"
     printf 'Creator failed with exit status %s.\n' "$creator_status" >"$attempt_dir/error.txt"
     other_error_count=$((other_error_count + 1))
-    progress "Attempt $attempt ended with Creator error."
+    progress "Attempt $attempt ended with Creator error after $(elapsed_seconds "$attempt_start")."
     continue
   fi
 
@@ -207,30 +230,36 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
     git diff --binary >"$attempt_dir/diff.patch"
     printf 'Expected exactly one changed candidate file, found %s.\n' "$(changed_file_count)" >"$attempt_dir/error.txt"
     other_error_count=$((other_error_count + 1))
-    progress "Attempt $attempt ended without exactly one changed file."
+    progress "Attempt $attempt ended without exactly one changed file after $(elapsed_seconds "$attempt_start")."
     continue
   fi
 
   prepare_diff_for_review "$candidate_file"
 
+  phase_start="$(now_seconds)"
+  progress "Attempt $attempt: validation started."
   set +e
   run_validation >"$attempt_dir/validator-output.txt" 2>&1
   validator_status="$?"
   set -e
+  progress "Attempt $attempt: validation completed in $(elapsed_seconds "$phase_start") with exit status $validator_status."
   if [[ "$validator_status" -ne 0 ]]; then
     validator_failure_count=$((validator_failure_count + 1))
   fi
 
+  phase_start="$(now_seconds)"
+  progress "Attempt $attempt: Reviewer run started."
   set +e
   run_reviewer "$attempt_dir/reviewer-output.txt"
   reviewer_status="$?"
   set -e
+  progress "Attempt $attempt: Reviewer run completed in $(elapsed_seconds "$phase_start") with exit status $reviewer_status."
 
   if [[ "$reviewer_status" -ne 0 ]]; then
     printf 'Reviewer failed with exit status %s.\n' "$reviewer_status" >"$attempt_dir/error.txt"
     other_error_count=$((other_error_count + 1))
     save_attempt_artifacts "$attempt_dir"
-    progress "Attempt $attempt ended with Reviewer error."
+    progress "Attempt $attempt ended with Reviewer error after $(elapsed_seconds "$attempt_start")."
     continue
   fi
 
@@ -238,7 +267,7 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
     printf 'Reviewer did not return ACCEPT, REVISE or STOP.\n' >"$attempt_dir/error.txt"
     other_error_count=$((other_error_count + 1))
     save_attempt_artifacts "$attempt_dir"
-    progress "Attempt $attempt ended with unparsable Reviewer verdict."
+    progress "Attempt $attempt ended with unparsable Reviewer verdict after $(elapsed_seconds "$attempt_start")."
     continue
   fi
 
@@ -262,9 +291,11 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
   fi
 
   save_attempt_artifacts "$attempt_dir"
-  progress "Attempt $attempt ended with verdict $verdict."
+  progress "Attempt $attempt ended with verdict $verdict after $(elapsed_seconds "$attempt_start")."
 done
 
+summary_start="$(now_seconds)"
+progress "Summary started."
 cd "$ROOT_DIR"
 ensure_clean_main_worktree
 
@@ -276,3 +307,5 @@ printf 'Validator failures: %s\n' "$validator_failure_count"
 printf 'Other errors: %s\n' "$other_error_count"
 printf 'Possible validator or instruction gaps: %s\n' "$gap_count"
 printf 'Report directory: %s\n' "$REPORT_DIR"
+progress "Summary completed in $(elapsed_seconds "$summary_start")."
+progress "Total discovery run completed in $(elapsed_seconds "$total_start")."
