@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/prompt-technique.schema.json",
+  "title": "RKM Prompt Technique Schema",
+  "description": "Defines a prompt technique entity used to guide query understanding, retrieval, context assembly, grounding, generation or evaluation in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "promptTechnique"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "PromptTechnique"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this prompt technique to RAG techniques, agents, workflows, language models, retrievers, evaluation metrics, frameworks, components or papers.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this prompt technique.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this prompt technique document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this prompt technique document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the prompt technique but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "promptTechnique": {
+      "$ref": "#/$defs/promptTechniqueDetails"
+    }
+  },
+  "$defs": {
+    "promptTechniqueDetails": {
+      "type": "object",
+      "description": "Prompt-technique-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "techniqueType",
+        "promptRole",
+        "ragStages"
+      ],
+      "properties": {
+        "techniqueType": {
+          "type": "string",
+          "description": "Primary category of prompt technique represented by this entity.",
+          "enum": [
+            "Instruction Prompting",
+            "System Prompting",
+            "Few Shot Prompting",
+            "Chain Of Thought",
+            "Self Consistency",
+            "Query Rewriting",
+            "Query Expansion",
+            "Hypothetical Document Generation",
+            "Step Back Prompting",
+            "Contextual Prompting",
+            "Citation Prompting",
+            "Grounding Prompting",
+            "Tool Use Prompting",
+            "Router Prompting",
+            "Evaluator Prompting",
+            "Critique Prompting",
+            "Reflection Prompting",
+            "Prompt Chaining",
+            "Other"
+          ]
+        },
+        "promptRole": {
+          "type": "string",
+          "description": "Primary role the prompt technique plays in a RAG system.",
+          "enum": [
+            "Query Understanding",
+            "Query Transformation",
+            "Retrieval Planning",
+            "Retriever Selection",
+            "Context Selection",
+            "Context Compression",
+            "Context Assembly",
+            "Answer Generation",
+            "Citation Generation",
+            "Grounding Verification",
+            "Tool Selection",
+            "Evaluation",
+            "Workflow Control",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the prompt technique is commonly used or has direct impact.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "inputRequirements": {
+          "type": "array",
+          "description": "Inputs or context required to apply the prompt technique.",
+          "items": {
+            "$ref": "#/$defs/promptInput"
+          },
+          "uniqueItems": true
+        },
+        "outputArtifacts": {
+          "type": "array",
+          "description": "Artifacts or decisions produced by applying the prompt technique.",
+          "items": {
+            "$ref": "#/$defs/promptOutput"
+          },
+          "uniqueItems": true
+        },
+        "modelRequirements": {
+          "$ref": "#/$defs/modelRequirements"
+        },
+        "groundingBehavior": {
+          "$ref": "#/$defs/groundingBehavior"
+        },
+        "controlProperties": {
+          "$ref": "#/$defs/controlProperties"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "operationalCharacteristics": {
+          "$ref": "#/$defs/operationalCharacteristics"
+        },
+        "failureModes": {
+          "type": "array",
+          "description": "Known failure modes associated with the prompt technique.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using the prompt technique in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "promptInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "inputType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputType": {
+          "type": "string",
+          "enum": [
+            "User Query",
+            "Conversation History",
+            "Retrieved Context",
+            "Document Metadata",
+            "Schema",
+            "Tool Description",
+            "Evaluation Rubric",
+            "Reference Answer",
+            "System Instruction",
+            "Example",
+            "Other"
+          ]
+        },
+        "requirementLevel": {
+          "$ref": "#/$defs/requirementLevel"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "promptOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "outputType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputType": {
+          "type": "string",
+          "enum": [
+            "Rewritten Query",
+            "Expanded Query",
+            "Retrieval Plan",
+            "Tool Call Plan",
+            "Selected Context",
+            "Compressed Context",
+            "Generated Answer",
+            "Citation",
+            "Grounding Judgment",
+            "Evaluation Score",
+            "Critique",
+            "Structured Object",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "modelRequirements": {
+      "type": "object",
+      "description": "Model capabilities or constraints relevant to the prompt technique.",
+      "additionalProperties": false,
+      "properties": {
+        "requiresInstructionFollowing": {
+          "type": "boolean"
+        },
+        "requiresLongContext": {
+          "type": "boolean"
+        },
+        "requiresStructuredOutput": {
+          "type": "boolean"
+        },
+        "requiresToolCalling": {
+          "type": "boolean"
+        },
+        "minimumContextWindow": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sensitiveToModelFamily": {
+          "type": "boolean"
+        }
+      }
+    },
+    "groundingBehavior": {
+      "type": "object",
+      "description": "How the prompt technique affects grounding, attribution and use of retrieved context.",
+      "additionalProperties": false,
+      "properties": {
+        "usesRetrievedContext": {
+          "type": "boolean"
+        },
+        "requiresCitations": {
+          "type": "boolean"
+        },
+        "supportsAbstention": {
+          "type": "boolean"
+        },
+        "contextBindingStrength": {
+          "$ref": "#/$defs/level"
+        },
+        "hallucinationRisk": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "controlProperties": {
+      "type": "object",
+      "description": "Control characteristics of the prompt technique.",
+      "additionalProperties": false,
+      "properties": {
+        "determinism": {
+          "$ref": "#/$defs/level"
+        },
+        "composability": {
+          "$ref": "#/$defs/level"
+        },
+        "requiresPromptChaining": {
+          "type": "boolean"
+        },
+        "humanReviewRecommended": {
+          "type": "boolean"
+        },
+        "structuredOutputRecommended": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation concerns for the prompt technique.",
+      "additionalProperties": false,
+      "properties": {
+        "applicableMetrics": {
+          "type": "array",
+          "description": "Metric names or metric entity identifiers relevant to evaluating the prompt technique.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evaluationTargets": {
+          "type": "array",
+          "description": "Behaviors or artifacts that should be evaluated.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Query Quality",
+              "Retrieval Quality",
+              "Context Relevance",
+              "Answer Faithfulness",
+              "Answer Correctness",
+              "Citation Accuracy",
+              "Instruction Adherence",
+              "Tool Selection Accuracy",
+              "Cost",
+              "Latency",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresHumanJudgment": {
+          "type": "boolean"
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to selecting and using the prompt technique.",
+      "additionalProperties": false,
+      "properties": {
+        "latencyImpact": {
+          "$ref": "#/$defs/level"
+        },
+        "costImpact": {
+          "$ref": "#/$defs/level"
+        },
+        "implementationComplexity": {
+          "$ref": "#/$defs/level"
+        },
+        "promptLengthImpact": {
+          "$ref": "#/$defs/level"
+        },
+        "retrievalQualityImpact": {
+          "$ref": "#/$defs/level"
+        },
+        "generationQualityImpact": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "requirementLevel": {
+      "type": "string",
+      "enum": [
+        "Required",
+        "Optional",
+        "Conditional"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
