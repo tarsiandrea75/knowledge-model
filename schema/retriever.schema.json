@@ -1,0 +1,492 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/retriever.schema.json",
+  "title": "RKM Retriever Schema",
+  "description": "Defines a retriever entity used to select candidate documents, chunks, nodes or records for Retrieval-Augmented Generation in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "retriever"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Retriever"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this retriever to embedding models, vector databases, graph databases, rerankers, datasets, benchmarks, frameworks, papers or RAG techniques.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this retriever.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this retriever document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this retriever document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the retriever but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "retriever": {
+      "$ref": "#/$defs/retrieverDetails"
+    }
+  },
+  "$defs": {
+    "retrieverDetails": {
+      "type": "object",
+      "description": "Retriever-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "retrieverType",
+        "retrievalApproach",
+        "retrievalTargets"
+      ],
+      "properties": {
+        "retrieverType": {
+          "type": "string",
+          "description": "Primary category of retriever represented by this entity.",
+          "enum": [
+            "Dense Vector Retriever",
+            "Sparse Retriever",
+            "Hybrid Retriever",
+            "Keyword Retriever",
+            "Graph Retriever",
+            "Multi Vector Retriever",
+            "Parent Document Retriever",
+            "Self Query Retriever",
+            "Metadata Filtered Retriever",
+            "Router Retriever",
+            "Ensemble Retriever",
+            "Web Retriever",
+            "Database Retriever",
+            "Other"
+          ]
+        },
+        "retrievalApproach": {
+          "type": "string",
+          "description": "How the retriever selects candidates from the underlying corpus or index.",
+          "enum": [
+            "Similarity Search",
+            "Maximum Marginal Relevance",
+            "Lexical Search",
+            "Boolean Search",
+            "Hybrid Search",
+            "Graph Traversal",
+            "Metadata Filtering",
+            "SQL Query",
+            "Full Text Search",
+            "Federated Search",
+            "Learned Retrieval",
+            "Heuristic Retrieval",
+            "Other"
+          ]
+        },
+        "retrievalTargets": {
+          "type": "array",
+          "description": "Artifacts the retriever can return as candidates for downstream RAG stages.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Document",
+              "Chunk",
+              "Passage",
+              "Node",
+              "Triple",
+              "Table Row",
+              "Image",
+              "Code Snippet",
+              "Search Result",
+              "External Resource",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "inputModalities": {
+          "type": "array",
+          "description": "Query input modalities accepted by the retriever.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Table",
+              "Graph",
+              "Structured Query",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "indexRequirements": {
+          "type": "array",
+          "description": "Indexes, stores or corpus structures required by the retriever.",
+          "items": {
+            "$ref": "#/$defs/indexRequirement"
+          },
+          "uniqueItems": true
+        },
+        "queryProcessing": {
+          "$ref": "#/$defs/queryProcessingProfile"
+        },
+        "ranking": {
+          "$ref": "#/$defs/rankingProfile"
+        },
+        "filtering": {
+          "$ref": "#/$defs/filteringProfile"
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Outputs produced by the retriever.",
+          "items": {
+            "$ref": "#/$defs/retrieverOutput"
+          },
+          "uniqueItems": true
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where this retriever is commonly used.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Retrieval capabilities associated with the retriever.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Semantic Retrieval",
+              "Lexical Retrieval",
+              "Hybrid Retrieval",
+              "Metadata Filtering",
+              "Faceted Search",
+              "Multi Hop Retrieval",
+              "Diversity Aware Retrieval",
+              "Query Expansion",
+              "Natural Language Filtering",
+              "Graph Neighborhood Retrieval",
+              "Cross Lingual Retrieval",
+              "Multimodal Retrieval",
+              "Streaming Retrieval",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "operationalCharacteristics": {
+          "$ref": "#/$defs/operationalCharacteristics"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, biases or operational constraints of the retriever.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this retriever in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "indexRequirement": {
+      "type": "object",
+      "description": "An index, store or corpus structure required by the retriever.",
+      "additionalProperties": false,
+      "required": [
+        "indexType"
+      ],
+      "properties": {
+        "indexType": {
+          "type": "string",
+          "enum": [
+            "Vector Index",
+            "Inverted Index",
+            "Full Text Index",
+            "Graph Index",
+            "Keyword Index",
+            "Metadata Index",
+            "Relational Table",
+            "External Search API",
+            "Other"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether this index or store is mandatory for the retriever."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "queryProcessingProfile": {
+      "type": "object",
+      "description": "Query processing behavior before candidate selection.",
+      "additionalProperties": false,
+      "properties": {
+        "supportsQueryEmbedding": {
+          "type": "boolean"
+        },
+        "supportsQueryExpansion": {
+          "type": "boolean"
+        },
+        "supportsQueryRewriting": {
+          "type": "boolean"
+        },
+        "supportsStructuredFilters": {
+          "type": "boolean"
+        },
+        "requiresEmbeddingModel": {
+          "type": "boolean"
+        },
+        "requiresLanguageModel": {
+          "type": "boolean"
+        }
+      }
+    },
+    "rankingProfile": {
+      "type": "object",
+      "description": "Candidate ranking behavior used by the retriever before optional downstream reranking.",
+      "additionalProperties": false,
+      "properties": {
+        "primaryScoreType": {
+          "type": "string",
+          "enum": [
+            "Similarity",
+            "Distance",
+            "Lexical Relevance",
+            "Graph Proximity",
+            "Recency",
+            "Popularity",
+            "Heuristic",
+            "Combined Score",
+            "Not Applicable",
+            "Other"
+          ]
+        },
+        "supportsTopK": {
+          "type": "boolean"
+        },
+        "supportsScoreThreshold": {
+          "type": "boolean"
+        },
+        "supportsDiversity": {
+          "type": "boolean"
+        },
+        "supportsRankFusion": {
+          "type": "boolean"
+        }
+      }
+    },
+    "filteringProfile": {
+      "type": "object",
+      "description": "Filtering capabilities used to constrain retrieval candidates.",
+      "additionalProperties": false,
+      "properties": {
+        "filterTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Metadata",
+              "Date Range",
+              "Source",
+              "Document Type",
+              "Access Control",
+              "Language",
+              "Tenant",
+              "Semantic Constraint",
+              "Graph Constraint",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "filterApplication": {
+          "type": "string",
+          "enum": [
+            "Pre Retrieval",
+            "During Retrieval",
+            "Post Retrieval",
+            "Multiple Stages",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "retrieverOutput": {
+      "type": "object",
+      "description": "A retrieval output artifact.",
+      "additionalProperties": false,
+      "required": [
+        "artifactType"
+      ],
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "Ranked Candidates",
+            "Unranked Candidates",
+            "Scored Documents",
+            "Scored Chunks",
+            "Graph Nodes",
+            "Graph Paths",
+            "Query Results",
+            "Context Candidates",
+            "Other"
+          ]
+        },
+        "includesScores": {
+          "type": "boolean"
+        },
+        "includesMetadata": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation practices commonly used with the retriever.",
+      "additionalProperties": false,
+      "properties": {
+        "commonMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Recall At K",
+              "Precision At K",
+              "Mean Reciprocal Rank",
+              "Mean Average Precision",
+              "Normalized Discounted Cumulative Gain",
+              "Hit Rate",
+              "Latency",
+              "Cost",
+              "Context Relevance",
+              "Answer Correctness",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresRelevanceJudgments": {
+          "type": "boolean"
+        },
+        "requiresBenchmarkDataset": {
+          "type": "boolean"
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to retriever selection and use.",
+      "additionalProperties": false,
+      "properties": {
+        "latencySensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "costSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "indexFreshnessSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "scaleSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "recallSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "precisionSensitivity": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
