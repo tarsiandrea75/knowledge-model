@@ -43,6 +43,8 @@
         "EmbeddingModel",
         "LanguageModel",
         "VectorDatabase",
+        "GraphDatabase",
+        "Retriever",
         "Reranker",
         "ChunkingStrategy",
         "EvaluationMetric",
