@@ -17,6 +17,7 @@ from urllib.parse import urldefrag
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_ROOT = REPOSITORY_ROOT / "schema"
+IDENTITY_SCHEMA_PATH = SCHEMA_ROOT / "definitions" / "identity.schema.json"
 EXPECTED_DRAFT = "https://json-schema.org/draft/2020-12/schema"
 ALLOWED_ID_PREFIXES = (
     "https://rkm.org/schema/",
@@ -136,6 +137,80 @@ def validate_schema_references(
             validate_reference(path, document, reference, loaded_documents)
 
 
+def identity_entity_type_enum(
+    loaded_documents: dict[Path, dict[str, object]],
+) -> set[str]:
+    identity_document = loaded_documents.get(IDENTITY_SCHEMA_PATH.resolve())
+    if identity_document is None:
+        raise ValidationError(f"{IDENTITY_SCHEMA_PATH}: identity schema was not loaded")
+
+    properties = identity_document.get("properties")
+    if not isinstance(properties, dict):
+        raise ValidationError(f"{IDENTITY_SCHEMA_PATH}: properties must be an object")
+
+    entity_type = properties.get("entityType")
+    if not isinstance(entity_type, dict):
+        raise ValidationError(
+            f"{IDENTITY_SCHEMA_PATH}: properties.entityType must be an object"
+        )
+
+    enum = entity_type.get("enum")
+    if not isinstance(enum, list) or not all(isinstance(value, str) for value in enum):
+        raise ValidationError(
+            f"{IDENTITY_SCHEMA_PATH}: properties.entityType.enum must be an array of strings"
+        )
+
+    return set(enum)
+
+
+def constrained_identity_entity_types(document: dict[str, object]) -> list[object]:
+    properties = document.get("properties")
+    if not isinstance(properties, dict):
+        return []
+
+    identity = properties.get("identity")
+    if not isinstance(identity, dict):
+        return []
+
+    all_of = identity.get("allOf")
+    if not isinstance(all_of, list):
+        return []
+
+    entity_types: list[object] = []
+    for item in all_of:
+        if not isinstance(item, dict):
+            continue
+
+        item_properties = item.get("properties")
+        if not isinstance(item_properties, dict):
+            continue
+
+        entity_type = item_properties.get("entityType")
+        if not isinstance(entity_type, dict) or "const" not in entity_type:
+            continue
+
+        entity_types.append(entity_type["const"])
+
+    return entity_types
+
+
+def validate_specialized_schema_entity_types(
+    path: Path,
+    document: dict[str, object],
+    allowed_entity_types: set[str],
+) -> None:
+    if path.parent != SCHEMA_ROOT:
+        return
+
+    for entity_type in constrained_identity_entity_types(document):
+        if entity_type not in allowed_entity_types:
+            raise ValidationError(
+                f"{path}: identity entityType const {entity_type!r} is not present "
+                f"in {IDENTITY_SCHEMA_PATH.relative_to(REPOSITORY_ROOT)} "
+                "properties.entityType.enum"
+            )
+
+
 def main() -> int:
     schema_files = find_schema_files()
     loaded_documents: dict[Path, dict[str, object]] = {}
@@ -145,6 +220,11 @@ def main() -> int:
         loaded_documents[path.resolve()] = document
 
     errors: list[str] = []
+    try:
+        allowed_entity_types = identity_entity_type_enum(loaded_documents)
+    except ValidationError as exc:
+        errors.append(str(exc))
+        allowed_entity_types = set()
 
     for path in schema_files:
         resolved_path = path.resolve()
@@ -152,6 +232,7 @@ def main() -> int:
         try:
             validate_schema_header(path, document)
             validate_schema_references(resolved_path, document, loaded_documents)
+            validate_specialized_schema_entity_types(path, document, allowed_entity_types)
         except ValidationError as exc:
             errors.append(str(exc))
 
