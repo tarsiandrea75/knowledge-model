@@ -17,6 +17,66 @@ progress() {
   printf '[rkm-cycle] %s\n' "$1" >&2
 }
 
+current_time() {
+  date '+%Y-%m-%d %H:%M:%S %Z'
+}
+
+current_epoch() {
+  date '+%s'
+}
+
+format_elapsed() {
+  local elapsed_seconds="$1"
+  local hours
+  local minutes
+  local seconds
+
+  hours=$((elapsed_seconds / 3600))
+  minutes=$(((elapsed_seconds % 3600) / 60))
+  seconds=$((elapsed_seconds % 60))
+
+  printf '%02d:%02d:%02d' "$hours" "$minutes" "$seconds"
+}
+
+clear_spinner_line() {
+  printf '\r%*s\r' 100 '' >&2
+}
+
+run_with_spinner() {
+  local label="$1"
+  shift
+
+  local start_epoch
+  local end_epoch
+  local command_status
+  local spinner_index=0
+  local spinner_frames=('|' '/' '-' '\')
+  local command_pid
+
+  start_epoch="$(current_epoch)"
+  progress "$label started at $(current_time)."
+
+  "$@" &
+  command_pid="$!"
+
+  while kill -0 "$command_pid" 2>/dev/null; do
+    printf '\r[rkm-cycle] %s %s running' "${spinner_frames[$spinner_index]}" "$label" >&2
+    spinner_index=$(((spinner_index + 1) % ${#spinner_frames[@]}))
+    sleep 0.2
+  done
+
+  set +e
+  wait "$command_pid"
+  command_status="$?"
+  set -e
+
+  clear_spinner_line
+  end_epoch="$(current_epoch)"
+  progress "$label ended at $(current_time). Elapsed: $(format_elapsed "$((end_epoch - start_epoch))")."
+
+  return "$command_status"
+}
+
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
@@ -109,7 +169,6 @@ commit_message_for_file() {
 }
 
 run_creator() {
-  CREATOR_OUTPUT="$(new_temp_file)"
   codex exec --sandbox workspace-write "$CREATOR_PROMPT" 2>&1 | tee "$CREATOR_OUTPUT"
 }
 
@@ -130,7 +189,6 @@ run_reviewer() {
   local reviewer_status_after
   local reviewer_exit
 
-  REVIEWER_OUTPUT="$(new_temp_file)"
   reviewer_status_before="$(git status --porcelain)"
 
   if run_reviewer_with_sandbox read-only; then
@@ -157,10 +215,25 @@ run_reviewer() {
   return "$reviewer_exit"
 }
 
+run_validation() {
+  bash scripts/validate-rkm.sh
+}
+
+run_commit() {
+  local changed_file="$1"
+  local commit_message="$2"
+
+  git add -- "$changed_file"
+  git diff --cached --check
+  git commit -m "$commit_message"
+}
+
 require_command codex
+require_command date
 require_command git
 require_command grep
 require_command sed
+require_command sleep
 require_command tee
 require_command mktemp
 require_command wc
@@ -174,18 +247,20 @@ trap cleanup EXIT
 ensure_clean_worktree
 
 accepted_files=0
+cycle_start_epoch="$(current_epoch)"
+progress "Cycle started at $(current_time)."
 
 while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   iteration=$((accepted_files + 1))
-  progress "Starting iteration $iteration of $TARGET_ACCEPTED_FILES."
+  iteration_start_epoch="$(current_epoch)"
+  progress "Iteration $iteration of $TARGET_ACCEPTED_FILES started at $(current_time)."
 
-  progress "Running Creator."
-  run_creator
-  progress "Creator completed."
+  CREATOR_OUTPUT="$(new_temp_file)"
+  run_with_spinner "Creator" run_creator
   prepare_diff_for_review
-  progress "Running Reviewer."
-  run_reviewer
-  progress "Reviewer completed."
+
+  REVIEWER_OUTPUT="$(new_temp_file)"
+  run_with_spinner "Reviewer" run_reviewer
 
   verdict="$(parse_verdict "$REVIEWER_OUTPUT")"
   progress "Reviewer verdict parsed: $verdict."
@@ -203,20 +278,19 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
     fail "RKM cycle must never modify AGENTS.md."
   fi
 
-  progress "Running validation."
-  bash scripts/validate-rkm.sh
+  run_with_spinner "validation" run_validation
 
   progress "Preparing commit for $changed_file."
-  git add -- "$changed_file"
-  git diff --cached --check
-
   commit_message="$(commit_message_for_file "$changed_file")"
-  progress "Committing $changed_file."
-  git commit -m "$commit_message"
+  run_with_spinner "commit" run_commit "$changed_file" "$commit_message"
   progress "Commit completed: $commit_message."
 
   accepted_files=$((accepted_files + 1))
+  iteration_end_epoch="$(current_epoch)"
+  progress "Iteration $iteration of $TARGET_ACCEPTED_FILES ended at $(current_time). Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
 done
 
+cycle_end_epoch="$(current_epoch)"
+progress "Cycle ended at $(current_time). Elapsed: $(format_elapsed "$((cycle_end_epoch - cycle_start_epoch))")."
 progress "Cycle completed: $accepted_files accepted file(s) committed."
 git status --short
