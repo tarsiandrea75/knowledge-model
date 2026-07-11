@@ -14,6 +14,27 @@ print_git_status() {
   git status --short
 }
 
+now_seconds() {
+  date +%s
+}
+
+elapsed_seconds() {
+  local started_at="$1"
+  local finished_at
+  finished_at="$(now_seconds)"
+  printf '%s' "$((finished_at - started_at))"
+}
+
+start_step() {
+  STEP_NAME="$1"
+  STEP_STARTED_AT="$(now_seconds)"
+  printf '\n==> %s\n' "$STEP_NAME"
+}
+
+pass_step() {
+  printf 'PASS: %s (%ss)\n' "$STEP_NAME" "$(elapsed_seconds "$STEP_STARTED_AT")"
+}
+
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
@@ -39,11 +60,15 @@ require_command find
 
 PYTHON_BIN="$(find_python)"
 trap print_git_status EXIT
+TOTAL_STARTED_AT="$(now_seconds)"
+STEP_NAME=""
+STEP_STARTED_AT="$TOTAL_STARTED_AT"
 
-echo "Running git whitespace validation..."
+start_step "Running git whitespace validation..."
 git diff --check
+pass_step
 
-echo "Checking file encoding and line endings..."
+start_step "Checking file encoding and line endings..."
 "$PYTHON_BIN" - <<'PY'
 from __future__ import annotations
 
@@ -124,8 +149,9 @@ if errors:
         print(error, file=sys.stderr)
     raise SystemExit(1)
 PY
+pass_step
 
-echo "Checking for forbidden RKM naming..."
+start_step "Checking for forbidden RKM naming..."
 forbidden_naming_matches="$(
   grep -RInE "RAG Knowledge Base|RAG-KB|ragkb|rag-kb|rkm\.dev" README.md docs schema scripts .gitattributes 2>/dev/null \
     | grep -v '^AGENTS.md:' \
@@ -135,8 +161,9 @@ if [[ -n "$forbidden_naming_matches" ]]; then
   printf '%s\n' "$forbidden_naming_matches" >&2
   fail "Forbidden project naming found."
 fi
+pass_step
 
-echo "Checking for TODO, TBD, placeholder markers and ellipses outside AGENTS.md..."
+start_step "Checking for TODO, TBD, placeholder markers and ellipses outside AGENTS.md..."
 incomplete_content_matches="$(
   grep -RInE "TODO|TBD|placeholder|Placeholder|PLACEHOLDER|\.{3}|…" README.md docs schema scripts .gitattributes 2>/dev/null \
     | grep -v '^AGENTS.md:' \
@@ -146,8 +173,9 @@ if [[ -n "$incomplete_content_matches" ]]; then
   printf '%s\n' "$incomplete_content_matches" >&2
   fail "Incomplete content marker found."
 fi
+pass_step
 
-echo "Checking for IDE files..."
+start_step "Checking for IDE files..."
 ide_file_matches="$(
   find . \
     -path './.git' -prune -o \
@@ -158,8 +186,9 @@ if [[ -n "$ide_file_matches" ]]; then
   printf '%s\n' "$ide_file_matches" >&2
   fail "IDE files or directories found."
 fi
+pass_step
 
-echo "Checking for temporary review files..."
+start_step "Checking for temporary review files..."
 temporary_review_matches="$(
   find . \
     -path './.git' -prune -o \
@@ -181,14 +210,18 @@ if [[ -n "$temporary_review_matches" ]]; then
   printf '%s\n' "$temporary_review_matches" >&2
   fail "Temporary review files found."
 fi
+pass_step
 
-echo "Running JSON Schema validation..."
+start_step "Running JSON Schema validation..."
 "$PYTHON_BIN" scripts/validate-schemas.py
+pass_step
 
-echo "Running registry validation..."
+start_step "Running registry validation..."
 "$PYTHON_BIN" scripts/validate-registries.py
+pass_step
 
-echo "Running documentation relationship validation..."
+start_step "Running documentation relationship validation..."
 "$PYTHON_BIN" scripts/validate-doc-relationships.py
+pass_step
 
-echo "RKM validation passed."
+printf '\nRKM validation passed. Total elapsed: %ss\n' "$(elapsed_seconds "$TOTAL_STARTED_AT")"
