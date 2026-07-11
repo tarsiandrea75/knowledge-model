@@ -5,7 +5,7 @@ CYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
 
-.PHONY: validate status log cycle discover push safe-push fix-eof clean-discovery-artifacts help
+.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof clean-discovery-artifacts help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -48,6 +48,10 @@ safe-push: validate
 	git log --oneline -n 5
 	git push
 
+install-hooks:
+	git config core.hooksPath .githooks
+	@printf 'Git hooks path configured to .githooks.\n'
+
 fix-eof:
 	@if [[ -z "$(strip $(FILE))" ]]; then \
 		printf 'FILE is required. Usage: make fix-eof FILE=path/to/file\n' >&2; \
@@ -70,6 +74,7 @@ help:
 	@printf '  make discover [N=5]              Run scripts/rkm-discover.sh N, save stdout to /tmp/rkm-discovery-output.txt, keep stderr visible, print exit code, output tail, and status.\n'
 	@printf '  make push                        Run git push.\n'
 	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
+	@printf '  make install-hooks               Configure Git to use hooks from .githooks.\n'
 	@printf '  make fix-eof FILE=path/to/file   Run scripts/rkm-fix-eof.sh on FILE.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
 	@printf '  make help                        Show this help.\n'
