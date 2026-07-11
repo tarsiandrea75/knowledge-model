@@ -18,6 +18,7 @@ from urllib.parse import urldefrag
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_ROOT = REPOSITORY_ROOT / "schema"
 IDENTITY_SCHEMA_PATH = SCHEMA_ROOT / "definitions" / "identity.schema.json"
+RELATIONSHIP_SCHEMA_PATH = SCHEMA_ROOT / "definitions" / "relationship.schema.json"
 EXPECTED_DRAFT = "https://json-schema.org/draft/2020-12/schema"
 ALLOWED_ID_PREFIXES = (
     "https://rkm.org/schema/",
@@ -163,6 +164,34 @@ def identity_entity_type_enum(
     return set(enum)
 
 
+def relationship_entity_type_enum(
+    loaded_documents: dict[Path, dict[str, object]],
+) -> set[str]:
+    relationship_document = loaded_documents.get(RELATIONSHIP_SCHEMA_PATH.resolve())
+    if relationship_document is None:
+        raise ValidationError(
+            f"{RELATIONSHIP_SCHEMA_PATH}: relationship schema was not loaded"
+        )
+
+    definitions = relationship_document.get("$defs")
+    if not isinstance(definitions, dict):
+        raise ValidationError(f"{RELATIONSHIP_SCHEMA_PATH}: $defs must be an object")
+
+    entity_type = definitions.get("entityType")
+    if not isinstance(entity_type, dict):
+        raise ValidationError(
+            f"{RELATIONSHIP_SCHEMA_PATH}: $defs.entityType must be an object"
+        )
+
+    enum = entity_type.get("enum")
+    if not isinstance(enum, list) or not all(isinstance(value, str) for value in enum):
+        raise ValidationError(
+            f"{RELATIONSHIP_SCHEMA_PATH}: $defs.entityType.enum must be an array of strings"
+        )
+
+    return set(enum)
+
+
 def constrained_identity_entity_types(document: dict[str, object]) -> list[object]:
     properties = document.get("properties")
     if not isinstance(properties, dict):
@@ -194,6 +223,11 @@ def constrained_identity_entity_types(document: dict[str, object]) -> list[objec
     return entity_types
 
 
+def has_relationships_property(document: dict[str, object]) -> bool:
+    properties = document.get("properties")
+    return isinstance(properties, dict) and "relationships" in properties
+
+
 def validate_specialized_schema_entity_types(
     path: Path,
     document: dict[str, object],
@@ -208,6 +242,24 @@ def validate_specialized_schema_entity_types(
                 f"{path}: identity entityType const {entity_type!r} is not present "
                 f"in {IDENTITY_SCHEMA_PATH.relative_to(REPOSITORY_ROOT)} "
                 "properties.entityType.enum"
+            )
+
+
+def validate_specialized_schema_relationship_entity_types(
+    path: Path,
+    document: dict[str, object],
+    relationship_entity_types: set[str],
+) -> None:
+    if path.parent != SCHEMA_ROOT or not has_relationships_property(document):
+        return
+
+    for entity_type in constrained_identity_entity_types(document):
+        if entity_type not in relationship_entity_types:
+            raise ValidationError(
+                f"{path}: identity entityType const {entity_type!r} is used by a "
+                "schema with a relationships property but is not present in "
+                f"{RELATIONSHIP_SCHEMA_PATH.relative_to(REPOSITORY_ROOT)} "
+                "$defs.entityType.enum"
             )
 
 
@@ -226,6 +278,12 @@ def main() -> int:
         errors.append(str(exc))
         allowed_entity_types = set()
 
+    try:
+        relationship_entity_types = relationship_entity_type_enum(loaded_documents)
+    except ValidationError as exc:
+        errors.append(str(exc))
+        relationship_entity_types = set()
+
     for path in schema_files:
         resolved_path = path.resolve()
         document = loaded_documents[resolved_path]
@@ -233,6 +291,11 @@ def main() -> int:
             validate_schema_header(path, document)
             validate_schema_references(resolved_path, document, loaded_documents)
             validate_specialized_schema_entity_types(path, document, allowed_entity_types)
+            validate_specialized_schema_relationship_entity_types(
+                path,
+                document,
+                relationship_entity_types,
+            )
         except ValidationError as exc:
             errors.append(str(exc))
 
