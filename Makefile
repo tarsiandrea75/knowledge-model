@@ -72,7 +72,7 @@ codex-commit:
 		printf 'MESSAGE is required. Usage: make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"\n' >&2; \
 		exit 1; \
 	fi
-	bash scripts/rkm-codex-commit.sh "$(PROMPT_FILE)" "$(FILE)" "$(MESSAGE)"
+	bash scripts/rkm-codex-commit.sh --prompt-file "$(PROMPT_FILE)" --file "$(FILE)" --message "$(MESSAGE)"
 
 clean-discovery-artifacts:
 	find . -maxdepth 1 \( \
