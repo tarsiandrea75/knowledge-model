@@ -1,0 +1,565 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/pattern.schema.json",
+  "title": "RKM Pattern Schema",
+  "description": "Defines a reusable architectural pattern entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "pattern"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Pattern"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this pattern to techniques, frameworks, components, workflows, agents, models, databases, benchmarks, papers or providers.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this pattern.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this pattern document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this pattern document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the pattern but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "pattern": {
+      "$ref": "#/$defs/patternDetails"
+    }
+  },
+  "$defs": {
+    "patternDetails": {
+      "type": "object",
+      "description": "Pattern-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "patternType",
+        "scope",
+        "ragStages"
+      ],
+      "properties": {
+        "patternType": {
+          "type": "string",
+          "description": "Primary category of architectural pattern represented by this entity.",
+          "enum": [
+            "Retrieval Pattern",
+            "Indexing Pattern",
+            "Chunking Pattern",
+            "Context Assembly Pattern",
+            "Generation Pattern",
+            "Evaluation Pattern",
+            "Orchestration Pattern",
+            "Agent Pattern",
+            "Data Management Pattern",
+            "Deployment Pattern",
+            "Governance Pattern",
+            "Other"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "description": "Architectural scope at which the pattern is normally applied.",
+          "enum": [
+            "Component",
+            "Pipeline",
+            "Workflow",
+            "System",
+            "Platform",
+            "Organization",
+            "Variable",
+            "Unknown"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the pattern is commonly applied or has direct impact.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Parsing",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring",
+              "Governance"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "problemContext": {
+          "type": "array",
+          "description": "Recurring problems, constraints or situations that motivate use of the pattern.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "applicability": {
+          "type": "array",
+          "description": "Conditions under which the pattern is appropriate.",
+          "items": {
+            "$ref": "#/$defs/applicabilityCondition"
+          },
+          "uniqueItems": true
+        },
+        "participants": {
+          "type": "array",
+          "description": "Architectural participants, components or entity roles involved in the pattern.",
+          "items": {
+            "$ref": "#/$defs/patternParticipant"
+          },
+          "uniqueItems": true
+        },
+        "structure": {
+          "$ref": "#/$defs/patternStructure"
+        },
+        "collaboration": {
+          "type": "array",
+          "description": "Interactions or responsibilities that define how pattern participants work together.",
+          "items": {
+            "$ref": "#/$defs/collaborationStep"
+          },
+          "uniqueItems": true
+        },
+        "forces": {
+          "type": "array",
+          "description": "Competing forces or tradeoffs that shape the pattern.",
+          "items": {
+            "$ref": "#/$defs/patternForce"
+          },
+          "uniqueItems": true
+        },
+        "consequences": {
+          "type": "array",
+          "description": "Expected consequences of applying the pattern.",
+          "items": {
+            "$ref": "#/$defs/patternConsequence"
+          },
+          "uniqueItems": true
+        },
+        "variants": {
+          "type": "array",
+          "description": "Known variants or specializations of the pattern.",
+          "items": {
+            "$ref": "#/$defs/patternVariant"
+          },
+          "uniqueItems": true
+        },
+        "implementationGuidance": {
+          "type": "array",
+          "description": "Guidance for implementing the pattern in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evaluationGuidance": {
+          "type": "array",
+          "description": "Metrics, benchmarks or evaluation practices useful for assessing the pattern.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "knownUses": {
+          "type": "array",
+          "description": "Known implementations, systems, frameworks, papers or techniques that use the pattern.",
+          "items": {
+            "$ref": "#/$defs/knownUse"
+          },
+          "uniqueItems": true
+        },
+        "antiPatterns": {
+          "type": "array",
+          "description": "Anti-patterns or misuse cases related to this pattern.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "applicabilityCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition",
+        "importance"
+      ],
+      "properties": {
+        "condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importance": {
+          "$ref": "#/$defs/importanceLevel"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "patternParticipant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "participantType"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "participantType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Component",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "External System",
+            "Human",
+            "Other"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Optional stable RKM identifier when the participant is a known entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "patternStructure": {
+      "type": "object",
+      "description": "Structural description of how the pattern is organized.",
+      "additionalProperties": false,
+      "properties": {
+        "topology": {
+          "type": "string",
+          "enum": [
+            "Linear Pipeline",
+            "Branching Pipeline",
+            "Feedback Loop",
+            "Router",
+            "Coordinator",
+            "Layered",
+            "Graph",
+            "Hub And Spoke",
+            "Event Driven",
+            "Hybrid",
+            "Other",
+            "Unknown"
+          ]
+        },
+        "stateModel": {
+          "type": "string",
+          "enum": [
+            "Stateless",
+            "Stateful",
+            "Session Scoped",
+            "Persistent",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "dataFlow": {
+          "type": "array",
+          "description": "Important data or control flow steps in the pattern.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "controlFlow": {
+          "type": "array",
+          "description": "Important control decisions or sequencing rules in the pattern.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "collaborationStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "description"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "actorRole": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "patternForce": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "impact"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "impact": {
+          "$ref": "#/$defs/impactLevel"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        }
+      }
+    },
+    "patternConsequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "polarity"
+      ],
+      "properties": {
+        "effect": {
+          "type": "string",
+          "minLength": 1
+        },
+        "polarity": {
+          "type": "string",
+          "enum": [
+            "Positive",
+            "Negative",
+            "Mixed",
+            "Neutral",
+            "Unknown"
+          ]
+        },
+        "affectedQuality": {
+          "type": "string",
+          "enum": [
+            "Accuracy",
+            "Recall",
+            "Precision",
+            "Faithfulness",
+            "Latency",
+            "Cost",
+            "Complexity",
+            "Scalability",
+            "Maintainability",
+            "Observability",
+            "Security",
+            "Reliability",
+            "User Experience",
+            "Other"
+          ]
+        },
+        "impact": {
+          "$ref": "#/$defs/impactLevel"
+        }
+      }
+    },
+    "patternVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationshipToPattern": {
+          "type": "string",
+          "enum": [
+            "Specialization",
+            "Simplification",
+            "Extension",
+            "Alternative",
+            "Composition",
+            "Other"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Optional stable RKM identifier when the variant is modeled as its own entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        }
+      }
+    },
+    "knownUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "useType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "useType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Framework",
+            "System",
+            "Paper",
+            "Benchmark",
+            "Dataset",
+            "Provider",
+            "Implementation",
+            "Other"
+          ]
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Optional stable RKM identifier when the known use is a modeled entity.",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "description": "Evidence records supporting this known use.",
+          "items": {
+            "type": "string",
+            "pattern": "^EVIDENCE-[0-9]{4,}$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "importanceLevel": {
+      "type": "string",
+      "enum": [
+        "Required",
+        "Recommended",
+        "Optional",
+        "Context Dependent",
+        "Unknown"
+      ]
+    },
+    "impactLevel": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
