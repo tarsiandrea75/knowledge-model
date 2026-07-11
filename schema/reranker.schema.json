@@ -1,0 +1,428 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/reranker.schema.json",
+  "title": "RKM Reranker Schema",
+  "description": "Defines a reranker entity used to reorder retrieved candidates by relevance, grounding value or task-specific utility in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "reranker"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Reranker"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this reranker to retrievers, embedding models, language models, datasets, benchmarks, frameworks, papers or RAG techniques.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this reranker.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this reranker document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this reranker document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the reranker but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "reranker": {
+      "$ref": "#/$defs/rerankerDetails"
+    }
+  },
+  "$defs": {
+    "rerankerDetails": {
+      "type": "object",
+      "description": "Reranker-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "rerankerType",
+        "scoringApproach",
+        "inputModalities"
+      ],
+      "properties": {
+        "rerankerType": {
+          "type": "string",
+          "description": "Primary category of reranker represented by this entity.",
+          "enum": [
+            "Cross Encoder",
+            "Bi Encoder Reranker",
+            "Sparse Reranker",
+            "LLM Based Reranker",
+            "Learning To Rank",
+            "Hybrid Reranker",
+            "Rule Based Reranker",
+            "Reciprocal Rank Fusion",
+            "Domain Specific Reranker",
+            "Other"
+          ]
+        },
+        "scoringApproach": {
+          "type": "string",
+          "description": "How the reranker assigns or combines candidate relevance scores.",
+          "enum": [
+            "Pairwise Query Candidate Scoring",
+            "Listwise Candidate Scoring",
+            "Pointwise Candidate Scoring",
+            "Rank Fusion",
+            "Heuristic Scoring",
+            "Generative Relevance Judging",
+            "Other"
+          ]
+        },
+        "inputModalities": {
+          "type": "array",
+          "description": "Input modalities the reranker can compare or reorder.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Text",
+              "Code",
+              "Image",
+              "Table",
+              "Graph",
+              "Multimodal",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "candidateInputs": {
+          "type": "array",
+          "description": "Candidate artifacts accepted by the reranker.",
+          "items": {
+            "$ref": "#/$defs/candidateInput"
+          },
+          "uniqueItems": true
+        },
+        "output": {
+          "$ref": "#/$defs/rerankerOutput"
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where this reranker is commonly used.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Retrieval-quality capabilities associated with the reranker.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Semantic Relevance Scoring",
+              "Lexical Relevance Scoring",
+              "Hybrid Relevance Scoring",
+              "Passage Reranking",
+              "Document Reranking",
+              "Multi Hop Evidence Ordering",
+              "Citation Candidate Selection",
+              "Diversity Aware Ranking",
+              "Query Document Matching",
+              "Instruction Following Ranking",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "modelProfile": {
+          "$ref": "#/$defs/modelProfile"
+        },
+        "deployment": {
+          "$ref": "#/$defs/deploymentProfile"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "operationalCharacteristics": {
+          "type": "object",
+          "description": "Operational characteristics relevant to reranker selection and use.",
+          "additionalProperties": false,
+          "properties": {
+            "latencyImpact": {
+              "$ref": "#/$defs/level"
+            },
+            "costImpact": {
+              "$ref": "#/$defs/level"
+            },
+            "qualityImpact": {
+              "$ref": "#/$defs/level"
+            },
+            "throughputSensitivity": {
+              "$ref": "#/$defs/level"
+            },
+            "contextLengthSensitivity": {
+              "$ref": "#/$defs/level"
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, biases or operational constraints of the reranker.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this reranker in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "candidateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactType"
+      ],
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "Passage",
+            "Document",
+            "Chunk",
+            "Node",
+            "Search Result",
+            "Citation Candidate",
+            "Generated Answer",
+            "Other"
+          ]
+        },
+        "requiresQuery": {
+          "type": "boolean"
+        },
+        "requiresMetadata": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rerankerOutput": {
+      "type": "object",
+      "description": "Outputs produced by the reranker.",
+      "additionalProperties": false,
+      "properties": {
+        "returnsScores": {
+          "type": "boolean"
+        },
+        "returnsRankedList": {
+          "type": "boolean"
+        },
+        "scoreRange": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supportsTopK": {
+          "type": "boolean"
+        },
+        "supportsTieBreaking": {
+          "type": "boolean"
+        }
+      }
+    },
+    "modelProfile": {
+      "type": "object",
+      "description": "Model characteristics when the reranker is model-based.",
+      "additionalProperties": false,
+      "properties": {
+        "baseModelType": {
+          "type": "string",
+          "enum": [
+            "Transformer Encoder",
+            "Transformer Decoder",
+            "Encoder Decoder Transformer",
+            "Sparse Retrieval Model",
+            "Embedding Model",
+            "Language Model",
+            "Traditional Ranking Model",
+            "Not Applicable",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "contextWindow": {
+          "type": "integer",
+          "description": "Maximum supported input context length in tokens when known.",
+          "minimum": 1
+        },
+        "trainingObjective": {
+          "type": "string",
+          "enum": [
+            "Contrastive",
+            "Pairwise Ranking",
+            "Listwise Ranking",
+            "Classification",
+            "Instruction Tuning",
+            "Preference Optimization",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "fineTuningSupported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "deploymentProfile": {
+      "type": "object",
+      "description": "How the reranker can be deployed or consumed.",
+      "additionalProperties": false,
+      "properties": {
+        "deploymentModels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "API",
+              "Managed Service",
+              "Self Hosted",
+              "Local",
+              "Embedded",
+              "Batch",
+              "Edge",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "hardwareRequirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "CPU",
+              "GPU",
+              "TPU",
+              "Memory Optimized",
+              "Not Specified",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "batchingSupported": {
+          "type": "boolean"
+        },
+        "streamingSupported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation information relevant to reranking quality.",
+      "additionalProperties": false,
+      "properties": {
+        "commonMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "NDCG",
+              "MRR",
+              "MAP",
+              "Recall At K",
+              "Precision At K",
+              "Hit Rate",
+              "Pairwise Accuracy",
+              "Latency",
+              "Cost",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "benchmarkSuites": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "requiresHumanJudgment": {
+          "type": "boolean"
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
