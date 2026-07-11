@@ -153,6 +153,14 @@ Prefer this style:
 * registries for controlled vocabularies
 * schemas that can support graph export
 
+## Lessons Learned / Hard Rules
+
+* Specialized schemas must only use `identity.entityType` `const` values already supported by `schema/definitions/identity.schema.json`.
+* Add shared identity support before introducing specialized schemas for new entity types.
+* Architecture documents must use canonical relationship predicates from the relationship model.
+* Noncanonical relationship names may appear only as explicitly noncanonical, future candidate, deprecated, or rejected examples.
+* Reviewer `ACCEPT` must consider semantic coherence with RKM architecture, not only validation success.
+
 ## Naming Rules
 
 Use these canonical project names:
