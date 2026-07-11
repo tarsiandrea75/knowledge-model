@@ -1,0 +1,600 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/agent.schema.json",
+  "title": "RKM Agent Schema",
+  "description": "Defines an agent entity that plans, coordinates tools, invokes models, retrieves knowledge or executes workflows in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "agent"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Agent"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this agent to techniques, frameworks, models, tools, components, workflows, benchmarks, datasets or providers.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this agent.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this agent document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this agent document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the agent but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "agent": {
+      "$ref": "#/$defs/agentDetails"
+    }
+  },
+  "$defs": {
+    "agentDetails": {
+      "type": "object",
+      "description": "Agent-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "agentType",
+        "autonomyLevel",
+        "ragRoles"
+      ],
+      "properties": {
+        "agentType": {
+          "type": "string",
+          "description": "Primary architectural form of the agent.",
+          "enum": [
+            "Single Agent",
+            "Multi Agent System",
+            "Planner Agent",
+            "Executor Agent",
+            "Retriever Agent",
+            "Router Agent",
+            "Evaluator Agent",
+            "Critic Agent",
+            "Tool Using Agent",
+            "Workflow Agent",
+            "Conversational Agent",
+            "Other"
+          ]
+        },
+        "autonomyLevel": {
+          "type": "string",
+          "description": "Degree of independent decision-making expected from the agent.",
+          "enum": [
+            "None",
+            "Low",
+            "Medium",
+            "High",
+            "Human Supervised",
+            "Variable",
+            "Unknown"
+          ]
+        },
+        "ragRoles": {
+          "type": "array",
+          "description": "RAG responsibilities performed or coordinated by the agent.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Query Understanding",
+              "Query Planning",
+              "Retrieval Planning",
+              "Retriever Selection",
+              "Tool Selection",
+              "Context Gathering",
+              "Context Verification",
+              "Context Assembly",
+              "Answer Generation",
+              "Grounding Verification",
+              "Citation Selection",
+              "Evaluation",
+              "Workflow Orchestration",
+              "User Interaction",
+              "Monitoring",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "planning": {
+          "$ref": "#/$defs/planningProfile"
+        },
+        "toolUse": {
+          "$ref": "#/$defs/toolUseProfile"
+        },
+        "memory": {
+          "$ref": "#/$defs/memoryProfile"
+        },
+        "retrievalBehavior": {
+          "$ref": "#/$defs/retrievalBehavior"
+        },
+        "coordination": {
+          "$ref": "#/$defs/coordinationProfile"
+        },
+        "controlPolicy": {
+          "$ref": "#/$defs/controlPolicy"
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Inputs consumed by the agent.",
+          "items": {
+            "$ref": "#/$defs/agentPort"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Outputs produced by the agent.",
+          "items": {
+            "$ref": "#/$defs/agentPort"
+          },
+          "uniqueItems": true
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "operationalCharacteristics": {
+          "$ref": "#/$defs/operationalCharacteristics"
+        },
+        "safetyConsiderations": {
+          "type": "array",
+          "description": "Safety, reliability or governance considerations associated with this agent.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations or failure modes of the agent.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this agent in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "planningProfile": {
+      "type": "object",
+      "description": "Planning capabilities used to decompose goals, sequence actions or revise plans.",
+      "additionalProperties": false,
+      "properties": {
+        "planningMode": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Static Plan",
+            "Dynamic Plan",
+            "Iterative Replanning",
+            "Tree Search",
+            "Graph Search",
+            "Reflection",
+            "Other"
+          ]
+        },
+        "planningHorizon": {
+          "type": "string",
+          "enum": [
+            "Single Step",
+            "Short Horizon",
+            "Long Horizon",
+            "Open Ended",
+            "Unknown"
+          ]
+        },
+        "usesIntermediateState": {
+          "type": "boolean"
+        },
+        "requiresHumanApproval": {
+          "type": "boolean"
+        }
+      }
+    },
+    "toolUseProfile": {
+      "type": "object",
+      "description": "Tool-use capabilities and constraints.",
+      "additionalProperties": false,
+      "properties": {
+        "toolSelectionMode": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Rule Based",
+            "Model Selected",
+            "Planner Selected",
+            "Human Selected",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "toolInvocationMode": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Synchronous",
+            "Asynchronous",
+            "Batch",
+            "Streaming",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "supportedToolTypes": {
+          "type": "array",
+          "description": "Kinds of tools the agent can invoke.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Retriever",
+              "Search",
+              "Database",
+              "Code Interpreter",
+              "Function",
+              "API",
+              "Browser",
+              "File System",
+              "Vector Database",
+              "Graph Database",
+              "Evaluator",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresToolSchemas": {
+          "type": "boolean"
+        }
+      }
+    },
+    "memoryProfile": {
+      "type": "object",
+      "description": "Memory mechanisms available to the agent.",
+      "additionalProperties": false,
+      "properties": {
+        "memoryTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Conversation History",
+              "Working Memory",
+              "Episodic Memory",
+              "Semantic Memory",
+              "Vector Memory",
+              "Tool Trace",
+              "External State",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "persistence": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Session",
+            "Persistent",
+            "Configurable",
+            "Unknown"
+          ]
+        },
+        "memoryUpdateMode": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Append Only",
+            "Summarized",
+            "Retrieval Augmented",
+            "Learned",
+            "Human Curated",
+            "Hybrid",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "retrievalBehavior": {
+      "type": "object",
+      "description": "How the agent uses retrieval as part of reasoning or task execution.",
+      "additionalProperties": false,
+      "properties": {
+        "retrievalInitiation": {
+          "type": "string",
+          "enum": [
+            "Never",
+            "Always",
+            "On Demand",
+            "Planner Decided",
+            "Tool Decided",
+            "Human Decided",
+            "Unknown"
+          ]
+        },
+        "queryGeneration": {
+          "type": "string",
+          "enum": [
+            "User Query",
+            "Rewritten Query",
+            "Generated Subqueries",
+            "Multi Hop Queries",
+            "Structured Query",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "retrievalIterations": {
+          "type": "string",
+          "enum": [
+            "Single",
+            "Fixed Multiple",
+            "Adaptive",
+            "Until Confidence Threshold",
+            "Unknown"
+          ]
+        },
+        "usesRetrievedEvidence": {
+          "type": "boolean"
+        }
+      }
+    },
+    "coordinationProfile": {
+      "type": "object",
+      "description": "Coordination model for multi-agent or workflow-based agents.",
+      "additionalProperties": false,
+      "properties": {
+        "coordinationMode": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Sequential",
+            "Parallel",
+            "Hierarchical",
+            "Debate",
+            "Blackboard",
+            "Event Driven",
+            "Workflow",
+            "Other"
+          ]
+        },
+        "roleAssignment": {
+          "type": "string",
+          "enum": [
+            "Static",
+            "Dynamic",
+            "Human Assigned",
+            "Model Assigned",
+            "Hybrid",
+            "Unknown"
+          ]
+        },
+        "sharedState": {
+          "type": "boolean"
+        }
+      }
+    },
+    "controlPolicy": {
+      "type": "object",
+      "description": "Controls that constrain agent execution.",
+      "additionalProperties": false,
+      "properties": {
+        "terminationCondition": {
+          "type": "string",
+          "enum": [
+            "Single Response",
+            "Max Steps",
+            "Goal Reached",
+            "Confidence Threshold",
+            "Human Stop",
+            "Budget Exhausted",
+            "External Signal",
+            "Unknown"
+          ]
+        },
+        "maxSteps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "budgetControls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Token Budget",
+              "Time Budget",
+              "Cost Budget",
+              "Tool Call Budget",
+              "Retrieval Budget",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "humanInTheLoop": {
+          "type": "boolean"
+        }
+      }
+    },
+    "agentPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modality": {
+          "type": "string",
+          "enum": [
+            "Text",
+            "Code",
+            "Image",
+            "Audio",
+            "Video",
+            "Structured Data",
+            "Tool Call",
+            "Retrieved Context",
+            "Trace",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation signals relevant to assessing agent behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "evaluationTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Task Success",
+              "Answer Faithfulness",
+              "Context Relevance",
+              "Citation Accuracy",
+              "Plan Quality",
+              "Tool Selection Accuracy",
+              "Tool Execution Success",
+              "Latency",
+              "Cost",
+              "Safety",
+              "User Satisfaction",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresTraceEvaluation": {
+          "type": "boolean"
+        },
+        "supportsOnlineEvaluation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to running the agent.",
+      "additionalProperties": false,
+      "properties": {
+        "latencySensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "costSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "complexity": {
+          "$ref": "#/$defs/level"
+        },
+        "observabilityRequirement": {
+          "$ref": "#/$defs/level"
+        },
+        "determinism": {
+          "type": "string",
+          "enum": [
+            "Deterministic",
+            "Mostly Deterministic",
+            "Non Deterministic",
+            "Configurable",
+            "Unknown"
+          ]
+        },
+        "statefulness": {
+          "type": "string",
+          "enum": [
+            "Stateless",
+            "Stateful",
+            "Depends On Configuration",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
