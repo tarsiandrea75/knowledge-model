@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/glossary.schema.json",
+  "title": "RKM Glossary Schema",
+  "description": "Defines a glossary term entity in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "glossary"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Glossary"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this glossary term to techniques, components, models, datasets, benchmarks, papers, frameworks or other glossary terms.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this glossary term.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this glossary term document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this glossary term document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the glossary term but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "glossary": {
+      "$ref": "#/$defs/glossaryDetails"
+    }
+  },
+  "$defs": {
+    "glossaryDetails": {
+      "type": "object",
+      "description": "Glossary-term-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "termType",
+        "definition",
+        "scope"
+      ],
+      "properties": {
+        "termType": {
+          "type": "string",
+          "description": "Primary kind of term represented by this glossary entity.",
+          "enum": [
+            "Concept",
+            "Technique Name",
+            "Component Name",
+            "Metric Name",
+            "Dataset Name",
+            "Benchmark Name",
+            "Model Name",
+            "Framework Name",
+            "Acronym",
+            "Synonym",
+            "Other"
+          ]
+        },
+        "definition": {
+          "type": "string",
+          "description": "Canonical definition of the term within RKM.",
+          "minLength": 20
+        },
+        "scope": {
+          "type": "string",
+          "description": "Domain scope in which the definition is intended to apply.",
+          "enum": [
+            "General RAG",
+            "Retrieval",
+            "Indexing",
+            "Chunking",
+            "Embedding",
+            "Reranking",
+            "Generation",
+            "Evaluation",
+            "Orchestration",
+            "Governance",
+            "Implementation",
+            "Research",
+            "Other"
+          ]
+        },
+        "preferredTerm": {
+          "type": "string",
+          "description": "Preferred lexical form when the entity identity name is not the canonical wording.",
+          "minLength": 1
+        },
+        "alternateTerms": {
+          "type": "array",
+          "description": "Alternative lexical forms, synonyms or commonly used variants.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "abbreviations": {
+          "type": "array",
+          "description": "Abbreviated forms or acronyms associated with the term.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "disambiguation": {
+          "type": "array",
+          "description": "Notes that distinguish this term from nearby or overloaded concepts.",
+          "items": {
+            "$ref": "#/$defs/disambiguationNote"
+          },
+          "uniqueItems": true
+        },
+        "usageNotes": {
+          "type": "array",
+          "description": "Guidance for using the term consistently in RKM content.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "examples": {
+          "type": "array",
+          "description": "Examples that clarify the meaning or expected usage of the term.",
+          "items": {
+            "$ref": "#/$defs/glossaryExample"
+          },
+          "uniqueItems": true
+        },
+        "nonExamples": {
+          "type": "array",
+          "description": "Examples of concepts or usages that should not be treated as this term.",
+          "items": {
+            "$ref": "#/$defs/glossaryExample"
+          },
+          "uniqueItems": true
+        },
+        "relatedEntityTypes": {
+          "type": "array",
+          "description": "RKM entity types commonly associated with the term.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Technique",
+              "Framework",
+              "Paper",
+              "Component",
+              "Pattern",
+              "Glossary",
+              "Dataset",
+              "Benchmark",
+              "EmbeddingModel",
+              "LanguageModel",
+              "VectorDatabase",
+              "GraphDatabase",
+              "Retriever",
+              "Reranker",
+              "ChunkingStrategy",
+              "EvaluationMetric",
+              "PromptTechnique",
+              "Agent",
+              "Provider"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "disambiguationNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nearbyTerm",
+        "distinction"
+      ],
+      "properties": {
+        "nearbyTerm": {
+          "type": "string",
+          "description": "Term or concept that may be confused with this glossary term.",
+          "minLength": 1
+        },
+        "distinction": {
+          "type": "string",
+          "description": "Explanation of the semantic difference.",
+          "minLength": 20
+        },
+        "relationshipType": {
+          "type": "string",
+          "description": "Canonical relationship predicate when the distinction should also be represented as a relationship.",
+          "pattern": "^[A-Z]+(?:_[A-Z]+)*$"
+        }
+      }
+    },
+    "glossaryExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context": {
+          "type": "string",
+          "description": "Context in which the example applies.",
+          "minLength": 1
+        },
+        "sourceEntityId": {
+          "type": "string",
+          "description": "Stable RKM entity identifier for a source or related example entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        }
+      }
+    }
+  }
+}
