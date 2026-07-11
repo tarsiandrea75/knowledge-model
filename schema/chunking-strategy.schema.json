@@ -1,0 +1,531 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/chunking-strategy.schema.json",
+  "title": "RKM Chunking Strategy Schema",
+  "description": "Defines a chunking strategy entity used to segment source content for indexing, retrieval and grounding in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "chunkingStrategy"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "ChunkingStrategy"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this chunking strategy to techniques, embedding models, retrievers, datasets, benchmarks, frameworks, components or papers.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this chunking strategy.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this chunking strategy document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this chunking strategy document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the chunking strategy but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "chunkingStrategy": {
+      "$ref": "#/$defs/chunkingStrategyDetails"
+    }
+  },
+  "$defs": {
+    "chunkingStrategyDetails": {
+      "type": "object",
+      "description": "Chunking-strategy-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "strategyType",
+        "chunkingUnit",
+        "boundaryPolicy"
+      ],
+      "properties": {
+        "strategyType": {
+          "type": "string",
+          "description": "Primary category of chunking strategy represented by this entity.",
+          "enum": [
+            "Fixed Size",
+            "Recursive Character",
+            "Token Based",
+            "Sentence Based",
+            "Paragraph Based",
+            "Section Based",
+            "Semantic",
+            "Structure Aware",
+            "Markdown Aware",
+            "Code Aware",
+            "Table Aware",
+            "Hierarchical",
+            "Sliding Window",
+            "Late Chunking",
+            "LLM Guided",
+            "Hybrid",
+            "Other"
+          ]
+        },
+        "chunkingUnit": {
+          "type": "string",
+          "description": "Primary unit used to determine chunk size or boundaries.",
+          "enum": [
+            "Character",
+            "Token",
+            "Word",
+            "Sentence",
+            "Paragraph",
+            "Section",
+            "Heading",
+            "Document Element",
+            "Semantic Segment",
+            "Code Block",
+            "Table Row",
+            "Table Cell",
+            "Graph Node",
+            "Other"
+          ]
+        },
+        "boundaryPolicy": {
+          "type": "string",
+          "description": "How the strategy selects or preserves boundaries between chunks.",
+          "enum": [
+            "Fixed Length",
+            "Delimiter Based",
+            "Recursive Separator",
+            "Natural Language Boundary",
+            "Structural Boundary",
+            "Semantic Similarity Boundary",
+            "Model Predicted Boundary",
+            "Sliding Window Boundary",
+            "Hybrid Boundary",
+            "Other"
+          ]
+        },
+        "supportedContentTypes": {
+          "type": "array",
+          "description": "Content types the chunking strategy is designed to segment.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Plain Text",
+              "Markdown",
+              "HTML",
+              "PDF Text",
+              "Code",
+              "Table",
+              "Transcript",
+              "Chat Conversation",
+              "Structured Document",
+              "Graph",
+              "Multimodal Metadata",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the chunking strategy is commonly used or has direct impact.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Parsing",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "configuration": {
+          "$ref": "#/$defs/chunkingConfiguration"
+        },
+        "inputRequirements": {
+          "type": "array",
+          "description": "Inputs or preprocessing requirements for applying the strategy.",
+          "items": {
+            "$ref": "#/$defs/chunkingRequirement"
+          },
+          "uniqueItems": true
+        },
+        "outputArtifacts": {
+          "type": "array",
+          "description": "Artifacts produced by the chunking strategy.",
+          "items": {
+            "$ref": "#/$defs/chunkingArtifact"
+          },
+          "uniqueItems": true
+        },
+        "metadataPropagation": {
+          "$ref": "#/$defs/metadataPropagation"
+        },
+        "retrievalEffects": {
+          "$ref": "#/$defs/retrievalEffects"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluationProfile"
+        },
+        "operationalCharacteristics": {
+          "type": "object",
+          "description": "Operational characteristics relevant to selecting and using the chunking strategy.",
+          "additionalProperties": false,
+          "properties": {
+            "implementationComplexity": {
+              "$ref": "#/$defs/level"
+            },
+            "preprocessingCost": {
+              "$ref": "#/$defs/level"
+            },
+            "retrievalQualityImpact": {
+              "$ref": "#/$defs/level"
+            },
+            "contextEfficiencyImpact": {
+              "$ref": "#/$defs/level"
+            },
+            "domainSensitivity": {
+              "$ref": "#/$defs/level"
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, tradeoffs or failure modes of the chunking strategy.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this chunking strategy in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "chunkingConfiguration": {
+      "type": "object",
+      "description": "Common configuration parameters for the chunking strategy.",
+      "additionalProperties": false,
+      "properties": {
+        "targetChunkSize": {
+          "type": "integer",
+          "description": "Target chunk size measured in the configured chunking unit when applicable.",
+          "minimum": 1
+        },
+        "minimumChunkSize": {
+          "type": "integer",
+          "description": "Minimum chunk size measured in the configured chunking unit when applicable.",
+          "minimum": 1
+        },
+        "maximumChunkSize": {
+          "type": "integer",
+          "description": "Maximum chunk size measured in the configured chunking unit when applicable.",
+          "minimum": 1
+        },
+        "overlap": {
+          "$ref": "#/$defs/overlapConfiguration"
+        },
+        "separatorPriority": {
+          "type": "array",
+          "description": "Ordered separator names or boundary classes used by recursive or delimiter-based strategies.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "preserveStructure": {
+          "type": "boolean",
+          "description": "Whether document structure such as headings, tables or code blocks should be preserved where possible."
+        },
+        "attachContextHeaders": {
+          "type": "boolean",
+          "description": "Whether parent headings or structural context should be attached to produced chunks."
+        }
+      }
+    },
+    "overlapConfiguration": {
+      "type": "object",
+      "description": "Overlap behavior between adjacent chunks.",
+      "additionalProperties": false,
+      "properties": {
+        "overlapType": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Fixed",
+            "Percentage",
+            "Semantic",
+            "Structural",
+            "Adaptive",
+            "Other"
+          ]
+        },
+        "overlapSize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overlapUnit": {
+          "type": "string",
+          "enum": [
+            "Character",
+            "Token",
+            "Word",
+            "Sentence",
+            "Paragraph",
+            "Percentage",
+            "Other"
+          ]
+        }
+      }
+    },
+    "chunkingRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "requirementLevel"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirementType": {
+          "type": "string",
+          "enum": [
+            "Parser",
+            "Tokenizer",
+            "Embedding Model",
+            "Language Model",
+            "Document Structure",
+            "Metadata",
+            "Domain Rules",
+            "Other"
+          ]
+        },
+        "requirementLevel": {
+          "type": "string",
+          "enum": [
+            "Required",
+            "Optional",
+            "Conditional"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "chunkingArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactType"
+      ],
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "Chunk",
+            "Passage",
+            "Document Section",
+            "Context Window",
+            "Parent Chunk",
+            "Child Chunk",
+            "Chunk Metadata",
+            "Chunk Graph",
+            "Other"
+          ]
+        },
+        "preservesSourceOffsets": {
+          "type": "boolean"
+        },
+        "preservesParentDocumentReference": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "metadataPropagation": {
+      "type": "object",
+      "description": "How source metadata is propagated to chunks.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceDocumentId": {
+          "type": "boolean"
+        },
+        "sourceOffsets": {
+          "type": "boolean"
+        },
+        "sectionHierarchy": {
+          "type": "boolean"
+        },
+        "pageNumbers": {
+          "type": "boolean"
+        },
+        "accessControls": {
+          "type": "boolean"
+        },
+        "customMetadata": {
+          "type": "boolean"
+        }
+      }
+    },
+    "retrievalEffects": {
+      "type": "object",
+      "description": "Expected effects of the strategy on retrieval and context assembly.",
+      "additionalProperties": false,
+      "properties": {
+        "recallEffect": {
+          "$ref": "#/$defs/effect"
+        },
+        "precisionEffect": {
+          "$ref": "#/$defs/effect"
+        },
+        "groundingEffect": {
+          "$ref": "#/$defs/effect"
+        },
+        "contextFragmentationRisk": {
+          "$ref": "#/$defs/level"
+        },
+        "duplicateContextRisk": {
+          "$ref": "#/$defs/level"
+        },
+        "bestFitScenarios": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation information relevant to chunking quality.",
+      "additionalProperties": false,
+      "properties": {
+        "commonMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Recall At K",
+              "Precision At K",
+              "MRR",
+              "NDCG",
+              "Hit Rate",
+              "Context Relevance",
+              "Faithfulness",
+              "Answer Correctness",
+              "Chunk Coherence",
+              "Chunk Boundary Quality",
+              "Latency",
+              "Cost",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresRelevanceJudgments": {
+          "type": "boolean"
+        },
+        "requiresEndToEndEvaluation": {
+          "type": "boolean"
+        },
+        "benchmarkSuites": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "effect": {
+      "type": "string",
+      "enum": [
+        "Improves",
+        "Reduces",
+        "Mixed",
+        "Neutral",
+        "Variable",
+        "Unknown"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
