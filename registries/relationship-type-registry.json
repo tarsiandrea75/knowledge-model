@@ -1,0 +1,1699 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Published",
+    "reviewState": "Approved",
+    "createdAt": "2026-07-11T00:00:00Z",
+    "updatedAt": "2026-07-11T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Registry author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Canonical RKM architecture documentation",
+      "sourceFiles": [
+        "docs/architecture/relationship-model.md",
+        "docs/architecture/ubiquitous-language.md"
+      ]
+    }
+  },
+  "ontologyVersion": "1.0.0",
+  "relationshipTypes": [
+    {
+      "type": "EXTENDS",
+      "label": "Extends",
+      "description": "Indicates that the source entity builds upon the target entity while preserving its core idea.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "extending entity",
+        "targetRole": "extended entity",
+        "description": "The source builds upon the target with additional capability or scope."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "transitivity": "Transitive",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "SPECIALIZES",
+      "label": "Specializes",
+      "description": "Indicates that the source entity is a more specific form of the target entity.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "specific entity",
+        "targetRole": "general entity",
+        "description": "The source narrows or specializes the concept represented by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "GENERALIZES",
+        "storage": "Derived",
+        "description": "The inverse states that the target generalizes the source."
+      },
+      "transitivity": "Transitive",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "GENERALIZES",
+      "label": "Generalizes",
+      "description": "Indicates that the source entity is a broader abstraction of the target entity.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "general entity",
+        "targetRole": "specific entity",
+        "description": "The source abstracts over the more specific target entity."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "SPECIALIZES",
+        "storage": "Derived",
+        "description": "The inverse states that the target specializes the source."
+      },
+      "transitivity": "Transitive",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "BELONGS_TO",
+      "label": "Belongs To",
+      "description": "Indicates that the source entity is a member of the target taxonomy, family, or category.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "member entity",
+        "targetRole": "category entity",
+        "description": "The source is classified as belonging to the target category."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "transitivity": "Transitive",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PART_OF",
+      "label": "Part Of",
+      "description": "Indicates that the source entity is a component, step, or member part of the target entity.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "part entity",
+        "targetRole": "whole entity",
+        "description": "The source is contained within or composes part of the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "CONTAINS",
+        "storage": "Derived",
+        "description": "The inverse states that the target contains the source."
+      },
+      "transitivity": "Transitive",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "CONTAINS",
+      "label": "Contains",
+      "description": "Indicates that the source entity contains the target entity as a component, step, or member part.",
+      "category": "Structural",
+      "canonicalDirection": {
+        "sourceRole": "whole entity",
+        "targetRole": "part entity",
+        "description": "The source contains the target as one of its constituent parts."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "PART_OF",
+        "storage": "Derived",
+        "description": "The inverse states that the target is part of the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "REQUIRES",
+      "label": "Requires",
+      "description": "Indicates that the target entity is a mandatory dependency for the source entity to function as defined.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "requiring entity",
+        "targetRole": "required dependency",
+        "description": "The source requires the target as a necessary dependency."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "DEPENDS_ON",
+      "label": "Depends On",
+      "description": "Indicates a conceptual, operational, or indirect dependency from the source entity to the target entity.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "dependent entity",
+        "targetRole": "dependency entity",
+        "description": "The source depends on the target without necessarily making it mandatory."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "USES",
+      "label": "Uses",
+      "description": "Indicates that the source entity uses the target entity without specifying whether usage is mandatory.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "using entity",
+        "targetRole": "used entity",
+        "description": "The source uses the target as part of its behavior, design, or operation."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "OPTIONALLY_USES",
+      "label": "Optionally Uses",
+      "description": "Indicates that the source entity may optionally use the target entity without requiring it.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "optionally using entity",
+        "targetRole": "optional dependency",
+        "description": "The source can use the target, but the target is not mandatory."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "CONSUMES",
+      "label": "Consumes",
+      "description": "Indicates that the source entity receives or consumes the target entity as an input.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "consumer entity",
+        "targetRole": "input entity",
+        "description": "The source consumes the target as input during operation."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PRODUCES",
+      "label": "Produces",
+      "description": "Indicates that the source entity creates, emits, or produces the target entity as an output.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "producer entity",
+        "targetRole": "output entity",
+        "description": "The source produces the target as an output or result."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "TRANSFORMS",
+      "label": "Transforms",
+      "description": "Indicates that the source entity converts, modifies, or transforms the target artifact.",
+      "category": "Dependency",
+      "canonicalDirection": {
+        "sourceRole": "transforming entity",
+        "targetRole": "transformed artifact",
+        "description": "The source transforms the target as part of a process."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "IMPLEMENTS",
+      "label": "Implements",
+      "description": "Indicates that the source entity realizes the target concept, abstraction, component, or technique.",
+      "category": "Implementation",
+      "canonicalDirection": {
+        "sourceRole": "implementing entity",
+        "targetRole": "implemented concept",
+        "description": "The source provides a concrete realization of the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "SUPPORTS",
+      "label": "Supports",
+      "description": "Indicates that the source entity supports the target capability, entity, or compatibility scenario.",
+      "category": "Implementation",
+      "canonicalDirection": {
+        "sourceRole": "supporting entity",
+        "targetRole": "supported entity",
+        "description": "The source provides support for the target capability or entity."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PROVIDES",
+      "label": "Provides",
+      "description": "Indicates that the source entity offers the target component, feature, service, model, or resource.",
+      "category": "Implementation",
+      "canonicalDirection": {
+        "sourceRole": "provider entity",
+        "targetRole": "provided entity",
+        "description": "The source offers or makes the target available."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "INTEGRATES_WITH",
+      "label": "Integrates With",
+      "description": "Indicates that the source entity has an integration relationship with the target system or component.",
+      "category": "Implementation",
+      "canonicalDirection": {
+        "sourceRole": "integrating entity",
+        "targetRole": "integrated entity",
+        "description": "The source integrates with the target system, service, or component."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "symmetry": "Conditionally Symmetric",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EXPOSES",
+      "label": "Exposes",
+      "description": "Indicates that the source entity exposes the target interface, capability, abstraction, or endpoint.",
+      "category": "Implementation",
+      "canonicalDirection": {
+        "sourceRole": "exposing entity",
+        "targetRole": "exposed entity",
+        "description": "The source makes the target interface or capability available."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "INTRODUCES",
+      "label": "Introduces",
+      "description": "Indicates that the source entity first introduced the target concept, technique, component, or benchmark.",
+      "category": "Provenance",
+      "canonicalDirection": {
+        "sourceRole": "introducing source",
+        "targetRole": "introduced entity",
+        "description": "The source is the origin that introduced the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Organization",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Author",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "evidenceRequirement": {
+        "required": true,
+        "minimumStrength": "Moderate",
+        "preferredSourcePriority": "Primary",
+        "description": "Introduction claims should cite the original paper, documentation, or source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "DESCRIBES",
+      "label": "Describes",
+      "description": "Indicates that the source entity explains or describes the target entity.",
+      "category": "Knowledge",
+      "canonicalDirection": {
+        "sourceRole": "describing source",
+        "targetRole": "described entity",
+        "description": "The source contains explanatory knowledge about the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Reference",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "DEFINES",
+      "label": "Defines",
+      "description": "Indicates that the source entity provides a formal or canonical definition of the target entity.",
+      "category": "Knowledge",
+      "canonicalDirection": {
+        "sourceRole": "defining source",
+        "targetRole": "defined entity",
+        "description": "The source gives the canonical definition for the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "REFERENCES",
+      "label": "References",
+      "description": "Indicates that the source entity has a general reference to the target entity or source.",
+      "category": "Knowledge",
+      "canonicalDirection": {
+        "sourceRole": "referencing entity",
+        "targetRole": "referenced entity",
+        "description": "The source refers to the target without asserting a narrower citation relationship."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "CITES",
+      "label": "Cites",
+      "description": "Indicates that the source paper or source document cites the target paper or source document.",
+      "category": "Provenance",
+      "canonicalDirection": {
+        "sourceRole": "citing source",
+        "targetRole": "cited source",
+        "description": "The source cites the target as a formal citation or source reference."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Reference",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Reference",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "AUTHORED_BY",
+      "label": "Authored By",
+      "description": "Indicates that the source entity was authored by the target author or organization.",
+      "category": "Provenance",
+      "canonicalDirection": {
+        "sourceRole": "authored entity",
+        "targetRole": "author entity",
+        "description": "The source was authored by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Author",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Organization",
+          "includeSubtypes": true
+        }
+      ],
+      "cardinality": {
+        "targetMin": 1,
+        "targetMax": "N",
+        "notation": "1..N",
+        "description": "Authored entities normally have at least one author."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PUBLISHED_IN",
+      "label": "Published In",
+      "description": "Indicates that the source publication appeared in the target venue or publication context.",
+      "category": "Provenance",
+      "canonicalDirection": {
+        "sourceRole": "published entity",
+        "targetRole": "publication venue",
+        "description": "The source was published in the target venue."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Venue",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "INSPIRED_BY",
+      "label": "Inspired By",
+      "description": "Indicates that the source entity was conceptually inspired by the target entity.",
+      "category": "Provenance",
+      "canonicalDirection": {
+        "sourceRole": "inspired entity",
+        "targetRole": "inspiration source",
+        "description": "The source draws conceptual inspiration from the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EVALUATES",
+      "label": "Evaluates",
+      "description": "Indicates that the source benchmark, paper, experiment, or metric evaluates the target entity.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "evaluating entity",
+        "targetRole": "evaluated entity",
+        "description": "The source evaluates the target according to an evaluation method or benchmark."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Benchmark",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "EvaluationMetric",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "EVALUATED_BY",
+        "storage": "Derived",
+        "description": "The inverse states that the target is evaluated by the source."
+      },
+      "evidenceRequirement": {
+        "required": true,
+        "minimumStrength": "Moderate",
+        "preferredSourcePriority": "Primary",
+        "description": "Evaluation relationships should cite benchmark, paper, or experiment evidence."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EVALUATED_BY",
+      "label": "Evaluated By",
+      "description": "Indicates that the source entity is evaluated by the target benchmark, paper, experiment, or metric.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "evaluated entity",
+        "targetRole": "evaluating entity",
+        "description": "The source is evaluated by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Benchmark",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "EvaluationMetric",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "EVALUATES",
+        "storage": "Derived",
+        "description": "The inverse states that the target evaluates the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "MEASURES",
+      "label": "Measures",
+      "description": "Indicates that the source metric measures the target quality attribute, property, or outcome.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "measuring entity",
+        "targetRole": "measured attribute",
+        "description": "The source measures the target attribute or quality."
+      },
+      "allowedSources": [
+        {
+          "entityType": "EvaluationMetric",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "VALIDATES",
+      "label": "Validates",
+      "description": "Indicates that the source evidence, experiment, or evaluation confirms or supports the target entity.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "validating entity",
+        "targetRole": "validated entity",
+        "description": "The source validates or confirms the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Evidence",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Benchmark",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "Paper",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "BENCHMARKED_BY",
+      "label": "Benchmarked By",
+      "description": "Indicates that the source entity has been benchmarked by the target benchmark.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "benchmarked entity",
+        "targetRole": "benchmark entity",
+        "description": "The source is benchmarked by the target benchmark."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Benchmark",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "EVALUATES",
+        "storage": "Derived",
+        "description": "Benchmarking is usually derived from a benchmark evaluating the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "ACHIEVES_SCORE_ON",
+      "label": "Achieves Score On",
+      "description": "Indicates that the source entity has a measured result on the target benchmark or evaluation metric.",
+      "category": "Evaluation",
+      "canonicalDirection": {
+        "sourceRole": "scored entity",
+        "targetRole": "benchmark or metric",
+        "description": "The source achieves a score on the target evaluation context."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Benchmark",
+          "includeSubtypes": true
+        },
+        {
+          "entityType": "EvaluationMetric",
+          "includeSubtypes": true
+        }
+      ],
+      "evidenceRequirement": {
+        "required": true,
+        "minimumStrength": "Strong",
+        "preferredSourcePriority": "Primary",
+        "description": "Score relationships should cite benchmark results and include score metadata."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "COMPATIBLE_WITH",
+      "label": "Compatible With",
+      "description": "Indicates that the source entity can be used together with the target entity.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "compatible entity",
+        "targetRole": "compatible counterpart",
+        "description": "The source is compatible with the target in an applicable context."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "symmetry": "Symmetric",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "INCOMPATIBLE_WITH",
+      "label": "Incompatible With",
+      "description": "Indicates that the source entity should not or cannot be used together with the target entity.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "incompatible entity",
+        "targetRole": "incompatible counterpart",
+        "description": "The source is incompatible with the target in an applicable context."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "symmetry": "Symmetric",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "ALTERNATIVE_TO",
+      "label": "Alternative To",
+      "description": "Indicates that the source entity may replace the target entity in some scenarios.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "alternative entity",
+        "targetRole": "alternative counterpart",
+        "description": "The source can act as an alternative to the target in a defined context."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "symmetry": "Conditionally Symmetric",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "COMPLEMENTS",
+      "label": "Complements",
+      "description": "Indicates that the source entity works well together with the target entity.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "complementing entity",
+        "targetRole": "complemented entity",
+        "description": "The source complements the target when used together."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "symmetry": "Symmetric",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "SUPERSEDES",
+      "label": "Supersedes",
+      "description": "Indicates that the source entity replaces or improves upon the target entity.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "superseding entity",
+        "targetRole": "superseded entity",
+        "description": "The source supersedes the target as a replacement or improvement."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "REPLACED_BY",
+        "storage": "Derived",
+        "description": "The inverse states that the target is replaced by the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "REPLACED_BY",
+      "label": "Replaced By",
+      "description": "Indicates that the source entity has been replaced by the target entity.",
+      "category": "Compatibility",
+      "canonicalDirection": {
+        "sourceRole": "replaced entity",
+        "targetRole": "replacement entity",
+        "description": "The source is replaced by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "SUPERSEDES",
+        "storage": "Derived",
+        "description": "The inverse states that the target supersedes the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PRECEDES",
+      "label": "Precedes",
+      "description": "Indicates that the source step, process, or entity comes before the target in a workflow.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "preceding entity",
+        "targetRole": "following entity",
+        "description": "The source occurs before the target in an ordered process."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "FOLLOWS",
+        "storage": "Derived",
+        "description": "The inverse states that the target follows the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "FOLLOWS",
+      "label": "Follows",
+      "description": "Indicates that the source step, process, or entity comes after the target in a workflow.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "following entity",
+        "targetRole": "preceding entity",
+        "description": "The source occurs after the target in an ordered process."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "inverse": {
+        "type": "PRECEDES",
+        "storage": "Derived",
+        "description": "The inverse states that the target precedes the source."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EXECUTES",
+      "label": "Executes",
+      "description": "Indicates that the source agent, workflow, system, or component executes the target step or tool.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "executing entity",
+        "targetRole": "executed entity",
+        "description": "The source executes the target as an action, step, workflow, or tool."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "TRIGGERS",
+      "label": "Triggers",
+      "description": "Indicates that the source event, condition, or step causes the target event, action, or step.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "triggering entity",
+        "targetRole": "triggered entity",
+        "description": "The source causes or initiates the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "ROUTES_TO",
+      "label": "Routes To",
+      "description": "Indicates that the source router, decision, or workflow condition routes execution to the target entity.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "routing entity",
+        "targetRole": "route target",
+        "description": "The source routes control, data, or execution to the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "BRANCHES_TO",
+      "label": "Branches To",
+      "description": "Indicates that the source workflow step or decision branches execution to the target path or step.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "branching entity",
+        "targetRole": "branch target",
+        "description": "The source creates a workflow branch to the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "SOLVES",
+      "label": "Solves",
+      "description": "Indicates that the source entity directly solves the target problem.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "solution entity",
+        "targetRole": "solved problem",
+        "description": "The source directly solves the target problem."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Problem",
+          "includeSubtypes": true
+        }
+      ],
+      "evidenceRequirement": {
+        "required": true,
+        "minimumStrength": "Moderate",
+        "preferredSourcePriority": "Primary",
+        "description": "Strong solution claims should be backed by evidence or explicit rationale."
+      },
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "MITIGATES",
+      "label": "Mitigates",
+      "description": "Indicates that the source entity partially reduces or addresses the target problem.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "mitigating entity",
+        "targetRole": "mitigated problem",
+        "description": "The source reduces the impact or likelihood of the target problem."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Problem",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_ADVANTAGE",
+      "label": "Has Advantage",
+      "description": "Connects the source entity to an advantage that it provides or exhibits.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "advantaged entity",
+        "targetRole": "advantage entity",
+        "description": "The source has the target advantage."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Advantage",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_LIMITATION",
+      "label": "Has Limitation",
+      "description": "Connects the source entity to a limitation that constrains or weakens it.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "limited entity",
+        "targetRole": "limitation entity",
+        "description": "The source has the target limitation."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Limitation",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_TRADEOFF",
+      "label": "Has Tradeoff",
+      "description": "Connects the source entity to a tradeoff that must be considered when using it.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "tradeoff-bearing entity",
+        "targetRole": "tradeoff entity",
+        "description": "The source has the target tradeoff."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Tradeoff",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_USE_CASE",
+      "label": "Has Use Case",
+      "description": "Connects the source entity to a use case where it is applicable.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "applicable entity",
+        "targetRole": "use case entity",
+        "description": "The source has the target use case."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "UseCase",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_ANTI_PATTERN",
+      "label": "Has Anti Pattern",
+      "description": "Connects the source entity to an anti-pattern associated with incorrect or harmful use.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "anti-pattern-bearing entity",
+        "targetRole": "anti-pattern entity",
+        "description": "The source has the target anti-pattern."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Problem",
+          "includeSubtypes": true,
+          "condition": "Represents an anti-pattern in the RKM domain."
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "HAS_COMMON_MISTAKE",
+      "label": "Has Common Mistake",
+      "description": "Connects the source entity to a common implementation or modeling mistake.",
+      "category": "Quality",
+      "canonicalDirection": {
+        "sourceRole": "mistake-bearing entity",
+        "targetRole": "common mistake entity",
+        "description": "The source has the target common mistake."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Problem",
+          "includeSubtypes": true,
+          "condition": "Represents a common mistake in the RKM domain."
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "DEPLOYED_WITH",
+      "label": "Deployed With",
+      "description": "Indicates that the source entity is deployed with the target production dependency or environment.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "deployed entity",
+        "targetRole": "deployment companion",
+        "description": "The source is deployed together with the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "OBSERVED_BY",
+      "label": "Observed By",
+      "description": "Indicates that the source entity is observed by the target observability tool, method, or artifact.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "observed entity",
+        "targetRole": "observability entity",
+        "description": "The source is observed by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "MONITORED_BY",
+      "label": "Monitored By",
+      "description": "Indicates that the source entity is monitored by the target metric, tool, method, or system.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "monitored entity",
+        "targetRole": "monitoring entity",
+        "description": "The source is monitored by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "LOGGED_BY",
+      "label": "Logged By",
+      "description": "Indicates that the source entity is logged by the target log, trace, tool, or logging mechanism.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "logged entity",
+        "targetRole": "logging entity",
+        "description": "The source is logged by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "SECURED_BY",
+      "label": "Secured By",
+      "description": "Indicates that the source entity is secured by the target security mechanism, control, or policy.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "secured entity",
+        "targetRole": "security entity",
+        "description": "The source is secured by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "GOVERNED_BY",
+      "label": "Governed By",
+      "description": "Indicates that the source entity is governed by the target governance mechanism, compliance control, or policy.",
+      "category": "Lifecycle",
+      "canonicalDirection": {
+        "sourceRole": "governed entity",
+        "targetRole": "governance entity",
+        "description": "The source is governed by the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    }
+  ],
+  "notes": [
+    "This registry captures canonical relationship predicates documented in docs/architecture/relationship-model.md and docs/architecture/ubiquitous-language.md.",
+    "Broad Artifact constraints preserve machine-readable validity until narrower per-predicate source and target constraints are introduced."
+  ]
+}
