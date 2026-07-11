@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/graph-database.schema.json",
+  "title": "RKM Graph Database Schema",
+  "description": "Defines a graph database entity used to store, query and traverse graph-structured knowledge in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "graphDatabase"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "GraphDatabase"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this graph database to frameworks, retrievers, vector databases, graph algorithms, datasets, benchmarks or storage components.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this graph database.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this graph database document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this graph database document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the graph database but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "graphDatabase": {
+      "$ref": "#/$defs/graphDatabaseDetails"
+    }
+  },
+  "$defs": {
+    "graphDatabaseDetails": {
+      "type": "object",
+      "description": "Graph-database-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "databaseType",
+        "graphModels",
+        "deploymentModels"
+      ],
+      "properties": {
+        "databaseType": {
+          "type": "string",
+          "description": "Primary product or architecture category of the graph database.",
+          "enum": [
+            "Native Graph Database",
+            "RDF Triplestore",
+            "Multi Model Database With Graph Support",
+            "Relational Database With Graph Extension",
+            "Search Engine With Graph Support",
+            "Managed Graph Database Service",
+            "Embedded Graph Database",
+            "In Memory Graph Store",
+            "Other"
+          ]
+        },
+        "graphModels": {
+          "type": "array",
+          "description": "Graph data models supported by the database.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Property Graph",
+              "RDF",
+              "Labeled Property Graph",
+              "Hypergraph",
+              "Knowledge Graph",
+              "Document Graph",
+              "Temporal Graph",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "deploymentModels": {
+          "type": "array",
+          "description": "Ways the graph database can be deployed or consumed.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Self Hosted",
+              "Managed Cloud",
+              "Serverless",
+              "Embedded",
+              "Local",
+              "Hybrid",
+              "Edge",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "queryLanguages": {
+          "type": "array",
+          "description": "Graph query languages or APIs supported by the database.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Cypher",
+              "Gremlin",
+              "SPARQL",
+              "GraphQL",
+              "GSQL",
+              "SQL Graph",
+              "OpenCypher",
+              "RDF API",
+              "Native API",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedWorkloads": {
+          "type": "array",
+          "description": "Graph workloads commonly supported by the database.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Transactional Graph Queries",
+              "Graph Traversal",
+              "Path Finding",
+              "Subgraph Search",
+              "Graph Analytics",
+              "Knowledge Graph Querying",
+              "Entity Resolution",
+              "Recommendation",
+              "Hybrid Graph Vector Retrieval",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "schemaSupport": {
+          "$ref": "#/$defs/schemaSupport"
+        },
+        "reasoningSupport": {
+          "$ref": "#/$defs/reasoningSupport"
+        },
+        "vectorIntegration": {
+          "$ref": "#/$defs/vectorIntegration"
+        },
+        "scalability": {
+          "$ref": "#/$defs/scalabilityProfile"
+        },
+        "consistency": {
+          "$ref": "#/$defs/consistencyProfile"
+        },
+        "operations": {
+          "$ref": "#/$defs/operationsProfile"
+        },
+        "ragUsage": {
+          "$ref": "#/$defs/ragUsage"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations, tradeoffs or operational constraints of the graph database.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this graph database in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "schemaSupport": {
+      "type": "object",
+      "description": "Support for graph schema, constraints and semantic typing.",
+      "additionalProperties": false,
+      "properties": {
+        "schemaMode": {
+          "type": "string",
+          "enum": [
+            "Schema Optional",
+            "Schema Enforced",
+            "Schema Inferred",
+            "Ontology Driven",
+            "Unknown"
+          ]
+        },
+        "constraintTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Uniqueness",
+              "Existence",
+              "Type",
+              "Cardinality",
+              "Referential Integrity",
+              "Custom Validation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "ontologyStandards": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "RDF Schema",
+              "OWL",
+              "SHACL",
+              "SKOS",
+              "Custom Ontology",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "reasoningSupport": {
+      "type": "object",
+      "description": "Semantic reasoning or inference capabilities supported by the graph database.",
+      "additionalProperties": false,
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+        "reasoningTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Rule Based Inference",
+              "Ontology Reasoning",
+              "Transitive Closure",
+              "Path Inference",
+              "Materialized Inference",
+              "Query Time Inference",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "vectorIntegration": {
+      "type": "object",
+      "description": "Vector search or embedding integration capabilities used with graph retrieval.",
+      "additionalProperties": false,
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+        "integrationTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Native Vector Index",
+              "External Vector Store",
+              "Embedding Property Storage",
+              "Hybrid Graph Vector Query",
+              "Graph Augmented Semantic Search",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "distanceMetrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Cosine Similarity",
+              "Dot Product",
+              "Euclidean Distance",
+              "Manhattan Distance",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "scalabilityProfile": {
+      "type": "object",
+      "description": "Scalability characteristics relevant to graph workloads.",
+      "additionalProperties": false,
+      "properties": {
+        "horizontalScaling": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "sharding": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "replication": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "distributedQuery": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "largeGraphSupport": {
+          "$ref": "#/$defs/supportLevel"
+        }
+      }
+    },
+    "consistencyProfile": {
+      "type": "object",
+      "description": "Consistency and transaction semantics exposed by the graph database.",
+      "additionalProperties": false,
+      "properties": {
+        "transactionSupport": {
+          "type": "string",
+          "enum": [
+            "ACID",
+            "Eventually Consistent",
+            "Read Committed",
+            "Snapshot Isolation",
+            "Implementation Dependent",
+            "Unknown"
+          ]
+        },
+        "multiStatementTransactions": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "distributedTransactions": {
+          "$ref": "#/$defs/supportLevel"
+        }
+      }
+    },
+    "operationsProfile": {
+      "type": "object",
+      "description": "Operational capabilities for running the graph database in RAG systems.",
+      "additionalProperties": false,
+      "properties": {
+        "backupAndRestore": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "monitoring": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "accessControl": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "multiTenancy": {
+          "$ref": "#/$defs/supportLevel"
+        },
+        "managedServiceAvailable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ragUsage": {
+      "type": "object",
+      "description": "How the graph database is used in Retrieval-Augmented Generation systems.",
+      "additionalProperties": false,
+      "properties": {
+        "ragRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Knowledge Graph Store",
+              "Entity Relationship Store",
+              "Metadata Graph Store",
+              "Graph Retriever Backend",
+              "GraphRAG Index",
+              "Citation Graph Store",
+              "Reasoning Context Store",
+              "Provenance Graph Store",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "retrievalPatterns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Entity Neighborhood Expansion",
+              "Multi Hop Traversal",
+              "Path Based Retrieval",
+              "Community Retrieval",
+              "Graph Vector Hybrid Retrieval",
+              "Subgraph Context Assembly",
+              "Ontology Guided Retrieval",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "contextArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Triples",
+              "Nodes",
+              "Edges",
+              "Paths",
+              "Subgraphs",
+              "Communities",
+              "Entity Summaries",
+              "Provenance Records",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "supportLevel": {
+      "type": "string",
+      "enum": [
+        "Native",
+        "Supported",
+        "Partial",
+        "External",
+        "Not Supported",
+        "Unknown"
+      ]
+    }
+  }
+}
