@@ -5,7 +5,7 @@ CYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
 
-.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof clean-discovery-artifacts help
+.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof codex-commit clean-discovery-artifacts help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -59,6 +59,21 @@ fix-eof:
 	fi
 	bash scripts/rkm-fix-eof.sh "$(FILE)"
 
+codex-commit:
+	@if [[ -z "$(strip $(PROMPT_FILE))" ]]; then \
+		printf 'PROMPT_FILE is required. Usage: make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"\n' >&2; \
+		exit 1; \
+	fi
+	@if [[ -z "$(strip $(FILE))" ]]; then \
+		printf 'FILE is required. Usage: make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"\n' >&2; \
+		exit 1; \
+	fi
+	@if [[ -z "$(strip $(MESSAGE))" ]]; then \
+		printf 'MESSAGE is required. Usage: make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"\n' >&2; \
+		exit 1; \
+	fi
+	bash scripts/rkm-codex-commit.sh "$(PROMPT_FILE)" "$(FILE)" "$(MESSAGE)"
+
 clean-discovery-artifacts:
 	find . -maxdepth 1 \( \
 		-type d \( -name 'rkm-discovery-report-*' -o -name 'rkm-discovery-*' \) \
@@ -76,5 +91,6 @@ help:
 	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
 	@printf '  make install-hooks               Configure Git to use hooks from .githooks.\n'
 	@printf '  make fix-eof FILE=path/to/file   Run scripts/rkm-fix-eof.sh on FILE.\n'
+	@printf '  make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"  Run scripts/rkm-codex-commit.sh with the provided prompt, file, and message.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
 	@printf '  make help                        Show this help.\n'
