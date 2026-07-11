@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 TARGET_ACCEPTED_FILES="${1:-3}"
-CREATOR_PROMPT="Create exactly one next missing RKM architecture or schema file that naturally follows from the current project state. Follow AGENTS.md strictly. Do not commit."
+CREATOR_PROMPT="Create exactly one next missing RKM architecture or schema file that naturally follows from the current project state. Follow AGENTS.md strictly. Ensure exactly one final newline and no blank line at EOF. Do not commit."
 REVIEWER_PROMPT="You are acting as Reviewer only. Review the current RKM git diff. Follow the Reviewer Protocol in AGENTS.md. Do not modify files. Return ACCEPT, REVISE, or STOP."
 
 fail() {
