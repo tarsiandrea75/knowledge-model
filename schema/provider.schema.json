@@ -1,0 +1,446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/provider.schema.json",
+  "title": "RKM Provider Schema",
+  "description": "Defines a provider entity that offers models, services, infrastructure, tools, datasets or platforms used in Retrieval-Augmented Generation systems in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "identity",
+    "metadata",
+    "description",
+    "provider"
+  ],
+  "properties": {
+    "identity": {
+      "allOf": [
+        {
+          "$ref": "definitions/identity.schema.json"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityType": {
+              "const": "Provider"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "$ref": "definitions/metadata.schema.json"
+    },
+    "description": {
+      "$ref": "definitions/description.schema.json"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships from this provider to models, frameworks, databases, datasets, benchmarks, tools, components or techniques.",
+      "items": {
+        "$ref": "definitions/relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims made about this provider.",
+      "items": {
+        "$ref": "definitions/claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records embedded in this provider document.",
+      "items": {
+        "$ref": "definitions/evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "References cited by this provider document.",
+      "items": {
+        "$ref": "definitions/reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "externalLinks": {
+      "type": "array",
+      "description": "External resources associated with the provider but not necessarily used as evidence.",
+      "items": {
+        "$ref": "definitions/knowledge-entity.schema.json#/$defs/externalLink"
+      },
+      "uniqueItems": true
+    },
+    "provider": {
+      "$ref": "#/$defs/providerDetails"
+    }
+  },
+  "$defs": {
+    "providerDetails": {
+      "type": "object",
+      "description": "Provider-specific structured knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "providerType",
+        "serviceCategories"
+      ],
+      "properties": {
+        "providerType": {
+          "type": "string",
+          "description": "Primary organizational or operational form of the provider.",
+          "enum": [
+            "Company",
+            "Cloud Provider",
+            "Research Lab",
+            "Foundation",
+            "Open Source Project",
+            "Academic Institution",
+            "Government Organization",
+            "Community",
+            "Individual",
+            "Other"
+          ]
+        },
+        "serviceCategories": {
+          "type": "array",
+          "description": "RAG-relevant categories of products, services or resources offered by the provider.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Language Models",
+              "Embedding Models",
+              "Reranking Models",
+              "Retrieval Services",
+              "Vector Databases",
+              "Graph Databases",
+              "RAG Frameworks",
+              "Agent Frameworks",
+              "Evaluation Services",
+              "Datasets",
+              "Benchmarks",
+              "Developer Tools",
+              "Model Hosting",
+              "Inference API",
+              "Observability",
+              "Security",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "deliveryModels": {
+          "type": "array",
+          "description": "How the provider makes its RAG-relevant offerings available.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Managed Service",
+              "API",
+              "SDK",
+              "Library",
+              "Open Source",
+              "Hosted Platform",
+              "Self Hosted",
+              "Marketplace",
+              "Research Release",
+              "Documentation",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedRagStages": {
+          "type": "array",
+          "description": "RAG pipeline stages directly supported by the provider's offerings.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Ingestion",
+              "Parsing",
+              "Chunking",
+              "Embedding",
+              "Indexing",
+              "Query Understanding",
+              "Retrieval",
+              "Reranking",
+              "Context Assembly",
+              "Generation",
+              "Evaluation",
+              "Orchestration",
+              "Monitoring",
+              "Deployment"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "deploymentRegions": {
+          "type": "array",
+          "description": "Regions or jurisdictions where relevant offerings are available when known.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "access": {
+          "$ref": "#/$defs/accessProfile"
+        },
+        "governance": {
+          "$ref": "#/$defs/governanceProfile"
+        },
+        "interoperability": {
+          "$ref": "#/$defs/interoperabilityProfile"
+        },
+        "operationalCharacteristics": {
+          "$ref": "#/$defs/operationalCharacteristics"
+        },
+        "compliance": {
+          "$ref": "#/$defs/complianceProfile"
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Known limitations or constraints associated with relying on this provider.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "usageGuidance": {
+          "type": "array",
+          "description": "Guidance for correctly using this provider's offerings in RAG systems.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "accessProfile": {
+      "type": "object",
+      "description": "Access and commercial availability characteristics.",
+      "additionalProperties": false,
+      "properties": {
+        "availability": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Private Preview",
+            "Limited Access",
+            "Enterprise",
+            "Research Only",
+            "Discontinued",
+            "Unknown"
+          ]
+        },
+        "pricingModel": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Free",
+              "Usage Based",
+              "Subscription",
+              "Enterprise Contract",
+              "Open Source",
+              "Bring Your Own Infrastructure",
+              "Unknown",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresAccount": {
+          "type": "boolean"
+        },
+        "requiresApiKey": {
+          "type": "boolean"
+        },
+        "supportsSelfHosting": {
+          "type": "boolean"
+        }
+      }
+    },
+    "governanceProfile": {
+      "type": "object",
+      "description": "Ownership, maintenance and lifecycle governance information.",
+      "additionalProperties": false,
+      "properties": {
+        "ownershipModel": {
+          "type": "string",
+          "enum": [
+            "Commercial",
+            "Open Source",
+            "Foundation Governed",
+            "Academic",
+            "Government",
+            "Community",
+            "Individual",
+            "Unknown"
+          ]
+        },
+        "projectStatus": {
+          "type": "string",
+          "enum": [
+            "Experimental",
+            "Active",
+            "Mature",
+            "Maintenance",
+            "Deprecated",
+            "Archived",
+            "Unknown"
+          ]
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier when the relevant offering is licensed as software.",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9-.+]*$",
+          "examples": [
+            "Apache-2.0",
+            "MIT"
+          ]
+        }
+      }
+    },
+    "interoperabilityProfile": {
+      "type": "object",
+      "description": "Integration surfaces exposed by the provider.",
+      "additionalProperties": false,
+      "properties": {
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "REST API",
+              "GraphQL API",
+              "gRPC API",
+              "SDK",
+              "CLI",
+              "MCP Server",
+              "Plugin",
+              "Webhook",
+              "OpenAPI Specification",
+              "File Export",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedLanguages": {
+          "type": "array",
+          "description": "Programming languages supported by official SDKs or first-party examples.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Python",
+              "Java",
+              "JavaScript",
+              "TypeScript",
+              "Go",
+              "Rust",
+              "C#",
+              "Kotlin",
+              "Ruby",
+              "PHP",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "standardCompatibility": {
+          "type": "array",
+          "description": "Standards, protocols or de facto interfaces supported by the provider.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to provider selection and use.",
+      "additionalProperties": false,
+      "properties": {
+        "productionReadiness": {
+          "$ref": "#/$defs/level"
+        },
+        "scalability": {
+          "$ref": "#/$defs/level"
+        },
+        "observabilitySupport": {
+          "$ref": "#/$defs/level"
+        },
+        "documentationQuality": {
+          "$ref": "#/$defs/level"
+        },
+        "ecosystemMaturity": {
+          "$ref": "#/$defs/level"
+        },
+        "vendorLockInRisk": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "complianceProfile": {
+      "type": "object",
+      "description": "Compliance, privacy and data-handling characteristics relevant to RAG deployments.",
+      "additionalProperties": false,
+      "properties": {
+        "dataResidencySupport": {
+          "type": "string",
+          "enum": [
+            "Supported",
+            "Limited",
+            "Not Supported",
+            "Unknown"
+          ]
+        },
+        "enterpriseControls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Access Control",
+              "Audit Logs",
+              "Encryption",
+              "Private Networking",
+              "Data Retention Controls",
+              "Model Governance",
+              "Policy Management",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "certifications": {
+          "type": "array",
+          "description": "Compliance certifications or attestations claimed by the provider.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
