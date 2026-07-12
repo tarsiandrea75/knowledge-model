@@ -65,6 +65,7 @@ REQUIRED_STATE_KEYS = {
     "exitCode",
     "finalOutcome",
     "nextActionJson",
+    "postFailureNextActionJson",
     "recoveryPlanJson",
 }
 
@@ -88,6 +89,8 @@ class CommandRunResult:
     exit_code: int
     commands_run: Sequence[str]
     commands_skipped: Sequence[str]
+    failed_command_label: str | None = None
+    failed_command_text: str | None = None
 
 
 def positive_int(value: str) -> int:
@@ -139,6 +142,7 @@ def new_state(
         "exitCode": None,
         "finalOutcome": "",
         "nextActionJson": next_action_json,
+        "postFailureNextActionJson": None,
         "recoveryPlanJson": recovery_plan_json,
     }
 
@@ -164,6 +168,10 @@ def write_state_or_report(state: dict[str, Any], state_path: str | Path) -> bool
 
 def make_safe_push() -> CommandSpec:
     return CommandSpec("safe-push", ("make", "safe-push"))
+
+
+def make_next_action(target: int) -> CommandSpec:
+    return CommandSpec("next-action", ("python3", "scripts/rkm-next-action.py", "--target", str(target), "--json"))
 
 
 def make_recover_revise() -> CommandSpec:
@@ -357,9 +365,99 @@ def run_commands(commands: Sequence[CommandSpec], *, dry_run: bool) -> CommandRu
         if completed.returncode != 0:
             print(f"final outcome: {command.label} failed with exit {completed.returncode}")
             commands_skipped = tuple(command_text(skipped) for skipped in commands[index + 1 :])
-            return CommandRunResult(completed.returncode, tuple(commands_run), commands_skipped)
+            return CommandRunResult(completed.returncode, tuple(commands_run), commands_skipped, command.label, text)
     commands_skipped = tuple(command_text(command) for command in commands) if dry_run else ()
     return CommandRunResult(0, tuple(commands_run), commands_skipped)
+
+
+def recovery_plan_blocks_post_failure_push(recovery_document: dict[str, Any] | None) -> bool:
+    if recovery_document is None:
+        return False
+    return recovery_document.get("status") in {
+        RECOVERY_AVAILABLE,
+        RECOVERY_FAILED_NEEDS_MANUAL_FIX,
+        MANUAL_REVIEW,
+        BLOCKED_IDE_FILES,
+    }
+
+
+def next_action_indicates_dirty(document: dict[str, Any]) -> bool:
+    if document.get("status") == DIRTY_WORKTREE:
+        return True
+    if document.get("isClean") is False:
+        return True
+    repo_status = document.get("repoStatus")
+    return isinstance(repo_status, str) and repo_status.lower() not in {"clean", "ready_to_push"}
+
+
+def try_push_after_partial_autocycle(
+    *,
+    target: int,
+    state: dict[str, Any],
+    command_result: CommandRunResult,
+    recovery_document: dict[str, Any] | None,
+    state_path: str | Path,
+) -> int | None:
+    if command_result.failed_command_label != "autocycle":
+        return None
+    if recovery_plan_blocks_post_failure_push(recovery_document):
+        return None
+
+    next_action_command = make_next_action(target)
+    print("autocycle failed; checking whether accepted commits are ready to push.")
+    code, stdout, stderr = run_next_action(target)
+    state["commandsRun"] = list(state["commandsRun"]) + [command_text(next_action_command)]
+    if code != 0:
+        print("post-failure next-action failed.")
+        if stdout:
+            print(stdout.rstrip())
+        if stderr:
+            print(stderr.rstrip(), file=sys.stderr)
+        state["exitCode"] = command_result.exit_code
+        state["finalOutcome"] = f"command failed with exit {command_result.exit_code}"
+        if not write_state_or_report(state, state_path):
+            return 1
+        return command_result.exit_code
+
+    try:
+        post_failure_document = parse_next_action(stdout)
+    except (json.JSONDecodeError, ValueError) as exc:
+        print(f"post-failure next-action output was not usable JSON: {exc}")
+        if stdout:
+            print(stdout.rstrip())
+        if stderr:
+            print(stderr.rstrip(), file=sys.stderr)
+        state["exitCode"] = command_result.exit_code
+        state["finalOutcome"] = f"command failed with exit {command_result.exit_code}"
+        if not write_state_or_report(state, state_path):
+            return 1
+        return command_result.exit_code
+
+    state["postFailureNextActionJson"] = post_failure_document
+    if post_failure_document.get("status") != READY_TO_PUSH or next_action_indicates_dirty(post_failure_document):
+        state["exitCode"] = command_result.exit_code
+        state["finalOutcome"] = f"command failed with exit {command_result.exit_code}"
+        if not write_state_or_report(state, state_path):
+            return 1
+        return command_result.exit_code
+
+    print("autocycle stopped after partial progress, but accepted commits are ready to push.")
+    push_result = run_commands((make_safe_push(),), dry_run=False)
+    state["commandsRun"] = list(state["commandsRun"]) + list(push_result.commands_run)
+    state["commandsSkipped"] = list(push_result.commands_skipped)
+    if push_result.exit_code != 0:
+        state["exitCode"] = push_result.exit_code
+        state["finalOutcome"] = f"command failed with exit {push_result.exit_code}"
+        if not write_state_or_report(state, state_path):
+            return 1
+        return push_result.exit_code
+
+    state["exitCode"] = 0
+    state["finalOutcome"] = "partial autocycle completed; accepted commits pushed"
+    print(f"final outcome: {state['finalOutcome']}")
+    if not write_state_or_report(state, state_path):
+        return 1
+    return 0
 
 
 def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_path: str | Path) -> int:
@@ -505,6 +603,16 @@ def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_pat
     state["commandsRun"] = list(command_result.commands_run)
     state["commandsSkipped"] = list(command_result.commands_skipped)
     if command_result.exit_code != 0:
+        if not dry_run:
+            recovery_exit = try_push_after_partial_autocycle(
+                target=target,
+                state=state,
+                command_result=command_result,
+                recovery_document=recovery_document,
+                state_path=state_path,
+            )
+            if recovery_exit is not None:
+                return recovery_exit
         state["exitCode"] = command_result.exit_code
         state["finalOutcome"] = f"command failed with exit {command_result.exit_code}"
         if not dry_run and not write_state_or_report(state, state_path):
@@ -788,6 +896,76 @@ def assert_autopilot_state(
         return state
 
 
+def assert_partial_autocycle_result(
+    name: str,
+    post_failure_document: dict[str, Any],
+    *,
+    expected_exit_code: int,
+    expected_safe_push: bool,
+    expected_state: bool = True,
+) -> dict[str, Any] | None:
+    original_run_next_action = run_next_action
+    original_run_commands = run_commands
+    initial_document = {
+        "status": READY_TO_AUTOCYCLE,
+        "recommendedTarget": 3,
+        "recommendedTokenBudget": 100,
+        "budgetSafetyFactor": 1.25,
+        "command": "make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25",
+    }
+    next_action_documents = [initial_document, post_failure_document]
+    command_calls: list[str] = []
+
+    with tempfile.TemporaryDirectory(prefix="rkm-autopilot-partial-test-") as directory:
+        state_path = Path(directory) / "autopilot-state.json"
+
+        def fake_next_action(target: int) -> tuple[int, str, str]:
+            if not next_action_documents:
+                raise AssertionError(f"{name}: unexpected next-action call")
+            return 0, json.dumps(next_action_documents.pop(0)), ""
+
+        def fake_run_commands(commands: Sequence[CommandSpec], *, dry_run: bool) -> CommandRunResult:
+            if dry_run:
+                return CommandRunResult(0, (), tuple(command_text(command) for command in commands))
+            if len(commands) == 2 and commands[0].label == "autocycle":
+                command_calls.append(commands[0].label)
+                return CommandRunResult(
+                    42,
+                    (command_text(commands[0]),),
+                    (command_text(commands[1]),),
+                    commands[0].label,
+                    command_text(commands[0]),
+                )
+            if len(commands) == 1 and commands[0].label == "safe-push":
+                command_calls.append(commands[0].label)
+                return CommandRunResult(0, (command_text(commands[0]),), ())
+            raise AssertionError(f"{name}: unexpected commands {commands!r}")
+
+        globals()["run_next_action"] = fake_next_action
+        globals()["run_commands"] = fake_run_commands
+        try:
+            actual_exit_code = run_autopilot(3, dry_run=False, allow_recovery=False, state_path=state_path)
+        finally:
+            globals()["run_next_action"] = original_run_next_action
+            globals()["run_commands"] = original_run_commands
+
+        if actual_exit_code != expected_exit_code:
+            raise AssertionError(f"{name}: expected exit {expected_exit_code}, got {actual_exit_code}")
+        safe_push_ran = "safe-push" in command_calls
+        if safe_push_ran != expected_safe_push:
+            raise AssertionError(f"{name}: expected safe-push ran {expected_safe_push}, got {safe_push_ran}")
+        if bool(next_action_documents):
+            raise AssertionError(f"{name}: expected post-failure next-action call")
+        if not expected_state:
+            if state_path.exists():
+                raise AssertionError(f"{name}: state file should not exist")
+            return None
+
+        state = read_state(state_path)
+        assert_required_state_keys(name, state)
+        return state
+
+
 def assert_status_result(
     name: str,
     state_content: str | None,
@@ -966,6 +1144,46 @@ def run_self_test() -> int:
 
     if failed_state["commandsRun"] != ["make safe-push"]:
         raise AssertionError("failed command records exit code: failed command was not recorded")
+
+    partial_ready_state = assert_partial_autocycle_result(
+        "partial autocycle READY_TO_PUSH runs safe-push",
+        {"status": READY_TO_PUSH, "command": "make safe-push", "isClean": True, "repoStatus": "clean"},
+        expected_exit_code=0,
+        expected_safe_push=True,
+    )
+    if partial_ready_state is None:
+        raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: state missing")
+    if partial_ready_state["postFailureNextActionJson"]["status"] != READY_TO_PUSH:
+        raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: post-failure JSON missing")
+    if partial_ready_state["finalOutcome"] != "partial autocycle completed; accepted commits pushed":
+        raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: wrong final outcome")
+    if partial_ready_state["exitCode"] != 0:
+        raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: wrong exit code")
+
+    partial_dirty_state = assert_partial_autocycle_result(
+        "partial autocycle DIRTY_WORKTREE skips safe-push",
+        {"status": DIRTY_WORKTREE, "command": "make recover-revise", "isClean": False, "repoStatus": "dirty"},
+        expected_exit_code=42,
+        expected_safe_push=False,
+    )
+    if partial_dirty_state is None or partial_dirty_state["exitCode"] != 42:
+        raise AssertionError("partial autocycle DIRTY_WORKTREE skips safe-push: wrong exit code")
+    if partial_dirty_state["postFailureNextActionJson"]["status"] != DIRTY_WORKTREE:
+        raise AssertionError("partial autocycle DIRTY_WORKTREE skips safe-push: post-failure JSON missing")
+
+    partial_revise_state = assert_partial_autocycle_result(
+        "partial autocycle recovery-like state skips safe-push",
+        {
+            "status": NEEDS_MANUAL_REVIEW,
+            "command": "git status --short && make validate",
+            "isClean": True,
+            "repoStatus": "clean",
+        },
+        expected_exit_code=42,
+        expected_safe_push=False,
+    )
+    if partial_revise_state is None or partial_revise_state["postFailureNextActionJson"]["status"] != NEEDS_MANUAL_REVIEW:
+        raise AssertionError("partial autocycle recovery-like state skips safe-push: post-failure JSON missing")
 
     assert_status_result(
         "status missing state",
