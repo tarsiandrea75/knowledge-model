@@ -123,19 +123,14 @@ single_changed_file() {
 
 parse_verdict() {
   local output_file="$1"
-  local verdict
-  verdict="$(
-    sed -nE \
-      -e 's/^[[:space:]]*([-*]|•)?[[:space:]]*\*\*[[:space:]]*[Vv][Ee][Rr][Dd][Ii][Cc][Tt]:[[:space:]]*`?(ACCEPT|REVISE|STOP)`?[[:space:]]*\*\*[[:space:]]*$/\2/p' \
-      -e 's/^[[:space:]]*([-*]|•)?[[:space:]]*[Vv][Ee][Rr][Dd][Ii][Cc][Tt]:[[:space:]]*`?(ACCEPT|REVISE|STOP)`?[[:space:]]*$/\2/p' \
-      -e 's/^[[:space:]]*(ACCEPT|REVISE|STOP)[[:space:]]*$/\1/p' \
-      "$output_file" | sed -n '1p'
-  )"
-  if [[ -z "$verdict" ]]; then
+  local parser_output
+
+  if ! parser_output="$(python3 scripts/rkm-review-verdict.py "$output_file")"; then
     cat "$output_file"
-    fail "Reviewer did not return ACCEPT, REVISE or STOP."
+    fail "Reviewer verdict parser could not find ACCEPT, REVISE or STOP."
   fi
-  printf '%s' "$verdict"
+
+  printf '%s' "$parser_output"
 }
 
 prepare_diff_for_review() {
@@ -236,6 +231,7 @@ require_command sed
 require_command sleep
 require_command tee
 require_command mktemp
+require_command python3
 require_command wc
 require_command tr
 
