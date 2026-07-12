@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Published",
+    "reviewState": "Approved",
+    "createdAt": "2026-07-12T00:00:00Z",
+    "updatedAt": "2026-07-12T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Registry author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Canonical RKM architecture documentation and supported identity entity types",
+      "sourceFiles": [
+        "docs/architecture/entity-model.md",
+        "docs/architecture/registry-model.md",
+        "schema/definitions/identity.schema.json"
+      ]
+    }
+  },
+  "ontologyVersion": "1.0.0",
+  "entityTypes": [
+    {
+      "type": "Technique",
+      "label": "Technique",
+      "pluralLabel": "Techniques",
+      "description": "A reusable Retrieval-Augmented Generation method, strategy or algorithmic approach represented as a first-class RKM entity.",
+      "category": "RAG Concept",
+      "identifierPrefix": "TECHNIQUE",
+      "directory": "techniques/",
+      "schema": "schema/rag-technique.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Framework",
+      "label": "Framework",
+      "pluralLabel": "Frameworks",
+      "description": "A software framework that supports, implements or orchestrates Retrieval-Augmented Generation systems or related workflows.",
+      "category": "Implementation",
+      "identifierPrefix": "FRAMEWORK",
+      "directory": "frameworks/",
+      "schema": "schema/framework.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Paper",
+      "label": "Paper",
+      "pluralLabel": "Papers",
+      "description": "A scholarly or technical publication used to describe, justify or evaluate concepts in the RAG ecosystem.",
+      "category": "Source",
+      "identifierPrefix": "PAPER",
+      "directory": "papers/",
+      "schema": "schema/paper.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Component",
+      "label": "Component",
+      "pluralLabel": "Components",
+      "description": "A reusable architectural or implementation part of a Retrieval-Augmented Generation system.",
+      "category": "Implementation",
+      "identifierPrefix": "COMPONENT",
+      "directory": "components/",
+      "schema": "schema/component.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Pattern",
+      "label": "Pattern",
+      "pluralLabel": "Patterns",
+      "description": "A recurring design pattern or structural arrangement used across RAG systems and implementations.",
+      "category": "RAG Concept",
+      "identifierPrefix": "PATTERN",
+      "directory": "patterns/",
+      "schema": "schema/pattern.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Glossary",
+      "label": "Glossary Term",
+      "pluralLabel": "Glossary Terms",
+      "description": "A canonical terminology entry that defines vocabulary used by RKM contributors, schemas and documentation.",
+      "category": "Core",
+      "identifierPrefix": "GLOSSARY",
+      "directory": "glossary/",
+      "schema": "schema/glossary.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Dataset",
+      "label": "Dataset",
+      "pluralLabel": "Datasets",
+      "description": "A structured collection of data used for retrieval, training, evaluation or benchmarking in RAG contexts.",
+      "category": "Evaluation",
+      "identifierPrefix": "DATASET",
+      "directory": "datasets/",
+      "schema": "schema/dataset.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Benchmark",
+      "label": "Benchmark",
+      "pluralLabel": "Benchmarks",
+      "description": "A standardized evaluation task, suite or protocol used to compare RAG systems, models, datasets or techniques.",
+      "category": "Evaluation",
+      "identifierPrefix": "BENCHMARK",
+      "directory": "benchmarks/",
+      "schema": "schema/benchmark.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EmbeddingModel",
+      "label": "Embedding Model",
+      "pluralLabel": "Embedding Models",
+      "description": "A model that converts text or other content into vector representations for retrieval, ranking or comparison.",
+      "category": "Implementation",
+      "identifierPrefix": "EMBEDDING-MODEL",
+      "directory": "embedding-models/",
+      "schema": "schema/embedding-model.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "LanguageModel",
+      "label": "Language Model",
+      "pluralLabel": "Language Models",
+      "description": "A language model used for generation, reasoning, transformation or evaluation within RAG systems.",
+      "category": "Implementation",
+      "identifierPrefix": "LANGUAGE-MODEL",
+      "directory": "language-models/",
+      "schema": "schema/language-model.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "VectorDatabase",
+      "label": "Vector Database",
+      "pluralLabel": "Vector Databases",
+      "description": "A database or search system specialized for storing, indexing and querying vector embeddings.",
+      "category": "Infrastructure",
+      "identifierPrefix": "VECTOR-DATABASE",
+      "directory": "vector-databases/",
+      "schema": "schema/vector-database.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "GraphDatabase",
+      "label": "Graph Database",
+      "pluralLabel": "Graph Databases",
+      "description": "A database or storage system specialized for representing and querying graph-structured data.",
+      "category": "Infrastructure",
+      "identifierPrefix": "GRAPH-DATABASE",
+      "directory": "graph-databases/",
+      "schema": "schema/graph-database.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Retriever",
+      "label": "Retriever",
+      "pluralLabel": "Retrievers",
+      "description": "A component or system responsible for retrieving candidate information for a Retrieval-Augmented Generation workflow.",
+      "category": "Implementation",
+      "identifierPrefix": "RETRIEVER",
+      "directory": "retrievers/",
+      "schema": "schema/retriever.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Reranker",
+      "label": "Reranker",
+      "pluralLabel": "Rerankers",
+      "description": "A model, component or method that reorders retrieved candidates according to estimated relevance or utility.",
+      "category": "Implementation",
+      "identifierPrefix": "RERANKER",
+      "directory": "rerankers/",
+      "schema": "schema/reranker.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "ChunkingStrategy",
+      "label": "Chunking Strategy",
+      "pluralLabel": "Chunking Strategies",
+      "description": "A strategy for dividing source content into retrieval units that can be indexed, embedded or assembled as context.",
+      "category": "RAG Concept",
+      "identifierPrefix": "CHUNKING-STRATEGY",
+      "directory": "chunking-strategies/",
+      "schema": "schema/chunking-strategy.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "EvaluationMetric",
+      "label": "Evaluation Metric",
+      "pluralLabel": "Evaluation Metrics",
+      "description": "A metric used to assess retrieval, generation, grounding, relevance, faithfulness or other RAG quality attributes.",
+      "category": "Evaluation",
+      "identifierPrefix": "EVALUATION-METRIC",
+      "directory": "evaluation-metrics/",
+      "schema": "schema/evaluation-metric.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "PromptTechnique",
+      "label": "Prompt Technique",
+      "pluralLabel": "Prompt Techniques",
+      "description": "A prompting method or template pattern used to guide model behavior in RAG-related workflows.",
+      "category": "RAG Concept",
+      "identifierPrefix": "PROMPT-TECHNIQUE",
+      "directory": "prompt-techniques/",
+      "schema": "schema/prompt-technique.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Agent",
+      "label": "Agent",
+      "pluralLabel": "Agents",
+      "description": "An autonomous or semi-autonomous system component that plans, invokes tools or coordinates steps in a RAG workflow.",
+      "category": "Workflow",
+      "identifierPrefix": "AGENT",
+      "directory": "agents/",
+      "schema": "schema/agent.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "Provider",
+      "label": "Provider",
+      "pluralLabel": "Providers",
+      "description": "An organization, platform or service provider that supplies RAG-relevant models, infrastructure, tools or data services.",
+      "category": "Infrastructure",
+      "identifierPrefix": "PROVIDER",
+      "directory": "providers/",
+      "schema": "schema/provider.schema.json",
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0"
+    }
+  ],
+  "notes": [
+    "This registry is limited to entity types already accepted by schema/definitions/identity.schema.json."
+  ]
+}
