@@ -13,7 +13,7 @@ BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover autopilot-status help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -118,6 +118,9 @@ autopilot-dry-run:
 autopilot-recover:
 	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --allow-recovery
 
+autopilot-status:
+	python3 scripts/rkm-autopilot.py status
+
 help:
 	@printf 'RKM developer commands:\n'
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
@@ -142,4 +145,5 @@ help:
 	@printf '  make autopilot [N=3]             Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET, defaulting to AUTOCYCLE_N.\n'
 	@printf '  make autopilot-dry-run [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --dry-run.\n'
 	@printf '  make autopilot-recover [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --allow-recovery.\n'
+	@printf '  make autopilot-status            Show the last autopilot decision from .rkm/autopilot-state.json.\n'
 	@printf '  make help                        Show this help.\n'
