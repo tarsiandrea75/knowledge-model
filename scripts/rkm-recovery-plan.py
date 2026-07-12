@@ -33,6 +33,7 @@ VERDICT_LINE = re.compile(
     re.IGNORECASE,
 )
 STANDALONE_VERDICT = re.compile(r"^\s*(?:`|\*\*|`?\*\*)?(ACCEPT|REVISE|STOP)(?:`|\*\*)?\s*$", re.IGNORECASE)
+PROJECT_PATH = re.compile(r"`?((?:docs|schema|scripts)/[A-Za-z0-9_.\-/]+|README\.md|Makefile)`?")
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,9 @@ class PlanInputs:
     recovery_attempted: bool
     recovery_still_revise: bool
     log_sources: list[str]
+    stale_recovery_logs_ignored: bool
+    current_dirty_file: str | None
+    current_file_latest_verdict: str | None
 
 
 @dataclass(frozen=True)
@@ -68,6 +72,9 @@ class RecoveryPlan:
     recommended_command: str | None
     reason: str
     log_sources: list[str]
+    stale_recovery_logs_ignored: bool
+    current_dirty_file: str | None
+    current_file_latest_verdict: str | None
 
 
 def run_command(args: list[str], repo_root: Path = REPOSITORY_ROOT) -> tuple[int, str, str]:
@@ -129,6 +136,35 @@ def extract_verdicts(text: str) -> list[str]:
         if standalone:
             verdicts.append(standalone.group(1).upper())
     return verdicts
+
+
+def extract_project_paths(text: str) -> list[str]:
+    paths: list[str] = []
+    for match in PROJECT_PATH.finditer(text):
+        path = match.group(1).rstrip(".,:;)")
+        if is_project_path(path) and path not in paths:
+            paths.append(path)
+    return paths
+
+
+def extract_log_touched_files(text: str) -> list[str]:
+    files: list[str] = []
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        normalized = line.strip().lower()
+        if "touched file" not in normalized and "changed project file" not in normalized and "dirty file" not in normalized:
+            continue
+        for candidate in lines[index : min(len(lines), index + 8)]:
+            if candidate != line:
+                stripped = candidate.strip()
+                if not stripped:
+                    break
+                if stripped.lower().rstrip(":") in {"reasons", "required fixes", "commit recommended", "verdict"}:
+                    break
+            for path in extract_project_paths(candidate):
+                if path not in files:
+                    files.append(path)
+    return files
 
 
 def read_text_if_present(path: Path) -> str | None:
@@ -209,6 +245,25 @@ def read_log_sources() -> dict[str, str]:
     return logs
 
 
+def is_recovery_log(source: str) -> bool:
+    return "rkm-recover-revise" in source or "recover-revise" in source
+
+
+def filter_logs_for_current_file(logs: dict[str, str], current_file: str | None) -> tuple[dict[str, str], bool]:
+    if current_file is None:
+        return logs, False
+
+    relevant: dict[str, str] = {}
+    stale_recovery_ignored = False
+    for source, text in logs.items():
+        paths = extract_log_touched_files(text)
+        if current_file in paths:
+            relevant[source] = text
+        elif paths and is_recovery_log(source):
+            stale_recovery_ignored = True
+    return relevant, stale_recovery_ignored
+
+
 def reviewer_summary_from_texts(texts: list[str], limit: int = 30) -> str:
     selected: list[str] = []
     for text in texts:
@@ -253,14 +308,17 @@ def recovery_still_revise_from(entry: dict[str, Any] | None, logs: dict[str, str
 def collect_inputs(repo_root: Path = REPOSITORY_ROOT) -> PlanInputs:
     code, stdout, _stderr = run_command(["git", "status", "--short"], repo_root)
     status_lines = stdout.splitlines() if code == 0 else []
+    project_files = changed_project_files(status_lines)
+    current_dirty_file = project_files[0] if len(project_files) == 1 else None
     entries = read_ledger_entries(repo_root / ".rkm" / "run-ledger.jsonl")
     latest = latest_relevant_ledger(entries)
-    logs = read_log_sources()
+    logs, stale_recovery_logs_ignored = filter_logs_for_current_file(read_log_sources(), current_dirty_file)
     log_verdicts: list[str] = []
     for text in logs.values():
         log_verdicts.extend(extract_verdicts(text))
     ledger_verdicts = entry_verdicts(latest)
     latest_verdicts = log_verdicts if log_verdicts else ledger_verdicts
+    current_file_latest_verdict = log_verdicts[-1] if current_dirty_file and log_verdicts else None
 
     return PlanInputs(
         status_lines=status_lines,
@@ -273,11 +331,18 @@ def collect_inputs(repo_root: Path = REPOSITORY_ROOT) -> PlanInputs:
         recovery_attempted=recovery_attempted_from(latest, logs),
         recovery_still_revise=recovery_still_revise_from(latest, logs),
         log_sources=list(logs.keys()),
+        stale_recovery_logs_ignored=stale_recovery_logs_ignored,
+        current_dirty_file=current_dirty_file,
+        current_file_latest_verdict=current_file_latest_verdict,
     )
 
 
 def manual_fix_command(path: str) -> str:
     return f'make codex-commit PROMPT_FILE=path/to/manual-fix-prompt.md FILE="{path}" MESSAGE="Fix reviewer findings for {path}"'
+
+
+def accept_uncommitted_command(path: str) -> str:
+    return f'make validate && git add {path} && git diff --cached --check && git commit -m "Add {path}" && make safe-push'
 
 
 def decide(inputs: PlanInputs) -> RecoveryPlan:
@@ -313,6 +378,12 @@ def decide(inputs: PlanInputs) -> RecoveryPlan:
     elif len(project_files) > 1:
         status = "MANUAL_REVIEW"
         reason = "multiple changed project files are present"
+    elif len(project_files) == 1 and inputs.current_file_latest_verdict == "ACCEPT":
+        status = "ACCEPTED_UNCOMMITTED"
+        command = accept_uncommitted_command(project_files[0])
+        reason = "one changed project file has a latest relevant ACCEPT reviewer verdict"
+        if inputs.stale_recovery_logs_ignored:
+            reason += "; stale recovery logs for another file were ignored"
     elif len(project_files) == 1 and inputs.recovery_still_revise and ledger_matches_dirty_file:
         status = "RECOVERY_FAILED_NEEDS_MANUAL_FIX"
         command = manual_fix_command(project_files[0])
@@ -346,6 +417,9 @@ def decide(inputs: PlanInputs) -> RecoveryPlan:
         recommended_command=command,
         reason=reason,
         log_sources=inputs.log_sources,
+        stale_recovery_logs_ignored=inputs.stale_recovery_logs_ignored,
+        current_dirty_file=inputs.current_dirty_file,
+        current_file_latest_verdict=inputs.current_file_latest_verdict,
     )
 
 
@@ -368,6 +442,9 @@ def plan_to_json(plan: RecoveryPlan) -> dict[str, Any]:
         "recommendedCommand": plan.recommended_command,
         "reason": plan.reason,
         "logSources": plan.log_sources,
+        "staleRecoveryLogsIgnored": plan.stale_recovery_logs_ignored,
+        "currentDirtyFile": plan.current_dirty_file,
+        "currentFileLatestVerdict": plan.current_file_latest_verdict,
     }
 
 
@@ -387,6 +464,9 @@ def print_human(plan: RecoveryPlan, verbose: bool = False) -> None:
     print(f"latest touched file: {plan.latest_touched_file or '(unknown)'}")
     print(f"recovery attempted: {str(plan.recovery_attempted).lower()}")
     print(f"recovery still REVISE: {str(plan.recovery_still_revise).lower()}")
+    print(f"stale recovery logs ignored: {str(plan.stale_recovery_logs_ignored).lower()}")
+    print(f"current dirty file: {plan.current_dirty_file or '(none)'}")
+    print(f"current file latest verdict: {plan.current_file_latest_verdict or '(none)'}")
     print(f"recommended command: {plan.recommended_command or '(none)'}")
     print(f"log sources: {', '.join(plan.log_sources) if plan.log_sources else '(none)'}")
     if plan.reviewer_summary and (verbose or not plan.latest_ledger_is_historical):
@@ -415,18 +495,26 @@ def test_inputs(
     reviewer_summary: str = "",
     recovery_attempted: bool = False,
     recovery_still_revise: bool = False,
+    latest_touched_file: str | None = None,
+    stale_recovery_logs_ignored: bool = False,
+    current_dirty_file: str | None = None,
+    current_file_latest_verdict: str | None = None,
 ) -> PlanInputs:
+    project_files = changed_project_files(status_lines or [])
     return PlanInputs(
         status_lines=status_lines or [],
         latest_ledger_final_status=latest_ledger_final_status,
         latest_ledger_label=None,
         latest_ledger_timestamp_utc=None,
         latest_verdicts=latest_verdicts or [],
-        latest_touched_file=None,
+        latest_touched_file=latest_touched_file,
         reviewer_summary=reviewer_summary,
         recovery_attempted=recovery_attempted,
         recovery_still_revise=recovery_still_revise,
         log_sources=[],
+        stale_recovery_logs_ignored=stale_recovery_logs_ignored,
+        current_dirty_file=current_dirty_file if current_dirty_file is not None else (project_files[0] if len(project_files) == 1 else None),
+        current_file_latest_verdict=current_file_latest_verdict,
     )
 
 
@@ -494,6 +582,63 @@ def run_self_test() -> int:
             "RECOVERY_FAILED_NEEDS_MANUAL_FIX",
         )
     )
+    graph_accept_plan = decide(
+        test_inputs(
+            [" M docs/architecture/graph-export-model.md"],
+            latest_ledger_final_status="REVISE_PENDING",
+            latest_verdicts=["ACCEPT"],
+            recovery_attempted=False,
+            recovery_still_revise=False,
+            latest_touched_file="docs/architecture/paper-model.md",
+            stale_recovery_logs_ignored=True,
+            current_file_latest_verdict="ACCEPT",
+        )
+    )
+    if graph_accept_plan.status != "ACCEPTED_UNCOMMITTED":
+        failures.append(
+            "dirty graph-export with ACCEPT cycle and stale paper recovery logs: "
+            f"expected ACCEPTED_UNCOMMITTED, got {graph_accept_plan.status}"
+        )
+    if graph_accept_plan.stale_recovery_logs_ignored is not True:
+        failures.append("dirty graph-export with stale paper recovery logs: expected staleRecoveryLogsIgnored true")
+    if graph_accept_plan.current_dirty_file != "docs/architecture/graph-export-model.md":
+        failures.append("dirty graph-export with stale paper recovery logs: expected currentDirtyFile graph-export")
+    if graph_accept_plan.current_file_latest_verdict != "ACCEPT":
+        failures.append("dirty graph-export with stale paper recovery logs: expected currentFileLatestVerdict ACCEPT")
+    if graph_accept_plan.recommended_command != (
+        'make validate && git add docs/architecture/graph-export-model.md && git diff --cached --check '
+        '&& git commit -m "Add docs/architecture/graph-export-model.md" && make safe-push'
+    ):
+        failures.append("dirty graph-export with ACCEPT cycle: unexpected recommended command")
+
+    paper_revise_plan = decide(
+        test_inputs(
+            [" M docs/architecture/paper-model.md"],
+            latest_ledger_final_status="REVISE_PENDING",
+            latest_verdicts=["REVISE"],
+            recovery_attempted=True,
+            recovery_still_revise=True,
+            latest_touched_file="docs/architecture/paper-model.md",
+            current_file_latest_verdict="REVISE",
+        )
+    )
+    if paper_revise_plan.status != "RECOVERY_FAILED_NEEDS_MANUAL_FIX":
+        failures.append(
+            "dirty paper-model with current REVISE recovery log: "
+            f"expected RECOVERY_FAILED_NEEDS_MANUAL_FIX, got {paper_revise_plan.status}"
+        )
+
+    stale_only_plan = decide(
+        test_inputs(
+            [" M docs/architecture/graph-export-model.md"],
+            latest_ledger_final_status="REVISE_PENDING",
+            latest_verdicts=[],
+            latest_touched_file="docs/architecture/paper-model.md",
+            stale_recovery_logs_ignored=True,
+        )
+    )
+    if stale_only_plan.stale_recovery_logs_ignored is not True:
+        failures.append("dirty file with stale logs for another file: expected staleRecoveryLogsIgnored true")
     failures.extend(
         assert_plan(
             "IDE files",
