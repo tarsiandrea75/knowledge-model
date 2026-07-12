@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/tool-contract.schema.json",
+  "title": "RKM Tool Contract Definition",
+  "description": "Defines the reusable invocation contract for a bounded callable capability used by agents, workflows, frameworks, components or humans in a RAG system.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "invocationMode",
+    "inputs",
+    "outputs"
+  ],
+  "properties": {
+    "invocationMode": {
+      "$ref": "#/$defs/invocationMode"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Structured inputs accepted by the callable capability.",
+      "items": {
+        "$ref": "#/$defs/contractField"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Structured outputs returned or emitted by the callable capability.",
+      "items": {
+        "$ref": "#/$defs/contractField"
+      },
+      "uniqueItems": true
+    },
+    "requiredParameters": {
+      "type": "array",
+      "description": "Parameters that must be supplied for a valid invocation.",
+      "items": {
+        "$ref": "#/$defs/parameter"
+      },
+      "uniqueItems": true
+    },
+    "optionalParameters": {
+      "type": "array",
+      "description": "Parameters that may be supplied to modify invocation behavior.",
+      "items": {
+        "$ref": "#/$defs/parameter"
+      },
+      "uniqueItems": true
+    },
+    "sideEffects": {
+      "type": "array",
+      "description": "State changes or external effects caused by invocation.",
+      "items": {
+        "$ref": "#/$defs/sideEffect"
+      },
+      "uniqueItems": true
+    },
+    "errorModes": {
+      "type": "array",
+      "description": "Expected failure modes that callers should handle.",
+      "items": {
+        "$ref": "#/$defs/errorMode"
+      },
+      "uniqueItems": true
+    },
+    "timeout": {
+      "$ref": "#/$defs/duration"
+    },
+    "retryPolicy": {
+      "$ref": "#/$defs/retryPolicy"
+    },
+    "idempotency": {
+      "$ref": "#/$defs/idempotency"
+    },
+    "authentication": {
+      "$ref": "#/$defs/authentication"
+    },
+    "authorization": {
+      "$ref": "#/$defs/authorization"
+    },
+    "rateLimits": {
+      "type": "array",
+      "description": "Known rate limits or quota constraints on invocation.",
+      "items": {
+        "$ref": "#/$defs/rateLimit"
+      },
+      "uniqueItems": true
+    },
+    "observability": {
+      "$ref": "#/$defs/observability"
+    }
+  },
+  "$defs": {
+    "invocationMode": {
+      "type": "string",
+      "description": "How the callable capability is invoked.",
+      "enum": [
+        "Synchronous",
+        "Asynchronous",
+        "Streaming",
+        "Batch",
+        "Scheduled",
+        "Event Driven",
+        "Human Initiated",
+        "Agent Initiated",
+        "Workflow Initiated",
+        "Hybrid"
+      ]
+    },
+    "contractField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "semanticType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Stable field name used by the contract.",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable field label.",
+          "minLength": 1
+        },
+        "semanticType": {
+          "$ref": "#/$defs/semanticType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the field semantics.",
+          "minLength": 1
+        },
+        "schemaReference": {
+          "type": "string",
+          "description": "URI or local reference to a schema that defines the field shape.",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "sensitive": {
+          "type": "boolean",
+          "description": "Whether the field may contain sensitive or access-controlled data.",
+          "default": false
+        }
+      }
+    },
+    "semanticType": {
+      "type": "string",
+      "description": "Reusable semantic category for a contract field.",
+      "enum": [
+        "User Query",
+        "Rewritten Query",
+        "Document Identifier",
+        "Chunk Identifier",
+        "Embedding Vector",
+        "Metadata Filter",
+        "Retrieval Result",
+        "Ranked Results",
+        "Source References",
+        "Prompt",
+        "Generated Answer",
+        "Evaluation Criterion",
+        "Evaluation Score",
+        "Validation Finding",
+        "Approval Request",
+        "Approval Decision",
+        "Trace Event",
+        "Generated Artifact",
+        "Other"
+      ]
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "valueType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Array",
+            "Object",
+            "URI",
+            "Date Time",
+            "Duration"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defaultValue": {
+          "description": "Default value used when the parameter is omitted."
+        },
+        "allowedValues": {
+          "type": "array",
+          "description": "Finite set of allowed values when the parameter is controlled.",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sideEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effectType",
+        "description"
+      ],
+      "properties": {
+        "effectType": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Writes Index",
+            "Updates Database",
+            "Sends Notification",
+            "Creates Audit Record",
+            "Publishes Content",
+            "Triggers Workflow",
+            "Changes Access Control",
+            "Calls External Service",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reversibility": {
+          "type": "string",
+          "enum": [
+            "Reversible",
+            "Partially Reversible",
+            "Irreversible",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "errorMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "description"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recoverability": {
+          "type": "string",
+          "enum": [
+            "Retryable",
+            "User Correctable",
+            "Configuration Required",
+            "Provider Required",
+            "Non Recoverable",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "Milliseconds",
+            "Seconds",
+            "Minutes",
+            "Hours"
+          ]
+        }
+      }
+    },
+    "retryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Fixed Delay",
+            "Exponential Backoff",
+            "Provider Defined",
+            "Caller Defined",
+            "Unknown"
+          ]
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retryableErrorCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "Idempotent",
+            "Idempotent With Key",
+            "Not Idempotent",
+            "Unknown"
+          ]
+        },
+        "keyField": {
+          "type": "string",
+          "description": "Name of the field used as an idempotency key when applicable.",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "API Key",
+              "Bearer Token",
+              "OAuth",
+              "Mutual TLS",
+              "Session",
+              "Local Credential",
+              "Human Approval",
+              "None",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requiredScopes": {
+          "type": "array",
+          "description": "Required permission scopes, roles or policy grants.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "approvalRequired": {
+          "type": "boolean",
+          "default": false
+        },
+        "dataAccessScope": {
+          "type": "string",
+          "enum": [
+            "No Data Access",
+            "Public Data",
+            "Project Data",
+            "User Data",
+            "Sensitive Data",
+            "Administrative Data",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "rateLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "limit",
+        "window"
+      ],
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "window": {
+          "$ref": "#/$defs/duration"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "Invocation",
+            "User",
+            "Project",
+            "Organization",
+            "Provider Account",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "emitsTraceEvents": {
+          "type": "boolean"
+        },
+        "emitsMetrics": {
+          "type": "boolean"
+        },
+        "auditLogging": {
+          "type": "string",
+          "enum": [
+            "Required",
+            "Supported",
+            "Unsupported",
+            "Unknown"
+          ]
+        }
+      }
+    }
+  }
+}
