@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/problem.schema.json",
+  "title": "RKM Problem Definition",
+  "description": "Defines a reusable structured problem that represents a recurring challenge, failure mode, requirement gap or quality issue in a RAG system context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "problemType",
+    "statement",
+    "scope"
+  ],
+  "properties": {
+    "problemId": {
+      "type": "string",
+      "description": "Stable local identifier for the problem within the containing entity, claim, evidence record or comparison.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "problemType": {
+      "$ref": "#/$defs/problemType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the challenge, failure mode, requirement gap or quality issue.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "severity": {
+      "type": "string",
+      "description": "Expected importance of the problem in the stated scope.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Context Dependent",
+        "Unknown"
+      ]
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the problem is expected to appear or become decision-relevant.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "effects": {
+      "type": "array",
+      "description": "Known or expected effects caused by the problem.",
+      "items": {
+        "$ref": "#/$defs/effect"
+      },
+      "uniqueItems": true
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes degraded, constrained or made harder to evaluate by this problem.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "candidateMitigations": {
+      "type": "array",
+      "description": "Techniques, components, workflows, policies or operational controls that may address the problem.",
+      "items": {
+        "$ref": "#/$defs/mitigation"
+      },
+      "uniqueItems": true
+    },
+    "relatedLimitations": {
+      "type": "array",
+      "description": "Limitations that expose, intensify or explain the problem.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, qualify or justify the problem.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the existence, scope, severity or impact of the problem.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the problem.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "problemType": {
+      "type": "string",
+      "description": "Primary nature of the problem.",
+      "enum": [
+        "Retrieval Problem",
+        "Ranking Problem",
+        "Generation Problem",
+        "Grounding Problem",
+        "Citation Problem",
+        "Evaluation Problem",
+        "Data Quality Problem",
+        "Freshness Problem",
+        "Context Assembly Problem",
+        "Latency Problem",
+        "Cost Problem",
+        "Scalability Problem",
+        "Observability Problem",
+        "Governance Problem",
+        "Operational Problem",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the problem applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities affected when the problem is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the problem is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "useCaseReferences": {
+          "type": "array",
+          "description": "Use cases where the problem materially affects suitability, design or evaluation.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor that causes, exposes or intensifies the problem.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "description": "Effect caused or amplified by the problem.",
+      "additionalProperties": false,
+      "required": [
+        "effectType"
+      ],
+      "properties": {
+        "effectType": {
+          "type": "string",
+          "enum": [
+            "Lower Retrieval Recall",
+            "Lower Precision",
+            "Weaker Grounding",
+            "Weaker Citation Faithfulness",
+            "Incomplete Answers",
+            "Stale Answers",
+            "Higher Latency",
+            "Higher Cost",
+            "Reduced Reproducibility",
+            "Weaker Evaluation Coverage",
+            "Greater Operational Complexity",
+            "Increased Governance Risk",
+            "Other"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Context Dependent",
+            "Unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mitigation": {
+      "type": "object",
+      "description": "Structured mitigation candidate for the problem.",
+      "additionalProperties": false,
+      "required": [
+        "mitigationType",
+        "description"
+      ],
+      "properties": {
+        "mitigationType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Workflow",
+            "Component",
+            "Policy",
+            "Evaluation Method",
+            "Operational Control",
+            "Provider Choice",
+            "Configuration",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mitigatingEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "evidenceReferences": {
+          "type": "array",
+          "description": "Local or stable identifiers for evidence supporting mitigation effectiveness.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
