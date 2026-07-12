@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/policy.schema.json",
+  "title": "RKM Embedded Policy Fragment Definition",
+  "description": "Defines a reusable embedded policy fragment for rules, constraints and governance requirements inside first-class RKM schemas. This schema does not provide the full knowledge entity envelope for a Policy: it intentionally omits first-class identity, metadata, description and top-level relationships. A complete first-class Policy entity schema must be introduced separately after shared identity, entity-type and relationship support exists for Policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policyType",
+    "statement",
+    "scope",
+    "requirements"
+  ],
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded policy fragment within the containing entity, workflow, tool contract, evaluation or governance record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for this embedded policy fragment.",
+      "minLength": 1
+    },
+    "policyType": {
+      "$ref": "#/$defs/policyType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the rule, constraint or governance requirement represented by this embedded policy fragment.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "requirements": {
+      "type": "array",
+      "description": "Verifiable policy requirements.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/requirement"
+      },
+      "uniqueItems": true
+    },
+    "enforcement": {
+      "type": "array",
+      "description": "Mechanisms that apply or check the policy.",
+      "items": {
+        "$ref": "#/$defs/enforcement"
+      },
+      "uniqueItems": true
+    },
+    "violationHandling": {
+      "type": "array",
+      "description": "Expected behavior when the policy is violated.",
+      "items": {
+        "$ref": "#/$defs/violationHandling"
+      },
+      "uniqueItems": true
+    },
+    "complianceEvidence": {
+      "type": "array",
+      "description": "Evidence records, observations or artifacts used to assess policy compliance.",
+      "items": {
+        "$ref": "#/$defs/complianceEvidence"
+      },
+      "uniqueItems": true
+    },
+    "governedEntities": {
+      "type": "array",
+      "description": "Existing RKM entities explicitly governed by this embedded policy fragment.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "relatedClaims": {
+      "type": "array",
+      "description": "Claims about this embedded policy fragment, its applicability or compliance state.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence supporting this embedded policy fragment, its scope or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources that define, document or justify this embedded policy fragment.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "policyType": {
+      "type": "string",
+      "description": "Primary governance role of the policy.",
+      "enum": [
+        "Access Policy",
+        "Data Handling Policy",
+        "Privacy Policy",
+        "Security Policy",
+        "Source Trust Policy",
+        "Citation Policy",
+        "Retention Policy",
+        "Cost Policy",
+        "Evaluation Policy",
+        "Human Review Policy",
+        "Provider Policy",
+        "Operational Policy",
+        "Compliance Policy",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where this embedded policy fragment applies.",
+      "additionalProperties": false,
+      "required": [
+        "scopeType"
+      ],
+      "properties": {
+        "scopeType": {
+          "type": "string",
+          "enum": [
+            "Entity",
+            "Workflow",
+            "Workflow Step",
+            "Tool Invocation",
+            "Provider Dependency",
+            "Dataset Use",
+            "Artifact Lifecycle",
+            "Evaluation Result",
+            "Deployment Environment",
+            "User Group",
+            "Jurisdiction",
+            "Other"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the policy applies.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions that determine when the policy applies.",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "description": "A specific policy-fragment condition that must be satisfied, avoided or checked.",
+      "additionalProperties": false,
+      "required": [
+        "requirementLevel",
+        "description"
+      ],
+      "properties": {
+        "requirementId": {
+          "type": "string",
+          "description": "Stable local identifier for the policy requirement.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "requirementLevel": {
+          "type": "string",
+          "enum": [
+            "Mandatory",
+            "Recommended",
+            "Conditional",
+            "Prohibited"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Verifiable requirement statement.",
+          "minLength": 1
+        },
+        "verificationMethod": {
+          "$ref": "#/$defs/verificationMethod"
+        },
+        "appliesWhen": {
+          "type": "array",
+          "description": "Conditions under which this requirement applies.",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "description": "Mechanism that applies, checks or records policy compliance.",
+      "additionalProperties": false,
+      "required": [
+        "enforcementType"
+      ],
+      "properties": {
+        "enforcementType": {
+          "type": "string",
+          "enum": [
+            "Manual Review",
+            "Automated Validation",
+            "Runtime Guardrail",
+            "Workflow Gate",
+            "Access Control Rule",
+            "Provider Contract",
+            "Deployment Configuration",
+            "Evaluation Threshold",
+            "Audit Review",
+            "Other"
+          ]
+        },
+        "enforcer": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredArtifact": {
+          "$ref": "#/$defs/artifactReference"
+        }
+      }
+    },
+    "violationHandling": {
+      "type": "object",
+      "description": "Expected response when a policy requirement is violated.",
+      "additionalProperties": false,
+      "required": [
+        "action"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "Reject",
+            "Fail Closed",
+            "Require Human Review",
+            "Log Finding",
+            "Escalate",
+            "Retry",
+            "Redact",
+            "Degrade Gracefully",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "complianceEvidence": {
+      "type": "object",
+      "description": "Observation or artifact used to assess whether the policy is satisfied, violated or not applicable.",
+      "additionalProperties": false,
+      "required": [
+        "evidenceType",
+        "complianceState"
+      ],
+      "properties": {
+        "evidenceType": {
+          "type": "string",
+          "enum": [
+            "Validation Result",
+            "Evaluation Report",
+            "Audit Log",
+            "Configuration Snapshot",
+            "Source Documentation",
+            "Provider Documentation",
+            "Benchmark Result",
+            "Human Review Record",
+            "Other"
+          ]
+        },
+        "complianceState": {
+          "type": "string",
+          "enum": [
+            "Satisfied",
+            "Violated",
+            "Partially Satisfied",
+            "Not Applicable",
+            "Unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "governedEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifactReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "verificationMethod": {
+      "type": "object",
+      "description": "How a policy requirement can be checked.",
+      "additionalProperties": false,
+      "required": [
+        "methodType"
+      ],
+      "properties": {
+        "methodType": {
+          "type": "string",
+          "enum": [
+            "Schema Validation",
+            "Metric Threshold",
+            "Human Review",
+            "Runtime Check",
+            "Static Analysis",
+            "Configuration Review",
+            "Audit Review",
+            "Reference Check",
+            "Other"
+          ]
+        },
+        "metric": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "threshold": {
+          "type": "string",
+          "description": "Human-readable threshold or pass condition.",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor required for policy applicability.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Type",
+            "User Group",
+            "Data Sensitivity",
+            "Source Trust Level",
+            "Deployment Environment",
+            "Provider",
+            "Jurisdiction",
+            "Cost Limit",
+            "Evaluation Context",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Stable reference to an existing RKM entity governed by or otherwise related to this embedded policy fragment. The id is required and authoritative for graph export; slug, name and entityType are optional display or discovery aids only.",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "relationship.schema.json#/$defs/entityId",
+          "description": "Stable RKM identifier of the referenced entity. Identifiers follow the project convention of an uppercase entity prefix and four or more digits."
+        },
+        "slug": {
+          "$ref": "relationship.schema.json#/$defs/slug",
+          "description": "Optional filesystem-safe slug for readability and discovery; it is not the stable graph identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional human-readable display name of the referenced entity; it is not the stable graph identifier.",
+          "minLength": 1
+        },
+        "entityType": {
+          "$ref": "relationship.schema.json#/$defs/entityType",
+          "description": "Known RKM entity type of the referenced entity, constrained to the shared relationship entity-type vocabulary."
+        }
+      }
+    },
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactType": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "artifactId"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
