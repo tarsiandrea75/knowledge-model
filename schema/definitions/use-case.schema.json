@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/use-case.schema.json",
+  "title": "RKM Use Case Definition",
+  "description": "Defines a reusable structured use case that describes a recurring RAG application context, its boundary, requirements, suitability factors and evidence-backed constraints.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "useCaseType",
+    "statement",
+    "boundary"
+  ],
+  "properties": {
+    "useCaseId": {
+      "type": "string",
+      "description": "Stable local identifier for the use case within the containing entity, comparison, claim or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "useCaseType": {
+      "$ref": "#/$defs/useCaseType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the recurring application context.",
+      "minLength": 1
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "contextDimensions": {
+      "type": "array",
+      "description": "Reusable context dimensions that affect RAG entity selection, evaluation or governance for this use case.",
+      "items": {
+        "$ref": "#/$defs/contextDimension"
+      },
+      "uniqueItems": true
+    },
+    "requirements": {
+      "type": "array",
+      "description": "Functional, quality, governance or operational requirements implied by the use case.",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      },
+      "uniqueItems": true
+    },
+    "ragStages": {
+      "type": "array",
+      "description": "RAG pipeline stages that are materially involved in the use case.",
+      "items": {
+        "$ref": "#/$defs/ragStage"
+      },
+      "uniqueItems": true
+    },
+    "suitableEntities": {
+      "type": "array",
+      "description": "Entities or named concepts that are suitable for this use case when the stated conditions hold.",
+      "items": {
+        "$ref": "#/$defs/suitability"
+      },
+      "uniqueItems": true
+    },
+    "relatedProblems": {
+      "type": "array",
+      "description": "Problems that commonly arise in this use case.",
+      "items": {
+        "$ref": "problem.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "advantages": {
+      "type": "array",
+      "description": "Advantages that matter for this use case.",
+      "items": {
+        "$ref": "advantage.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Limitations or constraints that qualify suitability for this use case.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "tradeoffs": {
+      "type": "array",
+      "description": "Tradeoffs that affect design or selection decisions for this use case.",
+      "items": {
+        "$ref": "tradeoff.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, justify or qualify the use case or entity suitability within it.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the use case, its requirements or suitability claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the use case.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "useCaseType": {
+      "type": "string",
+      "description": "Primary task context represented by the use case.",
+      "enum": [
+        "Question Answering",
+        "Document Search",
+        "Research Assistance",
+        "Compliance Research",
+        "Codebase Assistance",
+        "Customer Support",
+        "Policy Lookup",
+        "Legal Analysis",
+        "Medical Information Retrieval",
+        "Knowledge Assistant",
+        "Content Generation",
+        "Decision Support",
+        "Other"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Boundary that defines where the use case applies.",
+      "additionalProperties": false,
+      "required": [
+        "task",
+        "expectedOutput"
+      ],
+      "properties": {
+        "actor": {
+          "type": "string",
+          "description": "User, role, system or agent performing the task.",
+          "minLength": 1
+        },
+        "task": {
+          "type": "string",
+          "description": "Task performed in the use case.",
+          "minLength": 1
+        },
+        "knowledgeDomain": {
+          "type": "string",
+          "description": "Subject area, corpus domain or operational domain relevant to the use case.",
+          "minLength": 1
+        },
+        "sourceMaterial": {
+          "type": "string",
+          "description": "Primary source material or corpus type used by the RAG system.",
+          "minLength": 1
+        },
+        "expectedOutput": {
+          "type": "string",
+          "description": "Expected user-facing or system-facing output.",
+          "minLength": 1
+        },
+        "outOfScope": {
+          "type": "array",
+          "description": "Responsibilities or scenarios explicitly outside the use case boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "contextDimension": {
+      "type": "object",
+      "description": "Contextual factor that affects entity selection, evaluation or governance.",
+      "additionalProperties": false,
+      "required": [
+        "dimensionType",
+        "description"
+      ],
+      "properties": {
+        "dimensionType": {
+          "type": "string",
+          "enum": [
+            "Task Type",
+            "User Role",
+            "Knowledge Domain",
+            "Source Freshness",
+            "Source Trust",
+            "Answer Format",
+            "Citation Requirement",
+            "Latency Expectation",
+            "Cost Constraint",
+            "Privacy Constraint",
+            "Evaluation Criterion",
+            "Failure Tolerance",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importance": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Required",
+            "Context Dependent",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "description": "Requirement implied by the use case without assuming a specific implementation.",
+      "additionalProperties": false,
+      "required": [
+        "requirementType",
+        "statement"
+      ],
+      "properties": {
+        "requirementType": {
+          "type": "string",
+          "enum": [
+            "Functional",
+            "Quality",
+            "Governance",
+            "Operational",
+            "Evaluation",
+            "Security",
+            "Privacy",
+            "Other"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Required",
+            "Context Dependent",
+            "Unknown"
+          ]
+        },
+        "measuredBy": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "suitability": {
+      "type": "object",
+      "description": "Structured suitability statement linking an entity or named concept to the use case.",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "rationale"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why the target is suitable for the use case under the stated conditions.",
+          "minLength": 1
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions required for the suitability statement to hold.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evidenceReferences": {
+          "type": "array",
+          "description": "Local or stable identifiers for evidence supporting the suitability statement.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
