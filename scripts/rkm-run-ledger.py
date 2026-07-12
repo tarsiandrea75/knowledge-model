@@ -47,18 +47,16 @@ REPO_PATH_TOKEN = re.compile(
     r")(?![\w./-])"
 )
 RECOVERY_MARKERS = (
-    "rkm-recover-revise.sh",
     "Codex recovery output",
     "entering single-file REVISE recovery",
     "accepted after recovery",
 )
+RECOVERY_SCRIPT_EXECUTION = re.compile(r"\bbash\s+scripts/rkm-recover-revise\.sh\b")
 RECOVERY_PATH_PATTERN = re.compile(
-    r"\bRecover\s+(?:"
+    r"(?:^\[[^\]\s]+\s+[0-9a-f]{6,40}\]\s+Recover\b|\bRecover\s+(?:"
     r"docs/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.md|"
-    r"scripts/[A-Za-z0-9._-]+\.(?:sh|py)|"
     r"schema/(?:definitions/)?[A-Za-z0-9._-]+\.schema\.json|"
-    r"registries/[A-Za-z0-9._-]+\.json"
-    r")\b"
+    r"))"
 )
 ERROR_MARKER = re.compile(r"\bERROR:")
 USAGE_LIMIT_MARKER = re.compile(r"\busage limit\b", re.IGNORECASE)
@@ -224,8 +222,14 @@ def failure_hints(text: str) -> list[str]:
     return hints
 
 
-def has_recovery(text: str) -> bool:
-    return any(marker in text for marker in RECOVERY_MARKERS) or bool(RECOVERY_PATH_PATTERN.search(text))
+def has_recovery(text: str, label: str | None) -> bool:
+    if label and "recovery" in label.lower():
+        return True
+    return (
+        any(marker in text for marker in RECOVERY_MARKERS)
+        or bool(RECOVERY_SCRIPT_EXECUTION.search(text))
+        or any(RECOVERY_PATH_PATTERN.search(line.strip()) for line in text.splitlines())
+    )
 
 
 def final_status(final_verdict: str | None, has_failure: bool, recovered: bool) -> str:
@@ -259,7 +263,7 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
     files = extract_files(text)
     hints = failure_hints(text)
     final_verdict = verdicts[-1] if verdicts else None
-    recovered = has_recovery(text)
+    recovered = has_recovery(text, label)
     has_failure = bool(hints)
 
     return {
@@ -387,6 +391,7 @@ def run_self_test() -> int:
                     "[rkm-cycle] start",
                     "Return ACCEPT, REVISE, or STOP",
                     "A prose sentence about docs architecture naming is not a repository path.",
+                    "Checking scripts/rkm-recover-revise.sh",
                     "tokens used",
                     "  1,234 total",
                     "verdict: `ACCEPT`",
