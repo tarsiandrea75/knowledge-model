@@ -11,8 +11,9 @@ BUDGET_RESERVE_RATIO ?= 0.20
 BUDGET_WINDOW_HOURS ?= 24
 BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
+AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -108,6 +109,15 @@ budget-check:
 next-action:
 	python3 scripts/rkm-next-action.py --target "$(NEXT_ACTION_TARGET)"
 
+autopilot:
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)"
+
+autopilot-dry-run:
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --dry-run
+
+autopilot-recover:
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --allow-recovery
+
 help:
 	@printf 'RKM developer commands:\n'
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
@@ -129,4 +139,7 @@ help:
 	@printf '  make budget-report               Show the local budget profile report.\n'
 	@printf '  make budget-check [N=3]          Check whether the local budget profile allows BUDGET_TARGET, defaulting to AUTOCYCLE_N.\n'
 	@printf '  make next-action [N=3]           Print the next safe operational action without modifying files.\n'
+	@printf '  make autopilot [N=3]             Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET, defaulting to AUTOCYCLE_N.\n'
+	@printf '  make autopilot-dry-run [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --dry-run.\n'
+	@printf '  make autopilot-recover [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --allow-recovery.\n'
 	@printf '  make help                        Show this help.\n'
