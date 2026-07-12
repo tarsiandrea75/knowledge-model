@@ -10,14 +10,20 @@ from pathlib import Path
 
 VERDICTS = ("ACCEPT", "REVISE", "STOP")
 
-STANDALONE_VERDICT = re.compile(r"^(?:`(?P<code>ACCEPT|REVISE|STOP)`|(?P<plain>ACCEPT|REVISE|STOP)|\*\*`(?P<bold_code>ACCEPT|REVISE|STOP)`\*\*|\*\*(?P<bold>ACCEPT|REVISE|STOP)\*\*)$")
+STANDALONE_VERDICT = re.compile(
+    r"^(?:`(?P<code>ACCEPT|REVISE|STOP)`|(?P<plain>ACCEPT|REVISE|STOP)|\*\*`(?P<bold_code>ACCEPT|REVISE|STOP)`\*\*|\*\*(?P<bold>ACCEPT|REVISE|STOP)\*\*)$"
+)
 LABELED_VERDICT = re.compile(
-    r"^(?:verdict:|Verdict:|\*\*Verdict:\*\*)\s*`?(?P<verdict>ACCEPT|REVISE|STOP)`?$"
+    r"^(?:verdict:|Verdict:|\*\*Verdict:\*\*)\s*(?:`(?P<code>ACCEPT|REVISE|STOP)`|\*\*(?P<bold>ACCEPT|REVISE|STOP)\*\*|(?P<plain>ACCEPT|REVISE|STOP))$"
 )
 
 
 def explicit_verdict(line: str) -> str | None:
     normalized = line.strip()
+
+    outer_bold = normalized.startswith("**") and normalized.endswith("**")
+    if outer_bold:
+        normalized = normalized[2:-2].strip()
 
     standalone = STANDALONE_VERDICT.fullmatch(normalized)
     if standalone:
@@ -28,7 +34,10 @@ def explicit_verdict(line: str) -> str | None:
 
     labeled = LABELED_VERDICT.fullmatch(normalized)
     if labeled:
-        return labeled.group("verdict")
+        for group_name in ("code", "bold", "plain"):
+            verdict = labeled.group(group_name)
+            if verdict:
+                return verdict
 
     return None
 
@@ -50,7 +59,10 @@ def run_self_test() -> int:
         "**`ACCEPT`**": "ACCEPT",
         "verdict: REVISE": "REVISE",
         "Verdict: `STOP`": "STOP",
+        "**Verdict: ACCEPT**": "ACCEPT",
         "**Verdict:** ACCEPT": "ACCEPT",
+        "**Verdict:** `STOP`": "STOP",
+        "Verdict: **REVISE**": "REVISE",
         "Verdict: ACCEPT\nnotes\nverdict: STOP": "STOP",
         "Return ACCEPT, REVISE, or STOP\n\n**Verdict:** `REVISE`": "REVISE",
     }
