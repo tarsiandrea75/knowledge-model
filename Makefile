@@ -28,7 +28,7 @@ cycle:
 	exit "$$exit_code"
 
 autocycle:
-	bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
+	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
 
 discover:
 	set +e; \
@@ -97,6 +97,7 @@ help:
 	@printf '  make log                         Show the 10 most recent commits.\n'
 	@printf '  make cycle [N=3]                 Run scripts/rkm-cycle.sh N, save stdout to /tmp/rkm-cycle-output.txt, print exit code, output tail, and status.\n'
 	@printf '  make autocycle [N=3]             Run bash scripts/rkm-autocycle.sh N.\n'
+	@printf '                                   Examples: make autocycle N=5; make autocycle N=10 TOKEN_BUDGET=300000; add optional BUDGET_SAFETY_FACTOR=1.25.\n'
 	@printf '  make discover [N=5]              Run scripts/rkm-discover.sh N, save stdout to /tmp/rkm-discovery-output.txt, keep stderr visible, print exit code, output tail, and status.\n'
 	@printf '  make push                        Run git push.\n'
 	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
