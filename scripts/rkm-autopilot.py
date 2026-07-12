@@ -647,6 +647,68 @@ def print_historical_ledger_status(next_action_json: Any) -> None:
         print("last ledger status: historical; no dirty file is pending.")
 
 
+def status_target(state: dict[str, Any]) -> int:
+    target = state.get("target")
+    if isinstance(target, bool) or not isinstance(target, int) or target <= 0:
+        return DEFAULT_TARGET
+    return target
+
+
+def read_current_status(target: int) -> tuple[dict[str, Any] | None, str | None]:
+    code, stdout, stderr = run_next_action(target)
+    if code != 0:
+        detail = stderr.strip() or stdout.strip()
+        warning = f"warning: current next-action failed with exit {code}; showing saved state only."
+        if detail:
+            warning = f"{warning} {detail}"
+        return None, warning
+
+    try:
+        return parse_next_action(stdout), None
+    except (json.JSONDecodeError, ValueError) as exc:
+        return None, f"warning: current next-action output was not usable JSON; showing saved state only. {exc}"
+
+
+def is_stale_state(saved_state: dict[str, Any], current: dict[str, Any]) -> bool:
+    saved_next_action = saved_state.get("nextActionJson")
+    saved_next_action_json = saved_next_action if isinstance(saved_next_action, dict) else {}
+    return (
+        saved_state.get("detectedStatus") != current.get("status")
+        or saved_next_action_json.get("head") != current.get("head")
+        or saved_next_action_json.get("isClean") != current.get("isClean")
+    )
+
+
+def print_current_budget_line(current: dict[str, Any]) -> None:
+    budget_keys = (
+        "tokensUsedInCurrentWindow",
+        "usableRemainingTokensAfterRisk",
+        "recommendedMaxTarget",
+    )
+    if not any(key in current for key in budget_keys):
+        return
+    print(
+        "current budget: "
+        f"used {display_value(current.get('tokensUsedInCurrentWindow'))}, "
+        f"usable after risk {display_value(current.get('usableRemainingTokensAfterRisk'))}, "
+        f"recommended max target {display_value(current.get('recommendedMaxTarget'))}"
+    )
+
+
+def print_current_status(saved_state: dict[str, Any], current: dict[str, Any]) -> None:
+    print("current state:")
+    print(f"  current status: {display_value(current.get('status'))}")
+    print(f"  current repo status: {display_value(current.get('repoStatus'))}")
+    print(f"  current budget status: {display_value(current.get('budgetStatus'))}")
+    print(f"  current recommended command: {display_value(current.get('command'))}")
+    print(f"  current head: {display_value(current.get('head'))}")
+    stale = is_stale_state(saved_state, current)
+    print(f"state stale: {'yes' if stale else 'no'}")
+    if stale:
+        print(f"safe current action: {display_value(current.get('command'))}")
+    print_current_budget_line(current)
+
+
 def print_status(state: dict[str, Any]) -> None:
     print("autopilot status")
     print(f"last autopilot timestamp: {display_value(state.get('timestampUtc'))}")
@@ -665,11 +727,20 @@ def print_status(state: dict[str, Any]) -> None:
     print_historical_ledger_status(next_action_json)
 
 
-def run_status(state_path: str | Path) -> int:
+def run_status(state_path: str | Path, *, no_current: bool = False) -> int:
     state, exit_code = read_status_state(state_path)
     if state is None:
         return exit_code
     print_status(state)
+    if no_current:
+        return 0
+
+    current, warning = read_current_status(status_target(state))
+    if warning is not None:
+        print(warning)
+        return 0
+    if current is not None:
+        print_current_status(state, current)
     return 0
 
 
@@ -724,7 +795,20 @@ def assert_status_result(
     expected_stdout: Sequence[str],
     expected_stderr: Sequence[str] = (),
     unexpected_stdout: Sequence[str] = (),
+    current_result: tuple[int, str, str] | None = None,
+    no_current: bool = True,
+    expected_current_calls: int | None = None,
 ) -> None:
+    original_run_next_action = run_next_action
+    current_calls = 0
+
+    def fake_next_action(target: int) -> tuple[int, str, str]:
+        nonlocal current_calls
+        current_calls += 1
+        if current_result is None:
+            raise AssertionError(f"{name}: unexpected current next-action call")
+        return current_result
+
     with tempfile.TemporaryDirectory(prefix="rkm-autopilot-status-test-") as directory:
         state_path = Path(directory) / "autopilot-state.json"
         if state_content is not None:
@@ -732,11 +816,18 @@ def assert_status_result(
 
         stdout = io.StringIO()
         stderr = io.StringIO()
-        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-            actual_exit_code = run_status(state_path)
+        globals()["run_next_action"] = fake_next_action
+        try:
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                actual_exit_code = run_status(state_path, no_current=no_current)
+        finally:
+            globals()["run_next_action"] = original_run_next_action
 
         if actual_exit_code != expected_exit_code:
             raise AssertionError(f"{name}: expected exit {expected_exit_code}, got {actual_exit_code}")
+
+        if expected_current_calls is not None and current_calls != expected_current_calls:
+            raise AssertionError(f"{name}: expected {expected_current_calls} current calls, got {current_calls}")
 
         actual_stdout = stdout.getvalue()
         for expected in expected_stdout:
@@ -993,6 +1084,159 @@ def run_self_test() -> int:
             "make safe-push",
         ),
     )
+    assert_status_result(
+        "status detects stale ready-to-autocycle state",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": True,
+                "allowRecovery": False,
+                "detectedStatus": READY_TO_AUTOCYCLE,
+                "nextAction": "run autocycle",
+                "recommendedCommand": "make autocycle N=3 TOKEN_BUDGET=500 BUDGET_SAFETY_FACTOR=1.25",
+                "actionSelected": "run autocycle, then safe-push if autocycle succeeds.",
+                "commandsPlanned": ["make autocycle N=3 TOKEN_BUDGET=500 BUDGET_SAFETY_FACTOR=1.25"],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "dry run complete; no changes made.",
+                "nextActionJson": {"status": READY_TO_AUTOCYCLE, "head": "abc1234", "isClean": False},
+            }
+        ),
+        0,
+        (
+            "detected status: READY_TO_AUTOCYCLE",
+            "current state:",
+            "current status: OVER_BUDGET",
+            "current repo status: clean",
+            "current budget status: over budget",
+            "current recommended command: make budget-report",
+            "current head: def5678",
+            "state stale: yes",
+            "safe current action: make budget-report",
+            "current budget: used 950, usable after risk -100, recommended max target 0",
+        ),
+        current_result=(
+            0,
+            json.dumps(
+                {
+                    "status": OVER_BUDGET,
+                    "repoStatus": "clean",
+                    "budgetStatus": "over budget",
+                    "command": "make budget-report",
+                    "head": "def5678",
+                    "isClean": True,
+                    "tokensUsedInCurrentWindow": 950,
+                    "usableRemainingTokensAfterRisk": -100,
+                    "recommendedMaxTarget": 0,
+                }
+            ),
+            "",
+        ),
+        no_current=False,
+        expected_current_calls=1,
+    )
+    assert_status_result(
+        "status detects fresh saved state",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": False,
+                "allowRecovery": False,
+                "detectedStatus": OVER_BUDGET,
+                "nextAction": "review budget usage",
+                "recommendedCommand": "make budget-report",
+                "actionSelected": "stopping without changes.",
+                "commandsPlanned": [],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "stopped without changes.",
+                "nextActionJson": {"status": OVER_BUDGET, "head": "def5678", "isClean": True},
+            }
+        ),
+        0,
+        (
+            "detected status: OVER_BUDGET",
+            "current state:",
+            "current status: OVER_BUDGET",
+            "state stale: no",
+        ),
+        unexpected_stdout=("safe current action:",),
+        current_result=(
+            0,
+            json.dumps(
+                {
+                    "status": OVER_BUDGET,
+                    "repoStatus": "clean",
+                    "budgetStatus": "over budget",
+                    "command": "make budget-report",
+                    "head": "def5678",
+                    "isClean": True,
+                }
+            ),
+            "",
+        ),
+        no_current=False,
+        expected_current_calls=1,
+    )
+    assert_status_result(
+        "status tolerates current next-action failure",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": False,
+                "allowRecovery": False,
+                "detectedStatus": OVER_BUDGET,
+                "nextAction": "review budget usage",
+                "recommendedCommand": "make budget-report",
+                "actionSelected": "stopping without changes.",
+                "commandsPlanned": [],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "stopped without changes.",
+                "nextActionJson": {"status": OVER_BUDGET, "head": "def5678", "isClean": True},
+            }
+        ),
+        0,
+        (
+            "detected status: OVER_BUDGET",
+            "warning: current next-action failed with exit 9; showing saved state only.",
+        ),
+        current_result=(9, "", "simulated failure"),
+        no_current=False,
+        expected_current_calls=1,
+    )
+    assert_status_result(
+        "status no-current skips current comparison",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": False,
+                "allowRecovery": False,
+                "detectedStatus": OVER_BUDGET,
+                "nextAction": "review budget usage",
+                "recommendedCommand": "make budget-report",
+                "actionSelected": "stopping without changes.",
+                "commandsPlanned": [],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "stopped without changes.",
+                "nextActionJson": {"status": OVER_BUDGET, "head": "def5678", "isClean": True},
+            }
+        ),
+        0,
+        ("detected status: OVER_BUDGET",),
+        unexpected_stdout=("current state:", "state stale:"),
+        no_current=True,
+        expected_current_calls=0,
+    )
 
     print("rkm-autopilot self-test passed")
     return 0
@@ -1015,6 +1259,7 @@ def make_parser() -> argparse.ArgumentParser:
 def make_status_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Print the latest RKM autopilot status.")
     parser.add_argument("--state-path", default=DEFAULT_STATE_PATH, metavar="PATH", help="autopilot state input path")
+    parser.add_argument("--no-current", action="store_true", help="show only the saved autopilot state")
     return parser
 
 
@@ -1022,7 +1267,7 @@ def run_cli(argv: list[str]) -> int:
     if len(argv) > 1 and argv[1] == "status":
         parser = make_status_parser()
         args = parser.parse_args(argv[2:])
-        return run_status(args.state_path)
+        return run_status(args.state_path, no_current=args.no_current)
 
     parser = make_parser()
     args = parser.parse_args(argv[1:])
