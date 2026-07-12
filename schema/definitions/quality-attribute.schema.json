@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/quality-attribute.schema.json",
+  "title": "RKM Quality Attribute Definition",
+  "description": "Defines a reusable structured assessment dimension for RAG entities, components, workflows, artifacts and system behavior.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "scope"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Canonical quality attribute name.",
+      "enum": [
+        "Retrieval Quality",
+        "Ranking Quality",
+        "Answer Correctness",
+        "Faithfulness",
+        "Citation Faithfulness",
+        "Context Relevance",
+        "Latency",
+        "Throughput",
+        "Cost",
+        "Freshness",
+        "Scalability",
+        "Reliability",
+        "Reproducibility",
+        "Observability",
+        "Privacy",
+        "Security",
+        "Safety",
+        "Maintainability",
+        "Portability",
+        "Robustness",
+        "Other"
+      ]
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "description": {
+      "type": "string",
+      "description": "Explanation of what the attribute means in the stated scope.",
+      "minLength": 1
+    },
+    "assessmentMethods": {
+      "type": "array",
+      "description": "Known ways this quality attribute can be assessed.",
+      "items": {
+        "$ref": "#/$defs/assessmentMethod"
+      },
+      "uniqueItems": true
+    },
+    "measurementDirection": {
+      "type": "string",
+      "description": "Preferred interpretation of higher or lower measured values.",
+      "enum": [
+        "Higher Is Better",
+        "Lower Is Better",
+        "Target Range Is Better",
+        "Context Dependent",
+        "Not Applicable"
+      ]
+    },
+    "relatedMetrics": {
+      "type": "array",
+      "description": "Stable identifiers or slugs of evaluation metrics commonly used to assess this attribute.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "tradeoffs": {
+      "type": "array",
+      "description": "Quality attributes that commonly improve, degrade or constrain this attribute.",
+      "items": {
+        "$ref": "#/$defs/tradeoff"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the quality attribute is being assessed.",
+      "additionalProperties": false,
+      "required": [
+        "targetType"
+      ],
+      "properties": {
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "Entity",
+            "Component",
+            "Workflow Stage",
+            "Artifact",
+            "End To End System",
+            "Provider",
+            "Benchmark",
+            "Dataset",
+            "Other"
+          ]
+        },
+        "ragStage": {
+          "type": "string",
+          "enum": [
+            "Ingestion",
+            "Parsing",
+            "Chunking",
+            "Embedding",
+            "Indexing",
+            "Query Understanding",
+            "Retrieval",
+            "Reranking",
+            "Context Assembly",
+            "Generation",
+            "Evaluation",
+            "Orchestration",
+            "Monitoring"
+          ]
+        },
+        "targetReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "artifactType": {
+          "type": "string",
+          "enum": [
+            "Source Document",
+            "Parsed Document",
+            "Chunk",
+            "Embedding Vector",
+            "User Query",
+            "Rewritten Query",
+            "Retrieved Context",
+            "Ranked Result",
+            "Assembled Context",
+            "Prompt",
+            "Generated Answer",
+            "Citation",
+            "Evaluation Score",
+            "Trace Event",
+            "Other"
+          ]
+        }
+      }
+    },
+    "assessmentMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "methodType"
+      ],
+      "properties": {
+        "methodType": {
+          "type": "string",
+          "enum": [
+            "Evaluation Metric",
+            "Benchmark",
+            "Dataset",
+            "Experiment",
+            "Human Review",
+            "Operational Observation",
+            "Policy Check",
+            "Reproducibility Procedure",
+            "Reference Analysis",
+            "Other"
+          ]
+        },
+        "methodReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "tradeoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attribute",
+        "effect"
+      ],
+      "properties": {
+        "attribute": {
+          "type": "string",
+          "description": "Quality attribute affected by the tradeoff.",
+          "minLength": 1
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "Improves",
+            "Degrades",
+            "Constrains",
+            "Depends On",
+            "Mixed"
+          ]
+        },
+        "condition": {
+          "type": "string",
+          "description": "Condition under which the tradeoff is expected to apply.",
+          "minLength": 1
+        },
+        "claimReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "evidenceReference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    }
+  }
+}
