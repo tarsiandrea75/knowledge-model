@@ -6,7 +6,7 @@ AUTOCYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -87,6 +87,9 @@ clean-discovery-artifacts:
 		-o -type f \( -name 'rkm-discovery-report-*.zip' -o -name 'rkm-discovery-*.zip' \) \
 	\) -exec rm -rf -- {} +
 
+usage-report:
+	python3 scripts/rkm-run-ledger.py report
+
 help:
 	@printf 'RKM developer commands:\n'
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
@@ -102,4 +105,5 @@ help:
 	@printf '  make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"  Run scripts/rkm-codex-commit.sh with the provided prompt, file, and message.\n'
 	@printf '  make recover-revise              Run bash scripts/rkm-recover-revise.sh.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
+	@printf '  make usage-report                Run python3 scripts/rkm-run-ledger.py report.\n'
 	@printf '  make help                        Show this help.\n'
