@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/deployment-context.schema.json",
+  "title": "RKM Deployment Context Definition",
+  "description": "Defines a reusable embedded deployment context for runtime, hosting, boundary and operational conditions that affect RAG entity behavior, governance, evidence interpretation or reproducibility. This schema does not provide a first-class knowledge entity envelope; it is intended for embedding in entities, workflows, evaluations, evidence records and operational knowledge.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hostingModel",
+    "runtimeBoundary",
+    "operationalContext"
+  ],
+  "properties": {
+    "deploymentContextId": {
+      "type": "string",
+      "description": "Stable local identifier for this deployment context within the containing entity, workflow, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the deployment context.",
+      "minLength": 1
+    },
+    "hostingModel": {
+      "$ref": "#/$defs/hostingModel"
+    },
+    "runtimeBoundary": {
+      "$ref": "#/$defs/runtimeBoundary"
+    },
+    "operationalContext": {
+      "$ref": "#/$defs/operationalContext"
+    },
+    "providerDependencies": {
+      "type": "array",
+      "description": "Providers that supply, host, operate or materially constrain this deployment context.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "deployedEntities": {
+      "type": "array",
+      "description": "RKM entities whose behavior, availability, governance or evidence interpretation depends on this deployment context.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "dataBoundaries": {
+      "type": "array",
+      "description": "Data movement, residency, isolation or access boundaries relevant to this deployment context.",
+      "items": {
+        "$ref": "#/$defs/dataBoundary"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern this deployment context.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "observability": {
+      "type": "array",
+      "description": "Observable signals or telemetry expected from this deployment context.",
+      "items": {
+        "$ref": "observable-signal.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships connecting this deployment context to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims about deployment behavior, suitability, availability, governance, cost, performance or reproducibility.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the deployment boundary, operational context or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources that define, document or justify this deployment context.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "hostingModel": {
+      "type": "string",
+      "description": "How the capability, system or entity is delivered for use.",
+      "enum": [
+        "Managed Service",
+        "Self Hosted",
+        "Serverless",
+        "Embedded",
+        "Local",
+        "Edge",
+        "Hybrid",
+        "Research Hosted",
+        "Marketplace",
+        "Other"
+      ]
+    },
+    "runtimeBoundary": {
+      "type": "object",
+      "description": "Execution and responsibility boundary for the deployment context.",
+      "additionalProperties": false,
+      "required": [
+        "boundaryType",
+        "responsibilities"
+      ],
+      "properties": {
+        "boundaryType": {
+          "type": "string",
+          "enum": [
+            "Application Runtime",
+            "Model Endpoint",
+            "Database Service",
+            "Indexing Runtime",
+            "Retrieval Service",
+            "Workflow Runtime",
+            "Agent Runtime",
+            "Evaluation Environment",
+            "Monitoring Environment",
+            "Other"
+          ]
+        },
+        "responsibilities": {
+          "type": "array",
+          "description": "Responsibilities inside the deployment boundary.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "externalDependencies": {
+          "type": "array",
+          "description": "Dependencies outside the deployment boundary.",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          },
+          "uniqueItems": true
+        },
+        "runtimeEnvironments": {
+          "type": "array",
+          "description": "Execution environments used by the deployment context.",
+          "items": {
+            "$ref": "#/$defs/runtimeEnvironment"
+          },
+          "uniqueItems": true
+        },
+        "releaseChannel": {
+          "type": "string",
+          "description": "Named release channel, version track or stability channel for deployed behavior.",
+          "minLength": 1
+        }
+      }
+    },
+    "operationalContext": {
+      "type": "object",
+      "description": "Operational properties that affect behavior, evaluation or governance.",
+      "additionalProperties": false,
+      "properties": {
+        "availabilityTarget": {
+          "type": "string",
+          "description": "Availability target, service level objective or documented availability posture.",
+          "minLength": 1
+        },
+        "latencyProfile": {
+          "type": "string",
+          "description": "Latency expectation, observed latency range or workload-specific latency description.",
+          "minLength": 1
+        },
+        "throughputProfile": {
+          "type": "string",
+          "description": "Throughput expectation, observed capacity or workload-specific throughput description.",
+          "minLength": 1
+        },
+        "scalabilityProfile": {
+          "type": "string",
+          "description": "How the deployment scales under load or corpus growth.",
+          "minLength": 1
+        },
+        "costModel": {
+          "$ref": "#/$defs/costModel"
+        },
+        "recoveryBehavior": {
+          "type": "string",
+          "description": "Expected recovery, retry, failover or degradation behavior.",
+          "minLength": 1
+        },
+        "versionStability": {
+          "type": "string",
+          "enum": [
+            "Pinned",
+            "Versioned",
+            "Rolling",
+            "Preview",
+            "Experimental",
+            "Unknown"
+          ]
+        },
+        "configurationArtifacts": {
+          "type": "array",
+          "description": "Configuration artifacts that materially affect deployment behavior.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "dataBoundary": {
+      "type": "object",
+      "description": "Boundary that constrains where data may move, persist or be accessed.",
+      "additionalProperties": false,
+      "required": [
+        "boundaryType"
+      ],
+      "properties": {
+        "boundaryType": {
+          "type": "string",
+          "enum": [
+            "Region",
+            "Jurisdiction",
+            "Tenant",
+            "Network",
+            "Access Scope",
+            "Data Residency",
+            "Provider Boundary",
+            "Storage Boundary",
+            "Other"
+          ]
+        },
+        "region": {
+          "type": "string",
+          "description": "Region, locality or deployment geography when relevant.",
+          "minLength": 1
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "Legal or compliance jurisdiction when relevant.",
+          "minLength": 1
+        },
+        "tenancyModel": {
+          "$ref": "#/$defs/tenancyModel"
+        },
+        "dataCategories": {
+          "type": "array",
+          "description": "Data categories affected by the boundary.",
+          "items": {
+            "$ref": "#/$defs/dataCategory"
+          },
+          "uniqueItems": true
+        },
+        "constraint": {
+          "type": "string",
+          "description": "Specific data movement, storage, access or isolation constraint.",
+          "minLength": 1
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "description": "External dependency required by the deployment context.",
+      "additionalProperties": false,
+      "required": [
+        "dependencyType",
+        "description"
+      ],
+      "properties": {
+        "dependencyType": {
+          "type": "string",
+          "enum": [
+            "Provider",
+            "Framework",
+            "Model",
+            "Database",
+            "Storage",
+            "Network",
+            "Runtime",
+            "Policy",
+            "Credential",
+            "Other"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "runtimeEnvironment": {
+      "type": "object",
+      "description": "Execution environment detail for deployed behavior.",
+      "additionalProperties": false,
+      "required": [
+        "environmentType"
+      ],
+      "properties": {
+        "environmentType": {
+          "type": "string",
+          "enum": [
+            "Container",
+            "Virtual Machine",
+            "Serverless Function",
+            "Managed Endpoint",
+            "Notebook",
+            "Local Process",
+            "Edge Runtime",
+            "Batch Job",
+            "Orchestrated Workflow",
+            "Other"
+          ]
+        },
+        "runtimeName": {
+          "type": "string",
+          "description": "Named runtime, platform, orchestrator or environment.",
+          "minLength": 1
+        },
+        "hardwareProfile": {
+          "type": "string",
+          "description": "Hardware, accelerator or resource profile when relevant.",
+          "minLength": 1
+        },
+        "networkAccess": {
+          "type": "string",
+          "enum": [
+            "Public Internet",
+            "Private Network",
+            "Restricted Egress",
+            "No Network",
+            "Hybrid",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "costModel": {
+      "type": "object",
+      "description": "Cost structure that may affect deployment suitability or comparison.",
+      "additionalProperties": false,
+      "required": [
+        "costBasis"
+      ],
+      "properties": {
+        "costBasis": {
+          "type": "string",
+          "enum": [
+            "Per Token",
+            "Per Request",
+            "Per Query",
+            "Per Document",
+            "Per Vector",
+            "Per Storage Unit",
+            "Per Compute Unit",
+            "Subscription",
+            "Open Source Operation",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "costDriver": {
+          "type": "string",
+          "description": "Primary variable that changes cost for the deployment context.",
+          "minLength": 1
+        },
+        "predictability": {
+          "type": "string",
+          "enum": [
+            "Predictable",
+            "Variable",
+            "Workload Dependent",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "tenancyModel": {
+      "type": "string",
+      "description": "How tenants, users or workloads are isolated.",
+      "enum": [
+        "Single Tenant",
+        "Multi Tenant",
+        "Dedicated Instance",
+        "Shared Instance",
+        "Local Only",
+        "Unknown",
+        "Other"
+      ]
+    },
+    "dataCategory": {
+      "type": "string",
+      "description": "RAG-relevant data category affected by a deployment boundary.",
+      "enum": [
+        "Source Documents",
+        "Parsed Documents",
+        "Chunks",
+        "Embeddings",
+        "Metadata",
+        "Queries",
+        "Prompts",
+        "Generated Answers",
+        "Retrieval Results",
+        "Citations",
+        "Evaluation Results",
+        "Traces",
+        "Credentials",
+        "Configuration",
+        "Other"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an existing RKM entity by stable identifier.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "entityType"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Glossary",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider"
+          ]
+        }
+      }
+    }
+  }
+}
