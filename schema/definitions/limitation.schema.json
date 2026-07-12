@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/limitation.schema.json",
+  "title": "RKM Limitation Definition",
+  "description": "Defines a reusable structured limitation that constrains the suitability, reliability, cost-effectiveness or operational use of a RAG entity in a stated context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "limitationType",
+    "statement",
+    "scope"
+  ],
+  "properties": {
+    "limitationId": {
+      "type": "string",
+      "description": "Stable local identifier for the limitation within the containing entity or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "limitationType": {
+      "$ref": "#/$defs/limitationType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the boundary, weakness or constraint.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the limitation is expected to matter.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "impacts": {
+      "type": "array",
+      "description": "Known or expected effects of the limitation.",
+      "items": {
+        "$ref": "#/$defs/impact"
+      },
+      "uniqueItems": true
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes affected by this limitation.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "mitigations": {
+      "type": "array",
+      "description": "Techniques, workflows, controls or operational practices that can reduce the effect of the limitation.",
+      "items": {
+        "$ref": "#/$defs/mitigation"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express or qualify this limitation.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the limitation, its scope or its impact.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the limitation.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "limitationType": {
+      "type": "string",
+      "description": "Primary nature of the constraint.",
+      "enum": [
+        "Data Quality Limitation",
+        "Retrieval Limitation",
+        "Ranking Limitation",
+        "Generation Limitation",
+        "Evaluation Limitation",
+        "Context Window Limitation",
+        "Latency Limitation",
+        "Cost Limitation",
+        "Scalability Limitation",
+        "Freshness Limitation",
+        "Observability Limitation",
+        "Governance Limitation",
+        "Provider Limitation",
+        "Operational Limitation",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the limitation applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities affected when the limitation is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the limitation is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "useCaseReferences": {
+          "type": "array",
+          "description": "Use cases where the limitation materially affects suitability.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor that exposes or intensifies the limitation.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "description": "Effect caused or amplified by the limitation.",
+      "additionalProperties": false,
+      "required": [
+        "impactType"
+      ],
+      "properties": {
+        "impactType": {
+          "type": "string",
+          "enum": [
+            "Lower Retrieval Recall",
+            "Lower Precision",
+            "Weaker Citation Faithfulness",
+            "Incomplete Answers",
+            "Higher Latency",
+            "Higher Cost",
+            "Reduced Reproducibility",
+            "Weaker Evaluation Coverage",
+            "Greater Operational Complexity",
+            "Increased Governance Risk",
+            "Other"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Context Dependent",
+            "Unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mitigation": {
+      "type": "object",
+      "description": "Structured mitigation candidate for the limitation.",
+      "additionalProperties": false,
+      "required": [
+        "mitigationType",
+        "description"
+      ],
+      "properties": {
+        "mitigationType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Workflow",
+            "Component",
+            "Policy",
+            "Evaluation Method",
+            "Operational Control",
+            "Provider Choice",
+            "Configuration",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetProblem": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "mitigatingEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "evidenceReferences": {
+          "type": "array",
+          "description": "Local or stable identifiers for evidence supporting mitigation effectiveness.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
