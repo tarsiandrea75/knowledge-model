@@ -28,6 +28,15 @@ IGNORED_MARKERS = (
     "derived inverse",
     "avoid storing both",
 )
+ELLIPSIS = "." * 3
+INVALID_RELATIONSHIP_TRIPLES = (
+    ("Dataset", "EVALUATES", None, f"Benchmark EVALUATES {ELLIPSIS}"),
+    ("Workflow", "EXECUTES", "Agent", "Agent EXECUTES Workflow"),
+    ("Framework", "SUPPORTS", "Component", "Framework PROVIDES Component"),
+    ("Framework", "SUPPORTS", "Workflow", "Framework IMPLEMENTS Workflow"),
+    ("Framework", "USES", "Tool", "Framework PROVIDES Tool"),
+    ("Provider", "PROVIDES", "Framework", "Provider SUPPORTS Framework"),
+)
 
 
 def display(path: Path) -> str:
@@ -104,6 +113,69 @@ def relationship_predicate_in_example(line: str) -> str | None:
     return None
 
 
+def clean_relationship_endpoint(value: str) -> str:
+    cleaned = value.strip()
+    cleaned = re.sub(r"^[*+-]\s+", "", cleaned)
+    cleaned = cleaned.strip("`| ")
+    cleaned = re.sub(r"^[\s|:;,.<>\-─—–→←►◄]+", "", cleaned)
+    cleaned = re.sub(r"[\s|:;,.<>\-─—–→←►◄]+$", "", cleaned)
+    return cleaned.strip()
+
+
+def relationship_triple_in_example(line: str) -> tuple[str, str, str] | None:
+    predicate = relationship_predicate_in_example(line)
+    if predicate is None:
+        return None
+
+    match = re.search(rf"\b{re.escape(predicate)}\b", line)
+    if match is None:
+        return None
+
+    subject = clean_relationship_endpoint(line[: match.start()])
+    object_ = clean_relationship_endpoint(line[match.end() :])
+    if not subject or not object_:
+        return None
+
+    return subject, predicate, object_
+
+
+def invalid_relationship_guidance(
+    subject: str,
+    predicate: str,
+    object_: str,
+) -> str | None:
+    for invalid_subject, invalid_predicate, invalid_object, guidance in (
+        INVALID_RELATIONSHIP_TRIPLES
+    ):
+        if subject != invalid_subject or predicate != invalid_predicate:
+            continue
+        if invalid_object is None or object_ == invalid_object:
+            return guidance
+
+    return None
+
+
+def validate_relationship_triple(
+    path: Path,
+    line_number: int,
+    line: str,
+    errors: list[str],
+) -> None:
+    triple = relationship_triple_in_example(line)
+    if triple is None:
+        return
+
+    subject, predicate, object_ = triple
+    guidance = invalid_relationship_guidance(subject, predicate, object_)
+    if guidance is None:
+        return
+
+    errors.append(
+        f"{display(path)}:{line_number}: invalid relationship triple "
+        f"{subject} {predicate} {object_}; prefer {guidance}"
+    )
+
+
 def validate_fenced_line(
     path: Path,
     line_number: int,
@@ -115,12 +187,15 @@ def validate_fenced_line(
         return
 
     predicate = relationship_predicate_in_example(line)
-    if predicate is None or predicate in canonical_predicates:
+    if predicate is None:
         return
 
-    errors.append(
-        f"{display(path)}:{line_number}: unknown relationship predicate {predicate}"
-    )
+    if predicate in canonical_predicates:
+        validate_relationship_triple(path, line_number, line, errors)
+    else:
+        errors.append(
+            f"{display(path)}:{line_number}: unknown relationship predicate {predicate}"
+        )
 
 
 def validate_inline_code(
