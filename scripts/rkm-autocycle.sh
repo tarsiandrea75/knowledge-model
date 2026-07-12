@@ -10,6 +10,7 @@ RECOVER_OUTPUT="/tmp/rkm-recover-revise-output.txt"
 REVIEW_OUTPUT="/tmp/rkm-recover-revise-review.txt"
 TAIL_LINES="${TAIL_LINES:-80}"
 LEDGER_SCRIPT="scripts/rkm-run-ledger.py"
+REVIEW_VERDICT_SCRIPT="scripts/rkm-review-verdict.py"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -107,6 +108,7 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   iteration_start_epoch="$(current_epoch)"
   cycle_result=0
   recovery_result=0
+  reviewer_verdict=""
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES started at $(current_time)."
 
   if bash scripts/rkm-cycle.sh 1 >"$CYCLE_OUTPUT" 2>&1; then
@@ -123,6 +125,29 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
     progress "Iteration $iteration of $TARGET_ACCEPTED_FILES accepted by rkm-cycle.sh. Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
     git log --oneline -n 1
     continue
+  fi
+
+  if [[ -f "$REVIEW_VERDICT_SCRIPT" ]]; then
+    if reviewer_verdict="$(python3 "$REVIEW_VERDICT_SCRIPT" "$CYCLE_OUTPUT" 2>/dev/null)"; then
+      :
+    else
+      reviewer_verdict=""
+    fi
+  fi
+
+  if [[ "$reviewer_verdict" == "STOP" ]]; then
+    printf 'Reviewer returned STOP; recovery will not be attempted.\n' >&2
+    print_ledger_report
+    git status --short
+    exit 1
+  fi
+
+  if [[ "$reviewer_verdict" != "REVISE" ]]; then
+    printf 'ERROR: Could not parse explicit reviewer verdict from %s; recovery will not be attempted.\n' "$CYCLE_OUTPUT" >&2
+    printf '\nrkm-cycle.sh output tail (%s lines):\n' "$TAIL_LINES"
+    tail -n "$TAIL_LINES" "$CYCLE_OUTPUT"
+    git status --short
+    exit 1
   fi
 
   printf '\nrkm-cycle.sh output tail (%s lines):\n' "$TAIL_LINES"
