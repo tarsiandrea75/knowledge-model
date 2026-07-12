@@ -163,7 +163,11 @@ def collect_snapshot(target: int, repo_root: Path = REPOSITORY_ROOT) -> RepoSnap
 
 
 def status_path(status_line: str) -> str:
-    path = status_line[3:].strip()
+    if len(status_line) >= 3 and status_line[2] == " ":
+        path = status_line[3:].strip()
+    else:
+        parts = status_line.split(maxsplit=1)
+        path = parts[1].strip() if len(parts) == 2 else ""
     if " -> " in path:
         path = path.rsplit(" -> ", 1)[1]
     return path.rstrip("/")
@@ -184,6 +188,10 @@ def changed_project_files(status_lines: list[str]) -> list[str]:
             continue
         paths.append(path)
     return paths
+
+
+def ide_files(status_lines: list[str]) -> list[str]:
+    return [status_path(line) for line in status_lines if is_ide_status_line(line)]
 
 
 def repo_has_dirty_files(snapshot: RepoSnapshot) -> bool:
@@ -238,6 +246,31 @@ def fallback_autocycle_command(snapshot: RepoSnapshot) -> str:
         f"make autocycle N={snapshot.target} TOKEN_BUDGET={estimated_budget} "
         "BUDGET_SAFETY_FACTOR=1.25 && make safe-push"
     )
+
+
+def autocycle_option(command: str, name: str) -> str | None:
+    match = re.search(rf"(?:^|\s){re.escape(name)}=([^\s&]+)", command)
+    if not match:
+        return None
+    return match.group(1)
+
+
+def parse_int_option(value: str | None) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+
+def parse_float_option(value: str | None) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return None
 
 
 def decide_next_action(snapshot: RepoSnapshot) -> Decision:
@@ -338,9 +371,13 @@ def latest_ledger_text(snapshot: RepoSnapshot) -> str:
         return "missing"
     if snapshot.latest_ledger_final_status is None:
         return "available, no finalStatus found"
-    if snapshot.latest_ledger_final_status == "REVISE_PENDING" and not repo_has_dirty_files(snapshot):
+    if last_ledger_is_historical(snapshot):
         return "REVISE_PENDING (historical; no dirty file to recover)"
     return snapshot.latest_ledger_final_status
+
+
+def last_ledger_is_historical(snapshot: RepoSnapshot) -> bool:
+    return snapshot.latest_ledger_final_status == "REVISE_PENDING" and not repo_has_dirty_files(snapshot)
 
 
 def format_human(snapshot: RepoSnapshot, decision: Decision) -> str:
@@ -361,17 +398,28 @@ def format_human(snapshot: RepoSnapshot, decision: Decision) -> str:
 
 
 def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
+    recommended_target = parse_int_option(autocycle_option(decision.command, "N"))
+    recommended_token_budget = parse_int_option(autocycle_option(decision.command, "TOKEN_BUDGET"))
+    budget_safety_factor = parse_float_option(autocycle_option(decision.command, "BUDGET_SAFETY_FACTOR"))
     document = {
         "status": decision.status,
+        "repoStatus": "clean" if not repo_has_dirty_files(snapshot) else "dirty",
         "repoStatusLines": list(snapshot.status_lines),
         "branch": snapshot.branch,
         "head": snapshot.head,
         "upstream": snapshot.upstream,
         "ahead": snapshot.ahead,
         "behind": snapshot.behind,
+        "isClean": not repo_has_dirty_files(snapshot),
+        "dirtyFiles": changed_project_files(snapshot.status_lines),
+        "ideFiles": ide_files(snapshot.status_lines),
         "budgetProfileExists": snapshot.budget_profile_exists,
         "ledgerExists": snapshot.ledger_exists,
         "lastLedgerFinalStatus": snapshot.latest_ledger_final_status,
+        "lastLedgerIsHistorical": last_ledger_is_historical(snapshot),
+        "recommendedTarget": recommended_target,
+        "recommendedTokenBudget": recommended_token_budget,
+        "budgetSafetyFactor": budget_safety_factor,
         "budgetStatus": decision.budget_status,
         "nextAction": decision.next_action,
         "command": decision.command,
@@ -402,6 +450,49 @@ def assert_human_contains(name: str, snapshot: RepoSnapshot, expected_text: str)
     output = format_human(snapshot, decision)
     if expected_text not in output:
         raise AssertionError(f"{name}: expected output to contain {expected_text!r}, got {output!r}")
+
+
+def assert_json_output(
+    name: str,
+    snapshot: RepoSnapshot,
+    expected_status: str,
+    expected_values: dict[str, Any] | None = None,
+) -> None:
+    decision = decide_next_action(snapshot)
+    output = format_json(snapshot, decision)
+    try:
+        document = json.loads(output)
+    except json.JSONDecodeError as exc:
+        raise AssertionError(f"{name}: JSON output is invalid: {exc}") from exc
+
+    required_keys = {
+        "status",
+        "repoStatus",
+        "branch",
+        "head",
+        "upstream",
+        "ahead",
+        "behind",
+        "isClean",
+        "dirtyFiles",
+        "ideFiles",
+        "budgetStatus",
+        "lastLedgerFinalStatus",
+        "lastLedgerIsHistorical",
+        "recommendedTarget",
+        "recommendedTokenBudget",
+        "budgetSafetyFactor",
+        "nextAction",
+        "command",
+    }
+    missing_keys = sorted(required_keys.difference(document))
+    if missing_keys:
+        raise AssertionError(f"{name}: JSON output is missing keys: {missing_keys}")
+    if document["status"] != expected_status:
+        raise AssertionError(f"{name}: expected JSON status {expected_status}, got {document['status']}")
+    for key, expected_value in (expected_values or {}).items():
+        if document.get(key) != expected_value:
+            raise AssertionError(f"{name}: expected JSON {key}={expected_value!r}, got {document.get(key)!r}")
 
 
 def test_snapshot(
@@ -446,12 +537,41 @@ def run_self_test() -> int:
         "READY_TO_PUSH",
         "make safe-push",
     )
+    assert_json_output(
+        "READY_TO_PUSH JSON output",
+        test_snapshot(ahead=2, behind=0),
+        "READY_TO_PUSH",
+        {
+            "repoStatus": "clean",
+            "isClean": True,
+            "dirtyFiles": [],
+            "ideFiles": [],
+            "recommendedTarget": None,
+            "recommendedTokenBudget": None,
+            "budgetSafetyFactor": None,
+        },
+    )
     assert_decision(
         "dirty repo with REVISE_PENDING and one changed file",
         test_snapshot(status_lines=[" M docs/architecture/paper-model.md"], latest_ledger_final_status="REVISE_PENDING"),
         "DIRTY_WORKTREE",
         "make recover-revise",
         "recover the pending revise for the single changed project file.",
+    )
+    assert_json_output(
+        "DIRTY_WORKTREE with one REVISE_PENDING file JSON output",
+        test_snapshot(status_lines=[" M docs/architecture/paper-model.md"], latest_ledger_final_status="REVISE_PENDING"),
+        "DIRTY_WORKTREE",
+        {
+            "repoStatus": "dirty",
+            "isClean": False,
+            "dirtyFiles": ["docs/architecture/paper-model.md"],
+            "lastLedgerFinalStatus": "REVISE_PENDING",
+            "lastLedgerIsHistorical": False,
+            "recommendedTarget": None,
+            "recommendedTokenBudget": None,
+            "budgetSafetyFactor": None,
+        },
     )
     assert_human_contains(
         "clean repo with historical REVISE_PENDING",
@@ -483,11 +603,36 @@ def run_self_test() -> int:
         "OVER_BUDGET",
         "make budget-report",
     )
+    assert_json_output(
+        "OVER_BUDGET clean repo JSON output",
+        test_snapshot(budget_check=CommandResult(3, "status: over budget", "")),
+        "OVER_BUDGET",
+        {
+            "repoStatus": "clean",
+            "isClean": True,
+            "budgetStatus": "over budget",
+            "recommendedTarget": None,
+            "recommendedTokenBudget": None,
+            "budgetSafetyFactor": None,
+        },
+    )
     assert_decision(
         "ready to autocycle",
         test_snapshot(),
         "READY_TO_AUTOCYCLE",
         "make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25 && make safe-push",
+    )
+    assert_json_output(
+        "READY_TO_AUTOCYCLE JSON output",
+        test_snapshot(),
+        "READY_TO_AUTOCYCLE",
+        {
+            "repoStatus": "clean",
+            "isClean": True,
+            "recommendedTarget": 3,
+            "recommendedTokenBudget": 100,
+            "budgetSafetyFactor": 1.25,
+        },
     )
     print("rkm-next-action self-test passed")
     return 0
