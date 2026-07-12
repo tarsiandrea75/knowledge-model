@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import re
@@ -423,9 +425,158 @@ def print_report(ledger_path: Path) -> int:
     return 0
 
 
+def positive_integer(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a positive integer") from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def non_negative_integer(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a non-negative integer") from exc
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be a non-negative integer")
+    return parsed
+
+
+def parse_timestamp_utc(value: str) -> datetime:
+    normalized = value
+    if normalized.endswith("Z"):
+        normalized = f"{normalized[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError(f"invalid UTC timestamp: {value}") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def entry_timestamp_utc(entry: dict[str, Any]) -> datetime | None:
+    timestamp = entry.get("timestampUtc")
+    if not isinstance(timestamp, str) or not timestamp:
+        return None
+    try:
+        return parse_timestamp_utc(timestamp)
+    except ValueError:
+        return None
+
+
+def estimate_values(
+    entries: list[dict[str, Any]], target: int, safety_factor: float, since: str | None
+) -> dict[str, float | int]:
+    historical_accepted_files = 0
+    historical_tokens = 0
+    costs_per_file: list[float] = []
+
+    for entry in entries:
+        accepted_count = int(entry.get("acceptedFileCount", 0) or 0)
+        total_tokens = int(entry.get("totalTokens", 0) or 0)
+        if entry_final_status(entry) not in {"ACCEPTED", "RECOVERED"} or accepted_count <= 0:
+            continue
+        historical_accepted_files += accepted_count
+        historical_tokens += total_tokens
+        costs_per_file.append(total_tokens / accepted_count)
+
+    if historical_accepted_files == 0:
+        return {
+            "historicalAcceptedFiles": 0,
+            "historicalTokens": 0,
+            "averageTokensPerAcceptedFile": 0.0,
+            "maxTokensPerAcceptedFile": 0.0,
+            "targetAcceptedFiles": target,
+            "safetyFactor": safety_factor,
+            "estimatedTokens": 0.0,
+            "tokensUsedSince": 0,
+        }
+
+    tokens_used_since = 0
+    if since is not None:
+        since_timestamp = parse_timestamp_utc(since)
+        for entry in entries:
+            entry_timestamp = entry_timestamp_utc(entry)
+            if entry_timestamp is not None and entry_timestamp >= since_timestamp:
+                tokens_used_since += int(entry.get("totalTokens", 0) or 0)
+
+    average_tokens_per_accepted_file = historical_tokens / historical_accepted_files
+    estimated_tokens = average_tokens_per_accepted_file * target * safety_factor
+
+    return {
+        "historicalAcceptedFiles": historical_accepted_files,
+        "historicalTokens": historical_tokens,
+        "averageTokensPerAcceptedFile": average_tokens_per_accepted_file,
+        "maxTokensPerAcceptedFile": max(costs_per_file),
+        "targetAcceptedFiles": target,
+        "safetyFactor": safety_factor,
+        "estimatedTokens": estimated_tokens,
+        "tokensUsedSince": tokens_used_since,
+    }
+
+
+def estimate_text(values: dict[str, float | int], budget: int | None) -> str:
+    lines = [
+        "RKM run ledger budget estimate",
+        f"historicalAcceptedFiles: {values['historicalAcceptedFiles']}",
+        f"historicalTokens: {values['historicalTokens']}",
+        f"averageTokensPerAcceptedFile: {values['averageTokensPerAcceptedFile']:.2f}",
+        f"maxTokensPerAcceptedFile: {values['maxTokensPerAcceptedFile']:.2f}",
+        f"targetAcceptedFiles: {values['targetAcceptedFiles']}",
+        f"safetyFactor: {values['safetyFactor']:.2f}",
+        f"estimatedTokens: {values['estimatedTokens']:.2f}",
+    ]
+    if budget is not None:
+        remaining_budget = budget - int(values["tokensUsedSince"])
+        over_budget = float(values["estimatedTokens"]) > remaining_budget
+        lines.extend(
+            [
+                f"budget: {budget}",
+                f"tokensUsedSince: {values['tokensUsedSince']}",
+                f"remainingBudget: {remaining_budget}",
+                f"overBudget: {str(over_budget).lower()}",
+            ]
+        )
+    return "\n".join(lines)
+
+
+def print_estimate(
+    ledger_path: Path, target: int, budget: int | None, since: str | None, safety_factor: float
+) -> int:
+    if not ledger_path.exists():
+        print(f"Estimation unavailable: no usable historical accepted entries in {repository_relative(ledger_path)}.")
+        return 2 if budget is not None else 0
+    try:
+        entries = read_ledger(ledger_path)
+        values = estimate_values(entries, target, safety_factor, since)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+    if int(values["historicalAcceptedFiles"]) == 0:
+        print(f"Estimation unavailable: no usable historical accepted entries in {repository_relative(ledger_path)}.")
+        return 2 if budget is not None else 0
+
+    print(estimate_text(values, budget))
+    if budget is None:
+        return 0
+
+    remaining_budget = budget - int(values["tokensUsedSince"])
+    return 3 if float(values["estimatedTokens"]) > remaining_budget else 0
+
+
 def assert_equal(actual: object, expected: object, label: str) -> None:
     if actual != expected:
         raise AssertionError(f"{label}: expected {expected!r}, got {actual!r}")
+
+
+def quiet_call(function: Any, *args: Any) -> int:
+    with contextlib.redirect_stdout(io.StringIO()):
+        return int(function(*args))
 
 
 def run_self_test() -> int:
@@ -625,6 +776,63 @@ def run_self_test() -> int:
             if expected not in report:
                 raise AssertionError(f"report behavior: missing {expected!r}")
 
+        estimate = estimate_values(entries, 3, 1.25, None)
+        assert_equal(estimate["historicalAcceptedFiles"], 5, "estimate historical accepted files")
+        assert_equal(estimate["historicalTokens"], 1734, "estimate historical tokens")
+        assert_equal(
+            f"{estimate['averageTokensPerAcceptedFile']:.2f}",
+            "346.80",
+            "estimate average tokens per accepted file",
+        )
+        assert_equal(f"{estimate['maxTokensPerAcceptedFile']:.2f}", "1234.00", "estimate max tokens per accepted file")
+        assert_equal(estimate["targetAcceptedFiles"], 3, "estimate target accepted files")
+        assert_equal(estimate["safetyFactor"], 1.25, "estimate safety factor")
+        assert_equal(f"{estimate['estimatedTokens']:.2f}", "1300.50", "estimate tokens")
+
+        assert_equal(quiet_call(print_estimate, ledger, 3, 2000, None, 1.25), 0, "estimate budget within")
+        assert_equal(quiet_call(print_estimate, ledger, 3, 1000, None, 1.25), 3, "estimate budget over")
+
+        since_ledger = root / ".rkm" / "since-ledger.jsonl"
+        since_entries = [
+            {
+                "timestampUtc": "2026-01-01T00:00:00Z",
+                "finalStatus": "ACCEPTED",
+                "totalTokens": 100,
+                "acceptedFileCount": 1,
+            },
+            {
+                "timestampUtc": "2026-01-02T00:00:00Z",
+                "finalStatus": "ACCEPTED",
+                "totalTokens": 200,
+                "acceptedFileCount": 1,
+            },
+        ]
+        since_ledger.parent.mkdir(parents=True, exist_ok=True)
+        since_ledger.write_text(
+            "".join(json.dumps(entry, sort_keys=True, separators=(",", ":")) + "\n" for entry in since_entries),
+            encoding="utf-8",
+        )
+        assert_equal(
+            quiet_call(print_estimate, since_ledger, 1, 500, "2026-01-02T00:00:00Z", 1.0),
+            0,
+            "estimate since within budget",
+        )
+        since_estimate = estimate_values(read_ledger(since_ledger), 1, 1.0, "2026-01-02T00:00:00Z")
+        assert_equal(since_estimate["tokensUsedSince"], 200, "estimate since tokens used")
+
+        empty_ledger = root / ".rkm" / "empty-ledger.jsonl"
+        empty_ledger.write_text(
+            json.dumps(
+                {"timestampUtc": "2026-01-01T00:00:00Z", "finalStatus": "STOPPED", "totalTokens": 900, "acceptedFileCount": 0},
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        assert_equal(quiet_call(print_estimate, empty_ledger, 1, None, None, 1.25), 0, "estimate no history without budget")
+        assert_equal(quiet_call(print_estimate, empty_ledger, 1, 1000, None, 1.25), 2, "estimate no history with budget")
+
     print("Self-test passed: parser precision, status, append, recovery, and report behavior verified.")
     return 0
 
@@ -641,6 +849,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     report_parser = subparsers.add_parser("report", help="print a concise ledger report")
     report_parser.add_argument("--ledger", help="path to the JSONL ledger")
+
+    estimate_parser = subparsers.add_parser("estimate", help="estimate token cost for accepted files")
+    estimate_parser.add_argument("--target", required=True, type=positive_integer, help="target accepted file count")
+    estimate_parser.add_argument("--budget", type=non_negative_integer, help="available token budget")
+    estimate_parser.add_argument("--ledger", help="path to the JSONL ledger")
+    estimate_parser.add_argument("--since", help="UTC timestamp for budget usage accounting")
+    estimate_parser.add_argument("--safety-factor", type=float, default=1.25, help="multiplier applied to the estimate")
 
     return parser
 
@@ -664,6 +879,18 @@ def main(argv: list[str]) -> int:
 
     if args.command == "report":
         return print_report(resolve_path(args.ledger, DEFAULT_LEDGER_PATH))
+
+    if args.command == "estimate":
+        if args.safety_factor <= 0:
+            print("ERROR: --safety-factor must be positive", file=sys.stderr)
+            return 2
+        return print_estimate(
+            resolve_path(args.ledger, DEFAULT_LEDGER_PATH),
+            args.target,
+            args.budget,
+            args.since,
+            args.safety_factor,
+        )
 
     parser.print_help()
     return 2
