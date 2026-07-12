@@ -220,6 +220,10 @@ start_step "Running registry validation..."
 "$PYTHON_BIN" scripts/validate-registries.py
 pass_step
 
+start_step "Running documentation relationship validator self-test..."
+python3 scripts/validate-doc-relationships.py --self-test
+pass_step
+
 start_step "Running documentation relationship validation..."
 "$PYTHON_BIN" scripts/validate-doc-relationships.py
 pass_step
