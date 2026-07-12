@@ -32,6 +32,12 @@ NEEDS_BUDGET_PROFILE = "NEEDS_BUDGET_PROFILE"
 BLOCKED = "BLOCKED"
 NEEDS_MANUAL_REVIEW = "NEEDS_MANUAL_REVIEW"
 
+RECOVERY_AVAILABLE = "RECOVERY_AVAILABLE"
+RECOVERY_FAILED_NEEDS_MANUAL_FIX = "RECOVERY_FAILED_NEEDS_MANUAL_FIX"
+BLOCKED_IDE_FILES = "BLOCKED_IDE_FILES"
+MANUAL_REVIEW = "MANUAL_REVIEW"
+NO_RECOVERY_NEEDED = "NO_RECOVERY_NEEDED"
+
 KNOWN_STATUSES = {
     READY_TO_PUSH,
     READY_TO_AUTOCYCLE,
@@ -59,6 +65,7 @@ REQUIRED_STATE_KEYS = {
     "exitCode",
     "finalOutcome",
     "nextActionJson",
+    "recoveryPlanJson",
 }
 
 
@@ -115,6 +122,7 @@ def new_state(
     action_selected: str,
     commands_planned: Sequence[str],
     next_action_json: dict[str, Any] | None,
+    recovery_plan_json: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "timestampUtc": "",
@@ -131,6 +139,7 @@ def new_state(
         "exitCode": None,
         "finalOutcome": "",
         "nextActionJson": next_action_json,
+        "recoveryPlanJson": recovery_plan_json,
     }
 
 
@@ -260,6 +269,78 @@ def parse_next_action(stdout: str) -> dict[str, Any]:
     return document
 
 
+def run_recovery_plan() -> tuple[int, str, str]:
+    completed = subprocess.run(
+        ["python3", "scripts/rkm-recovery-plan.py", "--json"],
+        cwd=REPOSITORY_ROOT,
+        check=False,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    return completed.returncode, completed.stdout, completed.stderr
+
+
+def parse_recovery_plan(stdout: str) -> dict[str, Any]:
+    document = json.loads(stdout)
+    if not isinstance(document, dict):
+        raise ValueError("recovery-plan JSON output was not an object")
+    return document
+
+
+def recovery_plan_summary(document: dict[str, Any]) -> str:
+    lines = [
+        f"recovery plan status: {document.get('status', 'UNKNOWN')}",
+        f"reason: {document.get('reason', '(unavailable)')}",
+        f"latest touched file: {document.get('latestTouchedFile', '(unavailable)')}",
+    ]
+    reviewer_summary = document.get("reviewerSummary")
+    if isinstance(reviewer_summary, str) and reviewer_summary:
+        lines.extend(("reviewer summary:", reviewer_summary))
+    lines.append(f"recommended command: {document.get('recommendedCommand', '(unavailable)')}")
+    return "\n".join(lines)
+
+
+def blocked_recovery_summary(document: dict[str, Any]) -> str:
+    lines = [
+        f"recovery plan status: {document.get('status', 'UNKNOWN')}",
+        f"reason: {document.get('reason', '(unavailable)')}",
+        f"recommended cleanup command: {document.get('recommendedCommand', '(unavailable)')}",
+    ]
+    return "\n".join(lines)
+
+
+def manual_review_recovery_summary(document: dict[str, Any]) -> str:
+    lines = [
+        f"recovery plan status: {document.get('status', 'UNKNOWN')}",
+        f"reason: {document.get('reason', '(unavailable)')}",
+    ]
+    recommended_command = document.get("recommendedCommand")
+    if recommended_command:
+        lines.append(f"recommended command: {recommended_command}")
+    return "\n".join(lines)
+
+
+def decide_recovery(document: dict[str, Any]) -> Plan | None:
+    status = document.get("status")
+    if status == NO_RECOVERY_NEEDED:
+        return None
+    if status == RECOVERY_AVAILABLE:
+        return Plan(
+            status,
+            "run recover-revise, then safe-push if recovery succeeds.",
+            (make_recover_revise(), make_safe_push()),
+            0,
+        )
+    if status == RECOVERY_FAILED_NEEDS_MANUAL_FIX:
+        return Plan(status, "recovery already failed; stopping for manual targeted fix.", (), 0)
+    if status == BLOCKED_IDE_FILES:
+        return Plan(status, "IDE files block recovery; stopping for cleanup.", (), 2)
+    if status == MANUAL_REVIEW:
+        return Plan(status, "manual review required by recovery plan; stopping.", (), 2)
+    return Plan(str(status or "UNKNOWN"), "unknown recovery-plan status; stopping.", (), 2)
+
+
 def run_commands(commands: Sequence[CommandSpec], *, dry_run: bool) -> CommandRunResult:
     commands_run: list[str] = []
     if not commands:
@@ -277,7 +358,8 @@ def run_commands(commands: Sequence[CommandSpec], *, dry_run: bool) -> CommandRu
             print(f"final outcome: {command.label} failed with exit {completed.returncode}")
             commands_skipped = tuple(command_text(skipped) for skipped in commands[index + 1 :])
             return CommandRunResult(completed.returncode, tuple(commands_run), commands_skipped)
-    return CommandRunResult(0, tuple(commands_run), ())
+    commands_skipped = tuple(command_text(command) for command in commands) if dry_run else ()
+    return CommandRunResult(0, tuple(commands_run), commands_skipped)
 
 
 def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_path: str | Path) -> int:
@@ -330,24 +412,94 @@ def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_pat
             return 1
         return 2
 
-    plan = decide(document, allow_recovery=allow_recovery)
+    recovery_document: dict[str, Any] | None = None
+    if allow_recovery:
+        recovery_code, recovery_stdout, recovery_stderr = run_recovery_plan()
+        if recovery_code != 0:
+            print(f"recovery-plan failed with exit {recovery_code}.")
+            if recovery_stdout:
+                print(recovery_stdout.rstrip())
+            if recovery_stderr:
+                print(recovery_stderr.rstrip(), file=sys.stderr)
+            state = new_state(
+                target=target,
+                dry_run=dry_run,
+                allow_recovery=allow_recovery,
+                detected_status="RECOVERY_PLAN_FAILED",
+                next_action=document.get("nextAction"),
+                recommended_command=document.get("command"),
+                action_selected="recovery-plan failed.",
+                commands_planned=(),
+                next_action_json=document,
+                recovery_plan_json=None,
+            )
+            state["exitCode"] = recovery_code
+            state["finalOutcome"] = f"recovery-plan failed with exit {recovery_code}"
+            if not dry_run and not write_state_or_report(state, state_path):
+                return 1
+            return recovery_code
+
+        try:
+            recovery_document = parse_recovery_plan(recovery_stdout)
+        except (json.JSONDecodeError, ValueError) as exc:
+            print(f"recovery-plan output was not usable JSON: {exc}")
+            if recovery_stdout:
+                print(recovery_stdout.rstrip())
+            if recovery_stderr:
+                print(recovery_stderr.rstrip(), file=sys.stderr)
+            state = new_state(
+                target=target,
+                dry_run=dry_run,
+                allow_recovery=allow_recovery,
+                detected_status="UNUSABLE_RECOVERY_PLAN_JSON",
+                next_action=document.get("nextAction"),
+                recommended_command=document.get("command"),
+                action_selected="recovery-plan output was not usable JSON.",
+                commands_planned=(),
+                next_action_json=document,
+                recovery_plan_json=None,
+            )
+            state["exitCode"] = 2
+            state["finalOutcome"] = "recovery-plan output was not usable JSON"
+            if not dry_run and not write_state_or_report(state, state_path):
+                return 1
+            return 2
+
+    recovery_plan = decide_recovery(recovery_document) if recovery_document is not None else None
+    plan = recovery_plan if recovery_plan is not None else decide(document, allow_recovery=allow_recovery)
     planned_commands = tuple(command_text(command) for command in plan.commands)
+    recommended_command = (
+        recovery_document.get("recommendedCommand")
+        if recovery_plan is not None and recovery_document is not None
+        else document.get("command")
+    )
     state = new_state(
         target=target,
         dry_run=dry_run,
         allow_recovery=allow_recovery,
         detected_status=plan.status,
         next_action=document.get("nextAction"),
-        recommended_command=document.get("command"),
+        recommended_command=recommended_command,
         action_selected=plan.action,
         commands_planned=planned_commands,
         next_action_json=document,
+        recovery_plan_json=recovery_document,
     )
     print(f"detected status: {plan.status}")
     print(f"action selected: {plan.action}")
 
     if not plan.commands:
-        print(summary(document))
+        if recovery_plan is not None and recovery_document is not None:
+            if plan.status == RECOVERY_FAILED_NEEDS_MANUAL_FIX:
+                print(recovery_plan_summary(recovery_document))
+            elif plan.status == BLOCKED_IDE_FILES:
+                print(blocked_recovery_summary(recovery_document))
+            elif plan.status == MANUAL_REVIEW:
+                print(manual_review_recovery_summary(recovery_document))
+            else:
+                print(recovery_plan_summary(recovery_document))
+        else:
+            print(summary(document))
 
     command_result = run_commands(plan.commands, dry_run=dry_run)
     state["commandsRun"] = list(command_result.commands_run)
@@ -361,6 +513,8 @@ def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_pat
 
     if dry_run and plan.commands:
         print("final outcome: dry run complete; no changes made.")
+        state["exitCode"] = 0
+        state["finalOutcome"] = "dry run complete; no changes made."
         return 0
 
     if plan.commands:
@@ -388,6 +542,22 @@ def assert_plan(
         raise AssertionError(f"{name}: expected commands {expected_commands!r}, got {actual_commands!r}")
     if plan.exit_code != expected_exit_code:
         raise AssertionError(f"{name}: expected exit {expected_exit_code}, got {plan.exit_code}")
+
+
+def assert_recovery_plan(
+    name: str,
+    document: dict[str, Any],
+    expected_commands: Sequence[str],
+    expected_exit_code: int,
+) -> Plan | None:
+    plan = decide_recovery(document)
+    actual_commands = tuple(command_text(command) for command in plan.commands) if plan is not None else ()
+    if actual_commands != expected_commands:
+        raise AssertionError(f"{name}: expected commands {expected_commands!r}, got {actual_commands!r}")
+    actual_exit_code = plan.exit_code if plan is not None else 0
+    if actual_exit_code != expected_exit_code:
+        raise AssertionError(f"{name}: expected exit {expected_exit_code}, got {actual_exit_code}")
+    return plan
 
 
 def read_state(path: Path) -> dict[str, Any]:
@@ -631,6 +801,45 @@ def run_self_test() -> int:
         (),
         2,
     )
+    recovery_available_plan = assert_recovery_plan(
+        "allow-recovery RECOVERY_AVAILABLE",
+        {"status": RECOVERY_AVAILABLE, "recommendedCommand": "make recover-revise"},
+        ("make recover-revise", "make safe-push"),
+        0,
+    )
+    if recovery_available_plan is None:
+        raise AssertionError("allow-recovery RECOVERY_AVAILABLE: expected recovery plan")
+    dry_run_output = io.StringIO()
+    with contextlib.redirect_stdout(dry_run_output):
+        dry_run_result = run_commands(recovery_available_plan.commands, dry_run=True)
+    if dry_run_result.commands_run:
+        raise AssertionError("allow-recovery RECOVERY_AVAILABLE dry-run: expected no commands run")
+    if tuple(dry_run_result.commands_skipped) != ("make recover-revise", "make safe-push"):
+        raise AssertionError("allow-recovery RECOVERY_AVAILABLE dry-run: expected both commands skipped")
+    assert_recovery_plan(
+        "allow-recovery RECOVERY_FAILED_NEEDS_MANUAL_FIX",
+        {"status": RECOVERY_FAILED_NEEDS_MANUAL_FIX, "recommendedCommand": "make manual-fix"},
+        (),
+        0,
+    )
+    assert_recovery_plan(
+        "allow-recovery BLOCKED_IDE_FILES",
+        {"status": BLOCKED_IDE_FILES, "recommendedCommand": "rm -rf .idea && make validate"},
+        (),
+        2,
+    )
+    assert_recovery_plan(
+        "allow-recovery MANUAL_REVIEW",
+        {"status": MANUAL_REVIEW, "recommendedCommand": "git status --short && make validate"},
+        (),
+        2,
+    )
+    no_recovery_plan = decide_recovery({"status": NO_RECOVERY_NEEDED})
+    if no_recovery_plan is not None:
+        raise AssertionError("allow-recovery NO_RECOVERY_NEEDED: expected normal next-action fallback")
+    fallback_plan = decide({"status": READY_TO_PUSH, "command": "make safe-push"}, allow_recovery=True)
+    if tuple(command_text(command) for command in fallback_plan.commands) != ("make safe-push",):
+        raise AssertionError("allow-recovery NO_RECOVERY_NEEDED: normal next-action fallback failed")
     assert_autopilot_state(
         "dry-run does not write state",
         {"status": READY_TO_PUSH, "command": "make safe-push"},
