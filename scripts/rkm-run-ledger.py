@@ -266,7 +266,7 @@ def has_recovery(text: str, label: str | None) -> bool:
 
 
 def final_status(final_verdict: str | None, has_failure: bool, recovered: bool) -> str:
-    if final_verdict == "ACCEPT" and recovered:
+    if final_verdict == "ACCEPT" and recovered and not has_failure:
         return "RECOVERED"
     if final_verdict == "ACCEPT" and not has_failure:
         return "ACCEPTED"
@@ -277,6 +277,21 @@ def final_status(final_verdict: str | None, has_failure: bool, recovered: bool) 
     if has_failure:
         return "FAILED"
     return "UNKNOWN"
+
+
+def has_unresolved_failure(hints: list[str], final_verdict: str | None, accepted_count: int) -> bool:
+    if not hints:
+        return False
+    if final_verdict == "ACCEPT" and accepted_count > 0:
+        severe_hints = {
+            "usage limit",
+            "Argument list too long",
+            "STOP",
+            "recovery failed",
+            "make fatal error",
+        }
+        return any(hint in severe_hints for hint in hints)
+    return True
 
 
 def entry_final_status(entry: dict[str, Any]) -> str:
@@ -297,7 +312,8 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
     hints = failure_hints(text)
     final_verdict = verdicts[-1] if verdicts else None
     recovered = has_recovery(text, label)
-    has_failure = bool(hints)
+    accepted_count = accepted_file_count(text, label, final_verdict, files)
+    has_failure = has_unresolved_failure(hints, final_verdict, accepted_count)
 
     return {
         "timestampUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -312,10 +328,11 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
         "hadStop": "STOP" in verdicts,
         "hadUsageLimit": "usage limit" in hints,
         "hadArgumentListTooLong": "Argument list too long" in hints,
+        "hadTraceback": "uncaught traceback" in hints,
         "finalStatus": final_status(final_verdict, has_failure, recovered),
         "commits": commits,
         "files": files,
-        "acceptedFileCount": accepted_file_count(text, label, final_verdict, files),
+        "acceptedFileCount": accepted_count,
         "hasRecovery": recovered,
         "hasFailure": has_failure,
         "failureHints": hints,
@@ -488,6 +505,7 @@ def run_self_test() -> int:
                 [
                     "[rkm-cycle] start",
                     "Argument list too long",
+                    "Traceback (most recent call last):",
                     "verdict: STOP",
                 ]
             ),
@@ -495,6 +513,7 @@ def run_self_test() -> int:
         )
         third_entry = append_entry(third_log, ledger, None)
         assert_equal(third_entry["hadArgumentListTooLong"], True, "argument list too long detection")
+        assert_equal(third_entry["hadTraceback"], True, "stop traceback detection")
         assert_equal(third_entry["hasFailure"], True, "argument list too long failure detection")
         assert_equal(third_entry["finalStatus"], "STOPPED", "stop final status")
 
@@ -544,6 +563,8 @@ def run_self_test() -> int:
                 [
                     "[rkm-autocycle] start",
                     "ERROR: usage limit reached",
+                    "verdict: ACCEPT",
+                    "Autocycle completed: 1 accepted file(s) committed.",
                 ]
             ),
             encoding="utf-8",
@@ -553,15 +574,51 @@ def run_self_test() -> int:
         assert_equal(sixth_entry["hasFailure"], True, "usage limit failure detection")
         assert_equal(sixth_entry["finalStatus"], "FAILED", "usage limit final status")
 
+        seventh_log = root / "seventh.log"
+        seventh_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    "Traceback (most recent call last):",
+                    "historical traceback captured in reviewer output",
+                    "verdict: ACCEPT",
+                    "Autocycle completed: 1 accepted file(s) committed.",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        seventh_entry = append_entry(seventh_log, ledger, None)
+        assert_equal(seventh_entry["hadTraceback"], True, "accepted traceback detection")
+        assert_equal(seventh_entry["hasFailure"], False, "accepted traceback failure detection")
+        assert_equal(seventh_entry["finalStatus"], "ACCEPTED", "accepted traceback final status")
+        assert_equal(seventh_entry["acceptedFileCount"], 1, "accepted traceback file count")
+
+        eighth_log = root / "eighth.log"
+        eighth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    "Argument list too long",
+                    "verdict: ACCEPT",
+                    "Autocycle completed: 1 accepted file(s) committed.",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        eighth_entry = append_entry(eighth_log, ledger, None)
+        assert_equal(eighth_entry["hadArgumentListTooLong"], True, "accepted argument list too long detection")
+        assert_equal(eighth_entry["hasFailure"], True, "accepted argument list too long failure detection")
+        assert_equal(eighth_entry["finalStatus"], "FAILED", "accepted argument list too long final status")
+
         entries = read_ledger(ledger)
-        assert_equal(len(entries), 6, "append behavior")
+        assert_equal(len(entries), 8, "append behavior")
         report = report_text(entries)
         for expected in (
-            "total runs: 6",
+            "total runs: 8",
             "total token events: 3",
             "total tokens: 1734",
             "runs with recovery: 1",
-            "runs with failure hints: 2",
+            "runs with failure hints: 3",
             "recovered runs: 1",
             "stopped runs: 1",
         ):
