@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/tradeoff.schema.json",
+  "title": "RKM Tradeoff Definition",
+  "description": "Defines a reusable structured tradeoff that describes a decision tension where improving, emphasizing or selecting one RAG property may degrade, constrain or complicate another property.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tradeoffType",
+    "statement",
+    "scope",
+    "positiveSide",
+    "negativeSide"
+  ],
+  "properties": {
+    "tradeoffId": {
+      "type": "string",
+      "description": "Stable local identifier for the tradeoff within the containing entity, comparison, claim or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "tradeoffType": {
+      "$ref": "#/$defs/tradeoffType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the decision tension.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "positiveSide": {
+      "$ref": "#/$defs/tradeoffSide"
+    },
+    "negativeSide": {
+      "$ref": "#/$defs/tradeoffSide"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the tradeoff is expected to apply.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "decisionVariables": {
+      "type": "array",
+      "description": "Parameters, design choices or operational controls that influence the tradeoff.",
+      "items": {
+        "$ref": "#/$defs/decisionVariable"
+      },
+      "uniqueItems": true
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes improved, degraded, constrained or balanced by this tradeoff.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedAdvantages": {
+      "type": "array",
+      "description": "Advantages that express the beneficial side or motivation for accepting this tradeoff.",
+      "items": {
+        "$ref": "advantage.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedLimitations": {
+      "type": "array",
+      "description": "Limitations that express the cost, risk or boundary created by this tradeoff.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, justify or qualify this tradeoff.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the tradeoff, its scope or its practical impact.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the tradeoff.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "tradeoffType": {
+      "type": "string",
+      "description": "Primary nature of the decision tension.",
+      "enum": [
+        "Retrieval Quality Tradeoff",
+        "Ranking Quality Tradeoff",
+        "Grounding Tradeoff",
+        "Citation Tradeoff",
+        "Latency Tradeoff",
+        "Cost Tradeoff",
+        "Scalability Tradeoff",
+        "Freshness Tradeoff",
+        "Context Window Tradeoff",
+        "Complexity Tradeoff",
+        "Observability Tradeoff",
+        "Governance Tradeoff",
+        "Operational Tradeoff",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the tradeoff applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities affected when the tradeoff is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the tradeoff is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "useCaseReferences": {
+          "type": "array",
+          "description": "Use cases where the tradeoff materially affects suitability or design choice.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "tradeoffSide": {
+      "type": "object",
+      "description": "One side of a tradeoff.",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "description"
+      ],
+      "properties": {
+        "effect": {
+          "type": "string",
+          "description": "How this side is affected by the decision.",
+          "enum": [
+            "Improves",
+            "Degrades",
+            "Constrains",
+            "Increases",
+            "Reduces",
+            "Complicates",
+            "Depends On",
+            "Mixed"
+          ]
+        },
+        "qualityAttribute": {
+          "$ref": "quality-attribute.schema.json"
+        },
+        "target": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the property, behavior or outcome represented by this side.",
+          "minLength": 1
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor required for the tradeoff to hold.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "decisionVariable": {
+      "type": "object",
+      "description": "Design or operational variable that changes the balance of the tradeoff.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the variable, parameter or design choice.",
+          "minLength": 1
+        },
+        "variableType": {
+          "type": "string",
+          "enum": [
+            "Configuration Parameter",
+            "Architecture Choice",
+            "Model Choice",
+            "Provider Choice",
+            "Evaluation Threshold",
+            "Operational Policy",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "examples": {
+          "type": "array",
+          "description": "Example values or choices for the decision variable.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
