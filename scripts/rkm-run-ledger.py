@@ -63,6 +63,16 @@ USAGE_LIMIT_MARKER = re.compile(r"\busage limit\b", re.IGNORECASE)
 ARGUMENT_LIST_TOO_LONG_MARKER = re.compile(r"\bArgument list too long\b", re.IGNORECASE)
 EXIT_NONZERO_MARKER = re.compile(r"\bexit nonzero\b", re.IGNORECASE)
 RECOVERY_FAILED_MARKER = re.compile(r"\brecovery failed\b", re.IGNORECASE)
+MAKE_FATAL_MARKER = re.compile(r"(?:^|\s)make(?:\[\d+\])?: \*\*\* .*", re.IGNORECASE)
+TRACEBACK_MARKER = re.compile(r"\bTraceback \(most recent call last\):")
+COMPLETION_ACCEPTED_FILE_COUNT = re.compile(
+    r"\b(?:Cycle|Autocycle) completed:\s+(?P<count>\d+)\s+accepted file\(s\) committed\.",
+    re.IGNORECASE,
+)
+ITERATION_ACCEPTED = re.compile(
+    r"\bIteration\s+\d+\s+of\s+\d+\s+accepted\s+(?:by rkm-cycle\.sh|after recovery)\b",
+    re.IGNORECASE,
+)
 
 
 def repository_relative(path: Path) -> str:
@@ -184,6 +194,24 @@ def extract_files(text: str) -> list[str]:
     return files
 
 
+def accepted_file_count(text: str, label: str | None, final_verdict: str | None, files: list[str]) -> int:
+    if final_verdict != "ACCEPT":
+        return 0
+
+    explicit_counts = [int(match.group("count")) for match in COMPLETION_ACCEPTED_FILE_COUNT.finditer(text)]
+    if explicit_counts:
+        return explicit_counts[-1]
+
+    iteration_acceptances = ITERATION_ACCEPTED.findall(text)
+    if iteration_acceptances:
+        return len(iteration_acceptances)
+
+    if label in {"autocycle-cycle", "autocycle-recovery-review"}:
+        return 1
+
+    return len(files)
+
+
 def extract_automation_kinds(text: str, label: str | None) -> list[str]:
     kinds: list[str] = []
     seen: set[str] = set()
@@ -202,11 +230,12 @@ def failure_hints(text: str) -> list[str]:
     hints: list[str] = []
     verdicts = extract_verdicts(text)
     final_verdict = verdicts[-1] if verdicts else None
+    accept_final = final_verdict == "ACCEPT"
 
     for line in text.splitlines():
         if re.search(r"\bReturn\s+ACCEPT,\s+REVISE,\s+or\s+STOP\b", line, re.IGNORECASE):
             continue
-        if ERROR_MARKER.search(line) and "ERROR:" not in hints:
+        if not accept_final and ERROR_MARKER.search(line) and "ERROR:" not in hints:
             hints.append("ERROR:")
         if USAGE_LIMIT_MARKER.search(line) and "usage limit" not in hints:
             hints.append("usage limit")
@@ -216,6 +245,10 @@ def failure_hints(text: str) -> list[str]:
             hints.append("exit nonzero")
         if RECOVERY_FAILED_MARKER.search(line) and "recovery failed" not in hints:
             hints.append("recovery failed")
+        if MAKE_FATAL_MARKER.search(line) and "make fatal error" not in hints:
+            hints.append("make fatal error")
+        if TRACEBACK_MARKER.search(line) and "uncaught traceback" not in hints:
+            hints.append("uncaught traceback")
 
     if final_verdict == "STOP" and "STOP" not in hints:
         hints.append("STOP")
@@ -282,7 +315,7 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
         "finalStatus": final_status(final_verdict, has_failure, recovered),
         "commits": commits,
         "files": files,
-        "acceptedFileCount": len(files) if final_verdict == "ACCEPT" else 0,
+        "acceptedFileCount": accepted_file_count(text, label, final_verdict, files),
         "hasRecovery": recovered,
         "hasFailure": has_failure,
         "failureHints": hints,
@@ -465,15 +498,70 @@ def run_self_test() -> int:
         assert_equal(third_entry["hasFailure"], True, "argument list too long failure detection")
         assert_equal(third_entry["finalStatus"], "STOPPED", "stop final status")
 
+        fourth_log = root / "fourth.log"
+        fourth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-cycle] start",
+                    "ERROR: validation failed before Codex fixed the file",
+                    "verdict: ACCEPT",
+                    "Cycle completed: 1 accepted file(s) committed.",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        fourth_entry = append_entry(fourth_log, ledger, None)
+        assert_equal(fourth_entry["hasFailure"], False, "accepted generic error failure detection")
+        assert_equal(fourth_entry["finalStatus"], "ACCEPTED", "accepted generic error final status")
+        assert_equal(fourth_entry["acceptedFileCount"], 1, "cycle completion accepted file count")
+
+        fifth_log = root / "fifth.log"
+        fifth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    (
+                        "Commit completed: Add docs/architecture/autocycle-model.md "
+                        "with schema/definitions/identity.schema.json support."
+                    ),
+                    "Autocycle completed: 1 accepted file(s) committed.",
+                    "verdict: ACCEPT",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        fifth_entry = append_entry(fifth_log, ledger, "autocycle-cycle")
+        assert_equal(
+            fifth_entry["files"],
+            ["docs/architecture/autocycle-model.md", "schema/definitions/identity.schema.json"],
+            "autocycle referenced file extraction",
+        )
+        assert_equal(fifth_entry["acceptedFileCount"], 1, "autocycle explicit accepted file count")
+
+        sixth_log = root / "sixth.log"
+        sixth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    "ERROR: usage limit reached",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        sixth_entry = append_entry(sixth_log, ledger, None)
+        assert_equal(sixth_entry["hadUsageLimit"], True, "usage limit detection")
+        assert_equal(sixth_entry["hasFailure"], True, "usage limit failure detection")
+        assert_equal(sixth_entry["finalStatus"], "FAILED", "usage limit final status")
+
         entries = read_ledger(ledger)
-        assert_equal(len(entries), 3, "append behavior")
+        assert_equal(len(entries), 6, "append behavior")
         report = report_text(entries)
         for expected in (
-            "total runs: 3",
+            "total runs: 6",
             "total token events: 3",
             "total tokens: 1734",
             "runs with recovery: 1",
-            "runs with failure hints: 1",
+            "runs with failure hints: 2",
             "recovered runs: 1",
             "stopped runs: 1",
         ):
