@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/advantage.schema.json",
+  "title": "RKM Advantage Definition",
+  "description": "Defines a reusable structured advantage that describes a beneficial property, improvement or suitability reason for a RAG entity in a stated context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "advantageType",
+    "statement",
+    "scope"
+  ],
+  "properties": {
+    "advantageId": {
+      "type": "string",
+      "description": "Stable local identifier for the advantage within the containing entity, comparison, claim or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "advantageType": {
+      "$ref": "#/$defs/advantageType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the beneficial property or outcome.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the advantage is expected to apply.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "baseline": {
+      "$ref": "#/$defs/baseline"
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes improved, supported or constrained by this advantage.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "supportedUseCases": {
+      "type": "array",
+      "description": "Use cases where the advantage materially affects suitability or design choice.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "relatedLimitations": {
+      "type": "array",
+      "description": "Limitations that qualify, bound or trade off against this advantage.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, justify or qualify this advantage.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the advantage, its scope or its comparative baseline.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the advantage.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "advantageType": {
+      "type": "string",
+      "description": "Primary nature of the benefit.",
+      "enum": [
+        "Retrieval Quality Advantage",
+        "Ranking Quality Advantage",
+        "Grounding Advantage",
+        "Citation Advantage",
+        "Latency Advantage",
+        "Cost Advantage",
+        "Scalability Advantage",
+        "Freshness Advantage",
+        "Explainability Advantage",
+        "Interoperability Advantage",
+        "Observability Advantage",
+        "Governance Advantage",
+        "Operational Advantage",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the advantage applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities affected when the advantage is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the advantage is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "workflowReferences": {
+          "type": "array",
+          "description": "Workflows where the advantage is expected to matter.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor required for the advantage to hold.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "description": "Comparison point used when the advantage is relative.",
+      "additionalProperties": false,
+      "required": [
+        "baselineType"
+      ],
+      "properties": {
+        "baselineType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Workflow Version",
+            "Component Configuration",
+            "Provider Capability",
+            "Benchmark Reference System",
+            "Manual Process",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "baselineReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the comparison point when a stable reference is not sufficient.",
+          "minLength": 1
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
