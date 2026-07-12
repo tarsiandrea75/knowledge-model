@@ -13,7 +13,7 @@ BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover autopilot-status help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover autopilot-status help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -88,6 +88,9 @@ codex-commit:
 recover-revise:
 	bash scripts/rkm-recover-revise.sh
 
+recovery-plan:
+	python3 scripts/rkm-recovery-plan.py
+
 clean-discovery-artifacts:
 	find . -maxdepth 1 \( \
 		-type d \( -name 'rkm-discovery-report-*' -o -name 'rkm-discovery-*' \) \
@@ -136,6 +139,7 @@ help:
 	@printf '  make fix-eof FILE=path/to/file   Run scripts/rkm-fix-eof.sh on FILE.\n'
 	@printf '  make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"  Run scripts/rkm-codex-commit.sh with the provided prompt, file, and message.\n'
 	@printf '  make recover-revise              Run bash scripts/rkm-recover-revise.sh.\n'
+	@printf '  make recovery-plan               Inspect the current repository and recent logs to recommend recovery without modifying files.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
 	@printf '  make usage-report                Run python3 scripts/rkm-run-ledger.py report.\n'
 	@printf '  make budget-init                 Initialize the local budget profile using DAILY_BUDGET, BUDGET_SAFETY_FACTOR, BUDGET_RESERVE_RATIO, and BUDGET_WINDOW_HOURS.\n'
