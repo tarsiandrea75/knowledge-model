@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import re
@@ -59,6 +61,7 @@ class RecoveryPlan:
     latest_ledger_timestamp_utc: str | None
     latest_verdicts: list[str]
     latest_touched_file: str | None
+    latest_ledger_is_historical: bool
     reviewer_summary: str
     recovery_attempted: bool
     recovery_still_revise: bool
@@ -288,6 +291,10 @@ def decide(inputs: PlanInputs) -> RecoveryPlan:
         single_project_file is not None
         and (inputs.latest_touched_file is None or inputs.latest_touched_file == single_project_file)
     )
+    latest_ledger_is_historical = (
+        is_clean
+        and inputs.latest_ledger_final_status in {"REVISE_PENDING", "FAILED", "STOPPED"}
+    )
 
     status = "MANUAL_REVIEW"
     command: str | None = None
@@ -295,7 +302,7 @@ def decide(inputs: PlanInputs) -> RecoveryPlan:
 
     if is_clean:
         status = "NO_RECOVERY_NEEDED"
-        reason = "git worktree is clean"
+        reason = "git worktree is clean; any REVISE ledger state is historical"
     elif ide:
         status = "BLOCKED_IDE_FILES"
         command = "rm -rf .idea && make validate"
@@ -332,6 +339,7 @@ def decide(inputs: PlanInputs) -> RecoveryPlan:
         latest_ledger_timestamp_utc=inputs.latest_ledger_timestamp_utc,
         latest_verdicts=inputs.latest_verdicts,
         latest_touched_file=inputs.latest_touched_file,
+        latest_ledger_is_historical=latest_ledger_is_historical,
         reviewer_summary=inputs.reviewer_summary,
         recovery_attempted=inputs.recovery_attempted,
         recovery_still_revise=inputs.recovery_still_revise,
@@ -353,6 +361,7 @@ def plan_to_json(plan: RecoveryPlan) -> dict[str, Any]:
         "latestLedgerTimestampUtc": plan.latest_ledger_timestamp_utc,
         "latestVerdicts": plan.latest_verdicts,
         "latestTouchedFile": plan.latest_touched_file,
+        "latestLedgerIsHistorical": plan.latest_ledger_is_historical,
         "reviewerSummary": plan.reviewer_summary,
         "recoveryAttempted": plan.recovery_attempted,
         "recoveryStillRevise": plan.recovery_still_revise,
@@ -362,25 +371,34 @@ def plan_to_json(plan: RecoveryPlan) -> dict[str, Any]:
     }
 
 
-def print_human(plan: RecoveryPlan) -> None:
+def print_human(plan: RecoveryPlan, verbose: bool = False) -> None:
     print(f"status: {plan.status}")
     print(f"reason: {plan.reason}")
     print(f"is clean: {str(plan.is_clean).lower()}")
     print(f"dirty files: {', '.join(plan.dirty_files) if plan.dirty_files else '(none)'}")
     print(f"changed project files: {', '.join(plan.changed_project_files) if plan.changed_project_files else '(none)'}")
     print(f"IDE files: {', '.join(plan.ide_files) if plan.ide_files else '(none)'}")
-    print(f"latest ledger finalStatus: {plan.latest_ledger_final_status or '(unknown)'}")
+    historical_marker = " (historical)" if plan.latest_ledger_is_historical else ""
+    print(f"latest ledger finalStatus: {plan.latest_ledger_final_status or '(unknown)'}{historical_marker}")
     print(f"latest ledger label: {plan.latest_ledger_label or '(unknown)'}")
     print(f"latest ledger timestampUtc: {plan.latest_ledger_timestamp_utc or '(unknown)'}")
+    print(f"latest ledger is historical: {str(plan.latest_ledger_is_historical).lower()}")
     print(f"latest verdicts: {', '.join(plan.latest_verdicts) if plan.latest_verdicts else '(none)'}")
     print(f"latest touched file: {plan.latest_touched_file or '(unknown)'}")
     print(f"recovery attempted: {str(plan.recovery_attempted).lower()}")
     print(f"recovery still REVISE: {str(plan.recovery_still_revise).lower()}")
     print(f"recommended command: {plan.recommended_command or '(none)'}")
     print(f"log sources: {', '.join(plan.log_sources) if plan.log_sources else '(none)'}")
-    if plan.reviewer_summary:
+    if plan.reviewer_summary and (verbose or not plan.latest_ledger_is_historical):
         print("reviewer summary:")
         print(plan.reviewer_summary)
+
+
+def render_human(plan: RecoveryPlan, verbose: bool = False) -> str:
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+        print_human(plan, verbose)
+    return output.getvalue()
 
 
 def assert_plan(name: str, inputs: PlanInputs, expected: str) -> list[str]:
@@ -394,6 +412,7 @@ def test_inputs(
     status_lines: list[str] | None = None,
     latest_ledger_final_status: str | None = None,
     latest_verdicts: list[str] | None = None,
+    reviewer_summary: str = "",
     recovery_attempted: bool = False,
     recovery_still_revise: bool = False,
 ) -> PlanInputs:
@@ -404,7 +423,7 @@ def test_inputs(
         latest_ledger_timestamp_utc=None,
         latest_verdicts=latest_verdicts or [],
         latest_touched_file=None,
-        reviewer_summary="",
+        reviewer_summary=reviewer_summary,
         recovery_attempted=recovery_attempted,
         recovery_still_revise=recovery_still_revise,
         log_sources=[],
@@ -414,6 +433,32 @@ def test_inputs(
 def run_self_test() -> int:
     failures: list[str] = []
     failures.extend(assert_plan("clean repo", test_inputs(), "NO_RECOVERY_NEEDED"))
+    clean_revise_plan = decide(
+        test_inputs(
+            latest_ledger_final_status="REVISE_PENDING",
+            latest_verdicts=["REVISE"],
+            reviewer_summary="reviewer summary detail",
+        )
+    )
+    clean_revise_output = render_human(clean_revise_plan)
+    clean_revise_verbose_output = render_human(clean_revise_plan, verbose=True)
+    clean_revise_json = plan_to_json(clean_revise_plan)
+    if clean_revise_plan.status != "NO_RECOVERY_NEEDED":
+        failures.append(f"clean REVISE_PENDING ledger: expected NO_RECOVERY_NEEDED, got {clean_revise_plan.status}")
+    if clean_revise_plan.reason != "git worktree is clean; any REVISE ledger state is historical":
+        failures.append("clean REVISE_PENDING ledger: reason does not clarify historical ledger state")
+    if clean_revise_plan.latest_ledger_is_historical is not True:
+        failures.append("clean REVISE_PENDING ledger: expected latest_ledger_is_historical true")
+    if clean_revise_plan.recommended_command is not None:
+        failures.append("clean REVISE_PENDING ledger: expected no recommended command")
+    if clean_revise_json.get("latestLedgerIsHistorical") is not True:
+        failures.append("clean REVISE_PENDING ledger: JSON latestLedgerIsHistorical missing or false")
+    if "reviewer summary:" in clean_revise_output or "reviewer summary detail" in clean_revise_output:
+        failures.append("clean REVISE_PENDING ledger: default human output should not show reviewer summary")
+    if "latest ledger finalStatus: REVISE_PENDING (historical)" not in clean_revise_output:
+        failures.append("clean REVISE_PENDING ledger: default human output should mark finalStatus historical")
+    if "reviewer summary detail" not in clean_revise_verbose_output:
+        failures.append("clean REVISE_PENDING ledger: verbose human output should show reviewer summary")
     failures.extend(
         assert_plan(
             "one dirty file with REVISE_PENDING",
@@ -421,6 +466,21 @@ def run_self_test() -> int:
             "RECOVERY_AVAILABLE",
         )
     )
+    dirty_revise_plan = decide(
+        test_inputs(
+            [" M docs/architecture/paper-model.md"],
+            "REVISE_PENDING",
+            ["REVISE"],
+            reviewer_summary="dirty reviewer summary detail",
+        )
+    )
+    dirty_revise_output = render_human(dirty_revise_plan)
+    if dirty_revise_plan.status != "RECOVERY_AVAILABLE":
+        failures.append(f"dirty REVISE_PENDING ledger: expected RECOVERY_AVAILABLE, got {dirty_revise_plan.status}")
+    if dirty_revise_plan.latest_ledger_is_historical is not False:
+        failures.append("dirty REVISE_PENDING ledger: expected latest_ledger_is_historical false")
+    if "dirty reviewer summary detail" not in dirty_revise_output:
+        failures.append("dirty REVISE_PENDING ledger: default human output should show reviewer summary")
     failures.extend(
         assert_plan(
             "recovery review still REVISE",
@@ -467,6 +527,7 @@ def run_self_test() -> int:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Produce a read-only RKM recovery plan.")
     parser.add_argument("--json", action="store_true", help="print stable JSON output")
+    parser.add_argument("--verbose", action="store_true", help="include historical reviewer detail in human output")
     parser.add_argument("--self-test", action="store_true", help="run pure decision self-tests")
     return parser.parse_args(argv)
 
@@ -480,7 +541,7 @@ def main(argv: list[str]) -> int:
     if args.json:
         print(json.dumps(plan_to_json(plan), indent=2, sort_keys=True))
     else:
-        print_human(plan)
+        print_human(plan, args.verbose)
     return 0
 
 
