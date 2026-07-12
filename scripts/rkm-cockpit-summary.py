@@ -37,7 +37,7 @@ class Decision:
 @dataclass(frozen=True)
 class RecentRunSummary:
     available: bool
-    accepted: int = 0
+    normal: int = 0
     recovered: int = 0
     revise_pending: int = 0
     partial: bool = False
@@ -206,6 +206,14 @@ def meaningful_ledger_entries(entries: list[dict[str, Any]]) -> list[dict[str, A
     return [entry for entry in entries if entry.get("label") != "autocycle-recovery-review"]
 
 
+def entry_files(entry: dict[str, Any]) -> tuple:
+    return tuple(str(file) for file in entry.get("files") or [] if file)
+
+
+def recovery_key(entry: dict[str, Any]) -> tuple:
+    return (str(entry.get("timestampUtc") or ""), entry_files(entry))
+
+
 def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any]) -> list[dict[str, Any]]:
     meaningful = meaningful_ledger_entries(entries)
     target = int_value(state.get("target"), 0)
@@ -213,23 +221,25 @@ def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any
         return meaningful[-20:]
 
     selected_reversed: list[dict[str, Any]] = []
-    accepted = 0
+    normal = 0
+    recovered_units: set[tuple] = set()
     recovered_files: set[str] = set()
     pending_files: set[str] = set()
 
     for entry in reversed(meaningful):
         selected_reversed.append(entry)
         status = str(entry.get("finalStatus") or "").upper()
-        files = tuple(str(file) for file in entry.get("files") or [] if file)
+        files = entry_files(entry)
         label = str(entry.get("label") or "")
         if status == "RECOVERED" and label == "autocycle-recovery":
+            recovered_units.add(recovery_key(entry))
             recovered_files.update(files)
         elif status == "ACCEPTED":
-            accepted += max(int_value(entry.get("acceptedFileCount"), 1), 1)
+            normal += max(int_value(entry.get("acceptedFileCount"), 1), 1)
         elif status == "REVISE_PENDING":
             pending_files.update(files)
         unresolved_pending = pending_files - recovered_files
-        if accepted + len(recovered_files) + len(unresolved_pending) >= target:
+        if normal + len(recovered_units) + len(unresolved_pending) >= target:
             break
 
     return list(reversed(selected_reversed))
@@ -239,33 +249,39 @@ def summarize_recent_run(
     state: dict[str, Any],
     ledger_entries: list[dict[str, Any]],
     next_action: dict[str, Any],
+    recovery: dict[str, Any] | None = None,
 ) -> RecentRunSummary:
     if not state and not ledger_entries:
         return RecentRunSummary(False)
 
     recent_entries = recent_entries_for_state(ledger_entries, state)
-    accepted = 0
+    normal = 0
+    recovered_units: set[tuple] = set()
     recovered_files: set[str] = set()
     pending_files: set[str] = set()
 
     for entry in recent_entries:
         status = str(entry.get("finalStatus") or "").upper()
         label = str(entry.get("label") or "")
-        files = tuple(str(file) for file in entry.get("files") or [] if file)
+        files = entry_files(entry)
         if status == "ACCEPTED":
-            accepted += max(int_value(entry.get("acceptedFileCount"), 1), 1)
+            normal += max(int_value(entry.get("acceptedFileCount"), 1), 1)
         elif status == "RECOVERED" and label == "autocycle-recovery":
+            recovered_units.add(recovery_key(entry))
             recovered_files.update(files)
         elif status == "REVISE_PENDING":
             pending_files.update(files)
 
-    unresolved_pending = pending_files - recovered_files
+    recovery_status = str((recovery or {}).get("status") or "").upper()
+    clean_recovery_state = recovery_status == "NO_RECOVERY_NEEDED" and not repo_is_dirty(next_action, recovery or {})
+    unresolved_pending = set() if clean_recovery_state else pending_files - recovered_files
     final_outcome = str(state.get("finalOutcome") or "").lower()
     commands_skipped = state.get("commandsSkipped") if isinstance(state.get("commandsSkipped"), list) else []
     skipped_push = any("safe-push" in str(command) for command in commands_skipped)
     exit_failed = int_value(state.get("exitCode"), 0) != 0
     target = int_value(state.get("target"), 0)
-    completed = accepted + len(recovered_files)
+    recovered = len(recovered_units)
+    completed = normal + recovered
     partial = (target > 0 and completed < target) or (exit_failed and skipped_push)
     budget_stop = (
         "budget" in final_outcome
@@ -276,8 +292,8 @@ def summarize_recent_run(
 
     return RecentRunSummary(
         True,
-        accepted=accepted,
-        recovered=len(recovered_files),
+        normal=normal,
+        recovered=recovered,
         revise_pending=len(unresolved_pending),
         partial=partial,
         budget_stop=budget_stop,
@@ -287,15 +303,14 @@ def summarize_recent_run(
 
 def recent_run_text(summary: RecentRunSummary) -> str | None:
     if not summary.available:
-        return None
-    state = "partial" if summary.partial else "complete"
+        return "clean; no recent autocycle summary"
+    state = "partial" if summary.partial else "completed"
     if summary.budget_stop:
-        state = f"{state}/budget-stop"
-    parts = [state, f"accepted {summary.accepted}", f"recovered {summary.recovered}"]
+        state = "budget-stop"
+    committed = summary.normal + summary.recovered
+    parts = [state, f"committed {committed} total", f"normal {summary.normal}", f"recovered {summary.recovered}"]
     if summary.revise_pending:
         parts.append(f"revise pending {summary.revise_pending}")
-    if summary.push_pending:
-        parts.append("push pending")
     return "; ".join(parts)
 
 
@@ -342,7 +357,7 @@ def render_dashboard(
     repo_status = "dirty" if repo_is_dirty(next_action, recovery) else "clean"
     title = " RKM COCKPIT "
     frame = "═" * len(title) if use_unicode else "=" * len(title)
-    recent = summarize_recent_run(state or {}, ledger_entries or [], next_action)
+    recent = summarize_recent_run(state or {}, ledger_entries or [], next_action, recovery)
 
     lines = [
         frame,
@@ -355,7 +370,7 @@ def render_dashboard(
     if recent_text:
         lines.append(f"{icons['recent']} last run -> {recent_text}")
     if str(next_action.get("status") or "").upper() == "READY_TO_PUSH":
-        lines.append(f"{icons['push']} push pending -> make safe-push")
+        lines.append(f"{icons['push']} push -> pending; command make safe-push")
     lines.extend(
         [
         row(icons["budget"], "budget", budget_text(next_action, budget, target)),
@@ -398,6 +413,10 @@ def run_self_test() -> int:
         if expected not in text:
             raise AssertionError(f"{name}: expected to find {expected!r} in:\n{text}")
 
+    def assert_not_contains(name: str, text: str, unexpected: str) -> None:
+        if unexpected in text:
+            raise AssertionError(f"{name}: expected not to find {unexpected!r} in:\n{text}")
+
     clean = {"isClean": True, "status": "NO_RECOVERY_NEEDED"}
     check("recover", {"status": "READY_TO_AUTOCYCLE"}, {}, {"status": "RECOVERY_AVAILABLE"}, Decision("RECOVER", "make autopilot-recover"))
     check("manual", {"status": "READY_TO_AUTOCYCLE"}, {}, {"status": "MANUAL_REVIEW"}, Decision("STOP", "make recovery-plan"))
@@ -423,8 +442,74 @@ def run_self_test() -> int:
         {"target": 3, "exitCode": 2, "commandsSkipped": ["make safe-push"]},
         recovered_ledger,
     )
-    assert_contains("push pending row", push_dashboard, "push pending -> make safe-push")
+    assert_contains("push pending row", push_dashboard, "push -> pending")
+    assert_contains("push command", push_dashboard, "command make safe-push")
     assert_contains("recovered count", push_dashboard, "recovered 1")
+
+    budget_stop_ledger = [
+        {"label": "autocycle-cycle", "finalStatus": "ACCEPTED", "acceptedFileCount": 1, "files": [f"normal-{index}.md"]}
+        for index in range(7)
+    ]
+    budget_stop_ledger.extend(
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "REVISE_PENDING",
+                "acceptedFileCount": 0,
+                "files": ["recovered-a.md"],
+                "timestampUtc": "2026-01-01T00:08:00Z",
+            },
+            {
+                "label": "autocycle-recovery",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["recovered-a.md"],
+                "timestampUtc": "2026-01-01T00:09:00Z",
+            },
+            {
+                "label": "autocycle-recovery-review",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["recovered-a.md"],
+                "timestampUtc": "2026-01-01T00:09:00Z",
+            },
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "REVISE_PENDING",
+                "acceptedFileCount": 0,
+                "files": ["recovered-b.md"],
+                "timestampUtc": "2026-01-01T00:10:00Z",
+            },
+            {
+                "label": "autocycle-recovery",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["recovered-b.md"],
+                "timestampUtc": "2026-01-01T00:11:00Z",
+            },
+            {
+                "label": "autocycle-recovery-review",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["recovered-b.md"],
+                "timestampUtc": "2026-01-01T00:11:00Z",
+            },
+        ]
+    )
+    budget_stop_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        10,
+        True,
+        {"target": 10, "exitCode": 0, "finalOutcome": "token budget guard stopped run"},
+        budget_stop_ledger,
+    )
+    assert_contains(
+        "budget stop committed totals",
+        budget_stop_dashboard,
+        "budget-stop; committed 9 total; normal 7; recovered 2",
+    )
 
     over_budget_dashboard = render_dashboard(
         {"status": "OVER_BUDGET", "recommendedMaxTarget": 1},
@@ -444,12 +529,24 @@ def run_self_test() -> int:
     )
     assert_contains("allowed budget row", allowed_dashboard, "target 3 allowed")
 
+    stale_revise_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE", "repoStatus": "clean"},
+        {},
+        clean,
+        3,
+        True,
+        {"target": 1, "exitCode": 0},
+        [{"label": "autocycle-cycle", "finalStatus": "REVISE_PENDING", "acceptedFileCount": 0, "files": ["old.md"]}],
+    )
+    assert_not_contains("historical revise pending", stale_revise_dashboard, "revise pending")
+
     missing_root = REPOSITORY_ROOT / ".missing-rkm-self-test"
     if read_json_file(missing_root / "autopilot-state.json") != {}:
         raise AssertionError("missing state file should return an empty object")
     if read_jsonl_file(missing_root / "run-ledger.jsonl") != []:
         raise AssertionError("missing ledger file should return an empty list")
-    render_dashboard({"status": "READY_TO_AUTOCYCLE"}, {}, clean, 3, True, {}, [])
+    no_recent_dashboard = render_dashboard({"status": "READY_TO_AUTOCYCLE"}, {}, clean, 3, True, {}, [])
+    assert_contains("no recent run", no_recent_dashboard, "clean; no recent autocycle summary")
 
     print("self-test: PASS")
     return 0
