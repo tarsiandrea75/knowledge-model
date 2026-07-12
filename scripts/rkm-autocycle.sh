@@ -76,6 +76,53 @@ append_ledger_log() {
   fi
 }
 
+run_with_heartbeat() {
+  local label="$1"
+  local log_path="$2"
+  shift 2
+
+  local start_epoch
+  local next_heartbeat_elapsed
+  local current_elapsed
+  local child_pid
+  local child_status
+
+  start_epoch="$(current_epoch)"
+  next_heartbeat_elapsed=30
+  "$@" >"$log_path" 2>&1 &
+  child_pid="$!"
+
+  while is_running_job "$child_pid"; do
+    sleep 1
+    current_elapsed="$(($(current_epoch) - start_epoch))"
+    if [[ "$current_elapsed" -ge "$next_heartbeat_elapsed" ]] && is_running_job "$child_pid"; then
+      progress "$label still running. Elapsed: $(format_elapsed "$current_elapsed"). Log: $log_path"
+      next_heartbeat_elapsed=$((next_heartbeat_elapsed + 30))
+    fi
+  done
+
+  if wait "$child_pid"; then
+    child_status=0
+  else
+    child_status="$?"
+  fi
+
+  return "$child_status"
+}
+
+is_running_job() {
+  local target_pid="$1"
+  local running_pid
+
+  while read -r running_pid; do
+    if [[ "$running_pid" == "$target_pid" ]]; then
+      return 0
+    fi
+  done < <(jobs -pr)
+
+  return 1
+}
+
 print_ledger_report() {
   if [[ ! -f "$LEDGER_SCRIPT" ]]; then
     warn "Ledger script not found: $LEDGER_SCRIPT"
@@ -111,7 +158,7 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   reviewer_verdict=""
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES started at $(current_time)."
 
-  if bash scripts/rkm-cycle.sh 1 >"$CYCLE_OUTPUT" 2>&1; then
+  if run_with_heartbeat "cycle attempt" "$CYCLE_OUTPUT" bash scripts/rkm-cycle.sh 1; then
     cycle_result=0
   else
     cycle_result=$?
@@ -154,7 +201,7 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   tail -n "$TAIL_LINES" "$CYCLE_OUTPUT"
 
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES entering single-file REVISE recovery at $(current_time)."
-  if bash scripts/rkm-recover-revise.sh; then
+  if run_with_heartbeat "recovery attempt" "$RECOVER_OUTPUT" bash scripts/rkm-recover-revise.sh; then
     recovery_result=0
   else
     recovery_result=$?
