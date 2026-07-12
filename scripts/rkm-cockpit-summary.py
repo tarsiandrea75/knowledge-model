@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,8 @@ STOP_RECOVERY_STATUSES = {
     "STOPPED",
     "BLOCKED",
 }
+LEDGER_TIMESTAMP_TOLERANCE = timedelta(seconds=2)
+FALLBACK_CLUSTER_GAP = timedelta(minutes=15)
 
 
 @dataclass(frozen=True)
@@ -40,6 +43,7 @@ class RecentRunSummary:
     normal: int = 0
     recovered: int = 0
     revise_pending: int = 0
+    exact_counts: bool = True
     partial: bool = False
     budget_stop: bool = False
     push_pending: bool = False
@@ -202,8 +206,40 @@ def row(icon: str, label: str, value: Any, color: bool = False, color_name: str 
     return f"{icon} {label:<27} -> {text}"
 
 
-def meaningful_ledger_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [entry for entry in entries if entry.get("label") != "autocycle-recovery-review"]
+def parse_utc_timestamp(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def entry_timestamp(entry: dict[str, Any]) -> datetime | None:
+    return parse_utc_timestamp(entry.get("timestampUtc"))
+
+
+def autopilot_boundary_timestamp(state: dict[str, Any]) -> datetime | None:
+    timestamp_keys = (
+        "runStartedAtUtc",
+        "startedAtUtc",
+        "startTimestampUtc",
+        "commandStartedAtUtc",
+        "autopilotStartedAtUtc",
+        "autopilotTimestampUtc",
+        "timestampUtc",
+    )
+    for key in timestamp_keys:
+        parsed = parse_utc_timestamp(state.get(key))
+        if parsed is not None:
+            return parsed
+    return None
 
 
 def entry_files(entry: dict[str, Any]) -> tuple:
@@ -211,14 +247,54 @@ def entry_files(entry: dict[str, Any]) -> tuple:
 
 
 def recovery_key(entry: dict[str, Any]) -> tuple:
-    return (str(entry.get("timestampUtc") or ""), entry_files(entry))
+    files = entry_files(entry)
+    return files if files else (str(entry.get("timestampUtc") or ""),)
 
 
-def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any]) -> list[dict[str, Any]]:
-    meaningful = meaningful_ledger_entries(entries)
+def ledger_entries_since(entries: list[dict[str, Any]], boundary: datetime) -> list[dict[str, Any]]:
+    threshold = boundary - LEDGER_TIMESTAMP_TOLERANCE
+    return [entry for entry in entries if (timestamp := entry_timestamp(entry)) is not None and timestamp >= threshold]
+
+
+def latest_ledger_cluster(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not entries:
+        return []
+
+    selected_reversed: list[dict[str, Any]] = []
+    latest_timestamp: datetime | None = None
+    for entry in reversed(entries):
+        timestamp = entry_timestamp(entry)
+        if not selected_reversed:
+            selected_reversed.append(entry)
+            latest_timestamp = timestamp
+            continue
+        if timestamp is None or latest_timestamp is None:
+            selected_reversed.append(entry)
+            continue
+        if latest_timestamp - timestamp > FALLBACK_CLUSTER_GAP:
+            break
+        selected_reversed.append(entry)
+        latest_timestamp = timestamp
+    return list(reversed(selected_reversed))
+
+
+def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any]) -> tuple[list[dict[str, Any]], bool]:
+    boundary = autopilot_boundary_timestamp(state)
+    if boundary is not None:
+        bounded = ledger_entries_since(entries, boundary)
+        if bounded:
+            has_entry_at_or_after_boundary = any(
+                (timestamp := entry_timestamp(entry)) is not None and timestamp >= boundary for entry in bounded
+            )
+            if has_entry_at_or_after_boundary:
+                return bounded, True
+            return latest_ledger_cluster(entries), False
+        return latest_ledger_cluster(entries), False
+
     target = int_value(state.get("target"), 0)
+    meaningful = entries
     if target <= 0:
-        return meaningful[-20:]
+        return latest_ledger_cluster(meaningful), False
 
     selected_reversed: list[dict[str, Any]] = []
     normal = 0
@@ -231,18 +307,18 @@ def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any
         status = str(entry.get("finalStatus") or "").upper()
         files = entry_files(entry)
         label = str(entry.get("label") or "")
-        if status == "RECOVERED" and label == "autocycle-recovery":
+        if status == "RECOVERED" and label in {"autocycle-recovery", "autocycle-recovery-review"}:
             recovered_units.add(recovery_key(entry))
             recovered_files.update(files)
-        elif status == "ACCEPTED":
-            normal += max(int_value(entry.get("acceptedFileCount"), 1), 1)
+        elif status == "ACCEPTED" and int_value(entry.get("acceptedFileCount"), 0) > 0:
+            normal += 1
         elif status == "REVISE_PENDING":
             pending_files.update(files)
         unresolved_pending = pending_files - recovered_files
         if normal + len(recovered_units) + len(unresolved_pending) >= target:
             break
 
-    return list(reversed(selected_reversed))
+    return list(reversed(selected_reversed)), False
 
 
 def summarize_recent_run(
@@ -254,7 +330,7 @@ def summarize_recent_run(
     if not state and not ledger_entries:
         return RecentRunSummary(False)
 
-    recent_entries = recent_entries_for_state(ledger_entries, state)
+    recent_entries, exact_counts = recent_entries_for_state(ledger_entries, state)
     normal = 0
     recovered_units: set[tuple] = set()
     recovered_files: set[str] = set()
@@ -264,9 +340,9 @@ def summarize_recent_run(
         status = str(entry.get("finalStatus") or "").upper()
         label = str(entry.get("label") or "")
         files = entry_files(entry)
-        if status == "ACCEPTED":
-            normal += max(int_value(entry.get("acceptedFileCount"), 1), 1)
-        elif status == "RECOVERED" and label == "autocycle-recovery":
+        if status == "ACCEPTED" and int_value(entry.get("acceptedFileCount"), 0) > 0:
+            normal += 1
+        elif status == "RECOVERED" and label in {"autocycle-recovery", "autocycle-recovery-review"}:
             recovered_units.add(recovery_key(entry))
             recovered_files.update(files)
         elif status == "REVISE_PENDING":
@@ -276,18 +352,24 @@ def summarize_recent_run(
     clean_recovery_state = recovery_status == "NO_RECOVERY_NEEDED" and not repo_is_dirty(next_action, recovery or {})
     unresolved_pending = set() if clean_recovery_state else pending_files - recovered_files
     final_outcome = str(state.get("finalOutcome") or "").lower()
+    state_text = json.dumps(state, sort_keys=True).lower() if state else ""
     commands_skipped = state.get("commandsSkipped") if isinstance(state.get("commandsSkipped"), list) else []
     skipped_push = any("safe-push" in str(command) for command in commands_skipped)
     exit_failed = int_value(state.get("exitCode"), 0) != 0
     target = int_value(state.get("target"), 0)
     recovered = len(recovered_units)
     completed = normal + recovered
+    next_status = str(next_action.get("status") or "").upper()
     partial = (target > 0 and completed < target) or (exit_failed and skipped_push)
+    partial_ready_after_failure = exit_failed and next_status == "READY_TO_PUSH" and clean_recovery_state
     budget_stop = (
         "budget" in final_outcome
         or "token" in final_outcome
+        or "budget guard" in state_text
+        or "token budget" in state_text
         or (exit_failed and skipped_push)
-        or str(next_action.get("status") or "").upper() == "OVER_BUDGET"
+        or partial_ready_after_failure
+        or next_status == "OVER_BUDGET"
     )
 
     return RecentRunSummary(
@@ -295,9 +377,10 @@ def summarize_recent_run(
         normal=normal,
         recovered=recovered,
         revise_pending=len(unresolved_pending),
+        exact_counts=exact_counts,
         partial=partial,
         budget_stop=budget_stop,
-        push_pending=str(next_action.get("status") or "").upper() == "READY_TO_PUSH",
+        push_pending=next_status == "READY_TO_PUSH",
     )
 
 
@@ -308,7 +391,14 @@ def recent_run_text(summary: RecentRunSummary) -> str | None:
     if summary.budget_stop:
         state = "budget-stop"
     committed = summary.normal + summary.recovered
-    parts = [state, f"committed {committed} total", f"normal {summary.normal}", f"recovered {summary.recovered}"]
+    if summary.exact_counts:
+        parts = [state, f"committed {committed} total", f"normal {summary.normal}", f"recovered {summary.recovered}"]
+    else:
+        parts = [state]
+        if committed:
+            parts.append("committed progress detected")
+        if summary.recovered:
+            parts.append(f"recovered {summary.recovered}")
     if summary.revise_pending:
         parts.append(f"revise pending {summary.revise_pending}")
     return "; ".join(parts)
@@ -447,9 +537,24 @@ def run_self_test() -> int:
     assert_contains("recovered count", push_dashboard, "recovered 1")
 
     budget_stop_ledger = [
-        {"label": "autocycle-cycle", "finalStatus": "ACCEPTED", "acceptedFileCount": 1, "files": [f"normal-{index}.md"]}
-        for index in range(7)
+        {
+            "label": "autocycle-cycle",
+            "finalStatus": "ACCEPTED",
+            "acceptedFileCount": 1,
+            "files": ["before-run.md"],
+            "timestampUtc": "2025-12-31T23:59:00Z",
+        }
     ]
+    budget_stop_ledger.extend(
+        {
+            "label": "autocycle-cycle",
+            "finalStatus": "ACCEPTED",
+            "acceptedFileCount": 1,
+            "files": [f"normal-{index}.md"],
+            "timestampUtc": f"2026-01-01T00:0{index + 1}:00Z",
+        }
+        for index in range(7)
+    )
     budget_stop_ledger.extend(
         [
             {
@@ -502,7 +607,12 @@ def run_self_test() -> int:
         clean,
         10,
         True,
-        {"target": 10, "exitCode": 0, "finalOutcome": "token budget guard stopped run"},
+        {
+            "target": 10,
+            "exitCode": 0,
+            "finalOutcome": "token budget guard stopped run",
+            "timestampUtc": "2026-01-01T00:00:00Z",
+        },
         budget_stop_ledger,
     )
     assert_contains(
@@ -535,10 +645,59 @@ def run_self_test() -> int:
         clean,
         3,
         True,
-        {"target": 1, "exitCode": 0},
-        [{"label": "autocycle-cycle", "finalStatus": "REVISE_PENDING", "acceptedFileCount": 0, "files": ["old.md"]}],
+        {"target": 1, "exitCode": 0, "timestampUtc": "2026-01-01T00:00:00Z"},
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "REVISE_PENDING",
+                "acceptedFileCount": 0,
+                "files": ["old.md"],
+                "timestampUtc": "2025-12-31T23:59:00Z",
+            },
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["new.md"],
+                "timestampUtc": "2026-01-01T00:01:00Z",
+            },
+        ],
     )
     assert_not_contains("historical revise pending", stale_revise_dashboard, "revise pending")
+
+    ambiguous_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        3,
+        True,
+        {"target": 3, "exitCode": 0, "finalOutcome": "token budget guard stopped run"},
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["ambiguous-a.md"],
+                "timestampUtc": "2026-01-01T00:00:00Z",
+            },
+            {
+                "label": "autocycle-recovery",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["ambiguous-b.md"],
+                "timestampUtc": "2026-01-01T00:01:00Z",
+            },
+            {
+                "label": "autocycle-recovery-review",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["ambiguous-b.md"],
+                "timestampUtc": "2026-01-01T00:01:00Z",
+            },
+        ],
+    )
+    assert_contains("missing timestamp fallback", ambiguous_dashboard, "budget-stop; committed progress detected; recovered 1")
+    assert_not_contains("ambiguous exact total", ambiguous_dashboard, "committed 2 total")
 
     missing_root = REPOSITORY_ROOT / ".missing-rkm-self-test"
     if read_json_file(missing_root / "autopilot-state.json") != {}:
