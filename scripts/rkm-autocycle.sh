@@ -6,7 +6,10 @@ cd "$ROOT_DIR"
 
 TARGET_ACCEPTED_FILES="${1:-3}"
 CYCLE_OUTPUT="/tmp/rkm-cycle-output.txt"
+RECOVER_OUTPUT="/tmp/rkm-recover-revise-output.txt"
+REVIEW_OUTPUT="/tmp/rkm-recover-revise-review.txt"
 TAIL_LINES="${TAIL_LINES:-80}"
+LEDGER_SCRIPT="scripts/rkm-run-ledger.py"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -15,6 +18,10 @@ fail() {
 
 progress() {
   printf '[rkm-autocycle] %s\n' "$1" >&2
+}
+
+warn() {
+  printf '[rkm-autocycle] WARNING: %s\n' "$1" >&2
 }
 
 current_time() {
@@ -50,6 +57,35 @@ ensure_clean_worktree() {
   fi
 }
 
+append_ledger_log() {
+  local log_path="$1"
+  local label="$2"
+
+  if [[ ! -f "$LEDGER_SCRIPT" ]]; then
+    warn "Ledger script not found: $LEDGER_SCRIPT"
+    return 0
+  fi
+
+  if [[ ! -f "$log_path" ]]; then
+    return 0
+  fi
+
+  if ! python3 "$LEDGER_SCRIPT" append --log "$log_path" --label "$label"; then
+    warn "Ledger append failed for $log_path with label $label."
+  fi
+}
+
+print_ledger_report() {
+  if [[ ! -f "$LEDGER_SCRIPT" ]]; then
+    warn "Ledger script not found: $LEDGER_SCRIPT"
+    return 0
+  fi
+
+  if ! python3 "$LEDGER_SCRIPT" report; then
+    warn "Ledger report failed."
+  fi
+}
+
 if ! [[ "$TARGET_ACCEPTED_FILES" =~ ^[0-9]+$ ]] || [[ "$TARGET_ACCEPTED_FILES" -lt 1 ]]; then
   fail "Accepted file target must be a positive integer."
 fi
@@ -69,12 +105,23 @@ progress "Autocycle started at $(current_time)."
 while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   iteration=$((accepted_files + 1))
   iteration_start_epoch="$(current_epoch)"
+  cycle_result=0
+  recovery_result=0
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES started at $(current_time)."
 
   if bash scripts/rkm-cycle.sh 1 >"$CYCLE_OUTPUT" 2>&1; then
+    cycle_result=0
+  else
+    cycle_result=$?
+  fi
+
+  append_ledger_log "$CYCLE_OUTPUT" "autocycle-cycle"
+
+  if [[ "$cycle_result" -eq 0 ]]; then
     accepted_files=$((accepted_files + 1))
     iteration_end_epoch="$(current_epoch)"
     progress "Iteration $iteration of $TARGET_ACCEPTED_FILES accepted by rkm-cycle.sh. Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
+    git log --oneline -n 1
     continue
   fi
 
@@ -83,9 +130,19 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
 
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES entering single-file REVISE recovery at $(current_time)."
   if bash scripts/rkm-recover-revise.sh; then
+    recovery_result=0
+  else
+    recovery_result=$?
+  fi
+
+  append_ledger_log "$RECOVER_OUTPUT" "autocycle-recovery"
+  append_ledger_log "$REVIEW_OUTPUT" "autocycle-recovery-review"
+
+  if [[ "$recovery_result" -eq 0 ]]; then
     accepted_files=$((accepted_files + 1))
     iteration_end_epoch="$(current_epoch)"
     progress "Iteration $iteration of $TARGET_ACCEPTED_FILES accepted after recovery. Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
+    git log --oneline -n 1
     continue
   fi
 
@@ -97,4 +154,5 @@ done
 autocycle_end_epoch="$(current_epoch)"
 progress "Autocycle ended at $(current_time). Elapsed: $(format_elapsed "$((autocycle_end_epoch - autocycle_start_epoch))")."
 progress "Autocycle completed: $accepted_files accepted file(s) committed."
+print_ledger_report
 git status --short
