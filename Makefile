@@ -5,7 +5,7 @@ CYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
 
-.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof codex-commit clean-discovery-artifacts help
+.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -74,6 +74,9 @@ codex-commit:
 	fi
 	bash scripts/rkm-codex-commit.sh --prompt-file "$(PROMPT_FILE)" --file "$(FILE)" --message "$(MESSAGE)"
 
+recover-revise:
+	bash scripts/rkm-recover-revise.sh
+
 clean-discovery-artifacts:
 	find . -maxdepth 1 \( \
 		-type d \( -name 'rkm-discovery-report-*' -o -name 'rkm-discovery-*' \) \
@@ -92,5 +95,6 @@ help:
 	@printf '  make install-hooks               Configure Git to use hooks from .githooks.\n'
 	@printf '  make fix-eof FILE=path/to/file   Run scripts/rkm-fix-eof.sh on FILE.\n'
 	@printf '  make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"  Run scripts/rkm-codex-commit.sh with the provided prompt, file, and message.\n'
+	@printf '  make recover-revise              Run bash scripts/rkm-recover-revise.sh.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
 	@printf '  make help                        Show this help.\n'
