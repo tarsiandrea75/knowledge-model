@@ -439,7 +439,7 @@ def read_status_state(state_path: str | Path) -> tuple[dict[str, Any] | None, in
     return state, 0
 
 
-def print_budget_status(next_action_json: Any) -> None:
+def print_budget_status(next_action_json: Any, requested_target: Any) -> None:
     if not isinstance(next_action_json, dict):
         return
 
@@ -462,12 +462,13 @@ def print_budget_status(next_action_json: Any) -> None:
 
     usable = next_action_json.get("usableRemainingTokensAfterRisk")
     required = next_action_json.get("requiredBudgetForTarget")
-    target = next_action_json.get("recommendedTarget")
-    if usable is not None or required is not None or target is not None:
+    recommended_target = next_action_json.get("recommendedTarget")
+    if usable is not None or required is not None or recommended_target is not None:
         print(
             "  explanation: "
             f"usable remaining tokens after reserves are {display_value(usable)}; "
-            f"target {display_value(target)} requires {display_value(required)} tokens."
+            f"requested target {display_value(requested_target)} requires {display_value(required)} tokens; "
+            f"recommended safe target is {display_value(recommended_target)}."
         )
 
 
@@ -490,7 +491,7 @@ def print_status(state: dict[str, Any]) -> None:
     print_command_list("commands skipped", state.get("commandsSkipped"))
     print(f"exit code: {display_value(state.get('exitCode'))}")
     next_action_json = state.get("nextActionJson")
-    print_budget_status(next_action_json)
+    print_budget_status(next_action_json, state.get("target"))
     print_historical_ledger_status(next_action_json)
 
 
@@ -552,6 +553,7 @@ def assert_status_result(
     expected_exit_code: int,
     expected_stdout: Sequence[str],
     expected_stderr: Sequence[str] = (),
+    unexpected_stdout: Sequence[str] = (),
 ) -> None:
     with tempfile.TemporaryDirectory(prefix="rkm-autopilot-status-test-") as directory:
         state_path = Path(directory) / "autopilot-state.json"
@@ -570,6 +572,10 @@ def assert_status_result(
         for expected in expected_stdout:
             if expected not in actual_stdout:
                 raise AssertionError(f"{name}: expected stdout to contain {expected!r}, got {actual_stdout!r}")
+
+        for unexpected in unexpected_stdout:
+            if unexpected in actual_stdout:
+                raise AssertionError(f"{name}: expected stdout not to contain {unexpected!r}, got {actual_stdout!r}")
 
         actual_stderr = stderr.getvalue()
         for expected in expected_stderr:
@@ -710,9 +716,42 @@ def run_self_test() -> int:
             "detected status: OVER_BUDGET",
             "dailyBudgetTokens: 1000",
             "usableRemainingTokensAfterRisk: -100",
-            "target 1 requires 300 tokens",
+            "requested target 3 requires 300 tokens",
+            "recommended safe target is 1",
             "last ledger status: historical; no dirty file is pending.",
         ),
+    )
+    assert_status_result(
+        "status budget explanation uses requested target",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": False,
+                "allowRecovery": False,
+                "detectedStatus": OVER_BUDGET,
+                "nextAction": "reduce target",
+                "recommendedCommand": "make budget-report",
+                "actionSelected": "stopping without changes.",
+                "commandsPlanned": [],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "stopped without changes.",
+                "nextActionJson": {
+                    "status": OVER_BUDGET,
+                    "usableRemainingTokensAfterRisk": 100000,
+                    "recommendedTarget": 0,
+                    "requiredBudgetForTarget": 223117,
+                },
+            }
+        ),
+        0,
+        (
+            "requested target 3 requires 223117 tokens",
+            "recommended safe target is 0",
+        ),
+        unexpected_stdout=("target 0 requires 223117 tokens",),
     )
     assert_status_result(
         "status valid ready-to-autocycle state",
