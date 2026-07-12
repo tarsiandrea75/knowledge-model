@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/external-link.schema.json",
+  "title": "RKM External Link Definition",
+  "description": "Defines a lightweight navigational resource associated with a knowledge entity without treating the resource as evidence, a claim or a citation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "label",
+    "url"
+  ],
+  "properties": {
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "linkType": {
+      "$ref": "#/$defs/linkType"
+    }
+  },
+  "$defs": {
+    "linkType": {
+      "type": "string",
+      "description": "Type of resource targeted by the external link.",
+      "enum": [
+        "Documentation",
+        "Repository",
+        "Homepage",
+        "Paper",
+        "Benchmark",
+        "Dataset",
+        "Example",
+        "Other"
+      ]
+    }
+  }
+}
