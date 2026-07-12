@@ -11,6 +11,7 @@ REVIEW_OUTPUT="/tmp/rkm-recover-revise-review.txt"
 TAIL_LINES="${TAIL_LINES:-80}"
 LEDGER_SCRIPT="scripts/rkm-run-ledger.py"
 REVIEW_VERDICT_SCRIPT="scripts/rkm-review-verdict.py"
+BUDGET_SAFETY_FACTOR="${BUDGET_SAFETY_FACTOR:-1.25}"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -31,6 +32,10 @@ current_time() {
 
 current_epoch() {
   date '+%s'
+}
+
+current_utc_iso() {
+  date -u '+%Y-%m-%dT%H:%M:%SZ'
 }
 
 format_elapsed() {
@@ -134,6 +139,44 @@ print_ledger_report() {
   fi
 }
 
+run_budget_estimate() {
+  local target="$1"
+  local estimate_output
+  local estimate_result
+
+  if [[ -z "${TOKEN_BUDGET:-}" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "$LEDGER_SCRIPT" ]]; then
+    warn "Ledger script not found: $LEDGER_SCRIPT; token budget guard skipped."
+    return 0
+  fi
+
+  if estimate_output="$(
+    python3 "$LEDGER_SCRIPT" estimate \
+      --target "$target" \
+      --budget "$TOKEN_BUDGET" \
+      --since "$AUTOCYCLE_STARTED_AT_UTC" \
+      --safety-factor "$BUDGET_SAFETY_FACTOR" 2>&1
+  )"; then
+    estimate_result=0
+  else
+    estimate_result="$?"
+  fi
+
+  if [[ -n "$estimate_output" ]]; then
+    printf '%s\n' "$estimate_output"
+  fi
+
+  if [[ "$estimate_result" -eq 2 ]] && [[ "$estimate_output" == Estimation\ unavailable:* ]]; then
+    warn "Token budget estimate history is unavailable; continuing without budget guard."
+    return 0
+  fi
+
+  return "$estimate_result"
+}
+
 if ! [[ "$TARGET_ACCEPTED_FILES" =~ ^[0-9]+$ ]] || [[ "$TARGET_ACCEPTED_FILES" -lt 1 ]]; then
   fail "Accepted file target must be a positive integer."
 fi
@@ -148,7 +191,26 @@ ensure_clean_worktree
 
 accepted_files=0
 autocycle_start_epoch="$(current_epoch)"
+AUTOCYCLE_STARTED_AT_UTC="$(current_utc_iso)"
 progress "Autocycle started at $(current_time)."
+
+if [[ -n "${TOKEN_BUDGET:-}" ]]; then
+  initial_budget_result=0
+  if run_budget_estimate "$TARGET_ACCEPTED_FILES"; then
+    initial_budget_result=0
+  else
+    initial_budget_result="$?"
+  fi
+
+  if [[ "$initial_budget_result" -eq 3 ]]; then
+    printf 'ERROR: Token budget guard stopped before work: budget is insufficient for %s accepted file(s).\n' "$TARGET_ACCEPTED_FILES" >&2
+    exit 1
+  fi
+
+  if [[ "$initial_budget_result" -ne 0 ]]; then
+    fail "Token budget estimate failed before work."
+  fi
+fi
 
 while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   iteration=$((accepted_files + 1))
@@ -171,6 +233,24 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
     iteration_end_epoch="$(current_epoch)"
     progress "Iteration $iteration of $TARGET_ACCEPTED_FILES accepted by rkm-cycle.sh. Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
     git log --oneline -n 1
+    remaining_target=$((TARGET_ACCEPTED_FILES - accepted_files))
+    if [[ -n "${TOKEN_BUDGET:-}" ]] && [[ "$remaining_target" -gt 0 ]]; then
+      budget_result=0
+      if run_budget_estimate "$remaining_target"; then
+        budget_result=0
+      else
+        budget_result="$?"
+      fi
+      if [[ "$budget_result" -eq 3 ]]; then
+        printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+        print_ledger_report
+        git status --short
+        exit 1
+      fi
+      if [[ "$budget_result" -ne 0 ]]; then
+        fail "Token budget estimate failed after iteration $iteration."
+      fi
+    fi
     continue
   fi
 
@@ -215,6 +295,24 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
     iteration_end_epoch="$(current_epoch)"
     progress "Iteration $iteration of $TARGET_ACCEPTED_FILES accepted after recovery. Elapsed: $(format_elapsed "$((iteration_end_epoch - iteration_start_epoch))")."
     git log --oneline -n 1
+    remaining_target=$((TARGET_ACCEPTED_FILES - accepted_files))
+    if [[ -n "${TOKEN_BUDGET:-}" ]] && [[ "$remaining_target" -gt 0 ]]; then
+      budget_result=0
+      if run_budget_estimate "$remaining_target"; then
+        budget_result=0
+      else
+        budget_result="$?"
+      fi
+      if [[ "$budget_result" -eq 3 ]]; then
+        printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+        print_ledger_report
+        git status --short
+        exit 1
+      fi
+      if [[ "$budget_result" -ne 0 ]]; then
+        fail "Token budget estimate failed after iteration $iteration."
+      fi
+    fi
     continue
   fi
 
