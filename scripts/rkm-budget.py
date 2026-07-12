@@ -28,6 +28,7 @@ DEFAULT_RESERVE_RATIO = 0.20
 DEFAULT_WINDOW_HOURS = 24
 
 SUCCESSFUL_STATUSES = {"ACCEPTED", "RECOVERED"}
+RECOVERY_RISK_STATUSES = {"REVISE_PENDING", "FAILED", "STOPPED"}
 
 
 def utc_now() -> datetime:
@@ -184,6 +185,14 @@ def successful_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def is_recovery_risk_entry(entry: dict[str, Any]) -> bool:
+    label = entry.get("label", "")
+    label_includes_recovery = isinstance(label, str) and "recovery" in label.lower()
+    return int_field(entry, "totalTokens") > 0 and (
+        entry.get("finalStatus") in RECOVERY_RISK_STATUSES or label_includes_recovery
+    )
+
+
 def compute_budget(profile: dict[str, Any], entries: list[dict[str, Any]], target: int | None = None) -> dict[str, Any]:
     window_started = parse_utc(str(profile["windowStartedAtUtc"]), "windowStartedAtUtc")
     successful = successful_entries(entries)
@@ -210,6 +219,11 @@ def compute_budget(profile: dict[str, Any], entries: list[dict[str, Any]], targe
     reserve_ratio = float(profile["reserveRatio"])
     reserve_tokens = daily_budget * reserve_ratio
     usable_remaining = daily_budget - tokens_used_in_current_window - reserve_tokens
+    recovery_risk_reserve_tokens = max(
+        (int_field(entry, "totalTokens") for entry in entries if is_recovery_risk_entry(entry)),
+        default=0,
+    )
+    usable_remaining_after_risk = usable_remaining - recovery_risk_reserve_tokens
 
     estimated_cost = None
     if target is not None and average > 0:
@@ -217,7 +231,7 @@ def compute_budget(profile: dict[str, Any], entries: list[dict[str, Any]], targe
 
     recommended_max_target = 0
     if average > 0 and safety_factor > 0:
-        recommended_max_target = max(0, math.floor(usable_remaining / (average * safety_factor)))
+        recommended_max_target = max(0, math.floor(usable_remaining_after_risk / (average * safety_factor)))
 
     return {
         "historicalAcceptedFiles": historical_accepted_files,
@@ -227,6 +241,8 @@ def compute_budget(profile: dict[str, Any], entries: list[dict[str, Any]], targe
         "tokensUsedInCurrentWindow": tokens_used_in_current_window,
         "reserveTokens": reserve_tokens,
         "usableRemainingTokens": usable_remaining,
+        "recoveryRiskReserveTokens": recovery_risk_reserve_tokens,
+        "usableRemainingTokensAfterRisk": usable_remaining_after_risk,
         "estimatedCostForTarget": estimated_cost,
         "recommendedMaxTarget": recommended_max_target,
     }
@@ -295,7 +311,10 @@ def command_report(args: argparse.Namespace) -> int:
         f"max tokens per accepted file: {budget['maxTokensPerAcceptedFile']:.2f}",
         f"tokens used in current window: {budget['tokensUsedInCurrentWindow']}",
         f"reserve tokens: {budget['reserveTokens']:.2f}",
+        "recovery risk reserve tokens "
+        f"(derived from historical REVISE/FAILED/RECOVERY ledger entries): {budget['recoveryRiskReserveTokens']}",
         f"usable remaining tokens: {budget['usableRemainingTokens']:.2f}",
+        f"usable remaining tokens after risk reserve: {budget['usableRemainingTokensAfterRisk']:.2f}",
         f"recommended max target: {budget['recommendedMaxTarget']}",
     ]
 
@@ -333,12 +352,13 @@ def command_check(args: argparse.Namespace) -> int:
         return 2
 
     estimated = float(budget["estimatedCostForTarget"])
-    remaining = float(budget["usableRemainingTokens"])
+    remaining = float(budget["usableRemainingTokensAfterRisk"])
     suggestion = suggested_command(args.target, estimated, float(profile["safetyFactor"]))
     status = "within budget" if estimated <= remaining else "over budget"
     print(f"target: {args.target}")
     print(f"estimated cost for target: {estimated:.2f}")
-    print(f"usable remaining tokens: {remaining:.2f}")
+    print(f"usable remaining tokens after risk reserve: {remaining:.2f}")
+    print(f"recovery risk reserve tokens: {budget['recoveryRiskReserveTokens']}")
     print(f"recommended max target: {budget['recommendedMaxTarget']}")
     print(f"status: {status}")
     print(f"suggested command: {suggestion}")
@@ -478,20 +498,154 @@ def run_self_test() -> int:
             assert_true(budget["tokensUsedInCurrentWindow"] == 150, "current window token count failed")
             assert_true(budget["reserveTokens"] == 250, "reserve calculation failed")
             assert_true(budget["usableRemainingTokens"] == 600, "usable remaining calculation failed")
+            assert_true(budget["recoveryRiskReserveTokens"] == 50, "recovery risk reserve calculation failed")
+            assert_true(budget["usableRemainingTokensAfterRisk"] == 550, "usable remaining after risk calculation failed")
             assert_true(budget["estimatedCostForTarget"] == 200, "target estimate failed")
-            assert_true(budget["recommendedMaxTarget"] == 3, "recommended max target failed")
+            assert_true(budget["recommendedMaxTarget"] == 2, "recommended max target failed")
 
             report_args = argparse.Namespace(profile=str(profile_path), ledger=str(ledger_path))
             code, out, err = capture_result(command_report, report_args)
-            assert_true(code == 0 and "recommended max target: 3" in out and err == "", "report behavior failed")
+            assert_true(
+                code == 0
+                and "recovery risk reserve tokens" in out
+                and "recommended max target: 2" in out
+                and err == "",
+                "report behavior failed",
+            )
 
-            check_args = argparse.Namespace(target=3, profile=str(profile_path), ledger=str(ledger_path))
+            check_args = argparse.Namespace(target=2, profile=str(profile_path), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, check_args)
-            assert_true(code == 0 and "status: within budget" in out and "make autocycle N=3" in out and err == "", "within-budget check failed")
+            assert_true(
+                code == 0
+                and "status: within budget" in out
+                and "usable remaining tokens after risk reserve: 550.00" in out
+                and "recovery risk reserve tokens: 50" in out
+                and "make autocycle N=2" in out
+                and err == "",
+                "within-budget check failed",
+            )
 
-            over_args = argparse.Namespace(target=4, profile=str(profile_path), ledger=str(ledger_path))
+            over_args = argparse.Namespace(target=3, profile=str(profile_path), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, over_args)
             assert_true(code == 3 and "status: over budget" in out and err == "", "over-budget check failed")
+
+            no_risk_ledger = root / ".rkm" / "no-risk.jsonl"
+            write_test_ledger(
+                no_risk_ledger,
+                [
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "ACCEPTED",
+                        "acceptedFileCount": 2,
+                        "totalTokens": 200,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "RECOVERED",
+                        "acceptedFileCount": 1,
+                        "totalTokens": 100,
+                    },
+                ],
+            )
+            no_risk_budget = compute_budget(loaded, read_ledger(no_risk_ledger), target=1)
+            assert_true(no_risk_budget["recoveryRiskReserveTokens"] == 0, "no-risk reserve should be zero")
+            assert_true(
+                no_risk_budget["usableRemainingTokensAfterRisk"] == no_risk_budget["usableRemainingTokens"],
+                "no-risk remaining should preserve previous behavior",
+            )
+            assert_true(no_risk_budget["recommendedMaxTarget"] == 3, "no-risk recommended max target changed")
+
+            recovery_history_ledger = root / ".rkm" / "recovery-history.jsonl"
+            write_test_ledger(
+                recovery_history_ledger,
+                [
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "ACCEPTED",
+                        "acceptedFileCount": 2,
+                        "totalTokens": 200,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "RECOVERED",
+                        "acceptedFileCount": 1,
+                        "totalTokens": 100,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "REVISE_PENDING",
+                        "acceptedFileCount": 0,
+                        "totalTokens": 125,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "ACCEPTED",
+                        "acceptedFileCount": 1,
+                        "label": "recovery retry",
+                        "totalTokens": 175,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "FAILED",
+                        "acceptedFileCount": 0,
+                        "totalTokens": 0,
+                    },
+                ],
+            )
+            recovery_history_budget = compute_budget(loaded, read_ledger(recovery_history_ledger), target=1)
+            assert_true(
+                recovery_history_budget["recoveryRiskReserveTokens"] == 175,
+                "recovery/revise reserve should use max relevant totalTokens",
+            )
+            assert_true(
+                recovery_history_budget["recommendedMaxTarget"] < no_risk_budget["recommendedMaxTarget"],
+                "recovery risk should decrease recommended max target",
+            )
+
+            risk_profile = build_profile(
+                daily_budget_tokens=1000,
+                safety_factor=2.0,
+                reserve_ratio=0.25,
+                window_hours=24,
+                now=profile_time,
+            )
+            risk_profile_path = root / ".rkm" / "risk-budget-profile.json"
+            risk_ledger_path = root / ".rkm" / "risk-run-ledger.jsonl"
+            write_profile(risk_profile_path, risk_profile)
+            write_test_ledger(
+                risk_ledger_path,
+                [
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "ACCEPTED",
+                        "acceptedFileCount": 2,
+                        "totalTokens": 200,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "RECOVERED",
+                        "acceptedFileCount": 1,
+                        "totalTokens": 100,
+                    },
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "STOPPED",
+                        "acceptedFileCount": 0,
+                        "totalTokens": 250,
+                    },
+                ],
+            )
+            risk_check_args = argparse.Namespace(target=3, profile=str(risk_profile_path), ledger=str(risk_ledger_path))
+            code, out, err = capture_result(command_check, risk_check_args)
+            assert_true(
+                code == 3
+                and "estimated cost for target: 600.00" in out
+                and "usable remaining tokens after risk reserve: 400.00" in out
+                and "recovery risk reserve tokens: 250" in out
+                and "status: over budget" in out
+                and err == "",
+                "risk reserve over-budget check failed",
+            )
 
             missing_profile_args = argparse.Namespace(target=1, profile=str(root / "missing.json"), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, missing_profile_args)
@@ -515,7 +669,10 @@ def run_self_test() -> int:
             assert_true(after_reset["dailyBudgetTokens"] == before_reset["dailyBudgetTokens"], "reset changed dailyBudgetTokens")
             assert_true(after_reset["windowStartedAtUtc"] != before_reset["windowStartedAtUtc"], "reset did not update window")
 
-        print("Self-test passed: init, report, check, reset-window, missing cases, and recommendation math verified.")
+        print(
+            "Self-test passed: init, report, check, reset-window, missing cases, "
+            "recovery risk reserve, and recommendation math verified."
+        )
         return 0
     except AssertionError as exc:
         print(f"ERROR: self-test failed: {exc}", file=sys.stderr)
