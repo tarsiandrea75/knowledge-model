@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 TAIL_LINES="${TAIL_LINES:-80}"
+REVIEW_CONTEXT_LINES="${REVIEW_CONTEXT_LINES:-180}"
 CYCLE_OUTPUT="/tmp/rkm-cycle-output.txt"
 RECOVER_OUTPUT="/tmp/rkm-recover-revise-output.txt"
 REVIEW_OUTPUT="/tmp/rkm-recover-revise-review.txt"
@@ -68,7 +69,7 @@ create_prompt() {
   local recovery_context
 
   if [[ -f "$CYCLE_OUTPUT" ]]; then
-    recovery_context="$(cat "$CYCLE_OUTPUT")"
+    recovery_context="$(tail -n "$REVIEW_CONTEXT_LINES" "$CYCLE_OUTPUT")"
   else
     recovery_context="No prior Reviewer output was found at $CYCLE_OUTPUT."
   fi
@@ -81,7 +82,7 @@ You are recovering an RKM single-file REVISE state.
 Changed file:
 $changed_file
 
-Recovery context from the latest Reviewer output, if available:
+Recovery context from the latest Reviewer output, if available (last $REVIEW_CONTEXT_LINES lines only):
 $(printf '%s\n' "$recovery_context")
 
 Task:
