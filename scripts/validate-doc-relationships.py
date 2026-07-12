@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -36,6 +37,22 @@ INVALID_RELATIONSHIP_TRIPLES = (
     ("Framework", "SUPPORTS", "Workflow", "Framework IMPLEMENTS Workflow"),
     ("Framework", "USES", "Tool", "Framework PROVIDES Tool"),
     ("Provider", "PROVIDES", "Framework", "Provider SUPPORTS Framework"),
+)
+SELF_TEST_VALID_TRIPLES = (
+    ("Benchmark", "EVALUATES", "Reranker"),
+    ("Agent", "EXECUTES", "Workflow"),
+    ("Framework", "PROVIDES", "Component"),
+    ("Framework", "IMPLEMENTS", "Workflow"),
+    ("Framework", "PROVIDES", "Tool"),
+    ("Provider", "SUPPORTS", "Framework"),
+)
+SELF_TEST_INVALID_TRIPLES = (
+    ("Dataset", "EVALUATES", "Reranker"),
+    ("Workflow", "EXECUTES", "Agent"),
+    ("Framework", "SUPPORTS", "Component"),
+    ("Framework", "SUPPORTS", "Workflow"),
+    ("Framework", "USES", "Tool"),
+    ("Provider", "PROVIDES", "Framework"),
 )
 
 
@@ -89,7 +106,10 @@ def load_canonical_predicates(errors: list[str]) -> set[str]:
     return predicates
 
 
-def relationship_predicate_in_example(line: str) -> str | None:
+def relationship_predicate_in_example(
+    line: str,
+    canonical_predicates: set[str] | None = None,
+) -> str | None:
     candidates = []
     for match in UPPERCASE_SNAKE_CASE.finditer(line):
         before = line[: match.start()].strip()
@@ -110,6 +130,11 @@ def relationship_predicate_in_example(line: str) -> str | None:
         if re.search(r"[─-]{2,}\s*$", before) and re.search(r"^\s*[─-]{2,}", after):
             return match.group(0)
 
+    if canonical_predicates is not None:
+        for match in candidates:
+            if match.group(0) in canonical_predicates:
+                return match.group(0)
+
     return None
 
 
@@ -122,8 +147,11 @@ def clean_relationship_endpoint(value: str) -> str:
     return cleaned.strip()
 
 
-def relationship_triple_in_example(line: str) -> tuple[str, str, str] | None:
-    predicate = relationship_predicate_in_example(line)
+def relationship_triple_in_example(
+    line: str,
+    canonical_predicates: set[str] | None = None,
+) -> tuple[str, str, str] | None:
+    predicate = relationship_predicate_in_example(line, canonical_predicates)
     if predicate is None:
         return None
 
@@ -159,9 +187,10 @@ def validate_relationship_triple(
     path: Path,
     line_number: int,
     line: str,
+    canonical_predicates: set[str],
     errors: list[str],
 ) -> None:
-    triple = relationship_triple_in_example(line)
+    triple = relationship_triple_in_example(line, canonical_predicates)
     if triple is None:
         return
 
@@ -186,12 +215,12 @@ def validate_fenced_line(
     if line_is_ignored(line):
         return
 
-    predicate = relationship_predicate_in_example(line)
+    predicate = relationship_predicate_in_example(line, canonical_predicates)
     if predicate is None:
         return
 
     if predicate in canonical_predicates:
-        validate_relationship_triple(path, line_number, line, errors)
+        validate_relationship_triple(path, line_number, line, canonical_predicates, errors)
     else:
         errors.append(
             f"{display(path)}:{line_number}: unknown relationship predicate {predicate}"
@@ -273,7 +302,102 @@ def validate_markdown_file(
             )
 
 
-def main() -> int:
+def run_self_test() -> int:
+    errors: list[str] = []
+    self_test_path = ARCHITECTURE_DOCS / "self-test.md"
+    canonical_predicates = {
+        predicate
+        for _, predicate, _ in SELF_TEST_VALID_TRIPLES + SELF_TEST_INVALID_TRIPLES
+    }
+
+    for line_number, expected_triple in enumerate(SELF_TEST_VALID_TRIPLES, start=1):
+        line = " ".join(expected_triple)
+        parsed = relationship_triple_in_example(line, canonical_predicates)
+        if parsed != expected_triple:
+            errors.append(
+                f"self-test valid case {line!r}: parsed {parsed!r}, "
+                f"expected {expected_triple!r}"
+            )
+            continue
+
+        case_errors: list[str] = []
+        validate_fenced_line(
+            self_test_path,
+            line_number,
+            line,
+            canonical_predicates,
+            case_errors,
+        )
+        if case_errors:
+            errors.append(
+                f"self-test valid case {line!r}: expected no errors, got "
+                f"{case_errors!r}"
+            )
+
+    first_invalid_line_number = len(SELF_TEST_VALID_TRIPLES) + 1
+    for offset, expected_triple in enumerate(SELF_TEST_INVALID_TRIPLES):
+        line_number = first_invalid_line_number + offset
+        line = " ".join(expected_triple)
+        parsed = relationship_triple_in_example(line, canonical_predicates)
+        if parsed != expected_triple:
+            errors.append(
+                f"self-test invalid case {line!r}: parsed {parsed!r}, "
+                f"expected {expected_triple!r}"
+            )
+            continue
+
+        case_errors: list[str] = []
+        validate_fenced_line(
+            self_test_path,
+            line_number,
+            line,
+            canonical_predicates,
+            case_errors,
+        )
+        if len(case_errors) != 1:
+            errors.append(
+                f"self-test invalid case {line!r}: expected one error, got "
+                f"{case_errors!r}"
+            )
+            continue
+
+        expected_message = f"invalid relationship triple {line}; prefer "
+        if expected_message not in case_errors[0]:
+            errors.append(
+                f"self-test invalid case {line!r}: error did not include "
+                f"{expected_message!r}: {case_errors[0]!r}"
+            )
+
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}", file=sys.stderr)
+        return 1
+
+    print(
+        "Documentation relationship self-test passed: "
+        f"{len(SELF_TEST_VALID_TRIPLES)} valid cases, "
+        f"{len(SELF_TEST_INVALID_TRIPLES)} invalid cases"
+    )
+    return 0
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Validate architecture documentation relationship predicate mentions."
+    )
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        help="run synthetic parser and semantic guardrail checks without reading docs",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+    if args.self_test:
+        return run_self_test()
+
     errors: list[str] = []
     canonical_predicates = load_canonical_predicates(errors)
 
