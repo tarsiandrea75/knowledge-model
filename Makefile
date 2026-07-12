@@ -2,10 +2,11 @@ SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
 
 CYCLE_N := $(or $(N),3)
+AUTOCYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
 
-.PHONY: validate status log cycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -25,6 +26,9 @@ cycle:
 	tail -n "$(TAIL_LINES)" /tmp/rkm-cycle-output.txt; \
 	git status --short; \
 	exit "$$exit_code"
+
+autocycle:
+	bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
 
 discover:
 	set +e; \
@@ -89,6 +93,7 @@ help:
 	@printf '  make status                      Show git status --short.\n'
 	@printf '  make log                         Show the 10 most recent commits.\n'
 	@printf '  make cycle [N=3]                 Run scripts/rkm-cycle.sh N, save stdout to /tmp/rkm-cycle-output.txt, print exit code, output tail, and status.\n'
+	@printf '  make autocycle [N=3]             Run bash scripts/rkm-autocycle.sh N.\n'
 	@printf '  make discover [N=5]              Run scripts/rkm-discover.sh N, save stdout to /tmp/rkm-discovery-output.txt, keep stderr visible, print exit code, output tail, and status.\n'
 	@printf '  make push                        Run git push.\n'
 	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
