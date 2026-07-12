@@ -52,4 +52,7 @@ printf '==> Running validate-doc-relationships self-test\n'
 printf '==> Running validate-schema-prerequisites self-test\n'
 "$PYTHON_BIN" scripts/validate-schema-prerequisites.py --self-test
 
+printf '==> Running validate-schema-contracts self-test\n'
+"$PYTHON_BIN" scripts/validate-schema-contracts.py --self-test
+
 printf 'SUCCESS: RKM unit tests passed.\n'

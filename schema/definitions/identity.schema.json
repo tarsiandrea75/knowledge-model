@@ -19,7 +19,7 @@
       "type": "string",
       "title": "Stable Identifier",
       "description": "Globally unique immutable identifier.",
-      "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$",
+      "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4,}$",
       "examples": [
         "TECHNIQUE-0001",
         "FRAMEWORK-0003",
