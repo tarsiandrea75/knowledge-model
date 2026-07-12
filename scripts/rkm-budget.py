@@ -255,6 +255,10 @@ def suggested_command(target: int, estimated_cost: float, safety_factor: float) 
     )
 
 
+def estimated_cost_for_target(average_tokens_per_file: float, target: int, safety_factor: float) -> float:
+    return average_tokens_per_file * target * safety_factor
+
+
 def missing_profile_message(profile_path: Path, repo_root: Path = REPOSITORY_ROOT) -> str:
     return (
         f"Budget profile is missing: {repository_relative(profile_path, repo_root)}\n"
@@ -351,18 +355,35 @@ def command_check(args: argparse.Namespace) -> int:
         print(missing_history_message(ledger_path), file=sys.stderr)
         return 2
 
+    safety_factor = float(profile["safetyFactor"])
     estimated = float(budget["estimatedCostForTarget"])
     remaining = float(budget["usableRemainingTokensAfterRisk"])
-    suggestion = suggested_command(args.target, estimated, float(profile["safetyFactor"]))
-    status = "within budget" if estimated <= remaining else "over budget"
+    recommended_max_target = int(budget["recommendedMaxTarget"])
+    is_within_budget = estimated <= remaining
+    status = "within budget" if is_within_budget else "over budget"
     print(f"target: {args.target}")
     print(f"estimated cost for target: {estimated:.2f}")
     print(f"usable remaining tokens after risk reserve: {remaining:.2f}")
     print(f"recovery risk reserve tokens: {budget['recoveryRiskReserveTokens']}")
-    print(f"recommended max target: {budget['recommendedMaxTarget']}")
+    print(f"recommended max target: {recommended_max_target}")
     print(f"status: {status}")
-    print(f"suggested command: {suggestion}")
-    return 0 if estimated <= remaining else 3
+    if is_within_budget:
+        print(f"suggested command: {suggested_command(args.target, estimated, safety_factor)}")
+        return 0
+
+    print(f"required budget for target: {math.ceil(estimated)}")
+    print("safe action: reset the window, increase the daily budget, or choose a target <= recommended max target.")
+    if recommended_max_target > 0:
+        recommended_estimated = estimated_cost_for_target(
+            float(budget["averageTokensPerAcceptedFile"]),
+            recommended_max_target,
+            safety_factor,
+        )
+        print(
+            "suggested command: "
+            f"{suggested_command(recommended_max_target, recommended_estimated, safety_factor)}"
+        )
+    return 3
 
 
 def command_reset_window(args: argparse.Namespace) -> int:
@@ -520,14 +541,23 @@ def run_self_test() -> int:
                 and "status: within budget" in out
                 and "usable remaining tokens after risk reserve: 550.00" in out
                 and "recovery risk reserve tokens: 50" in out
-                and "make autocycle N=2" in out
+                and "suggested command: make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2" in out
                 and err == "",
                 "within-budget check failed",
             )
 
             over_args = argparse.Namespace(target=3, profile=str(profile_path), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, over_args)
-            assert_true(code == 3 and "status: over budget" in out and err == "", "over-budget check failed")
+            assert_true(
+                code == 3
+                and "status: over budget" in out
+                and "required budget for target: 600" in out
+                and "safe action: reset the window, increase the daily budget" in out
+                and "suggested command: make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2" in out
+                and "make autocycle N=3" not in out
+                and err == "",
+                "over-budget check with safe recommended target failed",
+            )
 
             no_risk_ledger = root / ".rkm" / "no-risk.jsonl"
             write_test_ledger(
@@ -643,8 +673,61 @@ def run_self_test() -> int:
                 and "usable remaining tokens after risk reserve: 400.00" in out
                 and "recovery risk reserve tokens: 250" in out
                 and "status: over budget" in out
+                and "required budget for target: 600" in out
+                and "suggested command: make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2" in out
+                and "make autocycle N=3" not in out
                 and err == "",
                 "risk reserve over-budget check failed",
+            )
+
+            exhausted_profile = build_profile(
+                daily_budget_tokens=1000,
+                safety_factor=2.0,
+                reserve_ratio=0.25,
+                window_hours=24,
+                now=profile_time,
+            )
+            exhausted_profile_path = root / ".rkm" / "exhausted-budget-profile.json"
+            exhausted_ledger_path = root / ".rkm" / "exhausted-run-ledger.jsonl"
+            write_profile(exhausted_profile_path, exhausted_profile)
+            write_test_ledger(
+                exhausted_ledger_path,
+                [
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "ACCEPTED",
+                        "acceptedFileCount": 2,
+                        "totalTokens": 200,
+                    },
+                    {
+                        "timestampUtc": current_entry_time,
+                        "finalStatus": "RECOVERED",
+                        "acceptedFileCount": 1,
+                        "totalTokens": 100,
+                    },
+                    {
+                        "timestampUtc": old_entry_time,
+                        "finalStatus": "STOPPED",
+                        "acceptedFileCount": 0,
+                        "totalTokens": 700,
+                    },
+                ],
+            )
+            exhausted_check_args = argparse.Namespace(
+                target=1,
+                profile=str(exhausted_profile_path),
+                ledger=str(exhausted_ledger_path),
+            )
+            code, out, err = capture_result(command_check, exhausted_check_args)
+            assert_true(
+                code == 3
+                and "status: over budget" in out
+                and "recommended max target: 0" in out
+                and "required budget for target: 200" in out
+                and "safe action: reset the window, increase the daily budget" in out
+                and "make autocycle" not in out
+                and err == "",
+                "over-budget check with no safe target failed",
             )
 
             missing_profile_args = argparse.Namespace(target=1, profile=str(root / "missing.json"), ledger=str(ledger_path))
