@@ -1,0 +1,504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/capability.schema.json",
+  "title": "RKM Embedded Capability Fragment Definition",
+  "description": "Defines a reusable embedded capability fragment for bounded functions, behaviors or serviceable abilities represented inside first-class RKM entities. This schema does not provide the full knowledge entity envelope for a Capability: it intentionally omits first-class identity, metadata, description and top-level relationships. A complete first-class Capability entity schema must be introduced separately after shared identity, registry and relationship support exists for Capability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capabilityType",
+    "statement",
+    "boundary",
+    "scope"
+  ],
+  "properties": {
+    "capabilityId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded capability fragment within the containing entity, tool contract, workflow, comparison or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the capability.",
+      "minLength": 1
+    },
+    "capabilityType": {
+      "$ref": "#/$defs/capabilityType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise action-oriented statement of the bounded behavior represented by the capability.",
+      "minLength": 1
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Artifacts, values or signals consumed by the capability.",
+      "items": {
+        "$ref": "#/$defs/capabilityPort"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Artifacts, values or signals produced by the capability.",
+      "items": {
+        "$ref": "#/$defs/capabilityPort"
+      },
+      "uniqueItems": true
+    },
+    "providers": {
+      "type": "array",
+      "description": "Entities that provide, expose, implement, support, use or require this capability.",
+      "items": {
+        "$ref": "#/$defs/capabilityProvider"
+      },
+      "uniqueItems": true
+    },
+    "qualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes relevant to selecting, evaluating or governing this capability.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Conditions or limits that bound when the capability applies.",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern use, exposure or evaluation of this capability.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare this capability.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the capability boundary, scope or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the capability.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "capabilityType": {
+      "type": "string",
+      "description": "Primary behavior represented by the capability.",
+      "enum": [
+        "Retrieval Capability",
+        "Ranking Capability",
+        "Embedding Capability",
+        "Chunking Capability",
+        "Parsing Capability",
+        "Generation Capability",
+        "Evaluation Capability",
+        "Routing Capability",
+        "Transformation Capability",
+        "Storage Capability",
+        "Orchestration Capability",
+        "Monitoring Capability",
+        "Governance Capability",
+        "Security Capability",
+        "Operational Capability",
+        "Other"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Behavioral boundary of the capability.",
+      "additionalProperties": false,
+      "required": [
+        "behavior"
+      ],
+      "properties": {
+        "behavior": {
+          "type": "string",
+          "description": "Specific function or behavior made available by the capability.",
+          "minLength": 1
+        },
+        "includedResponsibilities": {
+          "type": "array",
+          "description": "Responsibilities that are inside the capability boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "excludedResponsibilities": {
+          "type": "array",
+          "description": "Responsibilities that are explicitly outside the capability boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evaluationBasis": {
+          "type": "string",
+          "description": "How the capability can be assessed or compared.",
+          "minLength": 1
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "Where and how the capability applies.",
+      "additionalProperties": false,
+      "properties": {
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the capability applies.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "artifactTypes": {
+          "type": "array",
+          "description": "Artifact types to which the capability applies.",
+          "items": {
+            "$ref": "#/$defs/artifactType"
+          },
+          "uniqueItems": true
+        },
+        "inputModalities": {
+          "type": "array",
+          "description": "Input modalities supported by the capability.",
+          "items": {
+            "$ref": "#/$defs/modality"
+          },
+          "uniqueItems": true
+        },
+        "deploymentModels": {
+          "type": "array",
+          "description": "Deployment models where the capability is available or relevant.",
+          "items": {
+            "$ref": "#/$defs/deploymentModel"
+          },
+          "uniqueItems": true
+        },
+        "accessModel": {
+          "$ref": "#/$defs/accessModel"
+        },
+        "runtimeEnvironments": {
+          "type": "array",
+          "description": "Runtime environments where the capability can operate.",
+          "items": {
+            "$ref": "#/$defs/runtimeEnvironment"
+          },
+          "uniqueItems": true
+        },
+        "evaluationContext": {
+          "type": "string",
+          "description": "Context in which the capability should be evaluated.",
+          "minLength": 1
+        }
+      }
+    },
+    "capabilityPort": {
+      "type": "object",
+      "description": "A structured input or output of a capability.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "artifactType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Stable port name.",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable port label.",
+          "minLength": 1
+        },
+        "artifactType": {
+          "$ref": "#/$defs/artifactType"
+        },
+        "artifact": {
+          "$ref": "artifact.schema.json"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the port is required for the capability boundary.",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the port semantics.",
+          "minLength": 1
+        }
+      }
+    },
+    "capabilityProvider": {
+      "type": "object",
+      "description": "Entity role associated with making the capability available or using it.",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "entity"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "Provides",
+            "Exposes",
+            "Implements",
+            "Supports",
+            "Uses",
+            "Requires",
+            "Evaluates",
+            "Governs"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "availability": {
+          "type": "string",
+          "enum": [
+            "Generally Available",
+            "Preview",
+            "Experimental",
+            "Deprecated",
+            "Limited",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "description": "Condition, dependency or limit that constrains the capability.",
+      "additionalProperties": false,
+      "required": [
+        "constraintType",
+        "description"
+      ],
+      "properties": {
+        "constraintType": {
+          "type": "string",
+          "enum": [
+            "Provider Dependency",
+            "Framework Integration",
+            "Runtime Environment",
+            "Data Format",
+            "Corpus Type",
+            "Modality",
+            "Latency Budget",
+            "Cost Budget",
+            "Access Requirement",
+            "Governance Requirement",
+            "Evaluation Context",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "description": "Known RKM entity type or architecture concept for the referenced target.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Glossary",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Policy",
+            "Artifact",
+            "Other"
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "artifactType": {
+      "type": "string",
+      "enum": [
+        "Source Document",
+        "Parsed Document",
+        "Chunk",
+        "Embedding Vector",
+        "Metadata Record",
+        "Query",
+        "Transformed Query",
+        "Retrieval Result",
+        "Ranked Result",
+        "Context Package",
+        "Prompt",
+        "Generated Answer",
+        "Citation Set",
+        "Evaluation Result",
+        "Execution Trace",
+        "Feedback Signal",
+        "Policy Decision",
+        "Configuration Snapshot",
+        "Other"
+      ]
+    },
+    "modality": {
+      "type": "string",
+      "enum": [
+        "Text",
+        "Image",
+        "Audio",
+        "Video",
+        "Code",
+        "Structured Data",
+        "Graph",
+        "Mixed",
+        "Other"
+      ]
+    },
+    "deploymentModel": {
+      "type": "string",
+      "enum": [
+        "Local",
+        "Self Hosted",
+        "Managed Service",
+        "Cloud",
+        "Hybrid",
+        "Edge",
+        "Embedded",
+        "Unknown"
+      ]
+    },
+    "accessModel": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "Authenticated",
+        "Authorized",
+        "Tenant Scoped",
+        "Provider Managed",
+        "Human Approved",
+        "Restricted",
+        "Unknown"
+      ]
+    },
+    "runtimeEnvironment": {
+      "type": "string",
+      "enum": [
+        "Application Runtime",
+        "Agent Runtime",
+        "Workflow Runtime",
+        "Database Runtime",
+        "Model Serving Runtime",
+        "Evaluation Harness",
+        "Command Line",
+        "Managed Platform",
+        "Other"
+      ]
+    }
+  }
+}
