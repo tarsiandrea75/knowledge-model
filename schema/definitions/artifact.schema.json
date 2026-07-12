@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/artifact.schema.json",
+  "title": "RKM Artifact Definition",
+  "description": "Defines a reusable structured artifact consumed, produced, transformed, stored or evaluated during a RAG process.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifactType",
+    "lifecycleRoles"
+  ],
+  "properties": {
+    "artifactId": {
+      "type": "string",
+      "description": "Stable local identifier for the artifact within the containing entity, workflow, execution trace or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable artifact name.",
+      "minLength": 1
+    },
+    "artifactType": {
+      "$ref": "#/$defs/artifactType"
+    },
+    "lifecycleRoles": {
+      "type": "array",
+      "description": "Process roles played by the artifact.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/lifecycleRole"
+      },
+      "uniqueItems": true
+    },
+    "description": {
+      "type": "string",
+      "description": "Explanation of the artifact boundary and RAG-relevant semantics.",
+      "minLength": 1
+    },
+    "contentFormat": {
+      "$ref": "#/$defs/contentFormat"
+    },
+    "schemaReference": {
+      "type": "string",
+      "description": "URI or local reference to a schema that defines the artifact shape.",
+      "minLength": 1
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "persistence": {
+      "$ref": "#/$defs/persistence"
+    },
+    "qualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes relevant to producing, consuming, evaluating or storing this artifact.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources associated with the artifact when it carries citations, source lineage or evidence links.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "sensitivity": {
+      "$ref": "#/$defs/sensitivity"
+    },
+    "retention": {
+      "$ref": "#/$defs/retention"
+    }
+  },
+  "$defs": {
+    "artifactType": {
+      "type": "string",
+      "description": "Primary semantic role of the artifact.",
+      "enum": [
+        "Source Document",
+        "Parsed Document",
+        "Chunk",
+        "Embedding Vector",
+        "Metadata Record",
+        "Query",
+        "Transformed Query",
+        "Retrieval Result",
+        "Ranked Result",
+        "Context Package",
+        "Prompt",
+        "Generated Answer",
+        "Citation Set",
+        "Evaluation Result",
+        "Execution Trace",
+        "Feedback Signal",
+        "Policy Decision",
+        "Configuration Snapshot",
+        "Other"
+      ]
+    },
+    "lifecycleRole": {
+      "type": "string",
+      "description": "Role the artifact plays in a RAG process.",
+      "enum": [
+        "Input",
+        "Output",
+        "Intermediate",
+        "Persisted Record",
+        "Derived Record",
+        "Evaluation Target",
+        "Evidence Source",
+        "Audit Record"
+      ]
+    },
+    "contentFormat": {
+      "type": "string",
+      "description": "Physical or logical representation of the artifact content.",
+      "enum": [
+        "Text",
+        "Markdown",
+        "HTML",
+        "JSON",
+        "JSONL",
+        "CSV",
+        "PDF",
+        "Image",
+        "Audio",
+        "Video",
+        "Vector",
+        "Graph",
+        "Trace",
+        "Mixed",
+        "Other"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Origin and production context for the artifact.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "producerEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "consumerEntities": {
+          "type": "array",
+          "description": "Entities known to consume the artifact.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "workflowStep": {
+          "type": "string",
+          "description": "Stable local workflow step identifier that produced or transformed the artifact.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "toolInvocation": {
+          "type": "string",
+          "description": "Stable local tool invocation identifier associated with the artifact.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the artifact was created, when known.",
+          "format": "date-time"
+        },
+        "parameters": {
+          "type": "array",
+          "description": "Important parameters that affected artifact production or transformation.",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "persistence": {
+      "type": "object",
+      "description": "Whether and how the artifact is stored or reused.",
+      "additionalProperties": false,
+      "required": [
+        "persistenceType"
+      ],
+      "properties": {
+        "persistenceType": {
+          "type": "string",
+          "enum": [
+            "Transient",
+            "Persistent",
+            "Cached",
+            "Indexed",
+            "Archived",
+            "Unknown"
+          ]
+        },
+        "storageLocation": {
+          "type": "string",
+          "description": "Logical storage location, repository path, service name or index name when known.",
+          "minLength": 1
+        },
+        "versioned": {
+          "type": "boolean",
+          "description": "Whether the artifact is versioned.",
+          "default": false
+        },
+        "reusable": {
+          "type": "boolean",
+          "description": "Whether the artifact is intended for reuse across executions, entities or evaluations.",
+          "default": false
+        }
+      }
+    },
+    "sensitivity": {
+      "type": "object",
+      "description": "Access, privacy and governance sensitivity for the artifact.",
+      "additionalProperties": false,
+      "properties": {
+        "containsSensitiveData": {
+          "type": "boolean",
+          "default": false
+        },
+        "accessLevel": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Internal",
+            "Restricted",
+            "Confidential",
+            "Unknown"
+          ]
+        },
+        "governanceNotes": {
+          "type": "string",
+          "description": "Governance considerations that affect artifact use, storage, sharing or deletion.",
+          "minLength": 1
+        }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "description": "Retention and deletion expectations for persistent artifacts.",
+      "additionalProperties": false,
+      "properties": {
+        "retentionPolicy": {
+          "type": "string",
+          "description": "Named retention policy or rule.",
+          "minLength": 1
+        },
+        "retentionDuration": {
+          "type": "string",
+          "description": "ISO 8601 duration or human-readable duration when formal duration is not available.",
+          "minLength": 1
+        },
+        "deletionRequired": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Array",
+            "Object",
+            "URI",
+            "Date Time",
+            "Duration"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
