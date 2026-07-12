@@ -1,0 +1,599 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/memory.schema.json",
+  "title": "RKM Embedded Memory Strategy Definition",
+  "description": "Defines a reusable embedded memory strategy fragment for retained state that affects retrieval, generation, grounding, evaluation, personalization or governance in RAG systems. This schema does not provide the full knowledge entity envelope for Memory: it intentionally omits first-class identity, metadata, description and top-level relationships. A complete first-class Memory entity schema must be introduced separately after shared identity, registry and relationship support exists for Memory.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "memoryType",
+    "scope",
+    "persistence",
+    "boundary"
+  ],
+  "properties": {
+    "memoryId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded memory strategy within the containing entity, workflow, agent, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the memory strategy.",
+      "minLength": 1
+    },
+    "memoryType": {
+      "$ref": "#/$defs/memoryType"
+    },
+    "scope": {
+      "$ref": "#/$defs/memoryScope"
+    },
+    "persistence": {
+      "$ref": "#/$defs/persistence"
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "retainedState": {
+      "type": "array",
+      "description": "Kinds of state retained by the memory strategy.",
+      "items": {
+        "$ref": "#/$defs/stateItem"
+      },
+      "uniqueItems": true
+    },
+    "readBehavior": {
+      "$ref": "#/$defs/readBehavior"
+    },
+    "writeBehavior": {
+      "$ref": "#/$defs/writeBehavior"
+    },
+    "storage": {
+      "$ref": "#/$defs/storage"
+    },
+    "lifecycle": {
+      "$ref": "#/$defs/lifecycle"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    },
+    "qualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes affected by the memory strategy.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare this memory strategy.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the memory boundary, behavior or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the memory strategy.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Limitations or failure modes associated with the memory strategy.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "tradeoffs": {
+      "type": "array",
+      "description": "Tradeoffs introduced by using this memory strategy.",
+      "items": {
+        "$ref": "tradeoff.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "memoryType": {
+      "type": "string",
+      "description": "Dominant kind of retained state represented by the memory strategy.",
+      "enum": [
+        "Conversation History",
+        "Retrieved Context",
+        "User Preference",
+        "User Fact",
+        "Task State",
+        "Intermediate Plan",
+        "Tool Output",
+        "Feedback Signal",
+        "Evaluation Trace",
+        "Policy State",
+        "Cache",
+        "Index State",
+        "Other"
+      ]
+    },
+    "memoryScope": {
+      "type": "string",
+      "description": "Where the retained state applies.",
+      "enum": [
+        "Step Local",
+        "Workflow Local",
+        "Session",
+        "Conversation",
+        "User",
+        "Tenant",
+        "Application",
+        "Corpus",
+        "Global",
+        "Unknown"
+      ]
+    },
+    "persistence": {
+      "type": "object",
+      "description": "Retention duration and persistence semantics for the memory strategy.",
+      "additionalProperties": false,
+      "required": [
+        "persistenceLevel"
+      ],
+      "properties": {
+        "persistenceLevel": {
+          "type": "string",
+          "enum": [
+            "Ephemeral",
+            "Turn",
+            "Session",
+            "Time Limited",
+            "User Controlled",
+            "Durable",
+            "Versioned",
+            "Unknown"
+          ]
+        },
+        "retentionPeriod": {
+          "type": "string",
+          "description": "Human-readable retention period or policy reference when known.",
+          "minLength": 1
+        },
+        "expiresAutomatically": {
+          "type": "boolean",
+          "description": "Whether memory expires without manual intervention.",
+          "default": false
+        },
+        "userDeletable": {
+          "type": "boolean",
+          "description": "Whether an affected user can delete retained memory.",
+          "default": false
+        },
+        "versioned": {
+          "type": "boolean",
+          "description": "Whether memory revisions are retained as versions.",
+          "default": false
+        }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Boundary of what the memory strategy may retain, expose, update or delete.",
+      "additionalProperties": false,
+      "required": [
+        "eligibleState"
+      ],
+      "properties": {
+        "eligibleState": {
+          "type": "array",
+          "description": "State that may be retained by this strategy.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "excludedState": {
+          "type": "array",
+          "description": "State that must not be retained by this strategy.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "readers": {
+          "type": "array",
+          "description": "Actors, components or workflows allowed to read the memory.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "writers": {
+          "type": "array",
+          "description": "Actors, components or workflows allowed to write the memory.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "deleters": {
+          "type": "array",
+          "description": "Actors, components or workflows allowed to delete or expire memory.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "boundaryNotes": {
+          "type": "string",
+          "description": "Additional explanation of memory boundaries that cannot be expressed structurally.",
+          "minLength": 1
+        }
+      }
+    },
+    "stateItem": {
+      "type": "object",
+      "description": "A semantically meaningful item of retained state.",
+      "additionalProperties": false,
+      "required": [
+        "stateType",
+        "semanticRole"
+      ],
+      "properties": {
+        "stateType": {
+          "$ref": "#/$defs/stateType"
+        },
+        "semanticRole": {
+          "type": "string",
+          "description": "Role the retained state plays in RAG behavior.",
+          "minLength": 1
+        },
+        "artifactReference": {
+          "$ref": "artifact.schema.json"
+        },
+        "sourceEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "sensitivity": {
+          "$ref": "#/$defs/sensitivity"
+        }
+      }
+    },
+    "stateType": {
+      "type": "string",
+      "enum": [
+        "User Query",
+        "Conversation Turn",
+        "Summary",
+        "Preference",
+        "Fact",
+        "Retrieved Chunk",
+        "Citation",
+        "Plan",
+        "Tool Result",
+        "Evaluation Result",
+        "Policy Decision",
+        "Trace Event",
+        "Embedding",
+        "Index Entry",
+        "Other"
+      ]
+    },
+    "readBehavior": {
+      "type": "object",
+      "description": "How retained memory is retrieved or exposed for use.",
+      "additionalProperties": false,
+      "properties": {
+        "retrievalTrigger": {
+          "type": "string",
+          "description": "Condition that causes memory to be read.",
+          "minLength": 1
+        },
+        "relevanceCriteria": {
+          "type": "array",
+          "description": "Criteria used to decide whether retained memory is relevant.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "rankingMethod": {
+          "type": "string",
+          "description": "Method used to rank retrieved memory when multiple records match.",
+          "minLength": 1
+        },
+        "maximumRetrievedItems": {
+          "type": "integer",
+          "description": "Maximum number of memory items returned for a read.",
+          "minimum": 1
+        },
+        "fallbackBehavior": {
+          "type": "string",
+          "description": "Behavior when no usable memory is found.",
+          "minLength": 1
+        },
+        "accessControl": {
+          "$ref": "#/$defs/accessControl"
+        }
+      }
+    },
+    "writeBehavior": {
+      "type": "object",
+      "description": "How retained memory is created, updated, summarized or rejected.",
+      "additionalProperties": false,
+      "properties": {
+        "writeTrigger": {
+          "type": "string",
+          "description": "Condition that causes memory to be written.",
+          "minLength": 1
+        },
+        "approvalRequirement": {
+          "type": "string",
+          "enum": [
+            "None",
+            "User Approval",
+            "Human Reviewer Approval",
+            "Policy Approval",
+            "Automated Validation",
+            "Unknown"
+          ]
+        },
+        "deduplicationBehavior": {
+          "type": "string",
+          "description": "How duplicate or near-duplicate memory records are handled.",
+          "minLength": 1
+        },
+        "conflictResolution": {
+          "type": "string",
+          "description": "How conflicting memory records are resolved.",
+          "minLength": 1
+        },
+        "summarizationBehavior": {
+          "type": "string",
+          "description": "How memory is summarized or compressed before storage.",
+          "minLength": 1
+        },
+        "validationRules": {
+          "type": "array",
+          "description": "Rules applied before memory is written.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "description": "Storage dependencies and representation details for retained memory.",
+      "additionalProperties": false,
+      "properties": {
+        "storageType": {
+          "type": "string",
+          "enum": [
+            "In Process",
+            "File",
+            "Relational Database",
+            "Document Database",
+            "Vector Database",
+            "Graph Database",
+            "Object Storage",
+            "Cache",
+            "External Service",
+            "Other",
+            "Unknown"
+          ]
+        },
+        "storageEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "representation": {
+          "type": "string",
+          "enum": [
+            "Raw Text",
+            "Summary",
+            "Structured Record",
+            "Embedding",
+            "Graph Node",
+            "Graph Edge",
+            "Trace",
+            "Mixed",
+            "Other",
+            "Unknown"
+          ]
+        },
+        "indexingStrategy": {
+          "type": "string",
+          "description": "How retained memory is indexed or made searchable.",
+          "minLength": 1
+        },
+        "encryption": {
+          "type": "string",
+          "description": "Encryption or protection approach for stored memory when known.",
+          "minLength": 1
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "description": "Creation, update, correction and expiration lifecycle for memory.",
+      "additionalProperties": false,
+      "properties": {
+        "creationPolicy": {
+          "type": "string",
+          "description": "Policy or rule for creating memory records.",
+          "minLength": 1
+        },
+        "updatePolicy": {
+          "type": "string",
+          "description": "Policy or rule for updating memory records.",
+          "minLength": 1
+        },
+        "correctionPolicy": {
+          "type": "string",
+          "description": "Policy or rule for correcting inaccurate memory records.",
+          "minLength": 1
+        },
+        "expirationPolicy": {
+          "type": "string",
+          "description": "Policy or rule for expiring memory records.",
+          "minLength": 1
+        },
+        "auditability": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Basic",
+            "Detailed",
+            "Evidence Linked",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "description": "Governance, privacy and policy constraints for memory use.",
+      "additionalProperties": false,
+      "properties": {
+        "policies": {
+          "type": "array",
+          "description": "Embedded policy fragments that govern memory retention, access or use.",
+          "items": {
+            "$ref": "policy.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "requiresConsent": {
+          "type": "boolean",
+          "description": "Whether memory use requires consent from an affected user or actor.",
+          "default": false
+        },
+        "containsSensitiveData": {
+          "type": "boolean",
+          "description": "Whether retained memory may contain sensitive data.",
+          "default": false
+        },
+        "dataResidencyConstraint": {
+          "type": "string",
+          "description": "Region, jurisdiction or residency constraint that applies to memory.",
+          "minLength": 1
+        },
+        "governanceNotes": {
+          "type": "string",
+          "description": "Additional governance considerations for memory behavior.",
+          "minLength": 1
+        }
+      }
+    },
+    "sensitivity": {
+      "type": "object",
+      "description": "Sensitivity classification for retained state.",
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Internal",
+            "Restricted",
+            "Confidential",
+            "Unknown"
+          ]
+        },
+        "containsPersonalData": {
+          "type": "boolean",
+          "default": false
+        },
+        "containsProprietaryData": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "accessControl": {
+      "type": "object",
+      "description": "Access-control requirements for reading memory.",
+      "additionalProperties": false,
+      "properties": {
+        "accessModel": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Authenticated",
+            "Role Based",
+            "Attribute Based",
+            "Owner Only",
+            "Tenant Scoped",
+            "Policy Evaluated",
+            "Unknown"
+          ]
+        },
+        "authorizationNotes": {
+          "type": "string",
+          "description": "Additional authorization constraints.",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity or local participant involved in memory behavior.",
+      "additionalProperties": false,
+      "required": [
+        "entityId"
+      ],
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "description": "Stable RKM entity identifier or local participant identifier.",
+          "minLength": 1
+        },
+        "entityType": {
+          "type": "string",
+          "description": "Known RKM entity type for the referenced entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Glossary",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "description": "Role played by the referenced entity in memory behavior.",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
