@@ -42,6 +42,7 @@ class RepoSnapshot:
     latest_ledger_final_status: str | None
     latest_ledger_entries: list[dict[str, Any]]
     budget_check: CommandResult | None
+    budget_check_json: dict[str, Any] | None
     budget_report: CommandResult | None
     target: int
 
@@ -140,8 +141,16 @@ def collect_snapshot(target: int, repo_root: Path = REPOSITORY_ROOT) -> RepoSnap
         latest_final_status = None
 
     budget_check = None
+    budget_check_json = None
     budget_report = None
-    if budget_profile.exists():
+    if budget_profile.exists() and ledger.exists():
+        budget_check = run_command(
+            ["python3", "scripts/rkm-budget.py", "check", "--target", str(target), "--json"],
+            repo_root,
+        )
+        budget_check_json = parse_budget_json(budget_check)
+        budget_report = run_command(["python3", "scripts/rkm-budget.py", "report"], repo_root)
+    elif budget_profile.exists():
         budget_check = run_command(["python3", "scripts/rkm-budget.py", "check", "--target", str(target)], repo_root)
         budget_report = run_command(["python3", "scripts/rkm-budget.py", "report"], repo_root)
 
@@ -157,6 +166,7 @@ def collect_snapshot(target: int, repo_root: Path = REPOSITORY_ROOT) -> RepoSnap
         latest_ledger_final_status=latest_final_status,
         latest_ledger_entries=latest_ledger_entries,
         budget_check=budget_check,
+        budget_check_json=budget_check_json,
         budget_report=budget_report,
         target=target,
     )
@@ -201,6 +211,9 @@ def repo_has_dirty_files(snapshot: RepoSnapshot) -> bool:
 def parse_budget_status(result: CommandResult | None) -> str:
     if result is None:
         return "unavailable"
+    parsed = parse_budget_json(result)
+    if parsed is not None and isinstance(parsed.get("status"), str):
+        return parsed["status"]
     text = "\n".join(part for part in (result.stdout, result.stderr) if part)
     match = re.search(r"^status:\s*(.+)$", text, flags=re.MULTILINE)
     if match:
@@ -214,6 +227,11 @@ def parse_suggested_command(*results: CommandResult | None) -> str | None:
     for result in results:
         if result is None:
             continue
+        parsed = parse_budget_json(result)
+        if parsed is not None:
+            command = parsed.get("suggestedCommand")
+            if isinstance(command, str) and command.startswith("make autocycle"):
+                return command
         text = "\n".join(part for part in (result.stdout, result.stderr) if part)
         for line in text.splitlines():
             prefix = "suggested command:"
@@ -227,11 +245,57 @@ def parse_suggested_command(*results: CommandResult | None) -> str | None:
 def parse_estimated_budget(result: CommandResult | None) -> int:
     if result is None:
         return DEFAULT_ESTIMATED_BUDGET
+    parsed = parse_budget_json(result)
+    if parsed is not None:
+        value = parsed.get("requiredBudgetForTarget")
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value
     text = "\n".join(part for part in (result.stdout, result.stderr) if part)
     match = re.search(r"^estimated cost for target:\s*([0-9]+)(?:\.[0-9]+)?$", text, flags=re.MULTILINE)
     if match:
         return int(match.group(1)) + 1
     return DEFAULT_ESTIMATED_BUDGET
+
+
+def parse_budget_json(result: CommandResult | None) -> dict[str, Any] | None:
+    if result is None or result.code not in (0, 3) or not result.stdout:
+        return None
+    try:
+        parsed = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    if isinstance(parsed, dict):
+        return parsed
+    return None
+
+
+def budget_number(payload: dict[str, Any] | None, key: str) -> int | float | None:
+    if payload is None:
+        return None
+    value = payload.get(key)
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return value
+    return None
+
+
+def budget_int(payload: dict[str, Any] | None, key: str) -> int | None:
+    value = budget_number(payload, key)
+    if value is None:
+        return None
+    return int(value)
+
+
+def budget_float(payload: dict[str, Any] | None, key: str) -> float | None:
+    value = budget_number(payload, key)
+    if value is None:
+        return None
+    return float(value)
+
+
+def has_budget_details(snapshot: RepoSnapshot) -> bool:
+    return snapshot.budget_check_json is not None and snapshot.budget_check_json.get("dailyBudgetTokens") is not None
 
 
 def with_safe_push(command: str) -> str:
@@ -384,23 +448,42 @@ def format_human(snapshot: RepoSnapshot, decision: Decision) -> str:
     repo_state = "clean" if not snapshot.status_lines else f"dirty ({len(snapshot.status_lines)} status entrie(s))"
     branch = snapshot.branch or "unknown"
     head = snapshot.head or "unknown"
-    return "\n".join(
+    lines = [
+        f"repo status: {decision.status} ({repo_state})",
+        f"branch/head: {branch} @ {head}",
+        f"upstream status: {upstream_text(snapshot)}",
+        f"budget status: {decision.budget_status}",
+    ]
+    if has_budget_details(snapshot):
+        lines.append(
+            "budget detail: "
+            f"used {snapshot.budget_check_json['tokensUsedInCurrentWindow']}, "
+            f"usable after risk {snapshot.budget_check_json['usableRemainingTokensAfterRisk']}, "
+            f"recommended max target {snapshot.budget_check_json['recommendedMaxTarget']}"
+        )
+    lines.extend(
         [
-            f"repo status: {decision.status} ({repo_state})",
-            f"branch/head: {branch} @ {head}",
-            f"upstream status: {upstream_text(snapshot)}",
-            f"budget status: {decision.budget_status}",
             f"last ledger final status: {latest_ledger_text(snapshot)}",
             f"next action: {decision.next_action}",
             f"command: {decision.command}",
         ]
     )
+    return "\n".join(lines)
 
 
 def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
+    budget_json = snapshot.budget_check_json
     recommended_target = parse_int_option(autocycle_option(decision.command, "N"))
     recommended_token_budget = parse_int_option(autocycle_option(decision.command, "TOKEN_BUDGET"))
     budget_safety_factor = parse_float_option(autocycle_option(decision.command, "BUDGET_SAFETY_FACTOR"))
+    if budget_json is not None:
+        budget_safety_factor = budget_float(budget_json, "safetyFactor")
+        if decision.status == "OVER_BUDGET":
+            recommended_target = budget_int(budget_json, "recommendedMaxTarget")
+            recommended_token_budget = None
+        elif decision.status == "READY_TO_AUTOCYCLE":
+            recommended_target = budget_int(budget_json, "target")
+            recommended_token_budget = budget_int(budget_json, "requiredBudgetForTarget")
     document = {
         "status": decision.status,
         "repoStatus": "clean" if not repo_has_dirty_files(snapshot) else "dirty",
@@ -424,6 +507,27 @@ def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
         "nextAction": decision.next_action,
         "command": decision.command,
     }
+    if budget_json is not None:
+        for key in (
+            "dailyBudgetTokens",
+            "safetyFactor",
+            "reserveRatio",
+            "historicalAcceptedFiles",
+            "historicalTokens",
+            "averageTokensPerAcceptedFile",
+            "maxTokensPerAcceptedFile",
+            "tokensUsedInCurrentWindow",
+            "reserveTokens",
+            "recoveryRiskReserveTokens",
+            "usableRemainingTokens",
+            "usableRemainingTokensAfterRisk",
+            "recommendedMaxTarget",
+            "estimatedCostForTarget",
+            "requiredBudgetForTarget",
+            "overBudget",
+        ):
+            if key in budget_json:
+                document[key] = budget_json[key]
     return json.dumps(document, indent=2, sort_keys=True)
 
 
@@ -504,6 +608,7 @@ def test_snapshot(
     ledger_exists: bool = True,
     latest_ledger_final_status: str | None = "ACCEPTED",
     budget_check: CommandResult | None = CommandResult(0, "status: within budget\nsuggested command: make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25", ""),
+    budget_check_json: dict[str, Any] | None = None,
     budget_report: CommandResult | None = CommandResult(0, "suggested command: make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25", ""),
     target: int = DEFAULT_TARGET,
 ) -> RepoSnapshot:
@@ -517,11 +622,49 @@ def test_snapshot(
         budget_profile_exists=budget_profile_exists,
         ledger_exists=ledger_exists,
         latest_ledger_final_status=latest_ledger_final_status,
-        latest_ledger_entries=(),
+        latest_ledger_entries=[],
         budget_check=budget_check,
+        budget_check_json=budget_check_json if budget_check_json is not None else parse_budget_json(budget_check),
         budget_report=budget_report,
         target=target,
     )
+
+
+def budget_payload(
+    *,
+    status: str,
+    over_budget: bool,
+    target: int = 3,
+    recommended_max_target: int = 3,
+    estimated_cost: float = 100.0,
+    required_budget: int = 100,
+    suggested_command: str | None = "make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25",
+) -> dict[str, Any]:
+    return {
+        "dailyBudgetTokens": 1000,
+        "safetyFactor": 1.25,
+        "reserveRatio": 0.2,
+        "historicalAcceptedFiles": 10,
+        "historicalTokens": 800,
+        "averageTokensPerAcceptedFile": 80.0,
+        "maxTokensPerAcceptedFile": 120.0,
+        "tokensUsedInCurrentWindow": 700,
+        "reserveTokens": 200.0,
+        "recoveryRiskReserveTokens": 0,
+        "usableRemainingTokens": 100.0,
+        "usableRemainingTokensAfterRisk": 100.0,
+        "recommendedMaxTarget": recommended_max_target,
+        "target": target,
+        "estimatedCostForTarget": estimated_cost,
+        "requiredBudgetForTarget": required_budget,
+        "status": status,
+        "overBudget": over_budget,
+        "suggestedCommand": suggested_command,
+    }
+
+
+def budget_json_result(payload: dict[str, Any], code: int) -> CommandResult:
+    return CommandResult(code, json.dumps(payload, sort_keys=True, separators=(",", ":")), "")
 
 
 def run_self_test() -> int:
@@ -616,6 +759,53 @@ def run_self_test() -> int:
             "budgetSafetyFactor": None,
         },
     )
+    over_budget_zero_payload = budget_payload(
+        status="over budget",
+        over_budget=True,
+        recommended_max_target=0,
+        estimated_cost=300.0,
+        required_budget=300,
+        suggested_command=None,
+    )
+    assert_json_output(
+        "OVER_BUDGET JSON output with zero recommended target",
+        test_snapshot(budget_check=budget_json_result(over_budget_zero_payload, 3)),
+        "OVER_BUDGET",
+        {
+            "budgetStatus": "over budget",
+            "recommendedTarget": 0,
+            "recommendedTokenBudget": None,
+            "budgetSafetyFactor": 1.25,
+            "recommendedMaxTarget": 0,
+            "requiredBudgetForTarget": 300,
+            "overBudget": True,
+            "command": "make budget-report",
+        },
+    )
+    assert_human_contains(
+        "OVER_BUDGET human output includes budget detail",
+        test_snapshot(budget_check=budget_json_result(over_budget_zero_payload, 3)),
+        "budget detail: used 700, usable after risk 100.0, recommended max target 0",
+    )
+    over_budget_recommended_payload = budget_payload(
+        status="over budget",
+        over_budget=True,
+        recommended_max_target=1,
+        estimated_cost=300.0,
+        required_budget=300,
+        suggested_command="make autocycle N=1 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25",
+    )
+    assert_json_output(
+        "OVER_BUDGET JSON output with nonzero recommended target",
+        test_snapshot(budget_check=budget_json_result(over_budget_recommended_payload, 3)),
+        "OVER_BUDGET",
+        {
+            "recommendedTarget": 1,
+            "recommendedTokenBudget": None,
+            "recommendedMaxTarget": 1,
+            "command": "make budget-report",
+        },
+    )
     assert_decision(
         "ready to autocycle",
         test_snapshot(),
@@ -632,6 +822,27 @@ def run_self_test() -> int:
             "recommendedTarget": 3,
             "recommendedTokenBudget": 100,
             "budgetSafetyFactor": 1.25,
+        },
+    )
+    ready_payload = budget_payload(
+        status="within budget",
+        over_budget=False,
+        target=3,
+        recommended_max_target=3,
+        estimated_cost=240.5,
+        required_budget=241,
+        suggested_command="make autocycle N=3 TOKEN_BUDGET=241 BUDGET_SAFETY_FACTOR=1.25",
+    )
+    assert_json_output(
+        "READY_TO_AUTOCYCLE JSON output uses budget JSON token budget",
+        test_snapshot(budget_check=budget_json_result(ready_payload, 0)),
+        "READY_TO_AUTOCYCLE",
+        {
+            "recommendedTarget": 3,
+            "recommendedTokenBudget": 241,
+            "budgetSafetyFactor": 1.25,
+            "requiredBudgetForTarget": 241,
+            "overBudget": False,
         },
     )
     print("rkm-next-action self-test passed")
