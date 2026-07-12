@@ -13,7 +13,7 @@ BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -109,6 +109,9 @@ budget-report:
 budget-check:
 	python3 scripts/rkm-budget.py check --target "$(BUDGET_TARGET)"
 
+budget-reset-window:
+	python3 scripts/rkm-budget.py reset-window
+
 next-action:
 	python3 scripts/rkm-next-action.py --target "$(NEXT_ACTION_TARGET)"
 
@@ -156,6 +159,7 @@ help:
 	@printf '  make budget-init                 Initialize the local budget profile using DAILY_BUDGET, BUDGET_SAFETY_FACTOR, BUDGET_RESERVE_RATIO, and BUDGET_WINDOW_HOURS.\n'
 	@printf '  make budget-report               Show the local budget profile report.\n'
 	@printf '  make budget-check [N=3]          Check whether the local budget profile allows BUDGET_TARGET, defaulting to AUTOCYCLE_N.\n'
+	@printf '  make budget-reset-window         Reset the local budget accounting window while preserving the existing budget profile.\n'
 	@printf '  make next-action [N=3]           Print the next safe operational action without modifying files.\n'
 	@printf '  make autopilot [N=3]             Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET, defaulting to AUTOCYCLE_N.\n'
 	@printf '  make autopilot-dry-run [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --dry-run.\n'
