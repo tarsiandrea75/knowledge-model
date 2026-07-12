@@ -1,0 +1,380 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/observable-signal.schema.json",
+  "title": "RKM Observable Signal Definition",
+  "description": "Defines a reusable embedded observable signal for traces, logs, measurements, invocations and review outcomes that describe RAG system behavior. This schema does not provide a first-class knowledge entity envelope; it is intended for embedding in entities, workflows, evaluations, evidence records and operational knowledge.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signalType",
+    "observedBehavior",
+    "observationContext"
+  ],
+  "properties": {
+    "signalId": {
+      "type": "string",
+      "description": "Stable local identifier for this observable signal within the containing entity, workflow, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the observable signal.",
+      "minLength": 1
+    },
+    "signalType": {
+      "$ref": "#/$defs/signalType"
+    },
+    "observedBehavior": {
+      "type": "string",
+      "description": "Concise description of the behavior, event, measurement or decision that was observed.",
+      "minLength": 1
+    },
+    "observationContext": {
+      "$ref": "#/$defs/observationContext"
+    },
+    "observedEntities": {
+      "type": "array",
+      "description": "RKM entities that produced, consumed, governed or were evaluated by the signal.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "inputArtifacts": {
+      "type": "array",
+      "description": "Artifacts consumed by the observed behavior.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "outputArtifacts": {
+      "type": "array",
+      "description": "Artifacts produced, transformed or evaluated by the observed behavior.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "measurements": {
+      "type": "array",
+      "description": "Measured values associated with the observable signal.",
+      "items": {
+        "$ref": "#/$defs/measurement"
+      },
+      "uniqueItems": true
+    },
+    "outcome": {
+      "$ref": "#/$defs/outcome"
+    },
+    "retention": {
+      "$ref": "#/$defs/retention"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that this observable signal supports, qualifies, contradicts or helps evaluate.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records derived from or associated with this observable signal.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources that define, document or interpret this observable signal.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "signalType": {
+      "type": "string",
+      "description": "Primary semantic role of the observation.",
+      "enum": [
+        "Trace Span",
+        "Log Event",
+        "Metric Sample",
+        "Evaluation Observation",
+        "Model Invocation",
+        "Tool Invocation",
+        "Retrieval Observation",
+        "Reranking Observation",
+        "Generation Observation",
+        "Citation Observation",
+        "Policy Observation",
+        "Cost Observation",
+        "Latency Observation",
+        "Failure Observation",
+        "Human Review Observation",
+        "Other"
+      ]
+    },
+    "observationContext": {
+      "type": "object",
+      "description": "Boundary and execution context for the observable signal.",
+      "additionalProperties": false,
+      "required": [
+        "contextType"
+      ],
+      "properties": {
+        "contextType": {
+          "type": "string",
+          "enum": [
+            "Ingestion",
+            "Parsing",
+            "Chunking",
+            "Embedding",
+            "Indexing",
+            "Query Understanding",
+            "Retrieval",
+            "Reranking",
+            "Context Assembly",
+            "Generation",
+            "Evaluation",
+            "Orchestration",
+            "Monitoring",
+            "Governance",
+            "Other"
+          ]
+        },
+        "workflowExecutionId": {
+          "type": "string",
+          "description": "Stable local or external identifier for the workflow execution that produced the signal.",
+          "minLength": 1
+        },
+        "workflowStepId": {
+          "type": "string",
+          "description": "Stable local workflow step identifier associated with the signal.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "parentSignalId": {
+          "type": "string",
+          "description": "Stable local identifier of a parent signal when this observation is part of a trace hierarchy.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "capturedAt": {
+          "type": "string",
+          "description": "Timestamp when the signal was captured.",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "description": "Execution, deployment or evaluation environment where the signal was observed.",
+          "minLength": 1
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "description": "Measured value associated with an observable signal.",
+      "additionalProperties": false,
+      "required": [
+        "measurementType",
+        "value"
+      ],
+      "properties": {
+        "measurementType": {
+          "type": "string",
+          "enum": [
+            "Latency",
+            "Cost",
+            "Token Count",
+            "Retrieval Score",
+            "Reranking Score",
+            "Similarity Score",
+            "Quality Score",
+            "Error Count",
+            "Result Count",
+            "Throughput",
+            "Other"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measure for the value when applicable.",
+          "minLength": 1
+        },
+        "aggregation": {
+          "type": "string",
+          "enum": [
+            "Single Sample",
+            "Minimum",
+            "Maximum",
+            "Mean",
+            "Median",
+            "Percentile",
+            "Sum",
+            "Count",
+            "Other"
+          ]
+        },
+        "measurementWindow": {
+          "type": "string",
+          "description": "Human-readable time window or execution boundary over which the value was measured.",
+          "minLength": 1
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "description": "Result or interpretation of the observed behavior.",
+      "additionalProperties": false,
+      "required": [
+        "outcomeType"
+      ],
+      "properties": {
+        "outcomeType": {
+          "type": "string",
+          "enum": [
+            "Success",
+            "Partial Success",
+            "Failure",
+            "Warning",
+            "Policy Allowed",
+            "Policy Denied",
+            "Human Approved",
+            "Human Rejected",
+            "Unknown"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Short explanation of the outcome.",
+          "minLength": 1
+        },
+        "failureMode": {
+          "type": "string",
+          "description": "Failure mode observed when the signal represents degraded or invalid behavior.",
+          "minLength": 1
+        },
+        "downstreamImpact": {
+          "type": "string",
+          "description": "Known impact on later workflow steps, artifacts, evaluation results or claims.",
+          "minLength": 1
+        }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "description": "Retention semantics for the observable signal.",
+      "additionalProperties": false,
+      "required": [
+        "retentionType"
+      ],
+      "properties": {
+        "retentionType": {
+          "type": "string",
+          "enum": [
+            "Transient",
+            "Sampled",
+            "Aggregated",
+            "Persisted",
+            "Archived",
+            "Promoted To Evidence",
+            "Deleted",
+            "Unknown"
+          ]
+        },
+        "retentionPeriod": {
+          "type": "string",
+          "description": "Human-readable retention period or governing policy reference.",
+          "minLength": 1
+        },
+        "redacted": {
+          "type": "boolean",
+          "description": "Whether sensitive signal content is redacted before storage or reuse.",
+          "default": false
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "description": "Governance context for collection, storage and use of the observable signal.",
+      "additionalProperties": false,
+      "properties": {
+        "policyReferences": {
+          "type": "array",
+          "description": "Policies that govern this signal.",
+          "items": {
+            "$ref": "policy.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "sensitivityLevel": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Internal",
+            "Confidential",
+            "Restricted",
+            "Unknown"
+          ]
+        },
+        "auditUse": {
+          "type": "boolean",
+          "description": "Whether the signal is intended for audit, incident review or compliance assessment.",
+          "default": false
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity involved in the observation.",
+      "additionalProperties": false,
+      "required": [
+        "entityId",
+        "entityType"
+      ],
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "description": "Stable RKM entity identifier.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "entityType": {
+          "$ref": "identity.schema.json#/properties/entityType"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role the entity played in the observation.",
+          "enum": [
+            "Producer",
+            "Consumer",
+            "Subject",
+            "Evaluator",
+            "Observer",
+            "Governor",
+            "Dependency",
+            "Other"
+          ]
+        }
+      }
+    }
+  }
+}
