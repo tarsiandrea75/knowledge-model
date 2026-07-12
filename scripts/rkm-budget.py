@@ -29,6 +29,31 @@ DEFAULT_WINDOW_HOURS = 24
 
 SUCCESSFUL_STATUSES = {"ACCEPTED", "RECOVERED"}
 RECOVERY_RISK_STATUSES = {"REVISE_PENDING", "FAILED", "STOPPED"}
+REQUIRED_JSON_FIELDS = (
+    "profileExists",
+    "ledgerExists",
+    "windowStartedAtUtc",
+    "dailyBudgetTokens",
+    "safetyFactor",
+    "reserveRatio",
+    "historicalAcceptedFiles",
+    "historicalTokens",
+    "averageTokensPerAcceptedFile",
+    "maxTokensPerAcceptedFile",
+    "tokensUsedInCurrentWindow",
+    "reserveTokens",
+    "recoveryRiskReserveTokens",
+    "usableRemainingTokens",
+    "usableRemainingTokensAfterRisk",
+    "recommendedMaxTarget",
+    "target",
+    "estimatedCostForTarget",
+    "requiredBudgetForTarget",
+    "status",
+    "overBudget",
+    "suggestedCommand",
+    "safeAction",
+)
 
 
 def utc_now() -> datetime:
@@ -259,6 +284,84 @@ def estimated_cost_for_target(average_tokens_per_file: float, target: int, safet
     return average_tokens_per_file * target * safety_factor
 
 
+def empty_json_budget(
+    profile_path: Path,
+    ledger_path: Path,
+    target: int | None,
+    status: str,
+    over_budget: bool | None,
+) -> dict[str, Any]:
+    return {
+        "profileExists": profile_path.exists(),
+        "ledgerExists": ledger_path.exists(),
+        "windowStartedAtUtc": None,
+        "dailyBudgetTokens": None,
+        "safetyFactor": None,
+        "reserveRatio": None,
+        "historicalAcceptedFiles": None,
+        "historicalTokens": None,
+        "averageTokensPerAcceptedFile": None,
+        "maxTokensPerAcceptedFile": None,
+        "tokensUsedInCurrentWindow": None,
+        "reserveTokens": None,
+        "recoveryRiskReserveTokens": None,
+        "usableRemainingTokens": None,
+        "usableRemainingTokensAfterRisk": None,
+        "recommendedMaxTarget": None,
+        "target": target,
+        "estimatedCostForTarget": None,
+        "requiredBudgetForTarget": None,
+        "status": status,
+        "overBudget": over_budget,
+        "suggestedCommand": None,
+        "safeAction": None,
+    }
+
+
+def build_json_budget(
+    profile_path: Path,
+    ledger_path: Path,
+    profile: dict[str, Any],
+    budget: dict[str, Any],
+    target: int | None,
+    status: str,
+    over_budget: bool | None,
+    suggested_command_value: str | None,
+    safe_action: str | None,
+) -> dict[str, Any]:
+    estimated_cost = budget["estimatedCostForTarget"]
+    required_budget = math.ceil(float(estimated_cost)) if estimated_cost is not None else None
+    return {
+        "profileExists": profile_path.exists(),
+        "ledgerExists": ledger_path.exists(),
+        "windowStartedAtUtc": profile.get("windowStartedAtUtc"),
+        "dailyBudgetTokens": int(profile["dailyBudgetTokens"]),
+        "safetyFactor": float(profile["safetyFactor"]),
+        "reserveRatio": float(profile["reserveRatio"]),
+        "historicalAcceptedFiles": budget["historicalAcceptedFiles"],
+        "historicalTokens": budget["historicalTokens"],
+        "averageTokensPerAcceptedFile": budget["averageTokensPerAcceptedFile"],
+        "maxTokensPerAcceptedFile": budget["maxTokensPerAcceptedFile"],
+        "tokensUsedInCurrentWindow": budget["tokensUsedInCurrentWindow"],
+        "reserveTokens": budget["reserveTokens"],
+        "recoveryRiskReserveTokens": budget["recoveryRiskReserveTokens"],
+        "usableRemainingTokens": budget["usableRemainingTokens"],
+        "usableRemainingTokensAfterRisk": budget["usableRemainingTokensAfterRisk"],
+        "recommendedMaxTarget": budget["recommendedMaxTarget"],
+        "target": target,
+        "estimatedCostForTarget": estimated_cost,
+        "requiredBudgetForTarget": required_budget,
+        "status": status,
+        "overBudget": over_budget,
+        "suggestedCommand": suggested_command_value,
+        "safeAction": safe_action,
+    }
+
+
+def print_json_budget(payload: dict[str, Any]) -> None:
+    print(json.dumps(payload, sort_keys=True, separators=(",", ":")))
+
+
 def missing_profile_message(profile_path: Path, repo_root: Path = REPOSITORY_ROOT) -> str:
     return (
         f"Budget profile is missing: {repository_relative(profile_path, repo_root)}\n"
@@ -288,8 +391,12 @@ def command_init(args: argparse.Namespace) -> int:
 def command_report(args: argparse.Namespace) -> int:
     profile_path = resolve_path(args.profile, DEFAULT_PROFILE_PATH)
     ledger_path = resolve_path(args.ledger, DEFAULT_LEDGER_PATH)
+    output_json = bool(getattr(args, "json", False))
 
     if not profile_path.exists():
+        if output_json:
+            print_json_budget(empty_json_budget(profile_path, ledger_path, None, "missing profile", None))
+            return 0
         print(missing_profile_message(profile_path))
         return 0
 
@@ -298,8 +405,41 @@ def command_report(args: argparse.Namespace) -> int:
         entries = read_ledger(ledger_path)
         budget = compute_budget(profile, entries)
     except (OSError, ValueError, TypeError) as exc:
+        if output_json:
+            payload = empty_json_budget(profile_path, ledger_path, None, "error", None)
+            payload["safeAction"] = str(exc)
+            print_json_budget(payload)
+            return 1
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
+
+    if output_json:
+        status = "ok"
+        suggested_command_value = None
+        safe_action = None
+        if budget["historicalAcceptedFiles"] <= 0:
+            status = "missing history"
+            safe_action = "Run a small autocycle first, then record it in the run ledger."
+        elif budget["recommendedMaxTarget"] > 0:
+            target = int(budget["recommendedMaxTarget"])
+            estimated = float(budget["averageTokensPerAcceptedFile"]) * target * float(profile["safetyFactor"])
+            suggested_command_value = suggested_command(target, estimated, float(profile["safetyFactor"]))
+        else:
+            safe_action = "Reset the window or increase the daily budget before running autocycle."
+        print_json_budget(
+            build_json_budget(
+                profile_path,
+                ledger_path,
+                profile,
+                budget,
+                None,
+                status,
+                None,
+                suggested_command_value,
+                safe_action,
+            )
+        )
+        return 0
 
     lines = [
         "RKM budget report",
@@ -338,8 +478,12 @@ def command_report(args: argparse.Namespace) -> int:
 def command_check(args: argparse.Namespace) -> int:
     profile_path = resolve_path(args.profile, DEFAULT_PROFILE_PATH)
     ledger_path = resolve_path(args.ledger, DEFAULT_LEDGER_PATH)
+    output_json = bool(getattr(args, "json", False))
 
     if not profile_path.exists():
+        if output_json:
+            print_json_budget(empty_json_budget(profile_path, ledger_path, args.target, "missing profile", None))
+            return 2
         print(missing_profile_message(profile_path), file=sys.stderr)
         return 2
 
@@ -348,10 +492,30 @@ def command_check(args: argparse.Namespace) -> int:
         entries = read_ledger(ledger_path)
         budget = compute_budget(profile, entries, args.target)
     except (OSError, ValueError, TypeError) as exc:
+        if output_json:
+            payload = empty_json_budget(profile_path, ledger_path, args.target, "error", None)
+            payload["safeAction"] = str(exc)
+            print_json_budget(payload)
+            return 2
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
     if budget["historicalAcceptedFiles"] <= 0 or budget["estimatedCostForTarget"] is None:
+        if output_json:
+            print_json_budget(
+                build_json_budget(
+                    profile_path,
+                    ledger_path,
+                    profile,
+                    budget,
+                    args.target,
+                    "missing history",
+                    None,
+                    None,
+                    "Run a small autocycle first, then record it in the run ledger.",
+                )
+            )
+            return 2
         print(missing_history_message(ledger_path), file=sys.stderr)
         return 2
 
@@ -361,6 +525,36 @@ def command_check(args: argparse.Namespace) -> int:
     recommended_max_target = int(budget["recommendedMaxTarget"])
     is_within_budget = estimated <= remaining
     status = "within budget" if is_within_budget else "over budget"
+    safe_action = None
+    suggested_command_value = None
+    if is_within_budget:
+        suggested_command_value = suggested_command(args.target, estimated, safety_factor)
+    else:
+        safe_action = "Reset the window, increase the daily budget, or choose a target <= recommended max target."
+        if recommended_max_target > 0:
+            recommended_estimated = estimated_cost_for_target(
+                float(budget["averageTokensPerAcceptedFile"]),
+                recommended_max_target,
+                safety_factor,
+            )
+            suggested_command_value = suggested_command(recommended_max_target, recommended_estimated, safety_factor)
+
+    if output_json:
+        print_json_budget(
+            build_json_budget(
+                profile_path,
+                ledger_path,
+                profile,
+                budget,
+                args.target,
+                status,
+                not is_within_budget,
+                suggested_command_value,
+                safe_action,
+            )
+        )
+        return 0 if is_within_budget else 3
+
     print(f"target: {args.target}")
     print(f"estimated cost for target: {estimated:.2f}")
     print(f"usable remaining tokens after risk reserve: {remaining:.2f}")
@@ -368,21 +562,13 @@ def command_check(args: argparse.Namespace) -> int:
     print(f"recommended max target: {recommended_max_target}")
     print(f"status: {status}")
     if is_within_budget:
-        print(f"suggested command: {suggested_command(args.target, estimated, safety_factor)}")
+        print(f"suggested command: {suggested_command_value}")
         return 0
 
     print(f"required budget for target: {math.ceil(estimated)}")
     print("safe action: reset the window, increase the daily budget, or choose a target <= recommended max target.")
-    if recommended_max_target > 0:
-        recommended_estimated = estimated_cost_for_target(
-            float(budget["averageTokensPerAcceptedFile"]),
-            recommended_max_target,
-            safety_factor,
-        )
-        print(
-            "suggested command: "
-            f"{suggested_command(recommended_max_target, recommended_estimated, safety_factor)}"
-        )
+    if suggested_command_value is not None:
+        print(f"suggested command: {suggested_command_value}")
     return 3
 
 
@@ -420,12 +606,14 @@ def make_parser() -> argparse.ArgumentParser:
     report_parser = subparsers.add_parser("report", help="print a budget report")
     report_parser.add_argument("--profile")
     report_parser.add_argument("--ledger")
+    report_parser.add_argument("--json", action="store_true", help="print machine-readable JSON only")
     report_parser.set_defaults(func=command_report)
 
     check_parser = subparsers.add_parser("check", help="check whether a target fits the usable budget")
     check_parser.add_argument("--target", type=positive_int, required=True, metavar="N")
     check_parser.add_argument("--profile")
     check_parser.add_argument("--ledger")
+    check_parser.add_argument("--json", action="store_true", help="print machine-readable JSON only")
     check_parser.set_defaults(func=command_check)
 
     reset_parser = subparsers.add_parser("reset-window", help="reset the profile window start to now")
@@ -464,6 +652,17 @@ def write_test_ledger(path: Path, entries: list[dict[str, Any]]) -> None:
 def assert_true(condition: bool, message: str) -> None:
     if not condition:
         raise AssertionError(message)
+
+
+def assert_json_payload(output: str, message: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(output)
+    except json.JSONDecodeError as exc:
+        raise AssertionError(f"{message}: invalid JSON: {exc}") from exc
+    assert_true(isinstance(payload, dict), f"{message}: JSON payload must be an object")
+    missing = [field for field in REQUIRED_JSON_FIELDS if field not in payload]
+    assert_true(not missing, f"{message}: missing JSON field(s): {', '.join(missing)}")
+    return payload
 
 
 def run_self_test() -> int:
@@ -534,6 +733,20 @@ def run_self_test() -> int:
                 "report behavior failed",
             )
 
+            report_json_args = argparse.Namespace(profile=str(profile_path), ledger=str(ledger_path), json=True)
+            code, out, err = capture_result(command_report, report_json_args)
+            payload = assert_json_payload(out, "report --json")
+            assert_true(
+                code == 0
+                and err == ""
+                and payload["profileExists"] is True
+                and payload["ledgerExists"] is True
+                and payload["target"] is None
+                and payload["estimatedCostForTarget"] is None
+                and payload["status"] == "ok",
+                "report --json behavior failed",
+            )
+
             check_args = argparse.Namespace(target=2, profile=str(profile_path), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, check_args)
             assert_true(
@@ -544,6 +757,21 @@ def run_self_test() -> int:
                 and "suggested command: make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2" in out
                 and err == "",
                 "within-budget check failed",
+            )
+
+            check_json_args = argparse.Namespace(target=2, profile=str(profile_path), ledger=str(ledger_path), json=True)
+            code, out, err = capture_result(command_check, check_json_args)
+            payload = assert_json_payload(out, "check --json within budget")
+            assert_true(
+                code == 0
+                and err == ""
+                and payload["target"] == 2
+                and payload["estimatedCostForTarget"] == 400
+                and payload["requiredBudgetForTarget"] == 400
+                and payload["status"] == "within budget"
+                and payload["overBudget"] is False
+                and payload["suggestedCommand"] == "make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2",
+                "check --json within-budget behavior failed",
             )
 
             over_args = argparse.Namespace(target=3, profile=str(profile_path), ledger=str(ledger_path))
@@ -557,6 +785,22 @@ def run_self_test() -> int:
                 and "make autocycle N=3" not in out
                 and err == "",
                 "over-budget check with safe recommended target failed",
+            )
+
+            over_json_args = argparse.Namespace(target=3, profile=str(profile_path), ledger=str(ledger_path), json=True)
+            code, out, err = capture_result(command_check, over_json_args)
+            payload = assert_json_payload(out, "check --json over budget")
+            assert_true(
+                code == 3
+                and err == ""
+                and payload["target"] == 3
+                and payload["estimatedCostForTarget"] == 600
+                and payload["requiredBudgetForTarget"] == 600
+                and payload["status"] == "over budget"
+                and payload["overBudget"] is True
+                and payload["suggestedCommand"] == "make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2"
+                and "make autocycle N=3" not in str(payload["suggestedCommand"]),
+                "check --json over-budget behavior failed",
             )
 
             no_risk_ledger = root / ".rkm" / "no-risk.jsonl"
@@ -733,6 +977,25 @@ def run_self_test() -> int:
             missing_profile_args = argparse.Namespace(target=1, profile=str(root / "missing.json"), ledger=str(ledger_path))
             code, out, err = capture_result(command_check, missing_profile_args)
             assert_true(code == 2 and out == "" and "init --daily-budget TOKENS" in err, "missing profile case failed")
+
+            missing_profile_json_args = argparse.Namespace(
+                target=1,
+                profile=str(root / "missing.json"),
+                ledger=str(ledger_path),
+                json=True,
+            )
+            code, out, err = capture_result(command_check, missing_profile_json_args)
+            payload = assert_json_payload(out, "missing profile --json")
+            assert_true(
+                code == 2
+                and err == ""
+                and payload["profileExists"] is False
+                and payload["ledgerExists"] is True
+                and payload["status"] == "missing profile"
+                and payload["target"] == 1
+                and payload["dailyBudgetTokens"] is None,
+                "missing profile --json behavior failed",
+            )
 
             no_history_ledger = root / ".rkm" / "no-history.jsonl"
             write_test_ledger(
