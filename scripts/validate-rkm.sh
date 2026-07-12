@@ -216,6 +216,10 @@ start_step "Running JSON Schema validation..."
 "$PYTHON_BIN" scripts/validate-schemas.py
 pass_step
 
+start_step "Running schema prerequisite validation..."
+"$PYTHON_BIN" scripts/validate-schema-prerequisites.py
+pass_step
+
 start_step "Running registry validation..."
 "$PYTHON_BIN" scripts/validate-registries.py
 pass_step
