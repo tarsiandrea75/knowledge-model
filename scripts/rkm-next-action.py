@@ -273,6 +273,13 @@ def decide_next_action(snapshot: RepoSnapshot) -> Decision:
                 next_action="recover the pending revise for the single changed project file.",
                 command="make recover-revise",
             )
+        if snapshot.latest_ledger_final_status == "REVISE_PENDING":
+            return Decision(
+                status="DIRTY_WORKTREE",
+                budget_status=budget_status,
+                next_action="manually review the dirty worktree before choosing a recovery path.",
+                command="git status --short && make validate",
+            )
         return Decision(
             status="DIRTY_WORKTREE",
             budget_status=budget_status,
@@ -331,6 +338,8 @@ def latest_ledger_text(snapshot: RepoSnapshot) -> str:
         return "missing"
     if snapshot.latest_ledger_final_status is None:
         return "available, no finalStatus found"
+    if snapshot.latest_ledger_final_status == "REVISE_PENDING" and not repo_has_dirty_files(snapshot):
+        return "REVISE_PENDING (historical; no dirty file to recover)"
     return snapshot.latest_ledger_final_status
 
 
@@ -370,12 +379,29 @@ def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
     return json.dumps(document, indent=2, sort_keys=True)
 
 
-def assert_decision(name: str, snapshot: RepoSnapshot, expected_status: str, expected_command: str) -> None:
+def assert_decision(
+    name: str,
+    snapshot: RepoSnapshot,
+    expected_status: str,
+    expected_command: str,
+    expected_next_action: str | None = None,
+) -> None:
     decision = decide_next_action(snapshot)
     if decision.status != expected_status:
         raise AssertionError(f"{name}: expected status {expected_status}, got {decision.status}")
     if decision.command != expected_command:
         raise AssertionError(f"{name}: expected command {expected_command!r}, got {decision.command!r}")
+    if expected_next_action is not None and decision.next_action != expected_next_action:
+        raise AssertionError(
+            f"{name}: expected next action {expected_next_action!r}, got {decision.next_action!r}"
+        )
+
+
+def assert_human_contains(name: str, snapshot: RepoSnapshot, expected_text: str) -> None:
+    decision = decide_next_action(snapshot)
+    output = format_human(snapshot, decision)
+    if expected_text not in output:
+        raise AssertionError(f"{name}: expected output to contain {expected_text!r}, got {output!r}")
 
 
 def test_snapshot(
@@ -425,6 +451,25 @@ def run_self_test() -> int:
         test_snapshot(status_lines=[" M docs/architecture/paper-model.md"], latest_ledger_final_status="REVISE_PENDING"),
         "DIRTY_WORKTREE",
         "make recover-revise",
+        "recover the pending revise for the single changed project file.",
+    )
+    assert_human_contains(
+        "clean repo with historical REVISE_PENDING",
+        test_snapshot(latest_ledger_final_status="REVISE_PENDING"),
+        "last ledger final status: REVISE_PENDING (historical; no dirty file to recover)",
+    )
+    assert_decision(
+        "dirty repo with REVISE_PENDING and multiple changed files",
+        test_snapshot(
+            status_lines=[
+                " M docs/architecture/paper-model.md",
+                " M docs/architecture/framework-model.md",
+            ],
+            latest_ledger_final_status="REVISE_PENDING",
+        ),
+        "DIRTY_WORKTREE",
+        "git status --short && make validate",
+        "manually review the dirty worktree before choosing a recovery path.",
     )
     assert_decision(
         "missing budget profile",
