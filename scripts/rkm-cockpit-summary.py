@@ -47,6 +47,7 @@ class RecentRunSummary:
     partial: bool = False
     budget_stop: bool = False
     push_pending: bool = False
+    pushed: bool = False
 
 
 def positive_int(value: str) -> int:
@@ -137,7 +138,7 @@ def int_value(value: Any, fallback: int = 0) -> int:
         return fallback
 
 
-def decide(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[str, Any]) -> Decision:
+def decide(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[str, Any], target: int = DEFAULT_TARGET) -> Decision:
     recovery_status = str(recovery.get("status") or "").upper()
     next_status = str(next_action.get("status") or "").upper()
     max_target = recommended_max_target(budget, next_action)
@@ -149,7 +150,8 @@ def decide(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[s
     if repo_is_dirty(next_action, recovery):
         return Decision("STOP", "make recovery-plan")
     if next_status == "READY_TO_AUTOCYCLE":
-        return Decision("RUN", "make autopilot")
+        command = "make autopilot" if target == DEFAULT_TARGET else f"make autopilot N={target}"
+        return Decision("RUN", command)
     if next_status == "OVER_BUDGET" and max_target > 0:
         return Decision("RUN_REDUCED_TARGET", f"make autopilot N={max_target}")
     if next_status == "OVER_BUDGET":
@@ -353,6 +355,10 @@ def summarize_recent_run(
     unresolved_pending = set() if clean_recovery_state else pending_files - recovered_files
     final_outcome = str(state.get("finalOutcome") or "").lower()
     state_text = json.dumps(state, sort_keys=True).lower() if state else ""
+    partial_pushed_outcome = "partial autocycle completed" in final_outcome and "accepted commits pushed" in final_outcome
+    pushed = partial_pushed_outcome or (
+        "pushed" in final_outcome and ("accepted commit" in final_outcome or "safe-push" in state_text)
+    )
     commands_skipped = state.get("commandsSkipped") if isinstance(state.get("commandsSkipped"), list) else []
     skipped_push = any("safe-push" in str(command) for command in commands_skipped)
     exit_failed = int_value(state.get("exitCode"), 0) != 0
@@ -367,6 +373,7 @@ def summarize_recent_run(
         or "token" in final_outcome
         or "budget guard" in state_text
         or "token budget" in state_text
+        or partial_pushed_outcome
         or (exit_failed and skipped_push)
         or partial_ready_after_failure
         or next_status == "OVER_BUDGET"
@@ -381,6 +388,7 @@ def summarize_recent_run(
         partial=partial,
         budget_stop=budget_stop,
         push_pending=next_status == "READY_TO_PUSH",
+        pushed=pushed,
     )
 
 
@@ -401,6 +409,8 @@ def recent_run_text(summary: RecentRunSummary) -> str | None:
             parts.append(f"recovered {summary.recovered}")
     if summary.revise_pending:
         parts.append(f"revise pending {summary.revise_pending}")
+    if summary.pushed:
+        parts.append("pushed")
     return "; ".join(parts)
 
 
@@ -443,7 +453,7 @@ def render_dashboard(
         "cmd": "›" if use_unicode else ">",
         "decision": "✓" if use_unicode else "!",
     }
-    decision = decide(next_action, budget, recovery)
+    decision = decide(next_action, budget, recovery, target)
     repo_status = "dirty" if repo_is_dirty(next_action, recovery) else "clean"
     title = " RKM COCKPIT "
     frame = "═" * len(title) if use_unicode else "=" * len(title)
@@ -494,8 +504,15 @@ def collect(target: int) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]
 
 
 def run_self_test() -> int:
-    def check(name: str, next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[str, Any], expected: Decision) -> None:
-        actual = decide(next_action, budget, recovery)
+    def check(
+        name: str,
+        next_action: dict[str, Any],
+        budget: dict[str, Any],
+        recovery: dict[str, Any],
+        expected: Decision,
+        target: int = DEFAULT_TARGET,
+    ) -> None:
+        actual = decide(next_action, budget, recovery, target)
         if actual != expected:
             raise AssertionError(f"{name}: expected {expected}, got {actual}")
 
@@ -512,6 +529,7 @@ def run_self_test() -> int:
     check("manual", {"status": "READY_TO_AUTOCYCLE"}, {}, {"status": "MANUAL_REVIEW"}, Decision("STOP", "make recovery-plan"))
     check("dirty", {"repoStatus": "dirty", "status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("STOP", "make recovery-plan"))
     check("run", {"status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("RUN", "make autopilot"))
+    check("run target", {"status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("RUN", "make autopilot N=5"), 5)
     check("reduced", {"status": "OVER_BUDGET"}, {"recommendedMaxTarget": 2}, clean, Decision("RUN_REDUCED_TARGET", "make autopilot N=2"))
     check("budget-blocked", {"status": "OVER_BUDGET"}, {"recommendedMaxTarget": 0}, clean, Decision("BUDGET_BLOCKED", "make budget-report"))
     check("push", {"status": "READY_TO_PUSH"}, {}, clean, Decision("PUSH", "make safe-push"))
@@ -698,6 +716,87 @@ def run_self_test() -> int:
     )
     assert_contains("missing timestamp fallback", ambiguous_dashboard, "budget-stop; committed progress detected; recovered 1")
     assert_not_contains("ambiguous exact total", ambiguous_dashboard, "committed 2 total")
+
+    partial_pushed_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        5,
+        True,
+        {
+            "target": 5,
+            "exitCode": 0,
+            "finalOutcome": "partial autocycle completed; accepted commits pushed",
+            "timestampUtc": "2026-01-01T00:00:00Z",
+        },
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["normal-1.md"],
+                "timestampUtc": "2026-01-01T00:01:00Z",
+            },
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["normal-2.md"],
+                "timestampUtc": "2026-01-01T00:02:00Z",
+            },
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["normal-3.md"],
+                "timestampUtc": "2026-01-01T00:03:00Z",
+            },
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "REVISE_PENDING",
+                "acceptedFileCount": 0,
+                "files": ["recovered.md"],
+                "timestampUtc": "2026-01-01T00:04:00Z",
+            },
+            {
+                "label": "autocycle-recovery",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["recovered.md"],
+                "timestampUtc": "2026-01-01T00:05:00Z",
+            },
+        ],
+    )
+    assert_contains("partial pushed budget stop", partial_pushed_dashboard, "budget-stop")
+    assert_contains("partial pushed total", partial_pushed_dashboard, "committed 4 total")
+    assert_contains("partial pushed normal", partial_pushed_dashboard, "normal 3")
+    assert_contains("partial pushed recovered", partial_pushed_dashboard, "recovered 1")
+    assert_contains("partial pushed flag", partial_pushed_dashboard, "pushed")
+
+    ambiguous_pushed_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        5,
+        True,
+        {
+            "target": 5,
+            "exitCode": 0,
+            "finalOutcome": "partial autocycle completed; accepted commits pushed",
+        },
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "ACCEPTED",
+                "acceptedFileCount": 1,
+                "files": ["ambiguous-pushed.md"],
+                "timestampUtc": "2026-01-01T00:01:00Z",
+            }
+        ],
+    )
+    assert_contains("ambiguous pushed budget stop", ambiguous_pushed_dashboard, "budget-stop")
+    assert_contains("ambiguous pushed progress", ambiguous_pushed_dashboard, "committed progress detected")
+    assert_contains("ambiguous pushed flag", ambiguous_pushed_dashboard, "pushed")
 
     missing_root = REPOSITORY_ROOT / ".missing-rkm-self-test"
     if read_json_file(missing_root / "autopilot-state.json") != {}:
