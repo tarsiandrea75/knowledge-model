@@ -5,8 +5,13 @@ CYCLE_N := $(or $(N),3)
 AUTOCYCLE_N := $(or $(N),3)
 DISCOVER_N := $(or $(N),5)
 TAIL_LINES ?= 40
+DAILY_BUDGET ?= 300000
+BUDGET_SAFETY_FACTOR ?= 1.25
+BUDGET_RESERVE_RATIO ?= 0.20
+BUDGET_WINDOW_HOURS ?= 24
+BUDGET_TARGET ?= $(AUTOCYCLE_N)
 
-.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report help
+.PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise clean-discovery-artifacts usage-report budget-init budget-report budget-check help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -90,6 +95,15 @@ clean-discovery-artifacts:
 usage-report:
 	python3 scripts/rkm-run-ledger.py report
 
+budget-init:
+	python3 scripts/rkm-budget.py init --daily-budget "$(DAILY_BUDGET)" --safety-factor "$(BUDGET_SAFETY_FACTOR)" --reserve-ratio "$(BUDGET_RESERVE_RATIO)" --window-hours "$(BUDGET_WINDOW_HOURS)"
+
+budget-report:
+	python3 scripts/rkm-budget.py report
+
+budget-check:
+	python3 scripts/rkm-budget.py check --target "$(BUDGET_TARGET)"
+
 help:
 	@printf 'RKM developer commands:\n'
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
@@ -107,4 +121,7 @@ help:
 	@printf '  make recover-revise              Run bash scripts/rkm-recover-revise.sh.\n'
 	@printf '  make clean-discovery-artifacts   Remove root-level rkm-discovery-report-* and rkm-discovery-* directories or zip files.\n'
 	@printf '  make usage-report                Run python3 scripts/rkm-run-ledger.py report.\n'
+	@printf '  make budget-init                 Initialize the local budget profile using DAILY_BUDGET, BUDGET_SAFETY_FACTOR, BUDGET_RESERVE_RATIO, and BUDGET_WINDOW_HOURS.\n'
+	@printf '  make budget-report               Show the local budget profile report.\n'
+	@printf '  make budget-check [N=3]          Check whether the local budget profile allows BUDGET_TARGET, defaulting to AUTOCYCLE_N.\n'
 	@printf '  make help                        Show this help.\n'
