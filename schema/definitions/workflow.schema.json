@@ -1,0 +1,552 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/workflow.schema.json",
+  "title": "RKM Embedded Workflow Fragment Definition",
+  "description": "Defines a reusable embedded workflow fragment for ordered, conditional or iterative RAG process structure. This schema does not provide the full knowledge entity envelope for Workflow: it intentionally omits first-class identity, metadata, description and top-level relationships. A complete first-class Workflow entity schema must be introduced separately after shared identity, registry and relationship support exists for Workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflowType",
+    "controlFlow",
+    "boundary",
+    "steps"
+  ],
+  "properties": {
+    "workflowId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded workflow fragment within the containing entity, architecture record, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable workflow name.",
+      "minLength": 1
+    },
+    "workflowType": {
+      "$ref": "#/$defs/workflowType"
+    },
+    "controlFlow": {
+      "$ref": "#/$defs/controlFlow"
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Structured artifacts consumed by the workflow.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Structured artifacts produced by the workflow.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "participants": {
+      "type": "array",
+      "description": "Entities, embedded capabilities or human roles that perform, support or govern workflow steps.",
+      "items": {
+        "$ref": "#/$defs/participant"
+      },
+      "uniqueItems": true
+    },
+    "steps": {
+      "type": "array",
+      "description": "Ordered, conditional, parallel or iterative units of work inside the workflow.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      },
+      "uniqueItems": true
+    },
+    "transitions": {
+      "type": "array",
+      "description": "Execution paths between workflow steps.",
+      "items": {
+        "$ref": "#/$defs/transition"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern workflow execution, artifacts, participants or transitions.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this embedded workflow fragment to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare workflow behavior, quality, risk or tradeoffs.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the workflow structure, boundary, behavior or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the workflow.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "workflowType": {
+      "type": "string",
+      "description": "Primary purpose of the workflow.",
+      "enum": [
+        "Ingestion Workflow",
+        "Indexing Workflow",
+        "Retrieval Workflow",
+        "Generation Workflow",
+        "Evaluation Workflow",
+        "Agent Workflow",
+        "Monitoring Workflow",
+        "Governance Workflow",
+        "End To End RAG Workflow",
+        "Other"
+      ]
+    },
+    "controlFlow": {
+      "type": "string",
+      "description": "Dominant execution structure of the workflow.",
+      "enum": [
+        "Linear",
+        "Branching",
+        "Parallel",
+        "Iterative",
+        "Event Driven",
+        "Human In The Loop",
+        "Agent Directed",
+        "Hybrid"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Scope boundary for the workflow.",
+      "additionalProperties": false,
+      "required": [
+        "trigger",
+        "responsibilities"
+      ],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "description": "Condition, event or request that starts the workflow.",
+          "minLength": 1
+        },
+        "responsibilities": {
+          "type": "array",
+          "description": "Responsibilities inside the workflow boundary.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "externalDependencies": {
+          "type": "array",
+          "description": "Dependencies outside the workflow boundary.",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          },
+          "uniqueItems": true
+        },
+        "completionCriteria": {
+          "type": "array",
+          "description": "Conditions that indicate the workflow has completed.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "failureCriteria": {
+          "type": "array",
+          "description": "Conditions that indicate the workflow has failed or must stop.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "description": "A participant that performs, supports or governs one or more workflow steps.",
+      "additionalProperties": false,
+      "required": [
+        "participantType",
+        "role"
+      ],
+      "properties": {
+        "participantId": {
+          "type": "string",
+          "description": "Stable local participant identifier.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "participantType": {
+          "$ref": "#/$defs/participantType"
+        },
+        "entity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable participant name when no first-class entity reference is available.",
+          "minLength": 1
+        },
+        "role": {
+          "$ref": "#/$defs/participantRole"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "description": "A unit of work inside a workflow.",
+      "additionalProperties": false,
+      "required": [
+        "stepId",
+        "name",
+        "stepType"
+      ],
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "description": "Stable local step identifier.",
+          "pattern": "^(?:[A-Z]+-[0-9]{4}|[a-z][a-z0-9]*(?:-[a-z0-9]+)*)$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Action-oriented step name.",
+          "minLength": 1
+        },
+        "stepType": {
+          "$ref": "#/$defs/stepType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the step boundary and RAG-relevant semantics.",
+          "minLength": 1
+        },
+        "participants": {
+          "type": "array",
+          "description": "Local participant identifiers or stable entity identifiers involved in the step.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Artifacts consumed by the step.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Artifacts produced by the step.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "toolContract": {
+          "$ref": "tool-contract.schema.json"
+        },
+        "humanReview": {
+          "$ref": "#/$defs/humanReview"
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions that affect whether or how the step executes.",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "description": "Execution movement from one workflow step to another.",
+      "additionalProperties": false,
+      "required": [
+        "fromStep",
+        "toStep",
+        "transitionType"
+      ],
+      "properties": {
+        "fromStep": {
+          "type": "string",
+          "description": "Source step identifier.",
+          "minLength": 1
+        },
+        "toStep": {
+          "type": "string",
+          "description": "Target step identifier.",
+          "minLength": 1
+        },
+        "transitionType": {
+          "$ref": "#/$defs/transitionType"
+        },
+        "condition": {
+          "$ref": "#/$defs/condition"
+        },
+        "retryPolicy": {
+          "$ref": "#/$defs/retryPolicy"
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "A condition that gates, routes or qualifies workflow execution.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Always",
+            "If",
+            "Unless",
+            "Threshold",
+            "Policy Gate",
+            "Human Approval",
+            "Error",
+            "Timeout",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Verifiable condition statement.",
+          "minLength": 1
+        },
+        "observedSignal": {
+          "$ref": "observable-signal.schema.json"
+        }
+      }
+    },
+    "humanReview": {
+      "type": "object",
+      "description": "Human review behavior for a step.",
+      "additionalProperties": false,
+      "required": [
+        "reviewType"
+      ],
+      "properties": {
+        "reviewType": {
+          "type": "string",
+          "enum": [
+            "Approval",
+            "Correction",
+            "Escalation",
+            "Annotation",
+            "Quality Review",
+            "Safety Review",
+            "Other"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "reviewerRole": {
+          "type": "string",
+          "description": "Human role expected to perform the review.",
+          "minLength": 1
+        }
+      }
+    },
+    "retryPolicy": {
+      "type": "object",
+      "description": "Retry behavior for a transition.",
+      "additionalProperties": false,
+      "properties": {
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "backoffStrategy": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Fixed",
+            "Linear",
+            "Exponential",
+            "Manual",
+            "Unknown"
+          ]
+        },
+        "retryConditions": {
+          "type": "array",
+          "description": "Conditions that allow retry.",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "description": "External dependency required by the workflow.",
+      "additionalProperties": false,
+      "required": [
+        "dependencyType",
+        "description"
+      ],
+      "properties": {
+        "dependencyType": {
+          "type": "string",
+          "enum": [
+            "Entity",
+            "Service",
+            "Dataset",
+            "Index",
+            "Provider",
+            "Policy",
+            "Human Role",
+            "Runtime Environment",
+            "Other"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an existing first-class RKM entity using a stable identifier and string entity type.",
+      "additionalProperties": false,
+      "required": [
+        "entityId",
+        "entityType"
+      ],
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "description": "Stable identifier of the referenced entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4}$"
+        },
+        "entityType": {
+          "$ref": "relationship.schema.json#/$defs/entityType"
+        }
+      }
+    },
+    "participantType": {
+      "type": "string",
+      "description": "Kind of workflow participant.",
+      "enum": [
+        "Component",
+        "Agent",
+        "Framework",
+        "Retriever",
+        "Reranker",
+        "Embedding Model",
+        "Language Model",
+        "Vector Database",
+        "Graph Database",
+        "Evaluation Metric",
+        "Provider",
+        "Embedded Tool Contract",
+        "Human Role",
+        "External Service",
+        "Other"
+      ]
+    },
+    "participantRole": {
+      "type": "string",
+      "description": "Role played by the participant in the workflow.",
+      "enum": [
+        "Executor",
+        "Coordinator",
+        "Producer",
+        "Consumer",
+        "Transformer",
+        "Retriever",
+        "Reranker",
+        "Evaluator",
+        "Approver",
+        "Observer",
+        "Governor",
+        "Other"
+      ]
+    },
+    "stepType": {
+      "type": "string",
+      "description": "Primary kind of work performed by a step.",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Citation Selection",
+        "Verification",
+        "Evaluation",
+        "Monitoring",
+        "Human Review",
+        "Routing",
+        "Storage",
+        "Other"
+      ]
+    },
+    "transitionType": {
+      "type": "string",
+      "description": "Execution pattern between steps.",
+      "enum": [
+        "Sequential",
+        "Conditional",
+        "Parallel",
+        "Iterative",
+        "Retry",
+        "Human Gated",
+        "Event Driven",
+        "Terminal"
+      ]
+    }
+  }
+}
