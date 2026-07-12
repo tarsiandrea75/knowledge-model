@@ -552,7 +552,7 @@ def run_self_test() -> int:
                 code == 3
                 and "status: over budget" in out
                 and "required budget for target: 600" in out
-                and "safe action: reset the window, increase the daily budget" in out
+                and "safe action: reset the window, increase the daily budget, or choose a target <= recommended max target." in out
                 and "suggested command: make autocycle N=2 TOKEN_BUDGET=400 BUDGET_SAFETY_FACTOR=2" in out
                 and "make autocycle N=3" not in out
                 and err == "",
@@ -724,7 +724,7 @@ def run_self_test() -> int:
                 and "status: over budget" in out
                 and "recommended max target: 0" in out
                 and "required budget for target: 200" in out
-                and "safe action: reset the window, increase the daily budget" in out
+                and "safe action: reset the window, increase the daily budget, or choose a target <= recommended max target." in out
                 and "make autocycle" not in out
                 and err == "",
                 "over-budget check with no safe target failed",
