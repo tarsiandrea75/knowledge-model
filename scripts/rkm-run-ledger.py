@@ -35,24 +35,36 @@ COMMIT_LINE = re.compile(r"^\[[^\]\s]+\s+(?P<hash>[0-9a-f]{6,40})\]\s+(?P<messag
 CREATE_MODE_LINE = re.compile(r"^create mode \d{6}\s+(?P<path>\S.+)$")
 STATUS_PATH_LINE = re.compile(r"^\s*(?:A|M|D|R|C|\?\?)\s+(?P<path>\S.+)$")
 AUTOMATION_PREFIX = re.compile(r"\[(?P<label>rkm-[a-z0-9-]+)\]")
-PATH_FRAGMENT = re.compile(
-    r"(?P<path>(?:docs|schema|scripts|data|examples|tests|\.rkm)/[A-Za-z0-9._/@+-][A-Za-z0-9._/@+\- ]*)"
+REPO_PATH_TOKEN = re.compile(
+    r"(?<![\w./-])(?P<path>"
+    r"docs/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.md|"
+    r"scripts/[A-Za-z0-9._-]+\.(?:sh|py)|"
+    r"schema/(?:definitions/)?[A-Za-z0-9._-]+\.schema\.json|"
+    r"registries/[A-Za-z0-9._-]+\.json|"
+    r"Makefile|"
+    r"AGENTS\.md|"
+    r"README\.md"
+    r")(?![\w./-])"
 )
 RECOVERY_MARKERS = (
-    "recovery",
-    "rkm-recover-revise",
-    "Recover docs/",
-    "Recover schema/",
-    "Recover scripts/",
+    "rkm-recover-revise.sh",
+    "Codex recovery output",
+    "entering single-file REVISE recovery",
+    "accepted after recovery",
 )
-FAILURE_MARKERS = (
-    "ERROR:",
-    "REVISE",
-    "STOP",
-    "usage limit",
-    "Argument list too long",
-    "failed",
+RECOVERY_PATH_PATTERN = re.compile(
+    r"\bRecover\s+(?:"
+    r"docs/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.md|"
+    r"scripts/[A-Za-z0-9._-]+\.(?:sh|py)|"
+    r"schema/(?:definitions/)?[A-Za-z0-9._-]+\.schema\.json|"
+    r"registries/[A-Za-z0-9._-]+\.json"
+    r")\b"
 )
+ERROR_MARKER = re.compile(r"\bERROR:")
+USAGE_LIMIT_MARKER = re.compile(r"\busage limit\b", re.IGNORECASE)
+ARGUMENT_LIST_TOO_LONG_MARKER = re.compile(r"\bArgument list too long\b", re.IGNORECASE)
+EXIT_NONZERO_MARKER = re.compile(r"\bexit nonzero\b", re.IGNORECASE)
+RECOVERY_FAILED_MARKER = re.compile(r"\brecovery failed\b", re.IGNORECASE)
 
 
 def repository_relative(path: Path) -> str:
@@ -144,6 +156,10 @@ def clean_path(value: str) -> str:
     return path
 
 
+def repo_paths(value: str) -> list[str]:
+    return [clean_path(match.group("path")) for match in REPO_PATH_TOKEN.finditer(value)]
+
+
 def extract_paths_from_line(line: str) -> list[str]:
     stripped = line.strip()
     paths: list[str] = []
@@ -151,13 +167,12 @@ def extract_paths_from_line(line: str) -> list[str]:
     for pattern in (CREATE_MODE_LINE, STATUS_PATH_LINE):
         match = pattern.match(stripped)
         if match:
-            paths.append(clean_path(match.group("path")))
+            paths.extend(repo_paths(match.group("path")))
 
     if stripped.startswith(("Commit completed:", "Recover ")):
-        for match in PATH_FRAGMENT.finditer(stripped):
-            paths.append(clean_path(match.group("path")))
+        paths.extend(repo_paths(stripped))
 
-    return [path for path in paths if "/" in path]
+    return paths
 
 
 def extract_files(text: str) -> list[str]:
@@ -187,23 +202,54 @@ def extract_automation_kinds(text: str, label: str | None) -> list[str]:
 
 def failure_hints(text: str) -> list[str]:
     hints: list[str] = []
+    verdicts = extract_verdicts(text)
+    final_verdict = verdicts[-1] if verdicts else None
+
     for line in text.splitlines():
         if re.search(r"\bReturn\s+ACCEPT,\s+REVISE,\s+or\s+STOP\b", line, re.IGNORECASE):
             continue
-        lower_line = line.lower()
-        for marker in FAILURE_MARKERS:
-            found = marker in line if marker not in ("usage limit", "failed") else marker in lower_line
-            if found and marker not in hints:
-                hints.append(marker)
+        if ERROR_MARKER.search(line) and "ERROR:" not in hints:
+            hints.append("ERROR:")
+        if USAGE_LIMIT_MARKER.search(line) and "usage limit" not in hints:
+            hints.append("usage limit")
+        if ARGUMENT_LIST_TOO_LONG_MARKER.search(line) and "Argument list too long" not in hints:
+            hints.append("Argument list too long")
+        if EXIT_NONZERO_MARKER.search(line) and "exit nonzero" not in hints:
+            hints.append("exit nonzero")
+        if RECOVERY_FAILED_MARKER.search(line) and "recovery failed" not in hints:
+            hints.append("recovery failed")
+
+    if final_verdict == "STOP" and "STOP" not in hints:
+        hints.append("STOP")
     return hints
 
 
 def has_recovery(text: str) -> bool:
-    lower_text = text.lower()
-    return any(
-        marker in text if marker.startswith("Recover ") else marker.lower() in lower_text
-        for marker in RECOVERY_MARKERS
-    )
+    return any(marker in text for marker in RECOVERY_MARKERS) or bool(RECOVERY_PATH_PATTERN.search(text))
+
+
+def final_status(final_verdict: str | None, has_failure: bool, recovered: bool) -> str:
+    if final_verdict == "ACCEPT" and recovered:
+        return "RECOVERED"
+    if final_verdict == "ACCEPT" and not has_failure:
+        return "ACCEPTED"
+    if final_verdict == "REVISE":
+        return "REVISE_PENDING"
+    if final_verdict == "STOP":
+        return "STOPPED"
+    if has_failure:
+        return "FAILED"
+    return "UNKNOWN"
+
+
+def entry_final_status(entry: dict[str, Any]) -> str:
+    stored = entry.get("finalStatus")
+    if isinstance(stored, str) and stored:
+        return stored
+    final_verdict = entry.get("finalVerdict")
+    if not isinstance(final_verdict, str):
+        final_verdict = None
+    return final_status(final_verdict, bool(entry.get("hasFailure")), bool(entry.get("hasRecovery")))
 
 
 def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
@@ -213,6 +259,8 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
     files = extract_files(text)
     hints = failure_hints(text)
     final_verdict = verdicts[-1] if verdicts else None
+    recovered = has_recovery(text)
+    has_failure = bool(hints)
 
     return {
         "timestampUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -223,11 +271,16 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
         "totalTokens": sum(event["tokens"] for event in token_events),
         "verdicts": verdicts,
         "finalVerdict": final_verdict,
+        "hadRevise": "REVISE" in verdicts,
+        "hadStop": "STOP" in verdicts,
+        "hadUsageLimit": "usage limit" in hints,
+        "hadArgumentListTooLong": "Argument list too long" in hints,
+        "finalStatus": final_status(final_verdict, has_failure, recovered),
         "commits": commits,
         "files": files,
         "acceptedFileCount": len(files) if final_verdict == "ACCEPT" else 0,
-        "hasRecovery": has_recovery(text),
-        "hasFailure": bool(hints),
+        "hasRecovery": recovered,
+        "hasFailure": has_failure,
         "failureHints": hints,
     }
 
@@ -264,6 +317,9 @@ def report_text(entries: list[dict[str, Any]]) -> str:
     accepted_files = sum(int(entry.get("acceptedFileCount", 0) or 0) for entry in entries)
     runs_with_recovery = sum(1 for entry in entries if entry.get("hasRecovery"))
     runs_with_failure = sum(1 for entry in entries if entry.get("hasFailure"))
+    recovered_runs = sum(1 for entry in entries if entry_final_status(entry) == "RECOVERED")
+    revise_pending_runs = sum(1 for entry in entries if entry_final_status(entry) == "REVISE_PENDING")
+    stopped_runs = sum(1 for entry in entries if entry_final_status(entry) == "STOPPED")
 
     lines = [
         "RKM run ledger report",
@@ -278,6 +334,9 @@ def report_text(entries: list[dict[str, Any]]) -> str:
         ),
         f"runs with recovery: {runs_with_recovery}",
         f"runs with failure hints: {runs_with_failure}",
+        f"recovered runs: {recovered_runs}",
+        f"revise pending runs: {revise_pending_runs}",
+        f"stopped runs: {stopped_runs}",
         "most recent entries:",
     ]
 
@@ -288,6 +347,7 @@ def report_text(entries: list[dict[str, Any]]) -> str:
             f"acceptedFileCount={entry.get('acceptedFileCount', 0)}; "
             f"totalTokens={entry.get('totalTokens', 0)}; "
             f"finalVerdict={entry.get('finalVerdict') or 'n/a'}; "
+            f"finalStatus={entry_final_status(entry)}; "
             f"hasRecovery={bool(entry.get('hasRecovery'))}"
         )
     if not entries:
@@ -326,6 +386,7 @@ def run_self_test() -> int:
                 [
                     "[rkm-cycle] start",
                     "Return ACCEPT, REVISE, or STOP",
+                    "A prose sentence about docs architecture naming is not a repository path.",
                     "tokens used",
                     "  1,234 total",
                     "verdict: `ACCEPT`",
@@ -344,20 +405,25 @@ def run_self_test() -> int:
         assert_equal(first_entry["commits"], [{"hash": "abc1234", "message": "Add docs architecture example"}], "commit extraction")
         assert_equal(first_entry["files"], ["docs/architecture/example-model.md"], "file extraction")
         assert_equal(first_entry["acceptedFileCount"], 1, "accepted file count")
+        assert_equal(first_entry["hasRecovery"], False, "plain accept recovery detection")
+        assert_equal(first_entry["hasFailure"], False, "plain accept failure detection")
+        assert_equal(first_entry["hadRevise"], False, "plain accept revise detection")
+        assert_equal(first_entry["finalStatus"], "ACCEPTED", "plain accept final status")
         assert_equal(first_entry["automationKinds"], ["rkm-cycle"], "automation prefix extraction")
 
         second_log.write_text(
             "\n".join(
                 [
-                    "[rkm-autocycle] recovery pass",
+                    "[rkm-autocycle] start",
                     "tokens used: 200",
-                    "usage limit reached",
+                    "validation failed before the requested fix was accepted",
                     "tokens used",
                     "  300",
-                    "rkm-recover-revise finished",
+                    "entering single-file REVISE recovery",
                     "Recover docs/architecture/recovered-model.md",
                     "verdict: REVISE",
-                    "STOP",
+                    "accepted after recovery",
+                    "verdict: ACCEPT",
                     "[main def5678] Recover docs architecture model",
                     "Commit completed: Add docs/architecture/recovered-model.md.",
                 ]
@@ -367,28 +433,49 @@ def run_self_test() -> int:
         second_entry = append_entry(second_log, ledger, "manual-label")
 
         assert_equal([event["tokens"] for event in second_entry["tokenEvents"]], [200, 300], "multiple token blocks")
-        assert_equal(second_entry["verdicts"], ["REVISE", "STOP"], "final verdict extraction")
-        assert_equal(second_entry["finalVerdict"], "STOP", "final verdict")
+        assert_equal(second_entry["verdicts"], ["REVISE", "ACCEPT"], "transient revise verdict extraction")
+        assert_equal(second_entry["finalVerdict"], "ACCEPT", "recovered final verdict")
+        assert_equal(second_entry["hadRevise"], True, "transient revise detection")
+        assert_equal(second_entry["hadStop"], False, "stop detection")
         assert_equal(second_entry["hasRecovery"], True, "recovery detection")
-        assert_equal(second_entry["hasFailure"], True, "failure detection")
+        assert_equal(second_entry["hasFailure"], False, "transient revise failure detection")
+        assert_equal(second_entry["finalStatus"], "RECOVERED", "recovered final status")
         assert_equal(second_entry["commits"][0]["hash"], "def5678", "recovered commit extraction")
         assert_equal(second_entry["files"], ["docs/architecture/recovered-model.md"], "recovered file extraction")
         assert_equal(second_entry["automationKinds"], ["manual-label", "rkm-autocycle"], "label and prefix extraction")
 
+        third_log = root / "third.log"
+        third_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-cycle] start",
+                    "Argument list too long",
+                    "verdict: STOP",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        third_entry = append_entry(third_log, ledger, None)
+        assert_equal(third_entry["hadArgumentListTooLong"], True, "argument list too long detection")
+        assert_equal(third_entry["hasFailure"], True, "argument list too long failure detection")
+        assert_equal(third_entry["finalStatus"], "STOPPED", "stop final status")
+
         entries = read_ledger(ledger)
-        assert_equal(len(entries), 2, "append behavior")
+        assert_equal(len(entries), 3, "append behavior")
         report = report_text(entries)
         for expected in (
-            "total runs: 2",
+            "total runs: 3",
             "total token events: 3",
             "total tokens: 1734",
             "runs with recovery: 1",
             "runs with failure hints: 1",
+            "recovered runs: 1",
+            "stopped runs: 1",
         ):
             if expected not in report:
                 raise AssertionError(f"report behavior: missing {expected!r}")
 
-    print("Self-test passed: token, verdict, commit, file, append, recovery, and report behavior verified.")
+    print("Self-test passed: parser precision, status, append, recovery, and report behavior verified.")
     return 0
 
 
