@@ -14,6 +14,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RELATIONSHIP_TYPE_REGISTRY = (
     REPOSITORY_ROOT / "registries" / "relationship-type-registry.json"
 )
+ENTITY_TYPE_REGISTRY = REPOSITORY_ROOT / "registries" / "entity-type-registry.json"
 ARCHITECTURE_DOCS = REPOSITORY_ROOT / "docs" / "architecture"
 
 UPPERCASE_SNAKE_CASE = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*\b")
@@ -53,6 +54,12 @@ SELF_TEST_INVALID_TRIPLES = (
     ("Framework", "SUPPORTS", "Workflow"),
     ("Framework", "USES", "Tool"),
     ("Provider", "PROVIDES", "Framework"),
+)
+SELF_TEST_UNKNOWN_PREDICATE = "Paper COMPARES Technique"
+SELF_TEST_CANONICAL_SINGLE_WORD = "Paper CITES Reference"
+SELF_TEST_ACRONYM_PROSE = "RAG uses JSON and HTTP APIs"
+SELF_TEST_ALLOWED_NONCANONICAL = (
+    "Future candidate noncanonical example: Paper COMPARES Technique"
 )
 
 
@@ -106,6 +113,117 @@ def load_canonical_predicates(errors: list[str]) -> set[str]:
     return predicates
 
 
+def load_registered_entity_types(errors: list[str]) -> set[str]:
+    entity_types = load_relationship_endpoint_entity_types(errors)
+
+    try:
+        with ENTITY_TYPE_REGISTRY.open("r", encoding="utf-8") as handle:
+            document = json.load(handle)
+    except FileNotFoundError:
+        return entity_types
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{display(ENTITY_TYPE_REGISTRY)}: could not load registry: {exc}")
+        return entity_types
+
+    registry_entity_types = document.get("entityTypes")
+    if not isinstance(registry_entity_types, list):
+        errors.append(f"{display(ENTITY_TYPE_REGISTRY)}: entityTypes must be an array")
+        return entity_types
+
+    for index, entity_type in enumerate(registry_entity_types):
+        if not isinstance(entity_type, dict):
+            errors.append(
+                f"{display(ENTITY_TYPE_REGISTRY)}: "
+                f"entityTypes[{index}] must be an object"
+            )
+            continue
+
+        type_name = entity_type.get("type")
+        if not isinstance(type_name, str):
+            errors.append(
+                f"{display(ENTITY_TYPE_REGISTRY)}: "
+                f"entityTypes[{index}].type must be a string"
+            )
+            continue
+
+        entity_types.add(type_name)
+
+    return entity_types
+
+
+def load_relationship_endpoint_entity_types(errors: list[str]) -> set[str]:
+    try:
+        with RELATIONSHIP_TYPE_REGISTRY.open("r", encoding="utf-8") as handle:
+            document = json.load(handle)
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{display(RELATIONSHIP_TYPE_REGISTRY)}: could not load registry: {exc}")
+        return set()
+
+    relationship_types = document.get("relationshipTypes")
+    if not isinstance(relationship_types, list):
+        errors.append(
+            f"{display(RELATIONSHIP_TYPE_REGISTRY)}: relationshipTypes must be an array"
+        )
+        return set()
+
+    entity_types: set[str] = set()
+    for relationship_index, relationship_type in enumerate(relationship_types):
+        if not isinstance(relationship_type, dict):
+            continue
+
+        for endpoint_name in ("allowedSources", "allowedTargets"):
+            endpoints = relationship_type.get(endpoint_name, [])
+            if not isinstance(endpoints, list):
+                errors.append(
+                    f"{display(RELATIONSHIP_TYPE_REGISTRY)}: "
+                    f"relationshipTypes[{relationship_index}].{endpoint_name} "
+                    "must be an array"
+                )
+                continue
+
+            for endpoint_index, endpoint in enumerate(endpoints):
+                if not isinstance(endpoint, dict):
+                    errors.append(
+                        f"{display(RELATIONSHIP_TYPE_REGISTRY)}: "
+                        f"relationshipTypes[{relationship_index}]."
+                        f"{endpoint_name}[{endpoint_index}] must be an object"
+                    )
+                    continue
+
+                entity_type = endpoint.get("entityType")
+                if isinstance(entity_type, str):
+                    entity_types.add(entity_type)
+
+    return entity_types
+
+
+def relationship_position_triples(
+    line: str,
+    entity_types: set[str],
+) -> list[tuple[str, str, str]]:
+    if not entity_types:
+        return []
+
+    entity_type_pattern = "|".join(
+        re.escape(entity_type)
+        for entity_type in sorted(entity_types, key=len, reverse=True)
+    )
+    pattern = re.compile(
+        rf"(?<![A-Za-z0-9])"
+        rf"(?P<subject>{entity_type_pattern})"
+        rf"\s+"
+        rf"(?P<predicate>[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*)"
+        rf"\s+"
+        rf"(?P<object>{entity_type_pattern})"
+        rf"\b"
+    )
+
+    return [
+        (match.group("subject"), match.group("predicate"), match.group("object"))
+        for match in pattern.finditer(line)
+    ]
+
+
 def relationship_predicate_in_example(
     line: str,
     canonical_predicates: set[str] | None = None,
@@ -150,8 +268,14 @@ def clean_relationship_endpoint(value: str) -> str:
 def relationship_triple_in_example(
     line: str,
     canonical_predicates: set[str] | None = None,
+    entity_types: set[str] | None = None,
 ) -> tuple[str, str, str] | None:
     predicate = relationship_predicate_in_example(line, canonical_predicates)
+    if predicate is None and entity_types is not None:
+        triples = relationship_position_triples(line, entity_types)
+        if triples:
+            return triples[0]
+
     if predicate is None:
         return None
 
@@ -205,14 +329,33 @@ def validate_relationship_triple(
     )
 
 
-def validate_fenced_line(
+def validate_relationship_position_line(
     path: Path,
     line_number: int,
     line: str,
     canonical_predicates: set[str],
+    entity_types: set[str],
     errors: list[str],
 ) -> None:
     if line_is_ignored(line):
+        return
+
+    position_triples = relationship_position_triples(line, entity_types)
+    if position_triples:
+        for subject, predicate, object_ in position_triples:
+            if predicate not in canonical_predicates:
+                errors.append(
+                    f"{display(path)}:{line_number}: "
+                    f"unknown relationship predicate {predicate}"
+                )
+                continue
+
+            guidance = invalid_relationship_guidance(subject, predicate, object_)
+            if guidance is not None:
+                errors.append(
+                    f"{display(path)}:{line_number}: invalid relationship triple "
+                    f"{subject} {predicate} {object_}; prefer {guidance}"
+                )
         return
 
     predicate = relationship_predicate_in_example(line, canonical_predicates)
@@ -227,30 +370,50 @@ def validate_fenced_line(
         )
 
 
+def validate_fenced_line(
+    path: Path,
+    line_number: int,
+    line: str,
+    canonical_predicates: set[str],
+    entity_types: set[str],
+    errors: list[str],
+) -> None:
+    validate_relationship_position_line(
+        path,
+        line_number,
+        line,
+        canonical_predicates,
+        entity_types,
+        errors,
+    )
+
+
 def validate_inline_code(
     path: Path,
     line_number: int,
     line: str,
     canonical_predicates: set[str],
+    entity_types: set[str],
     errors: list[str],
 ) -> None:
     if line_is_ignored(line):
         return
 
     for match in INLINE_CODE.finditer(line):
-        predicate = match.group(1).strip()
-        if not is_uppercase_snake_case(predicate):
-            continue
-        if predicate in canonical_predicates:
-            continue
-        errors.append(
-            f"{display(path)}:{line_number}: unknown relationship predicate {predicate}"
+        validate_relationship_position_line(
+            path,
+            line_number,
+            match.group(1),
+            canonical_predicates,
+            entity_types,
+            errors,
         )
 
 
 def validate_markdown_file(
     path: Path,
     canonical_predicates: set[str],
+    entity_types: set[str],
     errors: list[str],
 ) -> None:
     in_fence = False
@@ -279,6 +442,15 @@ def validate_markdown_file(
                 line_number,
                 line,
                 canonical_predicates,
+                entity_types,
+                errors,
+            )
+            validate_relationship_position_line(
+                path,
+                line_number,
+                INLINE_CODE.sub(" ", line),
+                canonical_predicates,
+                entity_types,
                 errors,
             )
             if line.strip():
@@ -298,6 +470,7 @@ def validate_markdown_file(
                 line_number,
                 line,
                 canonical_predicates,
+                entity_types,
                 errors,
             )
 
@@ -309,10 +482,21 @@ def run_self_test() -> int:
         predicate
         for _, predicate, _ in SELF_TEST_VALID_TRIPLES + SELF_TEST_INVALID_TRIPLES
     }
+    canonical_predicates.add("CITES")
+    entity_types = {
+        entity_type
+        for subject, _, object_ in SELF_TEST_VALID_TRIPLES + SELF_TEST_INVALID_TRIPLES
+        for entity_type in (subject, object_)
+    }
+    entity_types.update({"Paper", "Technique", "Reference"})
 
     for line_number, expected_triple in enumerate(SELF_TEST_VALID_TRIPLES, start=1):
         line = " ".join(expected_triple)
-        parsed = relationship_triple_in_example(line, canonical_predicates)
+        parsed = relationship_triple_in_example(
+            line,
+            canonical_predicates,
+            entity_types,
+        )
         if parsed != expected_triple:
             errors.append(
                 f"self-test valid case {line!r}: parsed {parsed!r}, "
@@ -326,6 +510,7 @@ def run_self_test() -> int:
             line_number,
             line,
             canonical_predicates,
+            entity_types,
             case_errors,
         )
         if case_errors:
@@ -338,7 +523,11 @@ def run_self_test() -> int:
     for offset, expected_triple in enumerate(SELF_TEST_INVALID_TRIPLES):
         line_number = first_invalid_line_number + offset
         line = " ".join(expected_triple)
-        parsed = relationship_triple_in_example(line, canonical_predicates)
+        parsed = relationship_triple_in_example(
+            line,
+            canonical_predicates,
+            entity_types,
+        )
         if parsed != expected_triple:
             errors.append(
                 f"self-test invalid case {line!r}: parsed {parsed!r}, "
@@ -352,6 +541,7 @@ def run_self_test() -> int:
             line_number,
             line,
             canonical_predicates,
+            entity_types,
             case_errors,
         )
         if len(case_errors) != 1:
@@ -368,6 +558,54 @@ def run_self_test() -> int:
                 f"{expected_message!r}: {case_errors[0]!r}"
             )
 
+    unknown_cases = (
+        ("prose", validate_relationship_position_line, SELF_TEST_UNKNOWN_PREDICATE),
+        ("inline", validate_inline_code, f"`{SELF_TEST_UNKNOWN_PREDICATE}`"),
+        ("fenced", validate_fenced_line, SELF_TEST_UNKNOWN_PREDICATE),
+    )
+    for offset, (case_name, validator, line) in enumerate(unknown_cases, start=1):
+        case_errors = []
+        validator(
+            self_test_path,
+            100 + offset,
+            line,
+            canonical_predicates,
+            entity_types,
+            case_errors,
+        )
+        if len(case_errors) != 1:
+            errors.append(
+                f"self-test {case_name} unknown predicate case {line!r}: "
+                f"expected one error, got {case_errors!r}"
+            )
+            continue
+        if "unknown relationship predicate COMPARES" not in case_errors[0]:
+            errors.append(
+                f"self-test {case_name} unknown predicate case {line!r}: "
+                f"unexpected error {case_errors[0]!r}"
+            )
+
+    valid_position_cases = (
+        ("canonical single-word predicate", SELF_TEST_CANONICAL_SINGLE_WORD),
+        ("ordinary acronym prose", SELF_TEST_ACRONYM_PROSE),
+        ("allowed noncanonical example", SELF_TEST_ALLOWED_NONCANONICAL),
+    )
+    for offset, (case_name, line) in enumerate(valid_position_cases, start=1):
+        case_errors = []
+        validate_relationship_position_line(
+            self_test_path,
+            200 + offset,
+            line,
+            canonical_predicates,
+            entity_types,
+            case_errors,
+        )
+        if case_errors:
+            errors.append(
+                f"self-test valid {case_name} case {line!r}: "
+                f"expected no errors, got {case_errors!r}"
+            )
+
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
@@ -376,7 +614,9 @@ def run_self_test() -> int:
     print(
         "Documentation relationship self-test passed: "
         f"{len(SELF_TEST_VALID_TRIPLES)} valid cases, "
-        f"{len(SELF_TEST_INVALID_TRIPLES)} invalid cases"
+        f"{len(SELF_TEST_INVALID_TRIPLES)} invalid cases, "
+        f"{len(unknown_cases)} unknown predicate cases, "
+        f"{len(valid_position_cases)} relationship-position cases"
     )
     return 0
 
@@ -400,10 +640,11 @@ def main(argv: list[str] | None = None) -> int:
 
     errors: list[str] = []
     canonical_predicates = load_canonical_predicates(errors)
+    entity_types = load_registered_entity_types(errors)
 
-    if canonical_predicates:
+    if canonical_predicates and entity_types:
         for path in sorted(ARCHITECTURE_DOCS.glob("*.md")):
-            validate_markdown_file(path, canonical_predicates, errors)
+            validate_markdown_file(path, canonical_predicates, entity_types, errors)
 
     if errors:
         for error in errors:
