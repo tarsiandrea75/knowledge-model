@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -395,6 +397,111 @@ def read_state(path: Path) -> dict[str, Any]:
     return document
 
 
+def display_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if value is None:
+        return "(unavailable)"
+    return str(value)
+
+
+def print_command_list(label: str, commands: Any) -> None:
+    print(f"{label}:")
+    if not isinstance(commands, list) or not commands:
+        print("  none")
+        return
+    for command in commands:
+        print(f"  - {display_value(command)}")
+
+
+def read_status_state(state_path: str | Path) -> tuple[dict[str, Any] | None, int]:
+    resolved = resolve_state_path(state_path)
+    try:
+        state = json.loads(resolved.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        print(
+            f"autopilot state not found: {resolved}\n"
+            "Run `make autopilot-dry-run` to generate a fresh state preview.",
+            file=sys.stderr,
+        )
+        return None, 2
+    except json.JSONDecodeError as exc:
+        print(f"autopilot state is invalid JSON: {resolved}: {exc}", file=sys.stderr)
+        return None, 2
+    except OSError as exc:
+        print(f"failed to read autopilot state: {resolved}: {exc}", file=sys.stderr)
+        return None, 2
+
+    if not isinstance(state, dict):
+        print(f"autopilot state is invalid: {resolved}: expected a JSON object", file=sys.stderr)
+        return None, 2
+
+    return state, 0
+
+
+def print_budget_status(next_action_json: Any) -> None:
+    if not isinstance(next_action_json, dict):
+        return
+
+    budget_keys = (
+        "dailyBudgetTokens",
+        "tokensUsedInCurrentWindow",
+        "reserveTokens",
+        "recoveryRiskReserveTokens",
+        "usableRemainingTokensAfterRisk",
+        "recommendedTarget",
+        "requiredBudgetForTarget",
+    )
+    if not any(key in next_action_json for key in budget_keys):
+        return
+
+    print("budget:")
+    for key in budget_keys:
+        if key in next_action_json:
+            print(f"  {key}: {display_value(next_action_json.get(key))}")
+
+    usable = next_action_json.get("usableRemainingTokensAfterRisk")
+    required = next_action_json.get("requiredBudgetForTarget")
+    target = next_action_json.get("recommendedTarget")
+    if usable is not None or required is not None or target is not None:
+        print(
+            "  explanation: "
+            f"usable remaining tokens after reserves are {display_value(usable)}; "
+            f"target {display_value(target)} requires {display_value(required)} tokens."
+        )
+
+
+def print_historical_ledger_status(next_action_json: Any) -> None:
+    if isinstance(next_action_json, dict) and next_action_json.get("lastLedgerIsHistorical") is True:
+        print("last ledger status: historical; no dirty file is pending.")
+
+
+def print_status(state: dict[str, Any]) -> None:
+    print("autopilot status")
+    print(f"last autopilot timestamp: {display_value(state.get('timestampUtc'))}")
+    print(f"detected status: {display_value(state.get('detectedStatus'))}")
+    print(f"final outcome: {display_value(state.get('finalOutcome'))}")
+    print(f"target: {display_value(state.get('target'))}")
+    print(f"dryRun: {display_value(state.get('dryRun'))}")
+    print(f"allowRecovery: {display_value(state.get('allowRecovery'))}")
+    print(f"recommended command: {display_value(state.get('recommendedCommand'))}")
+    print_command_list("commands planned", state.get("commandsPlanned"))
+    print_command_list("commands run", state.get("commandsRun"))
+    print_command_list("commands skipped", state.get("commandsSkipped"))
+    print(f"exit code: {display_value(state.get('exitCode'))}")
+    next_action_json = state.get("nextActionJson")
+    print_budget_status(next_action_json)
+    print_historical_ledger_status(next_action_json)
+
+
+def run_status(state_path: str | Path) -> int:
+    state, exit_code = read_status_state(state_path)
+    if state is None:
+        return exit_code
+    print_status(state)
+    return 0
+
+
 def assert_required_state_keys(name: str, state: dict[str, Any]) -> None:
     missing = REQUIRED_STATE_KEYS.difference(state)
     if missing:
@@ -437,6 +544,37 @@ def assert_autopilot_state(
         state = read_state(state_path)
         assert_required_state_keys(name, state)
         return state
+
+
+def assert_status_result(
+    name: str,
+    state_content: str | None,
+    expected_exit_code: int,
+    expected_stdout: Sequence[str],
+    expected_stderr: Sequence[str] = (),
+) -> None:
+    with tempfile.TemporaryDirectory(prefix="rkm-autopilot-status-test-") as directory:
+        state_path = Path(directory) / "autopilot-state.json"
+        if state_content is not None:
+            state_path.write_text(state_content, encoding="utf-8")
+
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            actual_exit_code = run_status(state_path)
+
+        if actual_exit_code != expected_exit_code:
+            raise AssertionError(f"{name}: expected exit {expected_exit_code}, got {actual_exit_code}")
+
+        actual_stdout = stdout.getvalue()
+        for expected in expected_stdout:
+            if expected not in actual_stdout:
+                raise AssertionError(f"{name}: expected stdout to contain {expected!r}, got {actual_stdout!r}")
+
+        actual_stderr = stderr.getvalue()
+        for expected in expected_stderr:
+            if expected not in actual_stderr:
+                raise AssertionError(f"{name}: expected stderr to contain {expected!r}, got {actual_stderr!r}")
 
 
 def run_self_test() -> int:
@@ -523,6 +661,91 @@ def run_self_test() -> int:
     if failed_state["commandsRun"] != ["make safe-push"]:
         raise AssertionError("failed command records exit code: failed command was not recorded")
 
+    assert_status_result(
+        "status missing state",
+        None,
+        2,
+        (),
+        ("autopilot state not found", "make autopilot-dry-run"),
+    )
+    assert_status_result(
+        "status invalid state",
+        "{",
+        2,
+        (),
+        ("autopilot state is invalid JSON",),
+    )
+    assert_status_result(
+        "status valid over-budget state",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": False,
+                "allowRecovery": False,
+                "detectedStatus": OVER_BUDGET,
+                "nextAction": "reduce target",
+                "recommendedCommand": "make budget-report",
+                "actionSelected": "stopping without changes.",
+                "commandsPlanned": [],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "stopped without changes.",
+                "nextActionJson": {
+                    "status": OVER_BUDGET,
+                    "dailyBudgetTokens": 1000,
+                    "tokensUsedInCurrentWindow": 950,
+                    "reserveTokens": 100,
+                    "recoveryRiskReserveTokens": 50,
+                    "usableRemainingTokensAfterRisk": -100,
+                    "recommendedTarget": 1,
+                    "requiredBudgetForTarget": 300,
+                    "lastLedgerIsHistorical": True,
+                },
+            }
+        ),
+        0,
+        (
+            "detected status: OVER_BUDGET",
+            "dailyBudgetTokens: 1000",
+            "usableRemainingTokensAfterRisk: -100",
+            "target 1 requires 300 tokens",
+            "last ledger status: historical; no dirty file is pending.",
+        ),
+    )
+    assert_status_result(
+        "status valid ready-to-autocycle state",
+        json.dumps(
+            {
+                "timestampUtc": "2026-07-12T00:00:00Z",
+                "target": 3,
+                "dryRun": True,
+                "allowRecovery": False,
+                "detectedStatus": READY_TO_AUTOCYCLE,
+                "nextAction": "run autocycle",
+                "recommendedCommand": "make autocycle N=3 TOKEN_BUDGET=500 BUDGET_SAFETY_FACTOR=1.25",
+                "actionSelected": "run autocycle, then safe-push if autocycle succeeds.",
+                "commandsPlanned": [
+                    "make autocycle N=3 TOKEN_BUDGET=500 BUDGET_SAFETY_FACTOR=1.25",
+                    "make safe-push",
+                ],
+                "commandsRun": [],
+                "commandsSkipped": [],
+                "exitCode": 0,
+                "finalOutcome": "dry run complete; no changes made.",
+                "nextActionJson": {"status": READY_TO_AUTOCYCLE},
+            }
+        ),
+        0,
+        (
+            "detected status: READY_TO_AUTOCYCLE",
+            "commands planned:",
+            "make autocycle N=3 TOKEN_BUDGET=500 BUDGET_SAFETY_FACTOR=1.25",
+            "make safe-push",
+        ),
+    )
+
     print("rkm-autopilot self-test passed")
     return 0
 
@@ -541,7 +764,18 @@ def make_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def make_status_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Print the latest RKM autopilot status.")
+    parser.add_argument("--state-path", default=DEFAULT_STATE_PATH, metavar="PATH", help="autopilot state input path")
+    return parser
+
+
 def run_cli(argv: list[str]) -> int:
+    if len(argv) > 1 and argv[1] == "status":
+        parser = make_status_parser()
+        args = parser.parse_args(argv[2:])
+        return run_status(args.state_path)
+
     parser = make_parser()
     args = parser.parse_args(argv[1:])
     if args.self_test:
