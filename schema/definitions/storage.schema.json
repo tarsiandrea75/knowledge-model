@@ -1,0 +1,451 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/storage.schema.json",
+  "title": "RKM Embedded Storage Definition",
+  "description": "Defines a reusable embedded storage fragment for persistence, indexing and query capabilities used by RAG systems. This schema does not provide the full knowledge entity envelope for Vector Database, Graph Database or other storage entities: it intentionally omits first-class identity, metadata, description and top-level relationships.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "storageType",
+    "storedRepresentations",
+    "queryCapabilities",
+    "deploymentModels"
+  ],
+  "properties": {
+    "storageId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded storage fragment within the containing entity, architecture record, workflow, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable storage name.",
+      "minLength": 1
+    },
+    "storageType": {
+      "$ref": "#/$defs/storageType"
+    },
+    "storedRepresentations": {
+      "type": "array",
+      "description": "Primary data representations persisted by the storage system.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/storedRepresentation"
+      },
+      "uniqueItems": true
+    },
+    "queryCapabilities": {
+      "type": "array",
+      "description": "Query and retrieval capabilities exposed by the storage system.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/queryCapability"
+      },
+      "uniqueItems": true
+    },
+    "deploymentModels": {
+      "type": "array",
+      "description": "Deployment models supported by the storage system.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/deploymentModel"
+      },
+      "uniqueItems": true
+    },
+    "indexing": {
+      "type": "array",
+      "description": "Indexing structures, strategies or constraints that affect retrieval behavior.",
+      "items": {
+        "$ref": "indexing.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "queryInterfaces": {
+      "type": "array",
+      "description": "Structured query interfaces, languages or APIs exposed by the storage system.",
+      "items": {
+        "$ref": "#/$defs/queryInterface"
+      },
+      "uniqueItems": true
+    },
+    "filtering": {
+      "type": "array",
+      "description": "Filtering capabilities that constrain eligible retrieval candidates.",
+      "items": {
+        "$ref": "#/$defs/filteringCapability"
+      },
+      "uniqueItems": true
+    },
+    "consistencyProfile": {
+      "$ref": "#/$defs/consistencyProfile"
+    },
+    "operationalCharacteristics": {
+      "$ref": "#/$defs/operationalCharacteristics"
+    },
+    "securityControls": {
+      "type": "array",
+      "description": "Security controls relevant to storage access, isolation or governance.",
+      "items": {
+        "$ref": "security-control.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern storage access, retention, residency, mutation or deletion.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "External systems, providers, models, retrievers or first-class RKM entities this storage fragment depends on.",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this embedded storage fragment to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare storage behavior, retrieval quality, latency, cost, scalability, consistency or limitations.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting storage behavior, configuration, operation or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the storage fragment.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "usageGuidance": {
+      "type": "array",
+      "description": "Guidance for modeling, selecting, configuring or operating the storage system in RAG systems.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "storageType": {
+      "type": "string",
+      "description": "Primary storage role represented by the fragment.",
+      "enum": [
+        "Vector Storage",
+        "Graph Storage",
+        "Document Storage",
+        "Relational Storage",
+        "Key Value Storage",
+        "Object Storage",
+        "Search Index",
+        "Cache",
+        "Hybrid Storage",
+        "Other"
+      ]
+    },
+    "storedRepresentation": {
+      "type": "string",
+      "description": "Data representation stored by the system.",
+      "enum": [
+        "Dense Vector",
+        "Sparse Vector",
+        "Multimodal Vector",
+        "Text Chunk",
+        "Document",
+        "Metadata Record",
+        "Property Graph",
+        "RDF Graph",
+        "Knowledge Graph",
+        "Embedding Index",
+        "Inverted Index",
+        "Evaluation Record",
+        "Trace Record",
+        "Other"
+      ]
+    },
+    "queryCapability": {
+      "type": "string",
+      "description": "Query or retrieval behavior exposed by the storage system.",
+      "enum": [
+        "Approximate Nearest Neighbor Search",
+        "Exact Vector Search",
+        "Sparse Search",
+        "Hybrid Search",
+        "Metadata Filtering",
+        "Full Text Search",
+        "Graph Traversal",
+        "Path Query",
+        "Subgraph Query",
+        "Aggregation Query",
+        "Transactional Query",
+        "Batch Export",
+        "Streaming Read",
+        "Other"
+      ]
+    },
+    "deploymentModel": {
+      "type": "string",
+      "description": "How the storage system can be deployed or consumed.",
+      "enum": [
+        "Managed Cloud",
+        "Self Hosted",
+        "Serverless",
+        "Embedded",
+        "Local",
+        "Hybrid",
+        "Edge",
+        "Other"
+      ]
+    },
+    "queryInterface": {
+      "type": "object",
+      "description": "Structured query interface, language or API exposed by the storage system.",
+      "additionalProperties": false,
+      "required": [
+        "interfaceType",
+        "name"
+      ],
+      "properties": {
+        "interfaceType": {
+          "type": "string",
+          "description": "Kind of query interface.",
+          "enum": [
+            "API",
+            "SDK",
+            "Query Language",
+            "SQL Dialect",
+            "Graph Query Language",
+            "Vector Search API",
+            "Search API",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Interface, language or API name.",
+          "minLength": 1
+        },
+        "supportedOperations": {
+          "type": "array",
+          "description": "Operations supported through the interface.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "filteringCapability": {
+      "type": "object",
+      "description": "Filtering behavior that affects which stored artifacts are eligible for retrieval.",
+      "additionalProperties": false,
+      "required": [
+        "filterType"
+      ],
+      "properties": {
+        "filterType": {
+          "type": "string",
+          "description": "Primary filter category.",
+          "enum": [
+            "Metadata",
+            "Tenant",
+            "Access Control",
+            "Time Window",
+            "Source Type",
+            "Region",
+            "Namespace",
+            "Collection",
+            "Document State",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable explanation of the filtering behavior.",
+          "minLength": 1
+        },
+        "supportedOperators": {
+          "type": "array",
+          "description": "Operators supported by the filter.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Equals",
+              "Not Equals",
+              "In",
+              "Not In",
+              "Range",
+              "Contains",
+              "Exists",
+              "Boolean",
+              "Geo",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "consistencyProfile": {
+      "type": "object",
+      "description": "Consistency, durability and freshness characteristics of the storage system.",
+      "additionalProperties": false,
+      "properties": {
+        "readConsistency": {
+          "$ref": "#/$defs/consistencyLevel"
+        },
+        "writeConsistency": {
+          "$ref": "#/$defs/consistencyLevel"
+        },
+        "durability": {
+          "$ref": "#/$defs/level"
+        },
+        "freshnessBehavior": {
+          "type": "string",
+          "description": "How quickly new or updated content becomes visible to queries.",
+          "minLength": 1
+        },
+        "replicationSupport": {
+          "type": "boolean",
+          "description": "Whether the storage system supports replication."
+        },
+        "backupSupport": {
+          "type": "boolean",
+          "description": "Whether the storage system supports backup and restore."
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to using the storage system in RAG systems.",
+      "additionalProperties": false,
+      "properties": {
+        "scalability": {
+          "$ref": "#/$defs/level"
+        },
+        "latencySensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "costSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "indexingLatency": {
+          "$ref": "#/$defs/level"
+        },
+        "queryLatency": {
+          "$ref": "#/$defs/level"
+        },
+        "mutationSupport": {
+          "type": "array",
+          "description": "Supported write or mutation operations.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Insert",
+              "Update",
+              "Delete",
+              "Upsert",
+              "Bulk Load",
+              "Streaming Ingest",
+              "Schema Migration",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "failureModes": {
+          "type": "array",
+          "description": "Known storage failure modes relevant to retrieval or operation.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "description": "Dependency required for storage operation, query behavior, indexing or governance.",
+      "additionalProperties": false,
+      "required": [
+        "dependencyType",
+        "role"
+      ],
+      "properties": {
+        "dependencyType": {
+          "type": "string",
+          "description": "Kind of dependency.",
+          "enum": [
+            "Provider",
+            "Embedding Model",
+            "Language Model",
+            "Retriever",
+            "Reranker",
+            "Framework",
+            "Component",
+            "Infrastructure",
+            "External Service",
+            "Other"
+          ]
+        },
+        "entity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role the dependency plays for this storage fragment.",
+          "minLength": 1
+        }
+      }
+    },
+    "consistencyLevel": {
+      "type": "string",
+      "description": "Consistency level exposed by the storage system.",
+      "enum": [
+        "Strong",
+        "Bounded Staleness",
+        "Session",
+        "Consistent Prefix",
+        "Eventual",
+        "Configurable",
+        "Unknown",
+        "Other"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "description": "Qualitative level.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
