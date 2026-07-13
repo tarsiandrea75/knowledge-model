@@ -58,7 +58,7 @@ printf '==> Running validate-schema-contracts self-test\n'
 printf '==> Running validate-fixtures self-test\n'
 "$PYTHON_BIN" scripts/validate-fixtures.py --self-test
 
-printf '==> Running validate-data self-test\n'
+printf '==> Running validate-data semantic self-test\n'
 "$PYTHON_BIN" scripts/validate-data.py --self-test
 
 printf '==> Running data validation\n'

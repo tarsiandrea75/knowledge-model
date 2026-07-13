@@ -42,7 +42,7 @@ Current seed data includes three RAG technique records:
 
 These records are intentionally small and conservative. They are not a complete RAG technique catalog and should not be presented as comprehensive coverage of the RAG ecosystem.
 
-The seed dataset also includes declared relationship instances under `data/relationships/`. These relationship sets connect existing data records by stable ID and are validated through `data/manifest.json`. Consumers should interpret these domain relationship edges as alpha dataset declarations with conservative scope, not as universal statements about every RAG system.
+The seed dataset also includes declared relationship instances under `data/relationships/`. These relationship sets connect existing data records by stable ID and are validated through `data/manifest.json`. Validation checks both JSON Schema shape and relationship semantics: predicates must exist in `registries/relationship-type-registry.json`, source and target IDs must resolve to declared data entity records, source and target data file fields must match the records that contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. Consumers should interpret these domain relationship edges as alpha dataset declarations with conservative scope, not as universal statements about every RAG system.
 
 Data validation is driven by `data/manifest.json`, which maps each data file to its validating schema. Direct data validation is available through:
 
@@ -73,7 +73,7 @@ Check that the committed export still matches the fixtures:
 python3 scripts/export-fixtures-graph.py --check
 ```
 
-The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, provenance edges that state which schema validates each record, and declared domain relationship edges from validated relationship-set files. It does not invent RAG domain relationships that are not present in the seed data.
+The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, provenance edges that state which schema validates each record, and declared domain relationship edges from relationship-set files that have been validated against the relationship type registry and declared data records. It does not invent RAG domain relationships that are not present in the seed data.
 
 Generate the data graph export from the project root:
 
@@ -125,7 +125,7 @@ This runs schema validity checks, fixture instance validity checks, data instanc
 
 Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fixture and schema paths from the repository root, and validates each fixture instance against its declared schema. The claim package fixture is an envelope, so its `claim`, `evidence`, and `reference` objects are validated against their corresponding definition schemas.
 
-Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema.
+Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema. For relationship-set files, data validation also checks registered predicates, source and target entity existence, source and target data file consistency, duplicate relationship IDs, and duplicate semantic triples.
 
 Fixture graph export generation is handled by:
 

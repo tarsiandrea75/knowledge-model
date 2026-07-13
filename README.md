@@ -75,6 +75,7 @@ It checks:
 - registries
 - fixture instances
 - data instances
+- relationship-set semantics against registered predicates and declared data records
 - fixture and data graph export consistency
 - graph export node and edge schema validation
 - unit tests

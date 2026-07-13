@@ -56,7 +56,7 @@ The current data export emits:
 - one `VALIDATED_BY_SCHEMA` provenance edge from each data record node to the schema node
 - declared domain relationship edges from relationship-set files listed in `data/manifest.json`
 
-The data export includes only domain relationships that are explicitly declared in validated relationship-set files under `data/relationships/`. The exporter must not fabricate technique-to-technique or technique-to-component domain edges from record names, descriptions, stages, or implementation guidance. If a declared relationship references a missing source or target node, export generation fails instead of emitting a dangling domain edge.
+The data export includes only domain relationships that are explicitly declared in validated relationship-set files under `data/relationships/`. Before export, data validation checks that declared relationship predicates exist in `registries/relationship-type-registry.json`, source and target IDs resolve to declared data entity records, source and target data file fields match those records, and relationship IDs and semantic triples are not duplicated. The exporter must not fabricate technique-to-technique or technique-to-component domain edges from record names, descriptions, stages, or implementation guidance. If a declared relationship references a missing source or target node, export generation fails instead of emitting a dangling domain edge.
 
 ## Nodes
 
@@ -181,7 +181,7 @@ Stable for the current exports:
 
 - the fixture export is generated from `examples/fixtures/`
 - the data export is generated from `data/manifest.json`
-- data export domain edges are emitted only from validated relationship-set files declared in `data/manifest.json`
+- data export domain edges are emitted only from relationship-set files declared in `data/manifest.json` after predicate registry checks and source and target data record integrity checks
 - nodes and edges are JSON arrays
 - formal graph node objects include `id`, `type`, `label`, `sourceDataFile`, and `properties`
 - formal graph edge objects include `id`, `predicate`, `sourceId`, `targetId`, `sourceDataFile`, and `properties`

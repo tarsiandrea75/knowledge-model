@@ -10,6 +10,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 - JSON Schema validation for graph export node and edge files, including duplicate ID checks and edge endpoint integrity checks.
 - Validated relationship sets under `data/relationships/` for declared seed dataset domain relationships.
 - Data graph export now includes declared domain relationship edges from validated relationship-set files without inferring undeclared relationships.
+- Semantic validation for data relationship instances, including registered predicate checks, source and target data record integrity checks, data file consistency checks, duplicate relationship ID checks, and duplicate semantic triple checks.
 
 ## v0.1.0-alpha - 2026-07-13
 
