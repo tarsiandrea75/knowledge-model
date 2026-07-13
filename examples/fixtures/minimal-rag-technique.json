@@ -1,0 +1,78 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-9001",
+    "slug": "hybrid-retrieval",
+    "name": {
+      "official": "Hybrid Retrieval",
+      "display": "Hybrid Retrieval"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "keyword retrieval",
+      "semantic retrieval",
+      "rank fusion"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Fixture author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Hybrid Retrieval combines lexical and vector retrieval so a RAG system can use exact term matching and semantic similarity together.",
+    "description": "Hybrid Retrieval is a RAG technique that queries more than one retrieval signal, commonly a keyword retriever and a dense vector retriever, then combines the candidate results before generation.",
+    "problemStatement": "A single retrieval method can miss relevant context when the query depends on exact terminology, semantic paraphrase, or both.",
+    "coreIdea": "Run complementary retrievers and merge their ranked candidates so downstream context assembly can choose from a broader evidence pool."
+  },
+  "technique": {
+    "techniqueFamily": "Hybrid Retrieval",
+    "ragStage": [
+      "Retrieval",
+      "Context Assembly"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Queryable corpus index",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "At least two retrieval indexes or retriever configurations are needed to combine retrieval signals."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Merged ranked candidates",
+        "artifactType": "Retrieval Result",
+        "description": "A candidate set produced by combining results from lexical and semantic retrieval."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Medium",
+      "costImpact": "Medium",
+      "complexityImpact": "Medium",
+      "qualityImpact": "High"
+    },
+    "implementationConsiderations": [
+      "Use a deterministic merge strategy so evaluation can compare retrieval configurations."
+    ],
+    "evaluationGuidance": [
+      "Compare recall-oriented retrieval metrics before and after combining lexical and semantic results."
+    ]
+  }
+}

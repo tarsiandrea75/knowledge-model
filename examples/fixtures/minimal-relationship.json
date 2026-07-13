@@ -1,0 +1,24 @@
+{
+  "id": "RELATIONSHIP-9001",
+  "type": "DEPENDS_ON",
+  "sourceId": "TECHNIQUE-9001",
+  "sourceType": "Technique",
+  "sourceSlug": "hybrid-retrieval",
+  "targetId": "COMPONENT-9001",
+  "targetType": "Component",
+  "targetSlug": "retriever",
+  "status": "Draft",
+  "confidence": "High",
+  "certainty": "Direct",
+  "scope": {
+    "appliesGenerally": true,
+    "implementationSpecific": false,
+    "versionSpecific": false
+  },
+  "rationale": "Hybrid Retrieval depends on retriever components because it combines candidate results from multiple retrieval signals.",
+  "introducedInVersion": "1.0.0",
+  "deprecatedInVersion": null,
+  "createdAt": "2026-07-13T00:00:00Z",
+  "updatedAt": "2026-07-13T00:00:00Z",
+  "createdBy": "Codex"
+}

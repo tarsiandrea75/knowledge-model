@@ -1,0 +1,63 @@
+{
+  "claim": {
+    "id": "CLAIM-9001",
+    "statement": "Hybrid Retrieval can improve retrieval coverage by combining lexical and semantic retrieval signals.",
+    "claimType": "Interpretive",
+    "subject": {
+      "id": "TECHNIQUE-9001",
+      "type": "Entity",
+      "name": "Hybrid Retrieval"
+    },
+    "predicate": "HAS_ADVANTAGE",
+    "object": {
+      "value": "Improved retrieval coverage from complementary retrieval signals"
+    },
+    "confidence": "Medium",
+    "status": "Draft",
+    "evidenceIds": [
+      "EVIDENCE-9001"
+    ],
+    "referenceIds": [
+      "REFERENCE-9001"
+    ],
+    "rationale": "The claim is represented because the fixture demonstrates how claims connect a technique to supporting evidence and source references."
+  },
+  "evidence": {
+    "id": "EVIDENCE-9001",
+    "role": "Supports",
+    "strength": "Moderate",
+    "summary": "The referenced OpenSearch documentation describes hybrid search as combining lexical and semantic search techniques.",
+    "interpretation": "The source supports modeling Hybrid Retrieval as a technique that combines complementary retrieval signals.",
+    "claimIds": [
+      "CLAIM-9001"
+    ],
+    "referenceIds": [
+      "REFERENCE-9001"
+    ],
+    "sourceFragments": [
+      {
+        "referenceId": "REFERENCE-9001",
+        "section": "Hybrid search",
+        "locator": "https://docs.opensearch.org/docs/latest/vector-search/ai-search/hybrid-search/"
+      }
+    ],
+    "confidence": "Medium",
+    "status": "Draft"
+  },
+  "reference": {
+    "id": "REFERENCE-9001",
+    "sourceType": "Official Documentation",
+    "sourcePriority": "Primary",
+    "title": "Hybrid search",
+    "authors": [
+      {
+        "name": "OpenSearch Project"
+      }
+    ],
+    "publisher": "OpenSearch Project",
+    "accessedAt": "2026-07-13",
+    "url": "https://docs.opensearch.org/docs/latest/vector-search/ai-search/hybrid-search/",
+    "citation": "OpenSearch Project. Hybrid search. OpenSearch documentation.",
+    "abstract": "The documentation describes hybrid search as combining lexical and semantic search techniques for retrieval."
+  }
+}
