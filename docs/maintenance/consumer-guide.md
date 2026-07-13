@@ -44,6 +44,8 @@ These records are intentionally small and conservative. They are not a complete 
 
 The seed dataset also includes declared relationship instances under `data/relationships/`. These relationship sets connect existing data records by stable ID and are validated through `data/manifest.json`. Validation checks both JSON Schema shape and relationship semantics: predicates must exist in `registries/relationship-type-registry.json`, source and target IDs must resolve to declared data entity records, source and target data file fields must match the records that contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. Consumers should interpret these domain relationship edges as alpha dataset declarations with conservative scope, not as universal statements about every RAG system.
 
+Relationship support sets live under `data/relationship-support/`. They connect declared relationship IDs to structured references, claims, and evidence. The first support set uses maintainer analysis as conservative internal support for seed dataset modeling rationale. Consumers should treat this metadata as traceability for why the seed relationship was included, not as external proof, mandatory RAG architecture, or benchmark-backed evidence.
+
 Data validation is driven by `data/manifest.json`, which maps each data file to its validating schema. Direct data validation is available through:
 
 ```bash
@@ -73,7 +75,7 @@ Check that the committed export still matches the fixtures:
 python3 scripts/export-fixtures-graph.py --check
 ```
 
-The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, provenance edges that state which schema validates each record, and declared domain relationship edges from relationship-set files that have been validated against the relationship type registry and declared data records. It does not invent RAG domain relationships that are not present in the seed data.
+The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, provenance edges that state which schema validates each record, and declared domain relationship edges from relationship-set files that have been validated against the relationship type registry and declared data records. Supported domain relationship edges can carry alpha/internal metadata such as `claimIds`, `evidenceIds`, `referenceIds`, `supportStatus`, and `supportSourceTypes`. It does not invent RAG domain relationships or support metadata that are not present in the seed data.
 
 Generate the data graph export from the project root:
 
@@ -125,7 +127,7 @@ This runs schema validity checks, fixture instance validity checks, data instanc
 
 Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fixture and schema paths from the repository root, and validates each fixture instance against its declared schema. The claim package fixture is an envelope, so its `claim`, `evidence`, and `reference` objects are validated against their corresponding definition schemas.
 
-Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema. For relationship-set files, data validation also checks registered predicates, source and target entity existence, source and target data file consistency, duplicate relationship IDs, and duplicate semantic triples.
+Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema. For relationship-set files, data validation also checks registered predicates, source and target entity existence, source and target data file consistency, duplicate relationship IDs, and duplicate semantic triples. For relationship support files, data validation checks reference, claim, and evidence ID uniqueness across support sets and verifies that all relationship, claim, evidence, and reference links resolve.
 
 Fixture graph export generation is handled by:
 
@@ -166,6 +168,7 @@ The following contracts are stable enough for early consumers:
 - Registries define controlled entity and relationship vocabularies.
 - The graph exports use stable IDs as node IDs and edge endpoints.
 - The graph exports have an alpha/internal node and edge shape checked by JSON Schema and endpoint integrity validation.
+- Relationship support metadata in the data graph export is alpha/internal and not yet a stable public API.
 
 ## What Is Still Evolving
 
@@ -189,6 +192,8 @@ Load RKM content by stable identifier first. Slugs and names are useful for disp
 Preserve relationship direction. For example, `TECHNIQUE-9001 DEPENDS_ON COMPONENT-9001` means the technique depends on the component. Inverse views should be generated by consumers only when needed for queries.
 
 Preserve the distinction between provenance and domain relationships in graph exports. `VALIDATED_BY_SCHEMA` edges describe validation provenance. Relationship-set predicates such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, and `CAN_REFINE_RESULTS_FROM` describe declared seed dataset relationships and should be treated as conservative alpha content.
+
+Interpret relationship support metadata as declared traceability. `claimIds`, `evidenceIds`, and `referenceIds` on a domain relationship edge point back to support objects in `data/relationship-support/`; they are not new graph nodes in the current data export and should not be treated as a stable public API yet.
 
 Treat claims as explicit statements, not comments. A claim should be linked to evidence and references when support is available.
 

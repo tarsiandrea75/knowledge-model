@@ -22,6 +22,7 @@ The package currently includes schemas, fixtures, seed data, validated relations
 - Validated fixtures under `examples/fixtures/`.
 - Validated seed dataset under `data/`.
 - Validated relationship sets under `data/relationships/`.
+- Validated relationship support sets under `data/relationship-support/`.
 - Minimal fixture-derived graph export under `examples/graph-export/`.
 - Post-alpha seed-data graph export under `examples/data-graph-export/`, including provenance edges and declared domain relationship edges.
 - Graph export node and edge schema validation.
@@ -76,6 +77,7 @@ It checks:
 - fixture instances
 - data instances
 - relationship-set semantics against registered predicates and declared data records
+- relationship support semantics for declared references, claims, evidence, and relationship IDs
 - fixture and data graph export consistency
 - graph export node and edge schema validation
 - unit tests

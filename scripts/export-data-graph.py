@@ -17,6 +17,7 @@ GRAPH_EXPORT_DIR = REPOSITORY_ROOT / "examples" / "data-graph-export"
 NODES_OUTPUT = GRAPH_EXPORT_DIR / "rag-techniques.nodes.json"
 EDGES_OUTPUT = GRAPH_EXPORT_DIR / "rag-techniques.edges.json"
 RELATIONSHIP_SET_SCHEMA = "schema/relationship-set.schema.json"
+RELATIONSHIP_SUPPORT_SET_SCHEMA = "schema/relationship-support-set.schema.json"
 
 
 class DataGraphExportError(Exception):
@@ -64,6 +65,10 @@ def optional_list(value: Any, context: str) -> list[Any]:
     if not isinstance(value, list):
         raise DataGraphExportError(f"{context} must be a JSON array when present")
     return value
+
+
+def sorted_strings(values: set[str]) -> list[str]:
+    return sorted(values)
 
 
 def compact_object(value: dict[str, Any]) -> dict[str, Any]:
@@ -215,6 +220,7 @@ def declared_relationship_edges(
     relationship_set: dict[str, Any],
     relationship_set_file: str,
     node_ids: set[str],
+    support_by_relationship: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     relationships = require_list(relationship_set.get("relationships"), f"{relationship_set_file} relationships")
     edges: list[dict[str, Any]] = []
@@ -244,9 +250,17 @@ def declared_relationship_edges(
         edge_properties = dict(properties)
         edge_properties.update(
             {
+                "claimIds": support_by_relationship.get(edge_id, {}).get("claimIds"),
                 "declaredInRelationshipSet": relationship_set_file,
+                "declaredInRelationshipSupportSets": support_by_relationship.get(edge_id, {}).get(
+                    "declaredInRelationshipSupportSets"
+                ),
                 "description": description,
+                "evidenceIds": support_by_relationship.get(edge_id, {}).get("evidenceIds"),
+                "referenceIds": support_by_relationship.get(edge_id, {}).get("referenceIds"),
                 "relationshipKind": relationship_kind,
+                "supportSourceTypes": support_by_relationship.get(edge_id, {}).get("supportSourceTypes"),
+                "supportStatus": support_by_relationship.get(edge_id, {}).get("supportStatus"),
                 "targetDataFile": target_data_file,
             }
         )
@@ -264,6 +278,108 @@ def declared_relationship_edges(
     return edges
 
 
+def relationship_support_index(
+    support_sets: list[tuple[str, dict[str, Any]]],
+) -> dict[str, dict[str, Any]]:
+    references_by_id: dict[str, dict[str, Any]] = {}
+    claims_by_id: dict[str, dict[str, Any]] = {}
+    evidence_by_id: dict[str, dict[str, Any]] = {}
+    support_files_by_relationship: dict[str, set[str]] = {}
+    claim_ids_by_relationship: dict[str, set[str]] = {}
+    evidence_ids_by_relationship: dict[str, set[str]] = {}
+    reference_ids_by_relationship: dict[str, set[str]] = {}
+    source_types_by_relationship: dict[str, set[str]] = {}
+    status_by_relationship: dict[str, set[str]] = {}
+
+    for support_file, support_set in support_sets:
+        for item in require_list(support_set.get("references"), f"{support_file} references"):
+            reference = require_object(item, f"{support_file} references item")
+            reference_id = require_string(reference.get("id"), f"{support_file} reference.id")
+            references_by_id[reference_id] = reference
+
+        for item in require_list(support_set.get("claims"), f"{support_file} claims"):
+            claim = require_object(item, f"{support_file} claims item")
+            claim_id = require_string(claim.get("id"), f"{support_file} claim.id")
+            claims_by_id[claim_id] = claim
+
+        for item in require_list(support_set.get("evidence"), f"{support_file} evidence"):
+            evidence = require_object(item, f"{support_file} evidence item")
+            evidence_id = require_string(evidence.get("id"), f"{support_file} evidence.id")
+            evidence_by_id[evidence_id] = evidence
+
+    for support_file, support_set in support_sets:
+        for item in require_list(support_set.get("claims"), f"{support_file} claims"):
+            claim = require_object(item, f"{support_file} claims item")
+            claim_id = require_string(claim.get("id"), f"{support_file} claim.id")
+            subject = require_object(claim.get("subject"), f"{support_file} claim.subject")
+            if subject.get("type") != "Relationship":
+                continue
+
+            relationship_id = require_string(subject.get("id"), f"{support_file} claim.subject.id")
+            support_files_by_relationship.setdefault(relationship_id, set()).add(support_file)
+            claim_ids_by_relationship.setdefault(relationship_id, set()).add(claim_id)
+            status = claim.get("status")
+            if isinstance(status, str) and status:
+                status_by_relationship.setdefault(relationship_id, set()).add(status)
+
+            for reference_id in optional_string_list(claim.get("referenceIds"), f"{support_file} claim.referenceIds"):
+                reference_ids_by_relationship.setdefault(relationship_id, set()).add(reference_id)
+                source_type = references_by_id.get(reference_id, {}).get("sourceType")
+                if isinstance(source_type, str) and source_type:
+                    source_types_by_relationship.setdefault(relationship_id, set()).add(source_type)
+
+            for evidence_id in optional_string_list(claim.get("evidenceIds"), f"{support_file} claim.evidenceIds"):
+                evidence_ids_by_relationship.setdefault(relationship_id, set()).add(evidence_id)
+
+        for item in require_list(support_set.get("evidence"), f"{support_file} evidence"):
+            evidence = require_object(item, f"{support_file} evidence item")
+            evidence_id = require_string(evidence.get("id"), f"{support_file} evidence.id")
+            relationships = optional_string_list(evidence.get("relationshipIds"), f"{support_file} evidence.relationshipIds")
+            claim_ids = optional_string_list(evidence.get("claimIds"), f"{support_file} evidence.claimIds")
+            reference_ids = optional_string_list(evidence.get("referenceIds"), f"{support_file} evidence.referenceIds")
+            status = evidence.get("status")
+
+            for relationship_id in relationships:
+                support_files_by_relationship.setdefault(relationship_id, set()).add(support_file)
+                evidence_ids_by_relationship.setdefault(relationship_id, set()).add(evidence_id)
+                if isinstance(status, str) and status:
+                    status_by_relationship.setdefault(relationship_id, set()).add(status)
+
+                for claim_id in claim_ids:
+                    claim_ids_by_relationship.setdefault(relationship_id, set()).add(claim_id)
+
+                for reference_id in reference_ids:
+                    reference_ids_by_relationship.setdefault(relationship_id, set()).add(reference_id)
+                    source_type = references_by_id.get(reference_id, {}).get("sourceType")
+                    if isinstance(source_type, str) and source_type:
+                        source_types_by_relationship.setdefault(relationship_id, set()).add(source_type)
+
+    support_by_relationship: dict[str, dict[str, Any]] = {}
+    for relationship_id in sorted(support_files_by_relationship):
+        support_by_relationship[relationship_id] = {
+            "claimIds": sorted_strings(claim_ids_by_relationship.get(relationship_id, set())),
+            "declaredInRelationshipSupportSets": sorted_strings(
+                support_files_by_relationship.get(relationship_id, set())
+            ),
+            "evidenceIds": sorted_strings(evidence_ids_by_relationship.get(relationship_id, set())),
+            "referenceIds": sorted_strings(reference_ids_by_relationship.get(relationship_id, set())),
+            "supportSourceTypes": sorted_strings(source_types_by_relationship.get(relationship_id, set())),
+            "supportStatus": sorted_strings(status_by_relationship.get(relationship_id, set())),
+        }
+
+    return support_by_relationship
+
+
+def optional_string_list(value: Any, context: str) -> list[str]:
+    values = optional_list(value, context)
+    result: list[str] = []
+    for index, item in enumerate(values):
+        if not isinstance(item, str) or not item:
+            raise DataGraphExportError(f"{context}[{index}] must be a non-empty string")
+        result.append(item)
+    return result
+
+
 def build_graph() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     manifest_entries = load_manifest()
     nodes: list[dict[str, Any]] = []
@@ -273,12 +389,16 @@ def build_graph() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     emitted_edge_ids: set[str] = set()
 
     relationship_set_entries: list[dict[str, str]] = []
+    relationship_support_entries: list[dict[str, str]] = []
 
     for entry in manifest_entries:
         data_file = entry["file"]
         schema_file = entry["schema"]
         if schema_file == RELATIONSHIP_SET_SCHEMA:
             relationship_set_entries.append(entry)
+            continue
+        if schema_file == RELATIONSHIP_SUPPORT_SET_SCHEMA:
+            relationship_support_entries.append(entry)
             continue
 
         record = require_object(load_json(REPOSITORY_ROOT / data_file), data_file)
@@ -299,14 +419,37 @@ def build_graph() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         emitted_edge_ids.add(candidate["id"])
         edges.append(candidate)
 
+    support_sets = [
+        (
+            entry["file"],
+            require_object(load_json(REPOSITORY_ROOT / entry["file"]), entry["file"]),
+        )
+        for entry in relationship_support_entries
+    ]
+    support_by_relationship = relationship_support_index(support_sets)
+    emitted_relationship_edge_ids: set[str] = set()
+
     for entry in relationship_set_entries:
         data_file = entry["file"]
         relationship_set = require_object(load_json(REPOSITORY_ROOT / data_file), data_file)
-        for candidate in declared_relationship_edges(relationship_set, data_file, emitted_node_ids):
+        for candidate in declared_relationship_edges(
+            relationship_set,
+            data_file,
+            emitted_node_ids,
+            support_by_relationship,
+        ):
             if candidate["id"] in emitted_edge_ids:
                 raise DataGraphExportError(f"{data_file}: duplicate graph edge id {candidate['id']}")
             emitted_edge_ids.add(candidate["id"])
+            emitted_relationship_edge_ids.add(candidate["id"])
             edges.append(candidate)
+
+    for relationship_id in sorted(support_by_relationship):
+        if relationship_id not in emitted_relationship_edge_ids:
+            raise DataGraphExportError(
+                f"relationship support references relationship {relationship_id!r}, "
+                "but that relationship was not exported as a data graph edge"
+            )
 
     nodes.extend(emitted_schema_nodes.values())
     return sorted(nodes, key=lambda item: item["id"]), sorted(edges, key=lambda item: item["id"])
@@ -402,21 +545,75 @@ def run_self_test() -> None:
         relationship_set,
         "data/relationships/sample-relationships.json",
         {"TECHNIQUE-0001", "TECHNIQUE-0002"},
+        {
+            "RELATIONSHIP-0001": {
+                "claimIds": ["CLAIM-0001"],
+                "declaredInRelationshipSupportSets": [
+                    "data/relationship-support/sample-relationship-support.json"
+                ],
+                "evidenceIds": ["EVIDENCE-0001"],
+                "referenceIds": ["REFERENCE-0001"],
+                "supportSourceTypes": ["Maintainer Analysis"],
+                "supportStatus": ["Draft"],
+            }
+        },
     )
     if declared_edges[0]["properties"].get("declaredInRelationshipSet") != "data/relationships/sample-relationships.json":
         raise DataGraphExportError("self-test failed: declared relationship provenance was not preserved")
+    if declared_edges[0]["properties"].get("claimIds") != ["CLAIM-0001"]:
+        raise DataGraphExportError("self-test failed: declared relationship support metadata was not preserved")
 
     try:
         declared_relationship_edges(
             relationship_set,
             "data/relationships/sample-relationships.json",
             {"TECHNIQUE-0001"},
+            {},
         )
     except DataGraphExportError as exc:
         if "references missing data graph node" not in str(exc):
             raise
     else:
         raise DataGraphExportError("self-test failed: missing relationship target node was not rejected")
+
+    support_index = relationship_support_index(
+        [
+            (
+                "data/relationship-support/sample-relationship-support.json",
+                {
+                    "references": [
+                        {
+                            "id": "REFERENCE-0001",
+                            "sourceType": "Maintainer Analysis",
+                        }
+                    ],
+                    "claims": [
+                        {
+                            "id": "CLAIM-0001",
+                            "subject": {
+                                "type": "Relationship",
+                                "id": "RELATIONSHIP-0001",
+                            },
+                            "evidenceIds": ["EVIDENCE-0001"],
+                            "referenceIds": ["REFERENCE-0001"],
+                            "status": "Draft",
+                        }
+                    ],
+                    "evidence": [
+                        {
+                            "id": "EVIDENCE-0001",
+                            "relationshipIds": ["RELATIONSHIP-0001"],
+                            "claimIds": ["CLAIM-0001"],
+                            "referenceIds": ["REFERENCE-0001"],
+                            "status": "Draft",
+                        }
+                    ],
+                },
+            )
+        ]
+    )
+    if support_index["RELATIONSHIP-0001"]["supportSourceTypes"] != ["Maintainer Analysis"]:
+        raise DataGraphExportError("self-test failed: relationship support source types were not indexed")
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

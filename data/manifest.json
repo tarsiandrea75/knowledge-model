@@ -15,6 +15,10 @@
     {
       "file": "data/relationships/rag-technique-relationships.json",
       "schema": "schema/relationship-set.schema.json"
+    },
+    {
+      "file": "data/relationship-support/rag-technique-relationship-support.json",
+      "schema": "schema/relationship-support-set.schema.json"
     }
   ]
 }

@@ -1,0 +1,140 @@
+{
+  "id": "RELATIONSHIP-SUPPORT-SET-10001",
+  "title": "Seed RAG Technique Relationship Support",
+  "description": "Conservative support objects for the seed RAG technique relationships. This support records maintainer rationale for including the declared relationships in the seed dataset and does not claim universal RAG pipeline behavior.",
+  "references": [
+    {
+      "id": "REFERENCE-10001",
+      "sourceType": "Maintainer Analysis",
+      "sourcePriority": "Tertiary",
+      "title": "RKM Seed Relationship Modeling Rationale",
+      "publisher": "RAG Knowledge Model maintainers",
+      "updatedAt": "2026-07-13",
+      "abstract": "Internal maintainer analysis describing why the first seed RAG technique relationships are modeled as conservative possible pipeline connections rather than universal or benchmark-proven facts.",
+      "notes": [
+        "This reference records internal modeling rationale for the seed dataset and should not be treated as an external publication."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-10001",
+      "statement": "RELATIONSHIP-10001 is included as a conservative seed dataset relationship because query rewriting can be modeled as a possible preparation step before hybrid retrieval in some RAG pipelines.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10001"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10001"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "rationale": "The claim explains seed dataset modeling intent and avoids asserting that query rewriting must precede retrieval in every RAG system."
+    },
+    {
+      "id": "CLAIM-10002",
+      "statement": "RELATIONSHIP-10002 is included as a conservative seed dataset relationship because hybrid retrieval can be modeled as a possible source of candidate results for a later reranking step.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10002"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10002"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "rationale": "The claim records a cautious modeling connection between candidate retrieval and reranking without presenting it as mandatory pipeline structure."
+    },
+    {
+      "id": "CLAIM-10003",
+      "statement": "RELATIONSHIP-10003 is included as a conservative seed dataset relationship because reranking can be modeled as a possible refinement step for candidate results produced by hybrid retrieval.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10003"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10003"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "rationale": "The claim records a cautious modeling connection from reranking to the candidate set returned by hybrid retrieval without asserting benchmark-proven superiority."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-10001",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling query rewriting as a possible preparation step before hybrid retrieval in the seed dataset.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed modeling rationale only and does not establish external factual consensus.",
+      "claimIds": [
+        "CLAIM-10001"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10001"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and should be replaced or supplemented by external sources before stronger claims are made."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10002",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling hybrid retrieval as a possible provider of candidate results to reranking in the seed dataset.",
+      "interpretation": "This evidence supports inclusion of the relationship as a conservative seed dataset edge and does not imply that reranking is required after hybrid retrieval.",
+      "claimIds": [
+        "CLAIM-10002"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10002"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not compare alternative pipeline designs."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10003",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling reranking as a possible refinement step for candidate results returned by hybrid retrieval in the seed dataset.",
+      "interpretation": "This evidence supports inclusion of the relationship as conservative modeling rationale only and does not establish performance or benchmark claims.",
+      "claimIds": [
+        "CLAIM-10003"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10003"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and should not be interpreted as a universal RAG architecture rule."
+      ]
+    }
+  ]
+}

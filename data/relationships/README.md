@@ -22,6 +22,8 @@ Semantic validation checks that:
 
 The data graph exporter reads relationship-set files listed in `data/manifest.json` and emits each declared relationship as a graph edge. These edges are declared, not inferred. The exporter must not invent domain graph edges from names, descriptions, stages, or other record fields.
 
+Declared relationship instances can be supported by relationship support sets under `data/relationship-support/`. A support set links relationship IDs to structured references, claims, and evidence. This keeps the relationship declaration separate from the rationale and support metadata while allowing validation to check that all identifiers resolve.
+
 Current relationship sets:
 
 - `rag-technique-relationships.json`: conservative workflow relationships among the seed RAG technique records.

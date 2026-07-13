@@ -74,13 +74,15 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` is the standard validation entry point.
 
-`make validate` checks schema validity, fixture instance validity, data instance validity, relationship-set semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, and graph endpoint integrity. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, stale export files, malformed graph node or edge files, duplicate graph IDs, or missing graph edge endpoints are validation failures rather than optional cleanup.
+`make validate` checks schema validity, fixture instance validity, data instance validity, relationship-set semantics, relationship support semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, and graph endpoint integrity. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, relationship support links that do not resolve, stale export files, malformed graph node or edge files, duplicate graph IDs, or missing graph edge endpoints are validation failures rather than optional cleanup.
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
 Fixtures and populated data serve different purposes. `examples/fixtures/` contains minimal pedagogical examples and validation fixtures. `data/` contains the first small populated knowledge dataset for consumer testing and release packaging. Do not describe fixtures as the real dataset, and do not describe the seed dataset as a complete RAG catalog.
 
 Relationship instances for populated data are declared in `data/relationships/` and validated through `data/manifest.json`. Relationship-set validation checks that predicates are registered in `registries/relationship-type-registry.json`, source and target IDs exist in declared data entity records, source and target data file fields point to the files that actually contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. The data graph exporter may emit domain graph edges only from declared, validated relationship-set files. Future assistants must not infer domain graph edges from record names, descriptions, stages, or other fields unless those relationships are first represented in validated data.
+
+Relationship support for populated data lives in `data/relationship-support/` and is validated through `data/manifest.json`. Support-set validation checks that references, claims, and evidence have unique IDs across support sets and that every relationship, claim, evidence, and reference link resolves. The data graph exporter may enrich declared domain relationship edges with support metadata only when that support is declared and validated. Future assistants must not infer support from relationship descriptions, technique records, or graph export behavior.
 
 There are now two graph export paths:
 
@@ -157,13 +159,13 @@ Current maturity is approximately:
 - Populated knowledge base maturity: 2.2 / 5
 - Release readiness: 3.0 / 5
 
-The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, a first small seed dataset checked during validation, relationship-set semantics checked against the registry and declared data records, and a post-alpha data graph export generated from that seed dataset with declared domain relationship edges. The project still needs broader populated data, richer examples, release packaging, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
+The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, a first small seed dataset checked during validation, relationship-set semantics checked against the registry and declared data records, validated relationship support semantics, and a post-alpha data graph export generated from that seed dataset with declared domain relationship edges and support metadata. The project still needs broader populated data, richer examples, release packaging, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
 
 ## Known Patterns and Hardening History
 
 The schema contract validator catches recurring semantic schema mistakes, not only syntax errors.
 
-Fixture validation, data validation, graph export consistency checks, and graph export schema validation are part of the normal validation path. Treat the committed fixture graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat the committed data graph export as a generated contract artifact derived from `data/manifest.json`, including relationship sets in `data/relationships/`, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
+Fixture validation, data validation, graph export consistency checks, and graph export schema validation are part of the normal validation path. Treat the committed fixture graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat the committed data graph export as a generated contract artifact derived from `data/manifest.json`, including relationship sets in `data/relationships/` and support sets in `data/relationship-support/`, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
 
 Recurring mistakes that have been hardened include:
 

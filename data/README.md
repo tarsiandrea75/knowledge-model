@@ -8,6 +8,8 @@ Data files are declared in `data/manifest.json`. Each manifest entry maps a repo
 
 `data/relationships/` contains declared relationship instances between populated data records. These relationship sets are validated through the same manifest and are exported as domain graph edges by the data graph exporter. Relationship edges are declared by data files, not inferred from technique names, descriptions, or stages.
 
+`data/relationship-support/` contains declared support objects for relationship instances. These files connect relationship IDs to references, claims, and evidence so consumers can inspect why a relationship appears in the seed dataset. Support is validated through the manifest and is not inferred.
+
 Run direct data validation from the repository root:
 
 ```bash
@@ -26,3 +28,4 @@ Current populated data scope:
 - `data/rag-techniques/query-rewriting.json`
 - `data/rag-techniques/reranking.json`
 - `data/relationships/rag-technique-relationships.json`
+- `data/relationship-support/rag-technique-relationship-support.json`

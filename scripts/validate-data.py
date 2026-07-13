@@ -19,6 +19,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_MANIFEST_PATH = REPOSITORY_ROOT / "data" / "manifest.json"
 SCHEMA_ROOT = REPOSITORY_ROOT / "schema"
 RELATIONSHIP_SET_SCHEMA_PATH = SCHEMA_ROOT / "relationship-set.schema.json"
+RELATIONSHIP_SUPPORT_SET_SCHEMA_PATH = SCHEMA_ROOT / "relationship-support-set.schema.json"
 RELATIONSHIP_TYPE_REGISTRY_PATH = REPOSITORY_ROOT / "registries" / "relationship-type-registry.json"
 
 
@@ -119,6 +120,10 @@ def is_relationship_set_schema(schema_path: Path) -> bool:
     return schema_path.resolve() == RELATIONSHIP_SET_SCHEMA_PATH.resolve()
 
 
+def is_relationship_support_set_schema(schema_path: Path) -> bool:
+    return schema_path.resolve() == RELATIONSHIP_SUPPORT_SET_SCHEMA_PATH.resolve()
+
+
 def relative_repository_file(path: Path) -> str:
     return display_path(path.resolve())
 
@@ -168,7 +173,7 @@ def validate_relationship_semantics(
     relationship_sets: list[tuple[Path, Any]],
     registered_predicates: set[str],
     entity_files: dict[str, str],
-) -> int:
+) -> tuple[int, set[str]]:
     relationship_ids: dict[str, str] = {}
     semantic_triples: dict[tuple[str, str, str], str] = {}
     validation_count = 0
@@ -254,7 +259,147 @@ def validate_relationship_semantics(
             semantic_triples[semantic_triple] = display_path(relationship_set_path)
             validation_count += 1
 
+    return validation_count, set(relationship_ids)
+
+
+def require_identifier(value: object, context: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise DataValidationError(f"{context} must be a non-empty string")
+    return value
+
+
+def record_unique_id(
+    ids: dict[str, str],
+    item_id: str,
+    context: str,
+    item_name: str,
+    source_file: str,
+) -> None:
+    previous_file = ids.get(item_id)
+    if previous_file is not None:
+        raise DataValidationError(
+            f"{context}: duplicate {item_name} id {item_id}; already declared in {previous_file}"
+        )
+    ids[item_id] = source_file
+
+
+def validate_relationship_support_semantics(
+    relationship_support_sets: list[tuple[Path, Any]],
+    relationship_ids: set[str],
+) -> int:
+    reference_ids: dict[str, str] = {}
+    claim_ids: dict[str, str] = {}
+    evidence_ids: dict[str, str] = {}
+    validation_count = 0
+
+    for support_set_path, support_set in relationship_support_sets:
+        support_set_object = require_object(support_set, display_path(support_set_path))
+        support_file = display_path(support_set_path)
+
+        references = require_list(
+            support_set_object.get("references"),
+            f"{support_file}.references",
+        )
+        claims = require_list(
+            support_set_object.get("claims"),
+            f"{support_file}.claims",
+        )
+        evidence_items = require_list(
+            support_set_object.get("evidence"),
+            f"{support_file}.evidence",
+        )
+
+        for index, raw_reference in enumerate(references, start=1):
+            context = f"{support_file}.references[{index}]"
+            reference = require_object(raw_reference, context)
+            reference_id = require_identifier(reference.get("id"), f"{context}.id")
+            record_unique_id(reference_ids, reference_id, context, "reference", support_file)
+
+        for index, raw_claim in enumerate(claims, start=1):
+            context = f"{support_file}.claims[{index}]"
+            claim = require_object(raw_claim, context)
+            claim_id = require_identifier(claim.get("id"), f"{context}.id")
+            record_unique_id(claim_ids, claim_id, context, "claim", support_file)
+
+        for index, raw_evidence in enumerate(evidence_items, start=1):
+            context = f"{support_file}.evidence[{index}]"
+            evidence = require_object(raw_evidence, context)
+            evidence_id = require_identifier(evidence.get("id"), f"{context}.id")
+            record_unique_id(evidence_ids, evidence_id, context, "evidence", support_file)
+
+    for support_set_path, support_set in relationship_support_sets:
+        support_set_object = require_object(support_set, display_path(support_set_path))
+        support_file = display_path(support_set_path)
+        claims = require_list(support_set_object.get("claims"), f"{support_file}.claims")
+        evidence_items = require_list(support_set_object.get("evidence"), f"{support_file}.evidence")
+
+        for index, raw_claim in enumerate(claims, start=1):
+            context = f"{support_file}.claims[{index}]"
+            claim = require_object(raw_claim, context)
+            claim_id = require_identifier(claim.get("id"), f"{context}.id")
+            subject = require_object(claim.get("subject"), f"{context}.subject")
+            subject_type = subject.get("type")
+            subject_id = require_identifier(subject.get("id"), f"{context}.subject.id")
+
+            if subject_type == "Relationship" and subject_id not in relationship_ids:
+                raise DataValidationError(
+                    f"{context}.subject.id {subject_id} does not match any declared relationship id"
+                )
+
+            for evidence_id in optional_string_ids(claim.get("evidenceIds"), f"{context}.evidenceIds"):
+                if evidence_id not in evidence_ids:
+                    raise DataValidationError(
+                        f"{context}.evidenceIds references missing evidence id {evidence_id} from claim {claim_id}"
+                    )
+
+            for reference_id in optional_string_ids(claim.get("referenceIds"), f"{context}.referenceIds"):
+                if reference_id not in reference_ids:
+                    raise DataValidationError(
+                        f"{context}.referenceIds references missing reference id {reference_id} from claim {claim_id}"
+                    )
+
+            validation_count += 1
+
+        for index, raw_evidence in enumerate(evidence_items, start=1):
+            context = f"{support_file}.evidence[{index}]"
+            evidence = require_object(raw_evidence, context)
+            evidence_id = require_identifier(evidence.get("id"), f"{context}.id")
+
+            for relationship_id in optional_string_ids(evidence.get("relationshipIds"), f"{context}.relationshipIds"):
+                if relationship_id not in relationship_ids:
+                    raise DataValidationError(
+                        f"{context}.relationshipIds references missing relationship id {relationship_id} "
+                        f"from evidence {evidence_id}"
+                    )
+
+            for claim_id in optional_string_ids(evidence.get("claimIds"), f"{context}.claimIds"):
+                if claim_id not in claim_ids:
+                    raise DataValidationError(
+                        f"{context}.claimIds references missing claim id {claim_id} from evidence {evidence_id}"
+                    )
+
+            for reference_id in optional_string_ids(evidence.get("referenceIds"), f"{context}.referenceIds"):
+                if reference_id not in reference_ids:
+                    raise DataValidationError(
+                        f"{context}.referenceIds references missing reference id {reference_id} "
+                        f"from evidence {evidence_id}"
+                    )
+
+            validation_count += 1
+
     return validation_count
+
+
+def optional_string_ids(value: object, context: str) -> list[str]:
+    if value is None:
+        return []
+    values = require_list(value, context)
+    result: list[str] = []
+    for index, item in enumerate(values, start=1):
+        if not isinstance(item, str) or not item:
+            raise DataValidationError(f"{context}[{index}] must be a non-empty string")
+        result.append(item)
+    return result
 
 
 def validate_manifest(manifest_path: Path = DATA_MANIFEST_PATH) -> tuple[int, int, int]:
@@ -269,6 +414,7 @@ def validate_manifest(manifest_path: Path = DATA_MANIFEST_PATH) -> tuple[int, in
     validation_count = 0
     entity_records: list[tuple[Path, Any]] = []
     relationship_sets: list[tuple[Path, Any]] = []
+    relationship_support_sets: list[tuple[Path, Any]] = []
     for index, raw_entry in enumerate(data_entries, start=1):
         entry = require_object(raw_entry, f"data manifest entry {index}")
         data_path = repository_path(entry.get("file"), f"data manifest entry {index}.file")
@@ -287,18 +433,29 @@ def validate_manifest(manifest_path: Path = DATA_MANIFEST_PATH) -> tuple[int, in
 
         if is_relationship_set_schema(schema_path):
             relationship_sets.append((data_path, data))
+        elif is_relationship_support_set_schema(schema_path):
+            relationship_support_sets.append((data_path, data))
         else:
             entity_records.append((data_path, data))
 
     semantic_validation_count = 0
+    relationship_ids: set[str] = set()
     if relationship_sets:
         registered_predicates = load_registered_predicates()
         entity_files = build_entity_file_index(entity_records)
-        semantic_validation_count = validate_relationship_semantics(
+        relationship_validation_count, relationship_ids = validate_relationship_semantics(
             relationship_sets,
             registered_predicates,
             entity_files,
         )
+        semantic_validation_count += relationship_validation_count
+
+    if relationship_support_sets:
+        support_validation_count = validate_relationship_support_semantics(
+            relationship_support_sets,
+            relationship_ids,
+        )
+        semantic_validation_count += support_validation_count
 
     return data_count, validation_count, semantic_validation_count
 
@@ -324,6 +481,15 @@ def run_self_test() -> None:
         )
         if relationship_schema != (SCHEMA_ROOT / "relationship-set.schema.json").resolve():
             raise DataValidationError("self-test failed: relationship-set schema path resolution returned the wrong path")
+
+        relationship_support_schema = repository_path(
+            "schema/relationship-support-set.schema.json",
+            "self-test.relationshipSupportSchema",
+        )
+        if relationship_support_schema != (SCHEMA_ROOT / "relationship-support-set.schema.json").resolve():
+            raise DataValidationError(
+                "self-test failed: relationship-support-set schema path resolution returned the wrong path"
+            )
 
         predicates = load_registered_predicates()
         if "CAN_PRECEDE_IN_PIPELINE" not in predicates:
@@ -360,7 +526,7 @@ def run_self_test() -> None:
                 }
             ]
         }
-        validate_relationship_semantics(
+        _, self_test_relationship_ids = validate_relationship_semantics(
             [(REPOSITORY_ROOT / "data/relationships/test-relationships.json", valid_relationship_set)],
             predicates,
             entity_files,
@@ -477,6 +643,98 @@ def run_self_test() -> None:
                 raise
         else:
             raise DataValidationError("self-test failed: duplicate semantic triple was not rejected")
+
+        valid_relationship_support_set = {
+            "references": [
+                {
+                    "id": "REFERENCE-TEST-1",
+                }
+            ],
+            "claims": [
+                {
+                    "id": "CLAIM-TEST-1",
+                    "subject": {
+                        "type": "Relationship",
+                        "id": "RELATIONSHIP-TEST-1",
+                    },
+                    "evidenceIds": [
+                        "EVIDENCE-TEST-1",
+                    ],
+                    "referenceIds": [
+                        "REFERENCE-TEST-1",
+                    ],
+                }
+            ],
+            "evidence": [
+                {
+                    "id": "EVIDENCE-TEST-1",
+                    "relationshipIds": [
+                        "RELATIONSHIP-TEST-1",
+                    ],
+                    "claimIds": [
+                        "CLAIM-TEST-1",
+                    ],
+                    "referenceIds": [
+                        "REFERENCE-TEST-1",
+                    ],
+                }
+            ],
+        }
+        validate_relationship_support_semantics(
+            [
+                (
+                    REPOSITORY_ROOT / "data/relationship-support/test-relationship-support.json",
+                    valid_relationship_support_set,
+                )
+            ],
+            self_test_relationship_ids,
+        )
+
+        missing_relationship_support_set = {
+            "references": [
+                {
+                    "id": "REFERENCE-TEST-2",
+                }
+            ],
+            "claims": [
+                {
+                    "id": "CLAIM-TEST-2",
+                    "subject": {
+                        "type": "Relationship",
+                        "id": "RELATIONSHIP-MISSING",
+                    },
+                }
+            ],
+            "evidence": [
+                {
+                    "id": "EVIDENCE-TEST-2",
+                    "relationshipIds": [
+                        "RELATIONSHIP-MISSING",
+                    ],
+                    "claimIds": [
+                        "CLAIM-TEST-2",
+                    ],
+                    "referenceIds": [
+                        "REFERENCE-TEST-2",
+                    ],
+                }
+            ],
+        }
+        try:
+            validate_relationship_support_semantics(
+                [
+                    (
+                        REPOSITORY_ROOT / "data/relationship-support/test-relationship-support.json",
+                        missing_relationship_support_set,
+                    )
+                ],
+                self_test_relationship_ids,
+            )
+        except DataValidationError as exc:
+            if "does not match any declared relationship id" not in str(exc):
+                raise
+        else:
+            raise DataValidationError("self-test failed: missing relationship support link was not rejected")
 
 
 def main() -> int:

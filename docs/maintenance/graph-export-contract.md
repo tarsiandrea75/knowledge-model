@@ -58,6 +58,8 @@ The current data export emits:
 
 The data export includes only domain relationships that are explicitly declared in validated relationship-set files under `data/relationships/`. Before export, data validation checks that declared relationship predicates exist in `registries/relationship-type-registry.json`, source and target IDs resolve to declared data entity records, source and target data file fields match those records, and relationship IDs and semantic triples are not duplicated. The exporter must not fabricate technique-to-technique or technique-to-component domain edges from record names, descriptions, stages, or implementation guidance. If a declared relationship references a missing source or target node, export generation fails instead of emitting a dangling domain edge.
 
+When relationship support is declared in `data/relationship-support/`, the data exporter can enrich the matching domain relationship edge with support metadata. Current support metadata includes claim IDs, evidence IDs, reference IDs, support status values, support source types, and the support-set files that declared the metadata. References, claims, and evidence from relationship support sets are not exported as graph nodes yet.
+
 ## Nodes
 
 A graph node represents a first-class RKM concept or a minimal endpoint needed to make an edge loadable.
@@ -148,6 +150,8 @@ The data export uses `VALIDATED_BY_SCHEMA` for schema validation provenance. Thi
 
 The data export also preserves declared domain predicates from validated relationship sets, such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, and `CAN_REFINE_RESULTS_FROM`. These predicates describe conservative, possible relationships in the seed dataset. They do not state universal RAG pipeline requirements.
 
+Supported data export domain edges may also expose `claimIds`, `evidenceIds`, and `referenceIds` in `properties`. These are links back to declared support objects, not generated graph nodes and not inferred evidence.
+
 These predicates are intended as minimal graph views, not as a complete graph vocabulary.
 
 ## Source Fixture Provenance
@@ -189,6 +193,12 @@ Stable for the current exports:
 - committed export files are checked during validation
 - graph export files are checked against node and edge schemas
 - graph export validation checks duplicate IDs and missing edge endpoints
+
+Alpha/internal for the current exports:
+
+- data export relationship support metadata on domain edge properties
+- the exact support property names and coverage
+- the decision not to export relationship support references, claims, and evidence as graph nodes yet
 
 Still evolving:
 

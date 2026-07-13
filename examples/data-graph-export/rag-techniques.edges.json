@@ -42,13 +42,31 @@
     "targetId": "TECHNIQUE-10001",
     "sourceDataFile": "data/rag-techniques/query-rewriting.json",
     "properties": {
+      "claimIds": [
+        "CLAIM-10001"
+      ],
       "confidence": "Conservative",
       "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
       "description": "Query Rewriting can precede Hybrid Retrieval in a RAG pipeline when a system rewrites a user query before retrieval.",
       "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10001"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
       "relationshipKind": "Domain Relationship",
       "scope": "Seed Dataset",
       "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
       "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
     }
   },
@@ -59,13 +77,31 @@
     "targetId": "TECHNIQUE-10003",
     "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
     "properties": {
+      "claimIds": [
+        "CLAIM-10002"
+      ],
       "confidence": "Conservative",
       "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
       "description": "Hybrid Retrieval can provide candidate results to Reranking when a pipeline applies a later ranking step to retrieved candidates.",
       "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10002"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
       "relationshipKind": "Domain Relationship",
       "scope": "Seed Dataset",
       "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
       "targetDataFile": "data/rag-techniques/reranking.json"
     }
   },
@@ -76,13 +112,31 @@
     "targetId": "TECHNIQUE-10001",
     "sourceDataFile": "data/rag-techniques/reranking.json",
     "properties": {
+      "claimIds": [
+        "CLAIM-10003"
+      ],
       "confidence": "Conservative",
       "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
       "description": "Reranking can refine candidate results returned by Hybrid Retrieval when a pipeline reranks the retrieved candidate set before context assembly.",
       "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10003"
+      ],
+      "referenceIds": [
+        "REFERENCE-10001"
+      ],
       "relationshipKind": "Domain Relationship",
       "scope": "Seed Dataset",
       "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
       "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
     }
   }
