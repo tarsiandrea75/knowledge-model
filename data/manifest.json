@@ -11,6 +11,10 @@
     {
       "file": "data/rag-techniques/reranking.json",
       "schema": "schema/rag-technique.schema.json"
+    },
+    {
+      "file": "data/relationships/rag-technique-relationships.json",
+      "schema": "schema/relationship-set.schema.json"
     }
   ]
 }

@@ -6,6 +6,8 @@ This first dataset is intentionally small. It exists to support early consumer t
 
 Data files are declared in `data/manifest.json`. Each manifest entry maps a repository-relative data file to the schema that validates it. `make validate` runs data instance validation after fixture validation, so malformed populated data fails the standard repository validation path.
 
+`data/relationships/` contains declared relationship instances between populated data records. These relationship sets are validated through the same manifest and are exported as domain graph edges by the data graph exporter. Relationship edges are declared by data files, not inferred from technique names, descriptions, or stages.
+
 Run direct data validation from the repository root:
 
 ```bash
@@ -23,3 +25,4 @@ Current populated data scope:
 - `data/rag-techniques/hybrid-retrieval.json`
 - `data/rag-techniques/query-rewriting.json`
 - `data/rag-techniques/reranking.json`
+- `data/relationships/rag-technique-relationships.json`

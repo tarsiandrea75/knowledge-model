@@ -61,6 +61,9 @@ printf '==> Running validate-fixtures self-test\n'
 printf '==> Running validate-data self-test\n'
 "$PYTHON_BIN" scripts/validate-data.py --self-test
 
+printf '==> Running data validation\n'
+"$PYTHON_BIN" scripts/validate-data.py
+
 printf '==> Running export-fixtures-graph self-test\n'
 "$PYTHON_BIN" scripts/export-fixtures-graph.py --self-test
 

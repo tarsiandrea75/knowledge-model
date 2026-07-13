@@ -54,8 +54,9 @@ The current data export emits:
 - one node for each seed RAG technique record
 - one schema node for the declared RAG technique schema
 - one `VALIDATED_BY_SCHEMA` provenance edge from each data record node to the schema node
+- declared domain relationship edges from relationship-set files listed in `data/manifest.json`
 
-The current seed records do not contain explicit inter-record RAG domain relationships. The data export therefore does not fabricate technique-to-technique or technique-to-component domain edges. When future seed records contain safely interpretable explicit relationships, the exporter can emit those relationships as explicit data edges.
+The data export includes only domain relationships that are explicitly declared in validated relationship-set files under `data/relationships/`. The exporter must not fabricate technique-to-technique or technique-to-component domain edges from record names, descriptions, stages, or implementation guidance. If a declared relationship references a missing source or target node, export generation fails instead of emitting a dangling domain edge.
 
 ## Nodes
 
@@ -143,7 +144,9 @@ Claim, evidence, and reference links use uppercase snake case predicates that ex
 - `REFERENCES` represents evidence use of a reference.
 - `CITES` represents the claim reference link.
 
-The data export currently uses `VALIDATED_BY_SCHEMA` for schema validation provenance. This is an export/provenance predicate, not a RAG domain relationship predicate.
+The data export uses `VALIDATED_BY_SCHEMA` for schema validation provenance. This is an export/provenance predicate, not a RAG domain relationship predicate.
+
+The data export also preserves declared domain predicates from validated relationship sets, such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, and `CAN_REFINE_RESULTS_FROM`. These predicates describe conservative, possible relationships in the seed dataset. They do not state universal RAG pipeline requirements.
 
 These predicates are intended as minimal graph views, not as a complete graph vocabulary.
 
@@ -151,7 +154,7 @@ These predicates are intended as minimal graph views, not as a complete graph vo
 
 Every fixture graph node and edge includes `sourceFixture`. This value is a repository-relative path to the fixture file that caused the graph item to be emitted.
 
-Every data graph node and edge includes `sourceDataFile`. For data record nodes and their validation edges, this value is the repository-relative data file path. For schema nodes, it is `data/manifest.json` because the manifest declares the schema association.
+Every data graph node and edge includes `sourceDataFile`. For data record nodes and their validation edges, this value is the repository-relative data file path. For schema nodes, it is `data/manifest.json` because the manifest declares the schema association. For declared domain relationship edges, this value is the source entity data file, while edge properties identify the relationship-set file that declared the edge.
 
 When a graph item is a referenced endpoint, `sourceFixture` points to the relationship fixture that introduced the endpoint. This makes provenance explicit even when the endpoint does not yet have its own entity fixture.
 
@@ -178,6 +181,7 @@ Stable for the current exports:
 
 - the fixture export is generated from `examples/fixtures/`
 - the data export is generated from `data/manifest.json`
+- data export domain edges are emitted only from validated relationship-set files declared in `data/manifest.json`
 - nodes and edges are JSON arrays
 - formal graph node objects include `id`, `type`, `label`, `sourceDataFile`, and `properties`
 - formal graph edge objects include `id`, `predicate`, `sourceId`, `targetId`, `sourceDataFile`, and `properties`
@@ -188,7 +192,7 @@ Stable for the current exports:
 
 Still evolving:
 
-- graph coverage beyond the minimal fixtures and seed-data provenance
+- graph coverage beyond the minimal fixtures and first seed-data relationship set
 - package-level graph metadata
 - loader-specific mappings for graph databases and indexers
 - version compatibility policy for future export formats

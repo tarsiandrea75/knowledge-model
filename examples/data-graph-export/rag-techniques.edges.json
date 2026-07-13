@@ -34,5 +34,56 @@
       "edgeKind": "Export Provenance",
       "schema": "schema/rag-technique.schema.json"
     }
+  },
+  {
+    "id": "RELATIONSHIP-10001",
+    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+    "sourceId": "TECHNIQUE-10002",
+    "targetId": "TECHNIQUE-10001",
+    "sourceDataFile": "data/rag-techniques/query-rewriting.json",
+    "properties": {
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "description": "Query Rewriting can precede Hybrid Retrieval in a RAG pipeline when a system rewrites a user query before retrieval.",
+      "edgeKind": "Domain Relationship",
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10002",
+    "predicate": "CAN_PROVIDE_CANDIDATES_TO",
+    "sourceId": "TECHNIQUE-10001",
+    "targetId": "TECHNIQUE-10003",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "description": "Hybrid Retrieval can provide candidate results to Reranking when a pipeline applies a later ranking step to retrieved candidates.",
+      "edgeKind": "Domain Relationship",
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "targetDataFile": "data/rag-techniques/reranking.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10003",
+    "predicate": "CAN_REFINE_RESULTS_FROM",
+    "sourceId": "TECHNIQUE-10003",
+    "targetId": "TECHNIQUE-10001",
+    "sourceDataFile": "data/rag-techniques/reranking.json",
+    "properties": {
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "description": "Reranking can refine candidate results returned by Hybrid Retrieval when a pipeline reranks the retrieved candidate set before context assembly.",
+      "edgeKind": "Domain Relationship",
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
   }
 ]

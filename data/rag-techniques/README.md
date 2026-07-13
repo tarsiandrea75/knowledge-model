@@ -10,6 +10,8 @@ Seed techniques:
 
 Each record is validated against `schema/rag-technique.schema.json` through `data/manifest.json`. The repository-wide validation command runs this check:
 
+Technique records can be connected through relationship sets under `data/relationships/`. Those relationship sets declare optional domain relationships between stable technique IDs without embedding graph edges inside individual technique records.
+
 ```bash
 make validate
 ```

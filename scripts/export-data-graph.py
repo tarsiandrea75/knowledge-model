@@ -16,6 +16,7 @@ MANIFEST_PATH = REPOSITORY_ROOT / "data" / "manifest.json"
 GRAPH_EXPORT_DIR = REPOSITORY_ROOT / "examples" / "data-graph-export"
 NODES_OUTPUT = GRAPH_EXPORT_DIR / "rag-techniques.nodes.json"
 EDGES_OUTPUT = GRAPH_EXPORT_DIR / "rag-techniques.edges.json"
+RELATIONSHIP_SET_SCHEMA = "schema/relationship-set.schema.json"
 
 
 class DataGraphExportError(Exception):
@@ -210,25 +211,45 @@ def validation_edge(record: dict[str, Any], source_data_file: str, schema_file: 
     )
 
 
-def explicit_relationship_edges(record: dict[str, Any], source_data_file: str) -> list[dict[str, Any]]:
-    identity = require_object(record.get("identity"), f"{source_data_file} identity")
-    default_source_id = require_string(identity.get("id"), f"{source_data_file} identity.id")
-    relationships = optional_list(record.get("relationships"), f"{source_data_file} relationships")
+def declared_relationship_edges(
+    relationship_set: dict[str, Any],
+    relationship_set_file: str,
+    node_ids: set[str],
+) -> list[dict[str, Any]]:
+    relationships = require_list(relationship_set.get("relationships"), f"{relationship_set_file} relationships")
     edges: list[dict[str, Any]] = []
 
     for index, item in enumerate(relationships):
-        relationship = require_object(item, f"{source_data_file} relationships[{index}]")
-        predicate_value = relationship.get("predicate", relationship.get("type"))
-        predicate = require_string(predicate_value, f"{source_data_file} relationships[{index}].predicate")
-        source_id = relationship.get("sourceId", default_source_id)
-        target_id = require_string(relationship.get("targetId"), f"{source_data_file} relationships[{index}].targetId")
-        if not isinstance(source_id, str) or not source_id:
-            raise DataGraphExportError(f"{source_data_file} relationships[{index}].sourceId must be a non-empty string")
+        context = f"{relationship_set_file} relationships[{index}]"
+        relationship = require_object(item, context)
+        edge_id = require_string(relationship.get("id"), f"{context}.id")
+        predicate = require_string(relationship.get("predicate"), f"{context}.predicate")
+        source_id = require_string(relationship.get("sourceId"), f"{context}.sourceId")
+        target_id = require_string(relationship.get("targetId"), f"{context}.targetId")
+        source_data_file = require_string(relationship.get("sourceDataFile"), f"{context}.sourceDataFile")
+        target_data_file = require_string(relationship.get("targetDataFile"), f"{context}.targetDataFile")
+        relationship_kind = require_string(relationship.get("relationshipKind"), f"{context}.relationshipKind")
+        description = require_string(relationship.get("description"), f"{context}.description")
+        properties = require_object(relationship.get("properties"), f"{context}.properties")
 
-        edge_id = relationship.get("id")
-        if edge_id is None:
-            edge_id = derived_edge_id(source_id, predicate, target_id)
-        edge_id = require_string(edge_id, f"{source_data_file} relationships[{index}].id")
+        if source_id not in node_ids:
+            raise DataGraphExportError(
+                f"{context}.sourceId references missing data graph node {source_id!r}"
+            )
+        if target_id not in node_ids:
+            raise DataGraphExportError(
+                f"{context}.targetId references missing data graph node {target_id!r}"
+            )
+
+        edge_properties = dict(properties)
+        edge_properties.update(
+            {
+                "declaredInRelationshipSet": relationship_set_file,
+                "description": description,
+                "relationshipKind": relationship_kind,
+                "targetDataFile": target_data_file,
+            }
+        )
         edges.append(
             edge(
                 edge_id,
@@ -236,13 +257,7 @@ def explicit_relationship_edges(record: dict[str, Any], source_data_file: str) -
                 source_id,
                 target_id,
                 source_data_file,
-                {
-                    "certainty": relationship.get("certainty"),
-                    "confidence": relationship.get("confidence"),
-                    "edgeKind": "Explicit Data Relationship",
-                    "rationale": relationship.get("rationale"),
-                    "status": relationship.get("status"),
-                },
+                edge_properties,
             )
         )
 
@@ -257,9 +272,15 @@ def build_graph() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     emitted_node_ids: set[str] = set()
     emitted_edge_ids: set[str] = set()
 
+    relationship_set_entries: list[dict[str, str]] = []
+
     for entry in manifest_entries:
         data_file = entry["file"]
         schema_file = entry["schema"]
+        if schema_file == RELATIONSHIP_SET_SCHEMA:
+            relationship_set_entries.append(entry)
+            continue
+
         record = require_object(load_json(REPOSITORY_ROOT / data_file), data_file)
         record_graph_node = record_node(record, data_file, schema_file)
 
@@ -272,9 +293,16 @@ def build_graph() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         if schema_id not in emitted_schema_nodes:
             emitted_schema_nodes[schema_id] = schema_node(schema_file)
 
-        candidate_edges = [validation_edge(record, data_file, schema_file)]
-        candidate_edges.extend(explicit_relationship_edges(record, data_file))
-        for candidate in candidate_edges:
+        candidate = validation_edge(record, data_file, schema_file)
+        if candidate["id"] in emitted_edge_ids:
+            raise DataGraphExportError(f"{data_file}: duplicate graph edge id {candidate['id']}")
+        emitted_edge_ids.add(candidate["id"])
+        edges.append(candidate)
+
+    for entry in relationship_set_entries:
+        data_file = entry["file"]
+        relationship_set = require_object(load_json(REPOSITORY_ROOT / data_file), data_file)
+        for candidate in declared_relationship_edges(relationship_set, data_file, emitted_node_ids):
             if candidate["id"] in emitted_edge_ids:
                 raise DataGraphExportError(f"{data_file}: duplicate graph edge id {candidate['id']}")
             emitted_edge_ids.add(candidate["id"])
@@ -352,6 +380,43 @@ def run_self_test() -> None:
     rendered = render_json([sample_node])
     if not rendered.endswith("\n") or "Sample Technique" not in rendered:
         raise DataGraphExportError("self-test failed: deterministic JSON rendering changed")
+
+    relationship_set = {
+        "relationships": [
+            {
+                "id": "RELATIONSHIP-0001",
+                "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                "sourceId": "TECHNIQUE-0001",
+                "targetId": "TECHNIQUE-0002",
+                "sourceDataFile": "data/rag-techniques/sample-technique.json",
+                "targetDataFile": "data/rag-techniques/next-technique.json",
+                "relationshipKind": "Domain Relationship",
+                "description": "Sample relationship for exporter self-test.",
+                "properties": {
+                    "edgeKind": "Domain Relationship"
+                }
+            }
+        ]
+    }
+    declared_edges = declared_relationship_edges(
+        relationship_set,
+        "data/relationships/sample-relationships.json",
+        {"TECHNIQUE-0001", "TECHNIQUE-0002"},
+    )
+    if declared_edges[0]["properties"].get("declaredInRelationshipSet") != "data/relationships/sample-relationships.json":
+        raise DataGraphExportError("self-test failed: declared relationship provenance was not preserved")
+
+    try:
+        declared_relationship_edges(
+            relationship_set,
+            "data/relationships/sample-relationships.json",
+            {"TECHNIQUE-0001"},
+        )
+    except DataGraphExportError as exc:
+        if "references missing data graph node" not in str(exc):
+            raise
+    else:
+        raise DataGraphExportError("self-test failed: missing relationship target node was not rejected")
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

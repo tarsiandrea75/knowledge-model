@@ -14,15 +14,16 @@ The current package is `v0.1.0-alpha`.
 
 This alpha package is intended for internal evaluation, onboarding, and consumer feedback. It contains a strong foundation, but it should not be treated as a stable public API, production dependency, or comprehensive RAG knowledge base.
 
-The package currently includes schemas, fixtures, seed data, a minimal fixture graph export, validation commands, and documentation for consumers, maintainers, and future assistants. Post-alpha work on `main` also includes a seed-data graph export under `examples/data-graph-export/`.
+The package currently includes schemas, fixtures, seed data, validated relationship sets, a minimal fixture graph export, validation commands, and documentation for consumers, maintainers, and future assistants. Post-alpha work on `main` also includes a seed-data graph export under `examples/data-graph-export/`.
 
 ## What RKM Currently Includes
 
 - Schema foundation using JSON Schema Draft 2020-12.
 - Validated fixtures under `examples/fixtures/`.
 - Validated seed dataset under `data/`.
+- Validated relationship sets under `data/relationships/`.
 - Minimal fixture-derived graph export under `examples/graph-export/`.
-- Post-alpha seed-data graph export under `examples/data-graph-export/`.
+- Post-alpha seed-data graph export under `examples/data-graph-export/`, including provenance edges and declared domain relationship edges.
 - Graph export node and edge schema validation.
 - Validation pipeline through `make validate`.
 - Consumer, release, maturity, roadmap, and assistant handoff documentation.
@@ -59,7 +60,7 @@ make data-graph-export
 - `examples/fixtures/`: small validated examples that demonstrate valid schema shape and validation behavior.
 - `examples/graph-export/`: minimal graph nodes and edges derived from fixtures.
 - `examples/data-graph-export/`: graph nodes and edges derived from the validated seed dataset.
-- `data/`: small validated seed dataset for early consumer testing and inspection.
+- `data/`: small validated seed dataset and declared relationship sets for early consumer testing and inspection.
 - `scripts/`: validation, graph export, cockpit, automation, recovery, and maintenance scripts.
 
 ## Validation

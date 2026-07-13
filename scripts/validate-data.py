@@ -157,6 +157,13 @@ def run_self_test() -> None:
         if path != DATA_MANIFEST_PATH.resolve():
             raise DataValidationError("self-test failed: repository path resolution returned the wrong path")
 
+        relationship_schema = repository_path(
+            "schema/relationship-set.schema.json",
+            "self-test.relationshipSchema",
+        )
+        if relationship_schema != (SCHEMA_ROOT / "relationship-set.schema.json").resolve():
+            raise DataValidationError("self-test failed: relationship-set schema path resolution returned the wrong path")
+
 
 def main() -> int:
     if len(sys.argv) == 2 and sys.argv[1] == "--self-test":

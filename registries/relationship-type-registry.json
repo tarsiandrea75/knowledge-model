@@ -1690,6 +1690,93 @@
       "status": "Published",
       "stability": "Stable",
       "introducedInOntologyVersion": "1.0.0"
+    },
+    {
+      "type": "CAN_PRECEDE_IN_PIPELINE",
+      "label": "Can Precede In Pipeline",
+      "description": "Indicates that the source entity can appear before the target entity in a pipeline composition without making that order mandatory.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "possible earlier pipeline entity",
+        "targetRole": "possible later pipeline entity",
+        "description": "The source can precede the target in a pipeline composition."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0",
+      "usageNotes": [
+        "Use this predicate only for optional or common pipeline ordering, not for mandatory sequencing."
+      ]
+    },
+    {
+      "type": "CAN_PROVIDE_CANDIDATES_TO",
+      "label": "Can Provide Candidates To",
+      "description": "Indicates that the source entity can provide candidate results or candidate items to the target entity in a pipeline.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "candidate-producing entity",
+        "targetRole": "candidate-consuming entity",
+        "description": "The source can provide candidates to the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0",
+      "usageNotes": [
+        "Use this predicate for possible candidate handoff relationships, not for guaranteed runtime behavior."
+      ]
+    },
+    {
+      "type": "CAN_REFINE_RESULTS_FROM",
+      "label": "Can Refine Results From",
+      "description": "Indicates that the source entity can refine, reorder, filter, or otherwise improve results produced by the target entity.",
+      "category": "Workflow",
+      "canonicalDirection": {
+        "sourceRole": "result-refining entity",
+        "targetRole": "result-producing entity",
+        "description": "The source can refine results from the target."
+      },
+      "allowedSources": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "allowedTargets": [
+        {
+          "entityType": "Artifact",
+          "includeSubtypes": true
+        }
+      ],
+      "status": "Published",
+      "stability": "Stable",
+      "introducedInOntologyVersion": "1.0.0",
+      "usageNotes": [
+        "Use this predicate for optional refinement relationships, not for universal RAG pipeline requirements."
+      ]
     }
   ],
   "notes": [

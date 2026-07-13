@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/relationship-set.schema.json",
+  "title": "RKM Relationship Set Schema",
+  "description": "Validates a declared set of relationship instances between populated RKM data records.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "title",
+    "description",
+    "relationships"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relationships": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/relationshipInstance"
+      }
+    }
+  },
+  "$defs": {
+    "relationshipInstance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "predicate",
+        "sourceId",
+        "targetId",
+        "sourceDataFile",
+        "targetDataFile",
+        "relationshipKind",
+        "description",
+        "properties"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predicate": {
+          "type": "string",
+          "description": "Uppercase snake case relationship predicate.",
+          "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$"
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDataFile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetDataFile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationshipKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

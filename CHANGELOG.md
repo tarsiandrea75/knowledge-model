@@ -8,6 +8,8 @@ All notable changes to RAG Knowledge Model are documented in this file.
 
 - Deterministic data graph export for the validated seed dataset under `data/`, exposed through `make data-graph-export` and checked by `make validate`.
 - JSON Schema validation for graph export node and edge files, including duplicate ID checks and edge endpoint integrity checks.
+- Validated relationship sets under `data/relationships/` for declared seed dataset domain relationships.
+- Data graph export now includes declared domain relationship edges from validated relationship-set files without inferring undeclared relationships.
 
 ## v0.1.0-alpha - 2026-07-13
 

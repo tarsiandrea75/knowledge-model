@@ -7,9 +7,9 @@ The data graph export is separate from `examples/graph-export/`, which is genera
 ## Files
 
 - `rag-techniques.nodes.json`: graph nodes derived from seed RAG technique records and their declared schema.
-- `rag-techniques.edges.json`: graph edges derived from safe data facts and export provenance.
+- `rag-techniques.edges.json`: graph edges derived from export provenance and declared domain relationships.
 
-The current seed records do not declare explicit inter-record RAG domain relationships. For that reason, the export emits RAG technique nodes, a schema node, and `VALIDATED_BY_SCHEMA` provenance edges. It does not fabricate relationships between techniques.
+The current export emits RAG technique nodes, a schema node, `VALIDATED_BY_SCHEMA` provenance edges, and declared domain relationship edges from `data/relationships/rag-technique-relationships.json`. It does not fabricate relationships between techniques.
 
 ## Generation
 
@@ -51,4 +51,4 @@ Schema-level validation checks node and edge shape, duplicate IDs, and edge endp
 
 ## Current Scope
 
-This export is minimal post-alpha work on `main`. It proves a deterministic graph export path for validated seed data, but it is not a complete downstream graph product and is not part of the already tagged `v0.1.0-alpha` package.
+This export is minimal post-alpha work on `main`. It proves a deterministic graph export path for validated seed data and declared relationship sets, but it is not a complete downstream graph product and is not part of the already tagged `v0.1.0-alpha` package.
