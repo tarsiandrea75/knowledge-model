@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/risk.schema.json",
+  "title": "RKM Risk Definition",
+  "description": "Defines a reusable structured risk that represents an uncertain exposure to negative outcomes in a RAG context without making risk a first-class identity-backed entity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "riskType",
+    "statement",
+    "scope"
+  ],
+  "properties": {
+    "riskId": {
+      "type": "string",
+      "description": "Stable local identifier for the risk within the containing entity, workflow, claim, evidence record or comparison.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "riskType": {
+      "$ref": "#/$defs/riskType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of what could go wrong under the stated conditions.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "likelihood": {
+      "$ref": "#/$defs/assessmentLevel"
+    },
+    "impact": {
+      "$ref": "#/$defs/assessmentLevel"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the risk may occur, become material or invalidate a claim.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "potentialImpacts": {
+      "type": "array",
+      "description": "Possible negative outcomes if the risk occurs.",
+      "items": {
+        "$ref": "#/$defs/impact"
+      },
+      "uniqueItems": true
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes, governance concerns or operational properties affected by this risk.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "mitigations": {
+      "type": "array",
+      "description": "Techniques, policies, controls, workflow steps, components or evaluation methods that may reduce risk likelihood, impact or uncertainty.",
+      "items": {
+        "$ref": "#/$defs/mitigation"
+      },
+      "uniqueItems": true
+    },
+    "relatedProblems": {
+      "type": "array",
+      "description": "Problems that explain, expose or are made more consequential by this risk.",
+      "items": {
+        "$ref": "problem.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedLimitations": {
+      "type": "array",
+      "description": "Limitations that expose, intensify or bound this risk.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedTradeoffs": {
+      "type": "array",
+      "description": "Tradeoffs that may introduce, reduce or shift this risk.",
+      "items": {
+        "$ref": "tradeoff.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, qualify or justify the risk assessment.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the risk existence, scope, likelihood, impact or mitigation effect.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the risk assessment.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "riskType": {
+      "type": "string",
+      "description": "Primary source of exposure represented by the risk.",
+      "enum": [
+        "Retrieval Risk",
+        "Generation Risk",
+        "Citation Risk",
+        "Security Risk",
+        "Privacy Risk",
+        "Provider Risk",
+        "Cost Risk",
+        "Latency Risk",
+        "Evaluation Risk",
+        "Observability Risk",
+        "Governance Risk",
+        "Operational Risk",
+        "Reproducibility Risk",
+        "Tool Invocation Risk",
+        "Other"
+      ]
+    },
+    "assessmentLevel": {
+      "type": "string",
+      "description": "Qualified assessment level for likelihood or impact in the stated scope.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Context Dependent",
+        "Unknown"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the risk applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities, workflows or artifacts exposed when the risk is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Artifact",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the risk may occur or be controlled.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "useCaseReferences": {
+          "type": "array",
+          "description": "Use cases where the risk materially affects suitability, governance or operational design.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "assumptions": {
+          "type": "array",
+          "description": "Assumptions that bound the risk assessment.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor that triggers, exposes or intensifies the risk.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Authorization Boundary",
+            "Tool Permission",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "description": "Possible consequence if the risk occurs.",
+      "additionalProperties": false,
+      "required": [
+        "impactType"
+      ],
+      "properties": {
+        "impactType": {
+          "type": "string",
+          "enum": [
+            "Unsupported Answer",
+            "Citation Mismatch",
+            "Unauthorized Disclosure",
+            "Unsafe Tool Invocation",
+            "Prompt Injection",
+            "Stale Answer",
+            "Provider Outage",
+            "Higher Latency",
+            "Higher Cost",
+            "Lower Retrieval Quality",
+            "Weaker Evaluation Coverage",
+            "Reduced Reproducibility",
+            "Incomplete Observability",
+            "Governance Noncompliance",
+            "Operational Failure",
+            "Other"
+          ]
+        },
+        "severity": {
+          "$ref": "#/$defs/assessmentLevel"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mitigation": {
+      "type": "object",
+      "description": "Structured mitigation candidate for the risk.",
+      "additionalProperties": false,
+      "required": [
+        "mitigationType",
+        "description"
+      ],
+      "properties": {
+        "mitigationType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Workflow Step",
+            "Component",
+            "Policy",
+            "Security Control",
+            "Evaluation Method",
+            "Observability Control",
+            "Operational Control",
+            "Provider Choice",
+            "Configuration",
+            "Human Review",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mitigatingEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "targetProblem": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "expectedEffect": {
+          "type": "string",
+          "enum": [
+            "Reduces Likelihood",
+            "Reduces Impact",
+            "Reduces Uncertainty",
+            "Improves Detection",
+            "Improves Recovery",
+            "Transfers Risk",
+            "Context Dependent"
+          ]
+        },
+        "evidenceReferences": {
+          "type": "array",
+          "description": "Local or stable identifiers for evidence supporting mitigation effectiveness.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity, workflow, artifact or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
