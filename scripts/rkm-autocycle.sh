@@ -12,6 +12,7 @@ TAIL_LINES="${TAIL_LINES:-80}"
 LEDGER_SCRIPT="scripts/rkm-run-ledger.py"
 REVIEW_VERDICT_SCRIPT="scripts/rkm-review-verdict.py"
 BUDGET_SAFETY_FACTOR="${BUDGET_SAFETY_FACTOR:-1.25}"
+FORCE="${FORCE:-false}"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -24,6 +25,16 @@ progress() {
 
 warn() {
   printf '[rkm-autocycle] WARNING: %s\n' "$1" >&2
+}
+
+parse_bool() {
+  local value
+  value="$(printf '%s' "${1:-}" | tr '[:upper:]' '[:lower:]')"
+  case "$value" in
+    true|1|yes|y|on) return 0 ;;
+    false|0|no|n|off|"") return 1 ;;
+    *) fail "Invalid FORCE value: $1. Expected true, false, 1, 0, yes, no, y, n, on, or off." ;;
+  esac
 }
 
 current_time() {
@@ -189,6 +200,12 @@ require_command wc
 
 ensure_clean_worktree
 
+force_enabled=false
+if parse_bool "$FORCE"; then
+  force_enabled=true
+  warn "FORCE mode enabled: token budget guard warnings will not stop autocycle."
+fi
+
 accepted_files=0
 autocycle_start_epoch="$(current_epoch)"
 AUTOCYCLE_STARTED_AT_UTC="$(current_utc_iso)"
@@ -203,8 +220,12 @@ if [[ -n "${TOKEN_BUDGET:-}" ]]; then
   fi
 
   if [[ "$initial_budget_result" -eq 3 ]]; then
-    printf 'ERROR: Token budget guard stopped before work: budget is insufficient for %s accepted file(s).\n' "$TARGET_ACCEPTED_FILES" >&2
-    exit 1
+    if [[ "$force_enabled" == "true" ]]; then
+      warn "token budget guard would stop here, but FORCE=true; continuing."
+    else
+      printf 'ERROR: Token budget guard stopped before work: budget is insufficient for %s accepted file(s).\n' "$TARGET_ACCEPTED_FILES" >&2
+      exit 1
+    fi
   fi
 
   if [[ "$initial_budget_result" -ne 0 ]]; then
@@ -242,10 +263,14 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
         budget_result="$?"
       fi
       if [[ "$budget_result" -eq 3 ]]; then
-        printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
-        print_ledger_report
-        git status --short
-        exit 1
+        if [[ "$force_enabled" == "true" ]]; then
+          warn "token budget guard would stop here, but FORCE=true; continuing."
+        else
+          printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+          print_ledger_report
+          git status --short
+          exit 1
+        fi
       fi
       if [[ "$budget_result" -ne 0 ]]; then
         fail "Token budget estimate failed after iteration $iteration."
@@ -304,10 +329,14 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
         budget_result="$?"
       fi
       if [[ "$budget_result" -eq 3 ]]; then
-        printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
-        print_ledger_report
-        git status --short
-        exit 1
+        if [[ "$force_enabled" == "true" ]]; then
+          warn "token budget guard would stop here, but FORCE=true; continuing."
+        else
+          printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+          print_ledger_report
+          git status --short
+          exit 1
+        fi
       fi
       if [[ "$budget_result" -ne 0 ]]; then
         fail "Token budget estimate failed after iteration $iteration."

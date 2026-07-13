@@ -19,6 +19,9 @@ sys.dont_write_bytecode = True
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET = 3
+DEFAULT_WORKING_TARGET_MAX = 5
+TRUTHY_VALUES = {"true", "1", "yes", "y", "on"}
+FALSEY_VALUES = {"false", "0", "no", "n", "off", ""}
 STOP_RECOVERY_STATUSES = {
     "RECOVERY_FAILED_NEEDS_MANUAL_FIX",
     "MANUAL_REVIEW",
@@ -58,6 +61,21 @@ def positive_int(value: str) -> int:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
     return parsed
+
+
+def parse_bool(value: str | bool | None) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    normalized = str(value).strip().lower()
+    if normalized in TRUTHY_VALUES:
+        return True
+    if normalized in FALSEY_VALUES:
+        return False
+    raise argparse.ArgumentTypeError(
+        f"invalid force value {value!r}; expected one of true, false, 1, 0, yes, no, y, n, on, off"
+    )
 
 
 def run_json(args: list[str]) -> dict[str, Any]:
@@ -138,7 +156,14 @@ def int_value(value: Any, fallback: int = 0) -> int:
         return fallback
 
 
-def decide(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[str, Any], target: int = DEFAULT_TARGET) -> Decision:
+def decide(
+    next_action: dict[str, Any],
+    budget: dict[str, Any],
+    recovery: dict[str, Any],
+    target: int = DEFAULT_TARGET,
+    *,
+    force: bool = False,
+) -> Decision:
     recovery_status = str(recovery.get("status") or "").upper()
     next_status = str(next_action.get("status") or "").upper()
     max_target = recommended_max_target(budget, next_action)
@@ -149,8 +174,16 @@ def decide(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[s
         return Decision("STOP", "make recovery-plan")
     if repo_is_dirty(next_action, recovery):
         return Decision("STOP", "make recovery-plan")
+    if next_status == "TARGET_TOO_AGGRESSIVE":
+        command = next_action.get("command")
+        if isinstance(command, str) and command:
+            return Decision("RUN_REDUCED_TARGET", command)
+        max_target = int_value(next_action.get("workingTargetMax"), DEFAULT_WORKING_TARGET_MAX)
+        return Decision("RUN_REDUCED_TARGET", f"make autopilot N={max_target}")
     if next_status == "READY_TO_AUTOCYCLE":
         command = "make autopilot" if target == DEFAULT_TARGET else f"make autopilot N={target}"
+        if force or next_action.get("force") is True:
+            command = f"{command} FORCE=true"
         return Decision("RUN", command)
     if next_status == "OVER_BUDGET" and max_target > 0:
         return Decision("RUN_REDUCED_TARGET", f"make autopilot N={max_target}")
@@ -442,9 +475,14 @@ def recent_run_text(summary: RecentRunSummary) -> str | None:
     return "; ".join(parts)
 
 
-def budget_text(next_action: dict[str, Any], budget: dict[str, Any], target: int) -> str:
+def budget_text(next_action: dict[str, Any], budget: dict[str, Any], target: int, *, force: bool = False) -> str:
     next_status = str(next_action.get("status") or "").upper()
     max_target = recommended_max_target(budget, next_action)
+    working_target_max = int_value(next_action.get("workingTargetMax"), DEFAULT_WORKING_TARGET_MAX)
+    if force or next_action.get("force") is True:
+        return f"target {target} forced; budget guard may warn"
+    if target > working_target_max or next_status == "TARGET_TOO_AGGRESSIVE":
+        return f"target {target} aggressive; working target {working_target_max}"
     if next_status == "OVER_BUDGET" and max_target > 0:
         return f"target {target} blocked; max safe target {max_target}"
     if next_status == "OVER_BUDGET":
@@ -466,6 +504,7 @@ def render_dashboard(
     no_color: bool,
     state: dict[str, Any] | None = None,
     ledger_entries: list[dict[str, Any]] | None = None,
+    force: bool = False,
 ) -> str:
     global COLOR
     COLOR = color_enabled(no_color)
@@ -481,7 +520,7 @@ def render_dashboard(
         "cmd": "›" if use_unicode else ">",
         "decision": "✓" if use_unicode else "!",
     }
-    decision = decide(next_action, budget, recovery, target)
+    decision = decide(next_action, budget, recovery, target, force=force)
     repo_status = "dirty" if repo_is_dirty(next_action, recovery) else "clean"
     title = " RKM COCKPIT "
     frame = "═" * len(title) if use_unicode else "=" * len(title)
@@ -494,6 +533,11 @@ def render_dashboard(
         row(icons["repo"], "repo status", repo_status, repo_status == "clean", "green"),
         row(icons["recovery"], "recovery status", recovery.get("status")),
     ]
+    force_command = next_action.get("forceCommand")
+    if force or next_action.get("force") is True:
+        lines.append(row(icons["target"], "force", "enabled"))
+    elif isinstance(force_command, str) and force_command:
+        lines.append(row(icons["target"], "force", force_command))
     recent_text = recent_run_text(recent)
     if recent_text:
         lines.append(f"{icons['recent']} last run -> {recent_text}")
@@ -501,7 +545,7 @@ def render_dashboard(
         lines.append(f"{icons['push']} push -> pending; command make safe-push")
     lines.extend(
         [
-        row(icons["budget"], "budget", budget_text(next_action, budget, target)),
+        row(icons["budget"], "budget", budget_text(next_action, budget, target, force=force)),
         row(icons["target"], "recommended max target", recommended_max_target(budget, next_action)),
         row(icons["next"], f"next-action status T={target}", next_action.get("status")),
         row(icons["cmd"], "current recommended command", next_action.get("command") or recovery.get("recommendedCommand")),
@@ -518,14 +562,32 @@ def render_dashboard(
     return "\n".join(lines)
 
 
-def print_dashboard(next_action: dict[str, Any], budget: dict[str, Any], recovery: dict[str, Any], target: int, no_color: bool) -> None:
+def print_dashboard(
+    next_action: dict[str, Any],
+    budget: dict[str, Any],
+    recovery: dict[str, Any],
+    target: int,
+    no_color: bool,
+    force: bool,
+) -> None:
     state = read_json_file(REPOSITORY_ROOT / ".rkm" / "autopilot-state.json")
     ledger_entries = read_jsonl_file(REPOSITORY_ROOT / ".rkm" / "run-ledger.jsonl")
-    print(render_dashboard(next_action, budget, recovery, target, no_color, state, ledger_entries))
+    print(render_dashboard(next_action, budget, recovery, target, no_color, state, ledger_entries, force=force))
 
 
-def collect(target: int) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    next_action = run_json(["python3", "scripts/rkm-next-action.py", "--target", str(target), "--json"])
+def collect(target: int, *, force: bool, working_target_max: int) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    next_action = run_json(
+        [
+            "python3",
+            "scripts/rkm-next-action.py",
+            "--target",
+            str(target),
+            "--json",
+            f"--force={'true' if force else 'false'}",
+            "--working-target-max",
+            str(working_target_max),
+        ]
+    )
     budget = run_json(["python3", "scripts/rkm-budget.py", "report", "--json"])
     recovery = run_json(["python3", "scripts/rkm-recovery-plan.py", "--json"])
     return next_action, budget, recovery
@@ -558,6 +620,14 @@ def run_self_test() -> int:
     check("dirty", {"repoStatus": "dirty", "status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("STOP", "make recovery-plan"))
     check("run", {"status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("RUN", "make autopilot"))
     check("run target", {"status": "READY_TO_AUTOCYCLE"}, {}, clean, Decision("RUN", "make autopilot N=5"), 5)
+    check(
+        "aggressive target reduced",
+        {"status": "TARGET_TOO_AGGRESSIVE", "workingTargetMax": 5, "command": "make autopilot N=5"},
+        {},
+        clean,
+        Decision("RUN_REDUCED_TARGET", "make autopilot N=5"),
+        24,
+    )
     check("reduced", {"status": "OVER_BUDGET"}, {"recommendedMaxTarget": 2}, clean, Decision("RUN_REDUCED_TARGET", "make autopilot N=2"))
     check("budget-blocked", {"status": "OVER_BUDGET"}, {"recommendedMaxTarget": 0}, clean, Decision("BUDGET_BLOCKED", "make budget-report"))
     check("push", {"status": "READY_TO_PUSH"}, {}, clean, Decision("PUSH", "make safe-push"))
@@ -775,6 +845,34 @@ def run_self_test() -> int:
     )
     assert_contains("allowed budget row", allowed_dashboard, "target 5 allowed to try")
 
+    aggressive_dashboard = render_dashboard(
+        {
+            "status": "TARGET_TOO_AGGRESSIVE",
+            "workingTargetMax": 5,
+            "command": "make autopilot N=5",
+            "forceCommand": "make autopilot N=24 FORCE=true",
+        },
+        {},
+        clean,
+        24,
+        True,
+    )
+    assert_contains("aggressive target row", aggressive_dashboard, "target 24 aggressive; working target 5")
+    assert_contains("aggressive reduced run", aggressive_dashboard, "run                         -> make autopilot N=5")
+    assert_contains("aggressive force row", aggressive_dashboard, "force                       -> make autopilot N=24 FORCE=true")
+
+    forced_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE", "force": True, "workingTargetMax": 5},
+        {},
+        clean,
+        24,
+        True,
+        force=True,
+    )
+    assert_contains("forced budget row", forced_dashboard, "target 24 forced; budget guard may warn")
+    assert_contains("forced run", forced_dashboard, "run                         -> make autopilot N=24 FORCE=true")
+    assert_contains("forced row", forced_dashboard, "force                       -> enabled")
+
     stale_revise_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE", "repoStatus": "clean"},
         {},
@@ -928,6 +1026,20 @@ def run_self_test() -> int:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", type=positive_int, default=DEFAULT_TARGET, help=f"next-action target (default: {DEFAULT_TARGET})")
+    parser.add_argument(
+        "--force",
+        nargs="?",
+        const="true",
+        default=os.environ.get("FORCE", "false"),
+        type=parse_bool,
+        help="show forced operation beyond working target and conservative budget boundaries",
+    )
+    parser.add_argument(
+        "--working-target-max",
+        type=positive_int,
+        default=positive_int(os.environ.get("WORKING_TARGET_MAX", str(DEFAULT_WORKING_TARGET_MAX))),
+        metavar="N",
+    )
     parser.add_argument("--no-color", action="store_true", help="disable ANSI color output")
     parser.add_argument("--self-test", action="store_true", help="run decision-rule tests without shelling out")
     return parser.parse_args()
@@ -940,8 +1052,8 @@ def main() -> int:
     if args.self_test:
         return run_self_test()
 
-    next_action, budget, recovery = collect(args.target)
-    print_dashboard(next_action, budget, recovery, args.target, args.no_color)
+    next_action, budget, recovery = collect(args.target, force=args.force, working_target_max=args.working_target_max)
+    print_dashboard(next_action, budget, recovery, args.target, args.no_color, args.force)
     return 0
 
 

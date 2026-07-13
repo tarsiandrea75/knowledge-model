@@ -19,7 +19,10 @@ sys.dont_write_bytecode = True
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET = 3
+DEFAULT_WORKING_TARGET_MAX = 5
 DEFAULT_ESTIMATED_BUDGET = 0
+TRUTHY_VALUES = {"true", "1", "yes", "y", "on"}
+FALSEY_VALUES = {"false", "0", "no", "n", "off", ""}
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,8 @@ class RepoSnapshot:
     budget_check_json: dict[str, Any] | None
     budget_report: CommandResult | None
     target: int
+    force: bool
+    working_target_max: int
 
 
 @dataclass(frozen=True)
@@ -53,6 +58,7 @@ class Decision:
     budget_status: str
     next_action: str
     command: str
+    force_command: str | None = None
 
 
 def run_command(args: list[str], repo_root: Path = REPOSITORY_ROOT) -> CommandResult:
@@ -75,6 +81,21 @@ def positive_int(value: str) -> int:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
     return parsed
+
+
+def parse_bool(value: str | bool | None) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    normalized = str(value).strip().lower()
+    if normalized in TRUTHY_VALUES:
+        return True
+    if normalized in FALSEY_VALUES:
+        return False
+    raise argparse.ArgumentTypeError(
+        f"invalid force value {value!r}; expected one of true, false, 1, 0, yes, no, y, n, on, off"
+    )
 
 
 def git_status_lines(repo_root: Path = REPOSITORY_ROOT) -> list[str]:
@@ -129,7 +150,13 @@ def read_ledger_entries(ledger_path: Path, limit: int = 5) -> list[dict[str, Any
     return entries[-limit:]
 
 
-def collect_snapshot(target: int, repo_root: Path = REPOSITORY_ROOT) -> RepoSnapshot:
+def collect_snapshot(
+    target: int,
+    *,
+    force: bool = False,
+    working_target_max: int = DEFAULT_WORKING_TARGET_MAX,
+    repo_root: Path = REPOSITORY_ROOT,
+) -> RepoSnapshot:
     branch = git_text(["git", "branch", "--show-current"], repo_root)
     head = git_text(["git", "rev-parse", "--short", "HEAD"], repo_root)
     upstream, ahead, behind = upstream_counts(repo_root)
@@ -169,6 +196,8 @@ def collect_snapshot(target: int, repo_root: Path = REPOSITORY_ROOT) -> RepoSnap
         budget_check_json=budget_check_json,
         budget_report=budget_report,
         target=target,
+        force=force,
+        working_target_max=working_target_max,
     )
 
 
@@ -312,6 +341,30 @@ def fallback_autocycle_command(snapshot: RepoSnapshot) -> str:
     )
 
 
+def forced_autocycle_command(snapshot: RepoSnapshot) -> str:
+    budget_json = snapshot.budget_check_json
+    suggested = parse_suggested_command(snapshot.budget_check, snapshot.budget_report)
+    suggested_budget = parse_int_option(autocycle_option(suggested, "TOKEN_BUDGET")) if suggested else None
+    estimated_budget = (
+        budget_int(budget_json, "requiredBudgetForTarget")
+        or suggested_budget
+        or parse_estimated_budget(snapshot.budget_check)
+    )
+    safety_factor = budget_float(budget_json, "safetyFactor") or 1.25
+    return (
+        f"make autocycle N={snapshot.target} TOKEN_BUDGET={estimated_budget} "
+        f"BUDGET_SAFETY_FACTOR={safety_factor:g} FORCE=true && make safe-push"
+    )
+
+
+def safer_autopilot_command(snapshot: RepoSnapshot) -> str:
+    return f"make autopilot N={snapshot.working_target_max}"
+
+
+def force_autopilot_command(snapshot: RepoSnapshot) -> str:
+    return f"make autopilot N={snapshot.target} FORCE=true"
+
+
 def autocycle_option(command: str, name: str) -> str | None:
     match = re.search(rf"(?:^|\s){re.escape(name)}=([^\s&]+)", command)
     if not match:
@@ -392,6 +445,26 @@ def decide_next_action(snapshot: RepoSnapshot) -> Decision:
             command="make budget-init DAILY_BUDGET=300000",
         )
 
+    if snapshot.target > snapshot.working_target_max and not snapshot.force:
+        return Decision(
+            status="TARGET_TOO_AGGRESSIVE",
+            budget_status=budget_status,
+            next_action=(
+                f"requested target {snapshot.target} exceeds recommended working target "
+                f"{snapshot.working_target_max}."
+            ),
+            command=safer_autopilot_command(snapshot),
+            force_command=force_autopilot_command(snapshot),
+        )
+
+    if snapshot.target > snapshot.working_target_max and snapshot.force:
+        return Decision(
+            status="READY_TO_AUTOCYCLE",
+            budget_status=f"{budget_status}; forced",
+            next_action="run the forced budgeted autocycle and safe-push if it succeeds.",
+            command=forced_autocycle_command(snapshot),
+        )
+
     if snapshot.budget_check is not None and (
         snapshot.budget_check.code == 3 or parse_budget_status(snapshot.budget_check) == "over budget"
     ):
@@ -464,10 +537,14 @@ def format_human(snapshot: RepoSnapshot, decision: Decision) -> str:
     lines.extend(
         [
             f"last ledger final status: {latest_ledger_text(snapshot)}",
+            f"force: {'enabled' if snapshot.force else 'disabled'}",
+            f"working target max: {snapshot.working_target_max}",
             f"next action: {decision.next_action}",
             f"command: {decision.command}",
         ]
     )
+    if decision.force_command:
+        lines.append(f"force command: {decision.force_command}")
     return "\n".join(lines)
 
 
@@ -486,6 +563,10 @@ def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
             recommended_token_budget = budget_int(budget_json, "requiredBudgetForTarget")
     document = {
         "status": decision.status,
+        "target": snapshot.target,
+        "force": snapshot.force,
+        "workingTargetMax": snapshot.working_target_max,
+        "recommendedWorkingTarget": min(snapshot.target, snapshot.working_target_max),
         "repoStatus": "clean" if not repo_has_dirty_files(snapshot) else "dirty",
         "repoStatusLines": list(snapshot.status_lines),
         "branch": snapshot.branch,
@@ -507,6 +588,8 @@ def format_json(snapshot: RepoSnapshot, decision: Decision) -> str:
         "nextAction": decision.next_action,
         "command": decision.command,
     }
+    if decision.force_command is not None:
+        document["forceCommand"] = decision.force_command
     if budget_json is not None:
         for key in (
             "dailyBudgetTokens",
@@ -588,6 +671,9 @@ def assert_json_output(
         "budgetSafetyFactor",
         "nextAction",
         "command",
+        "force",
+        "workingTargetMax",
+        "recommendedWorkingTarget",
     }
     missing_keys = sorted(required_keys.difference(document))
     if missing_keys:
@@ -611,6 +697,8 @@ def test_snapshot(
     budget_check_json: dict[str, Any] | None = None,
     budget_report: CommandResult | None = CommandResult(0, "suggested command: make autocycle N=3 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25", ""),
     target: int = DEFAULT_TARGET,
+    force: bool = False,
+    working_target_max: int = DEFAULT_WORKING_TARGET_MAX,
 ) -> RepoSnapshot:
     return RepoSnapshot(
         status_lines=status_lines or [],
@@ -627,6 +715,8 @@ def test_snapshot(
         budget_check_json=budget_check_json if budget_check_json is not None else parse_budget_json(budget_check),
         budget_report=budget_report,
         target=target,
+        force=force,
+        working_target_max=working_target_max,
     )
 
 
@@ -807,6 +897,36 @@ def run_self_test() -> int:
         },
     )
     assert_decision(
+        "target above working cap without force",
+        test_snapshot(target=24, working_target_max=5),
+        "TARGET_TOO_AGGRESSIVE",
+        "make autopilot N=5",
+        "requested target 24 exceeds recommended working target 5.",
+    )
+    assert_json_output(
+        "target above working cap without force JSON output",
+        test_snapshot(target=24, working_target_max=5),
+        "TARGET_TOO_AGGRESSIVE",
+        {
+            "force": False,
+            "workingTargetMax": 5,
+            "recommendedWorkingTarget": 5,
+            "command": "make autopilot N=5",
+            "forceCommand": "make autopilot N=24 FORCE=true",
+        },
+    )
+    assert_json_output(
+        "target above working cap with force JSON output",
+        test_snapshot(target=24, working_target_max=5, force=True),
+        "READY_TO_AUTOCYCLE",
+        {
+            "force": True,
+            "workingTargetMax": 5,
+            "recommendedWorkingTarget": 5,
+            "command": "make autocycle N=24 TOKEN_BUDGET=100 BUDGET_SAFETY_FACTOR=1.25 FORCE=true && make safe-push",
+        },
+    )
+    assert_decision(
         "ready to autocycle",
         test_snapshot(),
         "READY_TO_AUTOCYCLE",
@@ -852,6 +972,20 @@ def run_self_test() -> int:
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Print the next safe operational action for RKM.")
     parser.add_argument("--target", type=positive_int, default=DEFAULT_TARGET, metavar="N")
+    parser.add_argument(
+        "--force",
+        nargs="?",
+        const="true",
+        default=os.environ.get("FORCE", "false"),
+        type=parse_bool,
+        help="allow forced operation beyond working target and conservative budget boundaries",
+    )
+    parser.add_argument(
+        "--working-target-max",
+        type=positive_int,
+        default=positive_int(os.environ.get("WORKING_TARGET_MAX", str(DEFAULT_WORKING_TARGET_MAX))),
+        metavar="N",
+    )
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON output")
     parser.add_argument("--self-test", action="store_true", help="run pure decision-function self-tests")
     return parser
@@ -863,7 +997,7 @@ def run_cli(argv: list[str]) -> int:
     if args.self_test:
         return run_self_test()
 
-    snapshot = collect_snapshot(args.target)
+    snapshot = collect_snapshot(args.target, force=args.force, working_target_max=args.working_target_max)
     decision = decide_next_action(snapshot)
     print(format_json(snapshot, decision) if args.json else format_human(snapshot, decision))
     return 0

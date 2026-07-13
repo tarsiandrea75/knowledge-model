@@ -22,12 +22,16 @@ sys.dont_write_bytecode = True
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET = 3
+DEFAULT_WORKING_TARGET_MAX = 5
 DEFAULT_STATE_PATH = Path(".rkm/autopilot-state.json")
+TRUTHY_VALUES = {"true", "1", "yes", "y", "on"}
+FALSEY_VALUES = {"false", "0", "no", "n", "off", ""}
 
 READY_TO_PUSH = "READY_TO_PUSH"
 READY_TO_AUTOCYCLE = "READY_TO_AUTOCYCLE"
 DIRTY_WORKTREE = "DIRTY_WORKTREE"
 OVER_BUDGET = "OVER_BUDGET"
+TARGET_TOO_AGGRESSIVE = "TARGET_TOO_AGGRESSIVE"
 NEEDS_BUDGET_PROFILE = "NEEDS_BUDGET_PROFILE"
 BLOCKED = "BLOCKED"
 NEEDS_MANUAL_REVIEW = "NEEDS_MANUAL_REVIEW"
@@ -43,12 +47,13 @@ KNOWN_STATUSES = {
     READY_TO_AUTOCYCLE,
     DIRTY_WORKTREE,
     OVER_BUDGET,
+    TARGET_TOO_AGGRESSIVE,
     NEEDS_BUDGET_PROFILE,
     BLOCKED,
     NEEDS_MANUAL_REVIEW,
 }
 
-STOP_EXIT_ZERO = {OVER_BUDGET, NEEDS_BUDGET_PROFILE}
+STOP_EXIT_ZERO = {OVER_BUDGET, NEEDS_BUDGET_PROFILE, TARGET_TOO_AGGRESSIVE}
 STOP_EXIT_TWO = {BLOCKED, NEEDS_MANUAL_REVIEW}
 REQUIRED_STATE_KEYS = {
     "timestampUtc",
@@ -101,6 +106,21 @@ def positive_int(value: str) -> int:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
     return parsed
+
+
+def parse_bool(value: str | bool | None) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    normalized = str(value).strip().lower()
+    if normalized in TRUTHY_VALUES:
+        return True
+    if normalized in FALSEY_VALUES:
+        return False
+    raise argparse.ArgumentTypeError(
+        f"invalid force value {value!r}; expected one of true, false, 1, 0, yes, no, y, n, on, off"
+    )
 
 
 def command_text(command: CommandSpec) -> str:
@@ -170,24 +190,39 @@ def make_safe_push() -> CommandSpec:
     return CommandSpec("safe-push", ("make", "safe-push"))
 
 
-def make_next_action(target: int) -> CommandSpec:
-    return CommandSpec("next-action", ("python3", "scripts/rkm-next-action.py", "--target", str(target), "--json"))
+def make_next_action(target: int, *, force: bool, working_target_max: int) -> CommandSpec:
+    return CommandSpec(
+        "next-action",
+        (
+            "python3",
+            "scripts/rkm-next-action.py",
+            "--target",
+            str(target),
+            "--json",
+            f"--force={'true' if force else 'false'}",
+            "--working-target-max",
+            str(working_target_max),
+        ),
+    )
 
 
 def make_recover_revise() -> CommandSpec:
     return CommandSpec("recover-revise", ("make", "recover-revise"))
 
 
-def make_autocycle(target: int, token_budget: int, budget_safety_factor: float) -> CommandSpec:
+def make_autocycle(target: int, token_budget: int, budget_safety_factor: float, *, force: bool = False) -> CommandSpec:
+    args = [
+        "make",
+        "autocycle",
+        f"N={target}",
+        f"TOKEN_BUDGET={token_budget}",
+        f"BUDGET_SAFETY_FACTOR={budget_safety_factor:g}",
+    ]
+    if force:
+        args.append("FORCE=true")
     return CommandSpec(
         "autocycle",
-        (
-            "make",
-            "autocycle",
-            f"N={target}",
-            f"TOKEN_BUDGET={token_budget}",
-            f"BUDGET_SAFETY_FACTOR={budget_safety_factor:g}",
-        ),
+        tuple(args),
     )
 
 
@@ -235,9 +270,21 @@ def decide(document: dict[str, Any], *, allow_recovery: bool) -> Plan:
         return Plan(
             status,
             "run autocycle, then safe-push if autocycle succeeds.",
-            (make_autocycle(target, token_budget, budget_safety_factor), make_safe_push()),
+            (make_autocycle(target, token_budget, budget_safety_factor, force=document.get("force") is True), make_safe_push()),
             0,
         )
+
+    if status == TARGET_TOO_AGGRESSIVE:
+        target = document.get("target") or document.get("requestedTarget")
+        working_target = document.get("workingTargetMax")
+        if isinstance(target, int) and isinstance(working_target, int):
+            action = (
+                f"requested target {target} exceeds recommended working target {working_target}; "
+                "run suggested command or rerun with FORCE=true."
+            )
+        else:
+            action = "requested target exceeds recommended working target; run suggested command or rerun with FORCE=true."
+        return Plan(status, action, (), 0)
 
     if status == DIRTY_WORKTREE and command == "make recover-revise":
         if not allow_recovery:
@@ -258,9 +305,18 @@ def decide(document: dict[str, Any], *, allow_recovery: bool) -> Plan:
     return Plan(status, "status is not automatically actionable; stopping.", (), 2)
 
 
-def run_next_action(target: int) -> tuple[int, str, str]:
+def run_next_action(target: int, *, force: bool = False, working_target_max: int = DEFAULT_WORKING_TARGET_MAX) -> tuple[int, str, str]:
     completed = subprocess.run(
-        ["python3", "scripts/rkm-next-action.py", "--target", str(target), "--json"],
+        [
+            "python3",
+            "scripts/rkm-next-action.py",
+            "--target",
+            str(target),
+            "--json",
+            f"--force={'true' if force else 'false'}",
+            "--working-target-max",
+            str(working_target_max),
+        ],
         cwd=REPOSITORY_ROOT,
         check=False,
         text=True,
@@ -392,6 +448,8 @@ def next_action_indicates_dirty(document: dict[str, Any]) -> bool:
 def try_push_after_partial_autocycle(
     *,
     target: int,
+    force: bool,
+    working_target_max: int,
     state: dict[str, Any],
     command_result: CommandRunResult,
     recovery_document: dict[str, Any] | None,
@@ -402,10 +460,10 @@ def try_push_after_partial_autocycle(
     if recovery_plan_blocks_post_failure_push(recovery_document):
         return None
 
-    next_action_command = make_next_action(target)
+    next_action_command = make_next_action(target, force=force, working_target_max=working_target_max)
     print("autocycle stopped before completing the requested target.")
     print("checking whether accepted commits are ready to push.")
-    code, stdout, stderr = run_next_action(target)
+    code, stdout, stderr = run_next_action(target, force=force, working_target_max=working_target_max)
     state["commandsRun"] = list(state["commandsRun"]) + [command_text(next_action_command)]
     if code != 0:
         print("post-failure next-action failed.")
@@ -464,8 +522,18 @@ def try_push_after_partial_autocycle(
     return 0
 
 
-def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_path: str | Path) -> int:
-    code, stdout, stderr = run_next_action(target)
+def run_autopilot(
+    target: int,
+    *,
+    dry_run: bool,
+    allow_recovery: bool,
+    state_path: str | Path,
+    force: bool = False,
+    working_target_max: int = DEFAULT_WORKING_TARGET_MAX,
+) -> int:
+    if force:
+        print("FORCE mode enabled: budget guard boundaries may be exceeded, but validation and recovery safeguards remain active.")
+    code, stdout, stderr = run_next_action(target, force=force, working_target_max=working_target_max)
     if code != 0:
         print("next-action failed.")
         if stdout:
@@ -589,6 +657,10 @@ def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_pat
     )
     print(f"detected status: {plan.status}")
     print(f"action selected: {plan.action}")
+    if plan.status == TARGET_TOO_AGGRESSIVE:
+        requested_target = document.get("target") if isinstance(document.get("target"), int) else target
+        print(f"requested target {requested_target} exceeds recommended working target {document.get('workingTargetMax')}")
+        print("run suggested command or rerun with FORCE=true")
 
     if not plan.commands:
         if recovery_plan is not None and recovery_document is not None:
@@ -610,6 +682,8 @@ def run_autopilot(target: int, *, dry_run: bool, allow_recovery: bool, state_pat
         if not dry_run:
             recovery_exit = try_push_after_partial_autocycle(
                 target=target,
+                force=force,
+                working_target_max=working_target_max,
                 state=state,
                 command_result=command_result,
                 recovery_document=recovery_document,
@@ -878,7 +952,7 @@ def assert_autopilot_state(
     with tempfile.TemporaryDirectory(prefix="rkm-autopilot-test-") as directory:
         state_path = Path(directory) / "autopilot-state.json"
 
-        def fake_next_action(target: int) -> tuple[int, str, str]:
+        def fake_next_action(target: int, *, force: bool = False, working_target_max: int = DEFAULT_WORKING_TARGET_MAX) -> tuple[int, str, str]:
             return 0, json.dumps(document), ""
 
         def fake_run_commands(commands: Sequence[CommandSpec], *, dry_run: bool) -> CommandRunResult:
@@ -930,7 +1004,7 @@ def assert_partial_autocycle_result(
     with tempfile.TemporaryDirectory(prefix="rkm-autopilot-partial-test-") as directory:
         state_path = Path(directory) / "autopilot-state.json"
 
-        def fake_next_action(target: int) -> tuple[int, str, str]:
+        def fake_next_action(target: int, *, force: bool = False, working_target_max: int = DEFAULT_WORKING_TARGET_MAX) -> tuple[int, str, str]:
             if not next_action_documents:
                 raise AssertionError(f"{name}: unexpected next-action call")
             return 0, json.dumps(next_action_documents.pop(0)), ""
@@ -963,7 +1037,13 @@ def assert_partial_autocycle_result(
         globals()["run_commands"] = fake_run_commands
         try:
             with contextlib.redirect_stdout(stdout):
-                actual_exit_code = run_autopilot(3, dry_run=False, allow_recovery=False, state_path=state_path)
+                actual_exit_code = run_autopilot(
+                    3,
+                    dry_run=False,
+                    allow_recovery=False,
+                    state_path=state_path,
+                    force=initial_document.get("force") is True,
+                )
         finally:
             globals()["run_next_action"] = original_run_next_action
             globals()["run_commands"] = original_run_commands
@@ -1006,7 +1086,7 @@ def assert_status_result(
     original_run_next_action = run_next_action
     current_calls = 0
 
-    def fake_next_action(target: int) -> tuple[int, str, str]:
+    def fake_next_action(target: int, *, force: bool = False, working_target_max: int = DEFAULT_WORKING_TARGET_MAX) -> tuple[int, str, str]:
         nonlocal current_calls
         current_calls += 1
         if current_result is None:
@@ -1073,6 +1153,32 @@ def run_self_test() -> int:
         {"status": OVER_BUDGET, "command": "make budget-report"},
         False,
         (),
+        0,
+    )
+    assert_plan(
+        "TARGET_TOO_AGGRESSIVE",
+        {
+            "status": TARGET_TOO_AGGRESSIVE,
+            "target": 24,
+            "workingTargetMax": 5,
+            "command": "make autopilot N=5",
+            "forceCommand": "make autopilot N=24 FORCE=true",
+        },
+        False,
+        (),
+        0,
+    )
+    assert_plan(
+        "READY_TO_AUTOCYCLE force",
+        {
+            "status": READY_TO_AUTOCYCLE,
+            "force": True,
+            "recommendedTarget": 24,
+            "recommendedTokenBudget": 1000,
+            "budgetSafetyFactor": 1.25,
+        },
+        False,
+        ("make autocycle N=24 TOKEN_BUDGET=1000 BUDGET_SAFETY_FACTOR=1.25 FORCE=true", "make safe-push"),
         0,
     )
     assert_plan(
@@ -1150,6 +1256,21 @@ def run_self_test() -> int:
     if over_budget_state is None or over_budget_state["detectedStatus"] != OVER_BUDGET:
         raise AssertionError("OVER_BUDGET writes state: wrong detected status")
 
+    aggressive_state = assert_autopilot_state(
+        "TARGET_TOO_AGGRESSIVE writes safe stop state",
+        {
+            "status": TARGET_TOO_AGGRESSIVE,
+            "target": 24,
+            "workingTargetMax": 5,
+            "command": "make autopilot N=5",
+            "forceCommand": "make autopilot N=24 FORCE=true",
+        },
+        dry_run=False,
+        command_result=CommandRunResult(0, (), ()),
+    )
+    if aggressive_state is None or aggressive_state["detectedStatus"] != TARGET_TOO_AGGRESSIVE:
+        raise AssertionError("TARGET_TOO_AGGRESSIVE writes safe stop state: wrong detected status")
+
     ready_to_push_state = assert_autopilot_state(
         "READY_TO_PUSH writes planned command",
         {"status": READY_TO_PUSH, "command": "make safe-push"},
@@ -1192,6 +1313,15 @@ def run_self_test() -> int:
         raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: wrong final outcome")
     if partial_ready_state["exitCode"] != 0:
         raise AssertionError("partial autocycle READY_TO_PUSH runs safe-push: wrong exit code")
+
+    forced_partial_state = assert_partial_autocycle_result(
+        "forced partial autocycle READY_TO_PUSH runs safe-push",
+        {"status": READY_TO_PUSH, "command": "make safe-push", "isClean": True, "repoStatus": "clean"},
+        expected_exit_code=0,
+        expected_safe_push=True,
+    )
+    if forced_partial_state is None:
+        raise AssertionError("forced partial autocycle READY_TO_PUSH runs safe-push: state missing")
 
     partial_dirty_state = assert_partial_autocycle_result(
         "partial autocycle DIRTY_WORKTREE skips safe-push",
@@ -1517,6 +1647,20 @@ def run_self_test() -> int:
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Execute the next safe RKM operational action.")
     parser.add_argument("--target", type=positive_int, default=DEFAULT_TARGET, metavar="N")
+    parser.add_argument(
+        "--force",
+        nargs="?",
+        const="true",
+        default=os.environ.get("FORCE", "false"),
+        type=parse_bool,
+        help="allow forced operation beyond working target and conservative budget boundaries",
+    )
+    parser.add_argument(
+        "--working-target-max",
+        type=positive_int,
+        default=positive_int(os.environ.get("WORKING_TARGET_MAX", str(DEFAULT_WORKING_TARGET_MAX))),
+        metavar="N",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print what would be done without modifying files")
     parser.add_argument(
         "--allow-recovery",
@@ -1545,7 +1689,14 @@ def run_cli(argv: list[str]) -> int:
     args = parser.parse_args(argv[1:])
     if args.self_test:
         return run_self_test()
-    return run_autopilot(args.target, dry_run=args.dry_run, allow_recovery=args.allow_recovery, state_path=args.state_path)
+    return run_autopilot(
+        args.target,
+        dry_run=args.dry_run,
+        allow_recovery=args.allow_recovery,
+        state_path=args.state_path,
+        force=args.force,
+        working_target_max=args.working_target_max,
+    )
 
 
 if __name__ == "__main__":

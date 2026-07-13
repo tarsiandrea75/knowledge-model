@@ -12,6 +12,8 @@ BUDGET_WINDOW_HOURS ?= 24
 BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
+FORCE ?= false
+WORKING_TARGET_MAX ?= 5
 
 .PHONY: validate status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
@@ -35,7 +37,7 @@ cycle:
 	exit "$$exit_code"
 
 autocycle:
-	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
+	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" FORCE="$(FORCE)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
 
 discover:
 	set +e; \
@@ -113,16 +115,16 @@ budget-reset-window:
 	python3 scripts/rkm-budget.py reset-window
 
 next-action:
-	python3 scripts/rkm-next-action.py --target "$(NEXT_ACTION_TARGET)"
+	python3 scripts/rkm-next-action.py --target "$(NEXT_ACTION_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
 
 autopilot:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)"
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
 
 autopilot-dry-run:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --dry-run
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --dry-run
 
 autopilot-recover:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --allow-recovery
+	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --allow-recovery
 
 autopilot-status:
 	python3 scripts/rkm-autopilot.py status
@@ -140,7 +142,7 @@ cockpit:
 
 cockpit-summary: N ?= 3
 cockpit-summary:
-	python3 scripts/rkm-cockpit-summary.py --target "$(N)"
+	python3 scripts/rkm-cockpit-summary.py --target "$(N)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
 
 help:
 	@printf 'RKM developer commands:\n'
@@ -166,9 +168,11 @@ help:
 	@printf '  make budget-reset-window         Reset the local budget accounting window while preserving the existing budget profile.\n'
 	@printf '  make next-action [N=3]           Print the next safe operational action without modifying files.\n'
 	@printf '  make autopilot [N=3]             Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET, defaulting to AUTOCYCLE_N.\n'
+	@printf '                                   Examples: make autopilot N=5; make autopilot N=24 FORCE=true.\n'
 	@printf '  make autopilot-dry-run [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --dry-run.\n'
 	@printf '  make autopilot-recover [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --allow-recovery.\n'
 	@printf '  make autopilot-status            Show the last autopilot decision from .rkm/autopilot-state.json.\n'
 	@printf '  make cockpit                     Show status, budget, recovery, next action, and autopilot status without modifying files.\n'
 	@printf '  make cockpit-summary [N=]        Show a compact colored decision dashboard.\n'
+	@printf '                                   Examples: make cockpit-summary N=24; make cockpit-summary N=24 FORCE=true.\n'
 	@printf '  make help                        Show this help.\n'
