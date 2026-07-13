@@ -65,6 +65,26 @@ The project needs:
 
 The repository is strong enough to build on, but not yet easy enough for new users to adopt without maintainer context.
 
+## Definition of Done for Level 4
+
+RKM should be considered level 4 only when an external user can evaluate and use a versioned package with limited maintainer help.
+
+The measurable criteria are:
+
+- Examples and fixtures exist for valid entities, relationships, claims, evidence, and references.
+- At least one validated dataset exists, with enough representative content to test loading and inspection.
+- A graph export contract exists for nodes, edges, identifiers, labels, predicates, evidence links, references, and provenance.
+- A consumer guide exists and explains validation, loading, inspection, schema location, registry usage, and expected stability.
+- A release tag exists with release notes, scope, validation instructions, and compatibility expectations.
+- Validation can be reproduced by a new user from a clean checkout using documented commands.
+- Schema, data, and registry coverage can be inspected through documented commands or reports.
+
+These criteria preserve the distinction between a strong foundation and a consumable system. They do not require RKM to be complete across the whole RAG ecosystem, but they do require enough packaging for real downstream evaluation.
+
+## Recommended Immediate Next Step
+
+Build the first consumable fixture and data package before expanding many more schemas. A small validated package with examples, a dataset, consumer guidance, and an initial export path will make the current foundation easier to evaluate and will expose the next modeling gaps more clearly than broad schema expansion alone.
+
 ## Key Risks
 
 **Conceptual duplication**

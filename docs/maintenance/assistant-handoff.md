@@ -23,6 +23,8 @@ A new assistant or maintainer should start with this sequence from the repositor
 
 `make cockpit-summary N=5` and `make validate` are authoritative for current operational state because the automation budget, run ledger, recovery state, and working target guardrails change over time. Static documentation explains the system, but cockpit and validation report the live state.
 
+Maintenance documents provide strategic context, not operational truth. Use them to understand direction and rationale, but treat `make cockpit-summary` and `make validate` as the current source of truth for readiness, validation, and next operational action.
+
 ## Related Maintenance Documents
 
 Use these documents together:
@@ -30,6 +32,8 @@ Use these documents together:
 - `docs/maintenance/repo-map.md` explains the repository structure, how the main areas fit together, and the operational command map.
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
+
+For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong, but external users still need fixtures, data, export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
 
 ## Repository Discipline
 
