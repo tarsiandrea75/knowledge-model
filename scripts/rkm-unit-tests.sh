@@ -58,7 +58,7 @@ printf '==> Running validate-schema-contracts self-test\n'
 printf '==> Running validate-fixtures self-test\n'
 "$PYTHON_BIN" scripts/validate-fixtures.py --self-test
 
-printf '==> Running validate-data semantic self-test, including component relationship endpoints\n'
+printf '==> Running validate-data semantic self-test, including retriever and reranker relationship endpoints\n'
 "$PYTHON_BIN" scripts/validate-data.py --self-test
 
 printf '==> Running relationship support data validation\n'
@@ -70,7 +70,7 @@ printf '==> Running data validation\n'
 printf '==> Running export-fixtures-graph self-test\n'
 "$PYTHON_BIN" scripts/export-fixtures-graph.py --self-test
 
-printf '==> Running export-data-graph self-test, including component nodes and supported technique-component edges\n'
+printf '==> Running export-data-graph self-test, including retriever and reranker nodes and supported specialization edges\n'
 "$PYTHON_BIN" scripts/export-data-graph.py --self-test
 
 printf '==> Running validate-graph-exports self-test\n'

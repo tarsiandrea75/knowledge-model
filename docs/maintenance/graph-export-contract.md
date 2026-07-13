@@ -53,11 +53,13 @@ The current data export emits:
 
 - one node for each seed RAG technique record
 - one node for each seed Component record
+- one node for each seed Retriever record
+- one node for each seed Reranker record
 - one schema node for each declared entity schema currently used by seed data
 - one `VALIDATED_BY_SCHEMA` provenance edge from each data record node to the schema node
 - declared domain relationship edges from relationship-set files listed in `data/manifest.json`
 
-The data export supports multiple entity types, starting with Technique and Component. Entity-specific properties are projected when the source record has the corresponding section. Technique nodes expose fields such as `techniqueFamily` and `ragStage`; Component nodes expose fields such as `componentType`, `ragStages`, `abstractionLevel`, and `interfaceRole`.
+The data export supports multiple entity types, currently including Technique, Component, Retriever, and Reranker. Entity-specific properties are projected when the source record has the corresponding section. Technique nodes expose fields such as `techniqueFamily` and `ragStage`; Component nodes expose fields such as `componentType`, `ragStages`, `abstractionLevel`, and `interfaceRole`; Retriever nodes expose fields such as `retrieverType`, `retrievalApproach`, and `retrievalTargets`; Reranker nodes expose fields such as `rerankerType` and `scoringApproach`.
 
 The data export includes only domain relationships that are explicitly declared in validated relationship-set files under `data/relationships/`. Before export, data validation checks that declared relationship predicates exist in `registries/relationship-type-registry.json`, source and target IDs resolve to declared data entity records, source and target data file fields match those records, and relationship IDs and semantic triples are not duplicated. The exporter must not fabricate technique-to-technique or technique-to-component domain edges from record names, descriptions, stages, component roles, or implementation guidance. If a declared relationship references a missing source or target node, export generation fails instead of emitting a dangling domain edge.
 
@@ -151,7 +153,7 @@ Claim, evidence, and reference links use uppercase snake case predicates that ex
 
 The data export uses `VALIDATED_BY_SCHEMA` for schema validation provenance. This is an export/provenance predicate, not a RAG domain relationship predicate.
 
-The data export also preserves declared domain predicates from validated relationship sets, such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, `CAN_REFINE_RESULTS_FROM`, and `OPTIONALLY_USES`. These predicates describe conservative, possible relationships in the seed dataset. They do not state universal RAG pipeline requirements or mandatory component usage.
+The data export also preserves declared domain predicates from validated relationship sets, such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, `CAN_REFINE_RESULTS_FROM`, `OPTIONALLY_USES`, and `SPECIALIZES`. These predicates describe conservative, possible relationships in the seed dataset. They do not state universal RAG pipeline requirements, mandatory component usage, or universal taxonomy claims.
 
 Supported data export domain edges may also expose `claimIds`, `evidenceIds`, and `referenceIds` in `properties`. These are links back to declared support objects, not generated graph nodes and not inferred evidence.
 

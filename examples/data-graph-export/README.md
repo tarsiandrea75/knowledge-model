@@ -6,10 +6,10 @@ The data graph export is separate from `examples/graph-export/`, which is genera
 
 ## Files
 
-- `rag-techniques.nodes.json`: graph nodes derived from seed RAG technique records, seed Component records, and their declared schemas.
+- `rag-techniques.nodes.json`: graph nodes derived from seed RAG technique records, seed Component records, seed Retriever records, seed Reranker records, and their declared schemas.
 - `rag-techniques.edges.json`: graph edges derived from export provenance and declared domain relationships.
 
-The current export emits RAG technique nodes, Component nodes, schema nodes, `VALIDATED_BY_SCHEMA` provenance edges, and declared domain relationship edges from relationship-set files under `data/relationships/`. Domain relationship edges may include support metadata from `data/relationship-support/`, such as claim, evidence, and reference identifiers, support status values, source types, and support-set file paths. It does not fabricate relationships between techniques, infer technique-component relationships, or infer support.
+The current export emits Technique nodes, Component nodes, Retriever nodes, Reranker nodes, schema nodes, `VALIDATED_BY_SCHEMA` provenance edges, and declared domain relationship edges from relationship-set files under `data/relationships/`. Domain relationship edges may include support metadata from `data/relationship-support/`, such as claim, evidence, and reference identifiers, support status values, source types, and support-set file paths. It does not fabricate relationships between techniques, infer technique-component or specialization relationships, or infer support.
 
 ## Generation
 

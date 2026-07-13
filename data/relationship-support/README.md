@@ -14,9 +14,12 @@ Validation has two layers. First, each support-set file is JSON-schema validated
 
 The first support files use `Maintainer Analysis` references. This is conservative internal support for seed dataset modeling rationale, not an external factual source and not a benchmark claim. These files explain why relationships are included as possible seed dataset relationships without claiming that every RAG system uses the same sequence or the same components.
 
+Component specialization relationship support explains why seed Retriever and Reranker entities are connected to existing Component records. This support describes modeling rationale only; it is not external factual proof and not a universal RAG taxonomy claim.
+
 Relationship support is declared and validated. It is not inferred from relationship descriptions, technique names, pipeline stages, or graph export behavior.
 
 Current relationship support sets:
 
+- `component-specialization-relationship-support.json`: conservative internal support for seed Retriever and Reranker specialization relationships.
 - `rag-technique-component-relationship-support.json`: conservative internal support for the seed technique-component relationships.
 - `rag-technique-relationship-support.json`: conservative internal support for the seed RAG technique relationships.

@@ -505,16 +505,32 @@ def run_self_test() -> None:
                 "id": "COMPONENT-TEST-1",
             },
         }
+        retriever_record = {
+            "identity": {
+                "id": "RETRIEVER-TEST-1",
+            },
+        }
+        reranker_record = {
+            "identity": {
+                "id": "RERANKER-TEST-1",
+            },
+        }
         entity_files = build_entity_file_index(
             [
                 (REPOSITORY_ROOT / "data/rag-techniques/source-test.json", source_record),
                 (REPOSITORY_ROOT / "data/components/target-test.json", target_record),
+                (REPOSITORY_ROOT / "data/retrievers/retriever-test.json", retriever_record),
+                (REPOSITORY_ROOT / "data/rerankers/reranker-test.json", reranker_record),
             ]
         )
         if entity_files["TECHNIQUE-TEST-1"] != "data/rag-techniques/source-test.json":
             raise DataValidationError("self-test failed: entity id to data file mapping returned the wrong path")
         if entity_files["COMPONENT-TEST-1"] != "data/components/target-test.json":
             raise DataValidationError("self-test failed: component entity id mapping returned the wrong path")
+        if entity_files["RETRIEVER-TEST-1"] != "data/retrievers/retriever-test.json":
+            raise DataValidationError("self-test failed: retriever entity id mapping returned the wrong path")
+        if entity_files["RERANKER-TEST-1"] != "data/rerankers/reranker-test.json":
+            raise DataValidationError("self-test failed: reranker entity id mapping returned the wrong path")
 
         valid_relationship_set = {
             "relationships": [
@@ -533,6 +549,35 @@ def run_self_test() -> None:
             predicates,
             entity_files,
         )
+
+        valid_specialization_set = {
+            "relationships": [
+                {
+                    "id": "RELATIONSHIP-TEST-7",
+                    "predicate": "SPECIALIZES",
+                    "sourceId": "RETRIEVER-TEST-1",
+                    "targetId": "COMPONENT-TEST-1",
+                    "sourceDataFile": "data/retrievers/retriever-test.json",
+                    "targetDataFile": "data/components/target-test.json",
+                },
+                {
+                    "id": "RELATIONSHIP-TEST-8",
+                    "predicate": "SPECIALIZES",
+                    "sourceId": "RERANKER-TEST-1",
+                    "targetId": "COMPONENT-TEST-1",
+                    "sourceDataFile": "data/rerankers/reranker-test.json",
+                    "targetDataFile": "data/components/target-test.json",
+                },
+            ]
+        }
+        specialization_count, specialization_relationship_ids = validate_relationship_semantics(
+            [(REPOSITORY_ROOT / "data/relationships/test-specialization-relationships.json", valid_specialization_set)],
+            predicates,
+            entity_files,
+        )
+        if specialization_count != 2:
+            raise DataValidationError("self-test failed: specialization relationships were not validated")
+        self_test_relationship_ids.update(specialization_relationship_ids)
 
         unknown_predicate_set = {
             "relationships": [

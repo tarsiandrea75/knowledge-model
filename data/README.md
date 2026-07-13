@@ -12,6 +12,10 @@ Data files are declared in `data/manifest.json`. Each manifest entry maps a repo
 
 `data/components/` contains first-class seed Component records. These records validate against `schema/component.schema.json` and can be connected to techniques through declared relationship sets.
 
+`data/retrievers/` contains first-class seed Retriever records. These records validate against `schema/retriever.schema.json` and can be connected to components through declared relationship sets.
+
+`data/rerankers/` contains first-class seed Reranker records. These records validate against `schema/reranker.schema.json` and can be connected to components through declared relationship sets.
+
 Run direct data validation from the repository root:
 
 ```bash
@@ -30,10 +34,15 @@ Current populated data scope:
 - `data/components/keyword-retriever.json`
 - `data/components/rank-fusion.json`
 - `data/components/semantic-retriever.json`
+- `data/rerankers/cross-encoder-reranker.json`
 - `data/rag-techniques/hybrid-retrieval.json`
 - `data/rag-techniques/query-rewriting.json`
 - `data/rag-techniques/reranking.json`
+- `data/retrievers/embedding-retriever.json`
+- `data/retrievers/lexical-retriever.json`
+- `data/relationships/component-specialization-relationships.json`
 - `data/relationships/rag-technique-component-relationships.json`
 - `data/relationships/rag-technique-relationships.json`
+- `data/relationship-support/component-specialization-relationship-support.json`
 - `data/relationship-support/rag-technique-component-relationship-support.json`
 - `data/relationship-support/rag-technique-relationship-support.json`

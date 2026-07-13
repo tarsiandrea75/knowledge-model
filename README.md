@@ -22,10 +22,11 @@ The package currently includes schemas, fixtures, seed data, validated relations
 - Validated fixtures under `examples/fixtures/`.
 - Validated seed dataset under `data/`.
 - Validated component seed data under `data/components/`.
+- Validated retriever and reranker seed data under `data/retrievers/` and `data/rerankers/`.
 - Validated relationship sets under `data/relationships/`.
 - Validated relationship support sets under `data/relationship-support/`.
 - Minimal fixture-derived graph export under `examples/graph-export/`.
-- Post-alpha seed-data graph export under `examples/data-graph-export/`, including technique nodes, Component nodes, provenance edges, and declared domain relationship edges.
+- Post-alpha seed-data graph export under `examples/data-graph-export/`, including Technique, Component, Retriever, Reranker, and schema nodes, provenance edges, and declared domain relationship edges.
 - Graph export node and edge schema validation.
 - Validation pipeline through `make validate`.
 - Consumer, release, maturity, roadmap, and assistant handoff documentation.
@@ -111,7 +112,7 @@ RKM is not yet level 4 maturity. The main gaps are dataset breadth, graph export
 
 Current limitations include:
 
-- The populated dataset is small, with initial seed techniques and components only.
+- The populated dataset is small, with initial seed techniques, components, retrievers, and rerankers only.
 - The graph exports are intentionally minimal. The fixture export is pedagogical, and the seed-data export is early post-alpha work.
 - Compatibility expectations are suitable for internal alpha evaluation, not stable public adoption.
 - Loader-specific guidance is still limited.

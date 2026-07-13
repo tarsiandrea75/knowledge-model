@@ -192,6 +192,33 @@ def record_node(record: dict[str, Any], source_data_file: str, schema_file: str)
             }
         )
 
+    retriever = record.get("retriever")
+    if retriever is not None:
+        retriever_object = require_object(retriever, f"{context} retriever")
+        properties.update(
+            {
+                "capabilities": retriever_object.get("capabilities"),
+                "inputModalities": retriever_object.get("inputModalities"),
+                "ragStages": retriever_object.get("ragStages"),
+                "retrievalApproach": retriever_object.get("retrievalApproach"),
+                "retrievalTargets": retriever_object.get("retrievalTargets"),
+                "retrieverType": retriever_object.get("retrieverType"),
+            }
+        )
+
+    reranker = record.get("reranker")
+    if reranker is not None:
+        reranker_object = require_object(reranker, f"{context} reranker")
+        properties.update(
+            {
+                "capabilities": reranker_object.get("capabilities"),
+                "inputModalities": reranker_object.get("inputModalities"),
+                "ragStages": reranker_object.get("ragStages"),
+                "rerankerType": reranker_object.get("rerankerType"),
+                "scoringApproach": reranker_object.get("scoringApproach"),
+            }
+        )
+
     return node(
         record_id,
         entity_type,
@@ -582,6 +609,82 @@ def run_self_test() -> None:
     if component_node["properties"].get("componentType") != "Retriever":
         raise DataGraphExportError("self-test failed: component properties were not exported")
 
+    retriever_record = {
+        "identity": {
+            "id": "RETRIEVER-0001",
+            "slug": "sample-retriever",
+            "name": {
+                "display": "Sample Retriever",
+            },
+            "entityType": "Retriever",
+            "status": "Draft",
+            "visibility": "Public",
+            "language": "en",
+            "version": "1.0.0",
+        },
+        "metadata": {
+            "status": "Draft",
+            "reviewState": "Not Reviewed",
+        },
+        "description": {
+            "summary": "Sample retriever for exporter self-test.",
+        },
+        "retriever": {
+            "retrieverType": "Keyword Retriever",
+            "retrievalApproach": "Lexical Search",
+            "retrievalTargets": ["Chunk"],
+            "ragStages": ["Retrieval"],
+            "capabilities": ["Lexical Retrieval"],
+        },
+    }
+    retriever_node = record_node(
+        retriever_record,
+        "data/retrievers/sample-retriever.json",
+        "schema/retriever.schema.json",
+    )
+    if retriever_node["type"] != "Retriever":
+        raise DataGraphExportError("self-test failed: retriever node type was not exported")
+    if retriever_node["properties"].get("retrieverType") != "Keyword Retriever":
+        raise DataGraphExportError("self-test failed: retriever properties were not exported")
+
+    reranker_record = {
+        "identity": {
+            "id": "RERANKER-0001",
+            "slug": "sample-reranker",
+            "name": {
+                "display": "Sample Reranker",
+            },
+            "entityType": "Reranker",
+            "status": "Draft",
+            "visibility": "Public",
+            "language": "en",
+            "version": "1.0.0",
+        },
+        "metadata": {
+            "status": "Draft",
+            "reviewState": "Not Reviewed",
+        },
+        "description": {
+            "summary": "Sample reranker for exporter self-test.",
+        },
+        "reranker": {
+            "rerankerType": "Cross Encoder",
+            "scoringApproach": "Pairwise Query Candidate Scoring",
+            "inputModalities": ["Text"],
+            "ragStages": ["Reranking"],
+            "capabilities": ["Passage Reranking"],
+        },
+    }
+    reranker_node = record_node(
+        reranker_record,
+        "data/rerankers/sample-reranker.json",
+        "schema/reranker.schema.json",
+    )
+    if reranker_node["type"] != "Reranker":
+        raise DataGraphExportError("self-test failed: reranker node type was not exported")
+    if reranker_node["properties"].get("rerankerType") != "Cross Encoder":
+        raise DataGraphExportError("self-test failed: reranker properties were not exported")
+
     relationship_set = {
         "relationships": [
             {
@@ -620,6 +723,47 @@ def run_self_test() -> None:
         raise DataGraphExportError("self-test failed: declared relationship provenance was not preserved")
     if declared_edges[0]["properties"].get("claimIds") != ["CLAIM-0001"]:
         raise DataGraphExportError("self-test failed: declared relationship support metadata was not preserved")
+
+    specialization_set = {
+        "relationships": [
+            {
+                "id": "RELATIONSHIP-0002",
+                "predicate": "SPECIALIZES",
+                "sourceId": "RETRIEVER-0001",
+                "targetId": "COMPONENT-0001",
+                "sourceDataFile": "data/retrievers/sample-retriever.json",
+                "targetDataFile": "data/components/sample-component.json",
+                "relationshipKind": "Domain Relationship",
+                "description": "Sample retriever is modeled as a more specific seed entity aligned with sample component.",
+                "properties": {
+                    "edgeKind": "Domain Relationship"
+                }
+            }
+        ]
+    }
+    specialization_edges = declared_relationship_edges(
+        specialization_set,
+        "data/relationships/sample-specialization-relationships.json",
+        {"RETRIEVER-0001", "COMPONENT-0001"},
+        {
+            "RELATIONSHIP-0002": {
+                "claimIds": ["CLAIM-0002"],
+                "declaredInRelationshipSupportSets": [
+                    "data/relationship-support/sample-specialization-support.json"
+                ],
+                "evidenceIds": ["EVIDENCE-0002"],
+                "referenceIds": ["REFERENCE-0002"],
+                "supportSourceTypes": ["Maintainer Analysis"],
+                "supportStatus": ["Draft"],
+            }
+        },
+    )
+    if specialization_edges[0]["predicate"] != "SPECIALIZES":
+        raise DataGraphExportError("self-test failed: specialization predicate was not exported")
+    if specialization_edges[0]["sourceId"] != "RETRIEVER-0001":
+        raise DataGraphExportError("self-test failed: retriever specialization source was not exported")
+    if specialization_edges[0]["properties"].get("evidenceIds") != ["EVIDENCE-0002"]:
+        raise DataGraphExportError("self-test failed: specialization support metadata was not preserved")
 
     try:
         declared_relationship_edges(

@@ -1,0 +1,60 @@
+{
+  "identity": {
+    "id": "RETRIEVER-10001",
+    "slug": "lexical-retriever",
+    "name": {
+      "official": "Lexical Retriever",
+      "display": "Lexical Retriever"
+    },
+    "entityType": "Retriever",
+    "keywords": [
+      "lexical retrieval",
+      "term matching",
+      "keyword retrieval"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "A Lexical Retriever retrieves candidate records using lexical, term-based, or keyword-oriented matching signals.",
+    "description": "A Lexical Retriever is a seed retriever entity that represents candidate retrieval using lexical, term-based, or keyword-oriented matching signals against a retrievable collection."
+  },
+  "retriever": {
+    "retrieverType": "Keyword Retriever",
+    "retrievalApproach": "Lexical Search",
+    "retrievalTargets": [
+      "Document",
+      "Chunk",
+      "Passage"
+    ],
+    "inputModalities": [
+      "Text"
+    ],
+    "ragStages": [
+      "Retrieval"
+    ],
+    "capabilities": [
+      "Lexical Retrieval"
+    ]
+  }
+}

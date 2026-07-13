@@ -48,6 +48,42 @@
     }
   },
   {
+    "id": "EDGE-RERANKER-10001-VALIDATED_BY_SCHEMA-SCHEMA-RERANKER",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "RERANKER-10001",
+    "targetId": "SCHEMA-RERANKER",
+    "sourceDataFile": "data/rerankers/cross-encoder-reranker.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/reranker.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-RETRIEVER-10001-VALIDATED_BY_SCHEMA-SCHEMA-RETRIEVER",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "RETRIEVER-10001",
+    "targetId": "SCHEMA-RETRIEVER",
+    "sourceDataFile": "data/retrievers/lexical-retriever.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/retriever.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-RETRIEVER-10002-VALIDATED_BY_SCHEMA-SCHEMA-RETRIEVER",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "RETRIEVER-10002",
+    "targetId": "SCHEMA-RETRIEVER",
+    "sourceDataFile": "data/retrievers/embedding-retriever.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/retriever.schema.json"
+    }
+  },
+  {
     "id": "EDGE-TECHNIQUE-10001-VALIDATED_BY_SCHEMA-SCHEMA-RAG_TECHNIQUE",
     "predicate": "VALIDATED_BY_SCHEMA",
     "sourceId": "TECHNIQUE-10001",
@@ -315,6 +351,111 @@
       ],
       "referenceIds": [
         "REFERENCE-10002"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/cross-encoder-reranker.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10201",
+    "predicate": "SPECIALIZES",
+    "sourceId": "RETRIEVER-10001",
+    "targetId": "COMPONENT-10001",
+    "sourceDataFile": "data/retrievers/lexical-retriever.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10201"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/component-specialization-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/component-specialization-relationship-support.json"
+      ],
+      "description": "Lexical Retriever is modeled as a more specific seed entity aligned with the Keyword Retriever component.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10201"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/keyword-retriever.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10202",
+    "predicate": "SPECIALIZES",
+    "sourceId": "RETRIEVER-10002",
+    "targetId": "COMPONENT-10002",
+    "sourceDataFile": "data/retrievers/embedding-retriever.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10202"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/component-specialization-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/component-specialization-relationship-support.json"
+      ],
+      "description": "Embedding Retriever is modeled as a more specific seed entity aligned with the Semantic Retriever component.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10202"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/semantic-retriever.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10203",
+    "predicate": "SPECIALIZES",
+    "sourceId": "RERANKER-10001",
+    "targetId": "COMPONENT-10004",
+    "sourceDataFile": "data/rerankers/cross-encoder-reranker.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10203"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/component-specialization-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/component-specialization-relationship-support.json"
+      ],
+      "description": "Cross-Encoder Reranker is modeled as a more specific seed entity aligned with the Cross-Encoder Reranker component.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10203"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
       ],
       "relationshipKind": "Domain Relationship",
       "scope": "Seed Dataset",

@@ -1,0 +1,55 @@
+{
+  "id": "RELATIONSHIP-SET-10201",
+  "title": "Seed Component Specialization Relationships",
+  "description": "Conservative declared specialization relationships from seed Retriever and Reranker records to seed Component records. These relationships describe how more specific seed entities align with existing component records in the seed dataset and do not state universal taxonomy claims.",
+  "relationships": [
+    {
+      "id": "RELATIONSHIP-10201",
+      "predicate": "SPECIALIZES",
+      "sourceId": "RETRIEVER-10001",
+      "targetId": "COMPONENT-10001",
+      "sourceDataFile": "data/retrievers/lexical-retriever.json",
+      "targetDataFile": "data/components/keyword-retriever.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Lexical Retriever is modeled as a more specific seed entity aligned with the Keyword Retriever component.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    },
+    {
+      "id": "RELATIONSHIP-10202",
+      "predicate": "SPECIALIZES",
+      "sourceId": "RETRIEVER-10002",
+      "targetId": "COMPONENT-10002",
+      "sourceDataFile": "data/retrievers/embedding-retriever.json",
+      "targetDataFile": "data/components/semantic-retriever.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Embedding Retriever is modeled as a more specific seed entity aligned with the Semantic Retriever component.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    },
+    {
+      "id": "RELATIONSHIP-10203",
+      "predicate": "SPECIALIZES",
+      "sourceId": "RERANKER-10001",
+      "targetId": "COMPONENT-10004",
+      "sourceDataFile": "data/rerankers/cross-encoder-reranker.json",
+      "targetDataFile": "data/components/cross-encoder-reranker.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Cross-Encoder Reranker is modeled as a more specific seed entity aligned with the Cross-Encoder Reranker component.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    }
+  ]
+}

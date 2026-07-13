@@ -1,0 +1,60 @@
+{
+  "identity": {
+    "id": "RETRIEVER-10002",
+    "slug": "embedding-retriever",
+    "name": {
+      "official": "Embedding Retriever",
+      "display": "Embedding Retriever"
+    },
+    "entityType": "Retriever",
+    "keywords": [
+      "embedding retrieval",
+      "vector retrieval",
+      "semantic retrieval"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "An Embedding Retriever retrieves candidate records by comparing vector or embedding representations.",
+    "description": "An Embedding Retriever is a seed retriever entity that represents candidate retrieval by comparing vector or embedding representations of queries and retrievable records."
+  },
+  "retriever": {
+    "retrieverType": "Dense Vector Retriever",
+    "retrievalApproach": "Similarity Search",
+    "retrievalTargets": [
+      "Document",
+      "Chunk",
+      "Passage"
+    ],
+    "inputModalities": [
+      "Text"
+    ],
+    "ragStages": [
+      "Retrieval"
+    ],
+    "capabilities": [
+      "Semantic Retrieval"
+    ]
+  }
+}

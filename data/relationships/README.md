@@ -22,9 +22,12 @@ Semantic validation checks that:
 
 The data graph exporter reads relationship-set files listed in `data/manifest.json` and emits each declared relationship as a graph edge. These edges are declared, not inferred. The exporter must not invent domain graph edges from names, descriptions, stages, or other record fields.
 
+Component specialization relationships connect more specific seed Retriever and Reranker records to existing Component records with `SPECIALIZES`. These edges are declared as seed dataset modeling relationships and should not be interpreted as universal taxonomy claims.
+
 Declared relationship instances can be supported by relationship support sets under `data/relationship-support/`. A support set links relationship IDs to structured references, claims, and evidence. This keeps the relationship declaration separate from the rationale and support metadata while allowing validation to check that all identifiers resolve.
 
 Current relationship sets:
 
+- `component-specialization-relationships.json`: conservative specialization relationships from seed Retriever and Reranker records to seed Component records.
 - `rag-technique-component-relationships.json`: conservative technique-component relationships from seed RAG techniques to seed Component records.
 - `rag-technique-relationships.json`: conservative workflow relationships among the seed RAG technique records.

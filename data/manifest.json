@@ -17,6 +17,10 @@
       "schema": "schema/component.schema.json"
     },
     {
+      "file": "data/rerankers/cross-encoder-reranker.json",
+      "schema": "schema/reranker.schema.json"
+    },
+    {
       "file": "data/rag-techniques/hybrid-retrieval.json",
       "schema": "schema/rag-technique.schema.json"
     },
@@ -29,6 +33,18 @@
       "schema": "schema/rag-technique.schema.json"
     },
     {
+      "file": "data/retrievers/embedding-retriever.json",
+      "schema": "schema/retriever.schema.json"
+    },
+    {
+      "file": "data/retrievers/lexical-retriever.json",
+      "schema": "schema/retriever.schema.json"
+    },
+    {
+      "file": "data/relationships/component-specialization-relationships.json",
+      "schema": "schema/relationship-set.schema.json"
+    },
+    {
       "file": "data/relationships/rag-technique-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },
@@ -38,6 +54,10 @@
     },
     {
       "file": "data/relationship-support/rag-technique-component-relationship-support.json",
+      "schema": "schema/relationship-support-set.schema.json"
+    },
+    {
+      "file": "data/relationship-support/component-specialization-relationship-support.json",
       "schema": "schema/relationship-support-set.schema.json"
     },
     {

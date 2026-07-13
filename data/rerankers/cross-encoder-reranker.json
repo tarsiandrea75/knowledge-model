@@ -1,0 +1,57 @@
+{
+  "identity": {
+    "id": "RERANKER-10001",
+    "slug": "cross-encoder-reranker",
+    "name": {
+      "official": "Cross-Encoder Reranker",
+      "display": "Cross-Encoder Reranker"
+    },
+    "entityType": "Reranker",
+    "keywords": [
+      "cross encoder reranking",
+      "query candidate scoring",
+      "reranking"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "A Cross-Encoder Reranker scores query-candidate pairs jointly to support reranking.",
+    "description": "A Cross-Encoder Reranker is a seed reranker entity that represents joint scoring of query-candidate pairs to support reordering candidate records before downstream use."
+  },
+  "reranker": {
+    "rerankerType": "Cross Encoder",
+    "scoringApproach": "Pairwise Query Candidate Scoring",
+    "inputModalities": [
+      "Text"
+    ],
+    "ragStages": [
+      "Reranking"
+    ],
+    "capabilities": [
+      "Semantic Relevance Scoring",
+      "Passage Reranking",
+      "Query Document Matching"
+    ]
+  }
+}

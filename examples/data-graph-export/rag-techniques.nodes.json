@@ -112,6 +112,117 @@
     }
   },
   {
+    "id": "RERANKER-10001",
+    "type": "Reranker",
+    "label": "Cross-Encoder Reranker",
+    "sourceDataFile": "data/rerankers/cross-encoder-reranker.json",
+    "properties": {
+      "capabilities": [
+        "Semantic Relevance Scoring",
+        "Passage Reranking",
+        "Query Document Matching"
+      ],
+      "inputModalities": [
+        "Text"
+      ],
+      "keywords": [
+        "cross encoder reranking",
+        "query candidate scoring",
+        "reranking"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Reranking"
+      ],
+      "rerankerType": "Cross Encoder",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/reranker.schema.json",
+      "scoringApproach": "Pairwise Query Candidate Scoring",
+      "slug": "cross-encoder-reranker",
+      "status": "Draft",
+      "summary": "A Cross-Encoder Reranker scores query-candidate pairs jointly to support reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "RETRIEVER-10001",
+    "type": "Retriever",
+    "label": "Lexical Retriever",
+    "sourceDataFile": "data/retrievers/lexical-retriever.json",
+    "properties": {
+      "capabilities": [
+        "Lexical Retrieval"
+      ],
+      "inputModalities": [
+        "Text"
+      ],
+      "keywords": [
+        "lexical retrieval",
+        "term matching",
+        "keyword retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Retrieval"
+      ],
+      "retrievalApproach": "Lexical Search",
+      "retrievalTargets": [
+        "Document",
+        "Chunk",
+        "Passage"
+      ],
+      "retrieverType": "Keyword Retriever",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/retriever.schema.json",
+      "slug": "lexical-retriever",
+      "status": "Draft",
+      "summary": "A Lexical Retriever retrieves candidate records using lexical, term-based, or keyword-oriented matching signals.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "RETRIEVER-10002",
+    "type": "Retriever",
+    "label": "Embedding Retriever",
+    "sourceDataFile": "data/retrievers/embedding-retriever.json",
+    "properties": {
+      "capabilities": [
+        "Semantic Retrieval"
+      ],
+      "inputModalities": [
+        "Text"
+      ],
+      "keywords": [
+        "embedding retrieval",
+        "vector retrieval",
+        "semantic retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Retrieval"
+      ],
+      "retrievalApproach": "Similarity Search",
+      "retrievalTargets": [
+        "Document",
+        "Chunk",
+        "Passage"
+      ],
+      "retrieverType": "Dense Vector Retriever",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/retriever.schema.json",
+      "slug": "embedding-retriever",
+      "status": "Draft",
+      "summary": "An Embedding Retriever retrieves candidate records by comparing vector or embedding representations.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
     "id": "SCHEMA-COMPONENT",
     "type": "Schema",
     "label": "schema/component.schema.json",
@@ -133,6 +244,30 @@
       "schemaId": "https://rkm.org/schema/rag-technique.schema.json",
       "schemaPath": "schema/rag-technique.schema.json",
       "title": "RKM RAG Technique Schema"
+    }
+  },
+  {
+    "id": "SCHEMA-RERANKER",
+    "type": "Schema",
+    "label": "schema/reranker.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/reranker.schema.json",
+      "schemaPath": "schema/reranker.schema.json",
+      "title": "RKM Reranker Schema"
+    }
+  },
+  {
+    "id": "SCHEMA-RETRIEVER",
+    "type": "Schema",
+    "label": "schema/retriever.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/retriever.schema.json",
+      "schemaPath": "schema/retriever.schema.json",
+      "title": "RKM Retriever Schema"
     }
   },
   {

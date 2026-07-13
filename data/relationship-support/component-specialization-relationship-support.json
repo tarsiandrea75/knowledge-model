@@ -1,0 +1,140 @@
+{
+  "id": "RELATIONSHIP-SUPPORT-SET-10201",
+  "title": "Seed Component Specialization Relationship Support",
+  "description": "Conservative support objects for the seed Retriever and Reranker specialization relationships. This support records maintainer rationale for including declared specialization edges in the seed dataset and does not claim external factual proof, benchmark superiority, or universal RAG taxonomy behavior.",
+  "references": [
+    {
+      "id": "REFERENCE-10003",
+      "sourceType": "Maintainer Analysis",
+      "sourcePriority": "Tertiary",
+      "title": "RKM Seed Component Specialization Modeling Rationale",
+      "publisher": "RAG Knowledge Model maintainers",
+      "updatedAt": "2026-07-13",
+      "abstract": "Internal maintainer analysis describing why seed Retriever and Reranker records are connected to existing Component records through conservative specialization relationships.",
+      "notes": [
+        "This reference records seed dataset modeling rationale and should not be treated as external factual proof."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-10201",
+      "statement": "RELATIONSHIP-10201 is included as seed dataset modeling rationale because Lexical Retriever is modeled as a more specific seed entity aligned with the Keyword Retriever component.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10201"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10201"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting a universal taxonomy or external factual proof."
+    },
+    {
+      "id": "CLAIM-10202",
+      "statement": "RELATIONSHIP-10202 is included as seed dataset modeling rationale because Embedding Retriever is modeled as a more specific seed entity aligned with the Semantic Retriever component.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10202"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10202"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting a universal taxonomy or benchmark-supported performance claim."
+    },
+    {
+      "id": "CLAIM-10203",
+      "statement": "RELATIONSHIP-10203 is included as seed dataset modeling rationale because Cross-Encoder Reranker is modeled as a more specific seed entity aligned with the Cross-Encoder Reranker component.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10203"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10203"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting a universal taxonomy or benchmark-supported performance claim."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-10201",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Lexical Retriever as a more specific seed entity aligned with the Keyword Retriever component.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10201"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10201"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and should not be interpreted as a universal RAG taxonomy rule."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10202",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Embedding Retriever as a more specific seed entity aligned with the Semantic Retriever component.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10202"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10202"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not claim benchmark-supported performance."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10203",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Cross-Encoder Reranker as a more specific seed entity aligned with the Cross-Encoder Reranker component.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10203"
+      ],
+      "referenceIds": [
+        "REFERENCE-10003"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10203"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not claim universal reranker taxonomy behavior."
+      ]
+    }
+  ]
+}
