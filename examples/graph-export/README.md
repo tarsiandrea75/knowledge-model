@@ -42,3 +42,11 @@ python3 scripts/export-fixtures-graph.py --check
 ```
 
 That check regenerates the graph in memory and fails if the committed node or edge files differ from the fixture-derived output.
+
+The fixture graph export is also validated against the formal graph node and graph edge schemas through:
+
+```bash
+make graph-export-validate
+```
+
+Schema-level validation checks node and edge shape, duplicate IDs, and edge endpoints that must resolve to nodes in the same export.

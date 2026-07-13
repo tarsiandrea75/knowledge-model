@@ -61,32 +61,54 @@ The current seed records do not contain explicit inter-record RAG domain relatio
 
 A graph node represents a first-class RKM concept or a minimal endpoint needed to make an edge loadable.
 
-Each node has:
+The formal node contract is defined by `schema/graph-node.schema.json`. Each node has:
 
 - `id`: the stable RKM identifier used as the graph node key.
 - `type`: the node type.
 - `label`: a short human-readable label for display.
-- `sourceFixture`: the fixture file that caused the node to be emitted by the fixture export.
-- `sourceDataFile`: the data file that caused the node to be emitted by the data export.
+- `sourceDataFile`: the repository-relative source file that caused the node to be emitted.
 - `properties`: a compact object with useful source fields.
 
-Fixture export nodes use `sourceFixture`. Data export nodes use `sourceDataFile`.
+The schema requires these fields and requires all string fields to be non-empty. `properties` must be a JSON object so future fixture-derived, data-derived, domain, and provenance properties can evolve without changing the base node shape.
+
+The current fixture exporter still emits `sourceFixture`; schema-level validation maps that fixture provenance field to the formal `sourceDataFile` contract before validating node shape. Data graph export nodes already emit `sourceDataFile` directly.
 
 ## Edges
 
 A graph edge represents a directed connection between two node IDs.
 
-Each edge has:
+The formal edge contract is defined by `schema/graph-edge.schema.json`. Each edge has:
 
 - `id`: a stable edge identifier.
 - `predicate`: an uppercase snake case edge predicate.
 - `sourceId`: the source node ID.
 - `targetId`: the target node ID.
-- `sourceFixture`: the fixture file that caused the edge to be emitted by the fixture export.
-- `sourceDataFile`: the data file that caused the edge to be emitted by the data export.
+- `sourceDataFile`: the repository-relative source file that caused the edge to be emitted.
 - `properties`: a compact object with useful source fields.
 
-Fixture export edges use `sourceFixture`. Data export edges use `sourceDataFile`.
+The schema requires these fields and requires all string fields to be non-empty. `properties` must be a JSON object so future domain edges and provenance edges can carry export-specific fields without weakening the base edge shape.
+
+The current fixture exporter still emits `sourceFixture`; schema-level validation maps that fixture provenance field to the formal `sourceDataFile` contract before validating edge shape. Data graph export edges already emit `sourceDataFile` directly.
+
+## Schema Validation
+
+Both graph export paths are now schema-validated:
+
+- `examples/graph-export/minimal-graph.nodes.json`
+- `examples/graph-export/minimal-graph.edges.json`
+- `examples/data-graph-export/rag-techniques.nodes.json`
+- `examples/data-graph-export/rag-techniques.edges.json`
+
+`scripts/validate-graph-exports.py` validates every node object against `schema/graph-node.schema.json` and every edge object against `schema/graph-edge.schema.json`. It also requires each export file to be a JSON array.
+
+After schema validation, the validator checks graph integrity inside each export:
+
+- node IDs must be unique within that export
+- edge IDs must be unique within that export
+- every edge `sourceId` must exist as a node ID in the same export
+- every edge `targetId` must exist as a node ID in the same export
+
+These checks are intentionally separate from exporter-specific deterministic checks. The exporter `--check` commands prove committed files match generated output. The graph export schema validator proves the generated shape is loadable as a coherent node and edge graph.
 
 ## Stable Identifiers
 
@@ -133,6 +155,8 @@ Every data graph node and edge includes `sourceDataFile`. For data record nodes 
 
 When a graph item is a referenced endpoint, `sourceFixture` points to the relationship fixture that introduced the endpoint. This makes provenance explicit even when the endpoint does not yet have its own entity fixture.
 
+The formal validation contract uses `sourceDataFile` as the shared provenance field name. The fixture export compatibility mapping is a validator bridge for the current fixture artifact, not a separate public node or edge shape.
+
 ## Claims, Evidence, And References
 
 The first export represents claims, evidence, and references as nodes because they are first-class RKM concepts.
@@ -155,19 +179,18 @@ Stable for the current exports:
 - the fixture export is generated from `examples/fixtures/`
 - the data export is generated from `data/manifest.json`
 - nodes and edges are JSON arrays
-- node objects include `id`, `type`, `label`, `sourceFixture`, and `properties`
-- edge objects include `id`, `predicate`, `sourceId`, `targetId`, `sourceFixture`, and `properties`
-- data node objects include `id`, `type`, `label`, `sourceDataFile`, and `properties`
-- data edge objects include `id`, `predicate`, `sourceId`, `targetId`, `sourceDataFile`, and `properties`
+- formal graph node objects include `id`, `type`, `label`, `sourceDataFile`, and `properties`
+- formal graph edge objects include `id`, `predicate`, `sourceId`, `targetId`, `sourceDataFile`, and `properties`
 - stable RKM identifiers are used as graph keys
 - committed export files are checked during validation
+- graph export files are checked against node and edge schemas
+- graph export validation checks duplicate IDs and missing edge endpoints
 
 Still evolving:
 
 - graph coverage beyond the minimal fixtures and seed-data provenance
 - package-level graph metadata
 - loader-specific mappings for graph databases and indexers
-- schemas for graph export files
 - version compatibility policy for future export formats
 
 ## Commands
@@ -194,6 +217,12 @@ Check that committed data export files match the seed dataset:
 
 ```bash
 python3 scripts/export-data-graph.py --check
+```
+
+Validate graph export node and edge schema contracts:
+
+```bash
+make graph-export-validate
 ```
 
 Run full repository validation:

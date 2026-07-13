@@ -7,6 +7,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 ### Added
 
 - Deterministic data graph export for the validated seed dataset under `data/`, exposed through `make data-graph-export` and checked by `make validate`.
+- JSON Schema validation for graph export node and edge files, including duplicate ID checks and edge endpoint integrity checks.
 
 ## v0.1.0-alpha - 2026-07-13
 

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/graph-edge.schema.json",
+  "title": "RKM Graph Export Edge",
+  "description": "Validates one graph export edge object emitted by RKM graph export paths.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "predicate",
+    "sourceId",
+    "targetId",
+    "sourceDataFile",
+    "properties"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "predicate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceDataFile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

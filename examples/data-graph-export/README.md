@@ -41,6 +41,14 @@ python3 scripts/export-data-graph.py --check
 
 That check regenerates the data graph in memory and fails if the committed node or edge files differ from the seed-data-derived output.
 
+The data graph export is also validated against the formal graph node and graph edge schemas through:
+
+```bash
+make graph-export-validate
+```
+
+Schema-level validation checks node and edge shape, duplicate IDs, and edge endpoints that must resolve to nodes in the same export.
+
 ## Current Scope
 
 This export is minimal post-alpha work on `main`. It proves a deterministic graph export path for validated seed data, but it is not a complete downstream graph product and is not part of the already tagged `v0.1.0-alpha` package.

@@ -35,7 +35,7 @@ Use these documents together:
 
 For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and graph export paths now exist for both fixtures and seed data, but external users still need broader real data, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
 
-When discussing consumability, onboarding, release scope, or alpha packaging, inspect `QUICKSTART.md` and `docs/releases/v0.1.0-alpha.md` before answering. `v0.1.0-alpha` has already been tagged. Do not confuse that already tagged alpha with post-alpha changes on `main`, such as the data graph export.
+When discussing consumability, onboarding, release scope, or alpha packaging, inspect `QUICKSTART.md` and `docs/releases/v0.1.0-alpha.md` before answering. `v0.1.0-alpha` has already been tagged. Do not confuse that already tagged alpha with post-alpha changes on `main`, such as the data graph export and graph export schema validation.
 
 ## Repository Discipline
 
@@ -74,7 +74,7 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` is the standard validation entry point.
 
-`make validate` checks schema validity, fixture instance validity, data instance validity, fixture graph export consistency, and data graph export consistency. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data or stale export files are validation failures rather than optional cleanup.
+`make validate` checks schema validity, fixture instance validity, data instance validity, fixture graph export consistency, data graph export consistency, graph export schema validity, and graph endpoint integrity. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data, stale export files, malformed graph node or edge files, duplicate graph IDs, or missing graph edge endpoints are validation failures rather than optional cleanup.
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
@@ -86,6 +86,13 @@ There are now two graph export paths:
 - `make data-graph-export` generates `examples/data-graph-export/` from validated seed data declared in `data/manifest.json`.
 
 Keep these paths distinct. The fixture graph export is pedagogical and minimal. The data graph export is post-alpha work on `main` and is derived from the real seed dataset.
+
+Graph exports have formal node and edge schemas:
+
+- `schema/graph-node.schema.json`
+- `schema/graph-edge.schema.json`
+
+Use `make graph-export-validate` or `python3 scripts/validate-graph-exports.py` to validate both fixture and data graph export files against those schemas. This validation also checks duplicate node IDs, duplicate edge IDs, and edge endpoints that must exist among nodes in the same export. The current fixture artifact still uses `sourceFixture`; the graph export validator maps that fixture provenance field into the formal `sourceDataFile` contract for schema validation.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
@@ -154,7 +161,7 @@ The architecture, schema base, validation system, registries, and automation are
 
 The schema contract validator catches recurring semantic schema mistakes, not only syntax errors.
 
-Fixture validation, data validation, and graph export consistency checks are part of the normal validation path. Treat the committed fixture graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat the committed data graph export as a generated contract artifact derived from `data/manifest.json`, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
+Fixture validation, data validation, graph export consistency checks, and graph export schema validation are part of the normal validation path. Treat the committed fixture graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat the committed data graph export as a generated contract artifact derived from `data/manifest.json`, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
 
 Recurring mistakes that have been hardened include:
 

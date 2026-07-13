@@ -246,6 +246,11 @@ start_step "Running data graph export validation..."
 pass_step
 printf 'Data graph export validation passed.\n'
 
+start_step "Running graph export schema validation..."
+"$PYTHON_BIN" scripts/validate-graph-exports.py
+pass_step
+printf 'Graph export schema validation passed.\n'
+
 start_step "Running RKM unit tests..."
 bash scripts/rkm-unit-tests.sh
 pass_step

@@ -23,6 +23,7 @@ The package currently includes schemas, fixtures, seed data, a minimal fixture g
 - Validated seed dataset under `data/`.
 - Minimal fixture-derived graph export under `examples/graph-export/`.
 - Post-alpha seed-data graph export under `examples/data-graph-export/`.
+- Graph export node and edge schema validation.
 - Validation pipeline through `make validate`.
 - Consumer, release, maturity, roadmap, and assistant handoff documentation.
 
@@ -74,6 +75,7 @@ It checks:
 - fixture instances
 - data instances
 - fixture and data graph export consistency
+- graph export node and edge schema validation
 - unit tests
 - documentation relationship usage
 - repository hygiene

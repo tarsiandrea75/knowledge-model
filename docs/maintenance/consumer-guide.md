@@ -87,6 +87,14 @@ python3 scripts/export-data-graph.py --check
 
 The repository validator runs both consistency checks, so stale graph export files fail `make validate`.
 
+Both graph export paths are also validated against formal graph node and edge schemas. The schema-level validator checks the exported object shape, duplicate node IDs, duplicate edge IDs, and edge endpoints that must resolve to nodes in the same export:
+
+```bash
+make graph-export-validate
+```
+
+Consumers can rely on the current node and edge shape as an alpha/internal contract for evaluation and importer experiments. This contract is not a stable public API. Field names, coverage, package metadata, and loader-specific mappings may still change before RKM offers a public compatibility guarantee.
+
 ## How To Validate
 
 Run repository validation from the project root:
@@ -109,6 +117,7 @@ This runs schema validity checks, fixture instance validity checks, data instanc
 - data instance validation using `data/manifest.json`
 - fixture graph export consistency validation using `scripts/export-fixtures-graph.py --check`
 - data graph export consistency validation using `scripts/export-data-graph.py --check`
+- graph export schema validation using `scripts/validate-graph-exports.py`
 - RKM unit tests
 - documentation relationship validation
 
@@ -154,6 +163,7 @@ The following contracts are stable enough for early consumers:
 - Metadata is separated from domain knowledge.
 - Registries define controlled entity and relationship vocabularies.
 - The graph exports use stable IDs as node IDs and edge endpoints.
+- The graph exports have an alpha/internal node and edge shape checked by JSON Schema and endpoint integrity validation.
 
 ## What Is Still Evolving
 
@@ -161,6 +171,7 @@ The following areas are still expected to change as RKM becomes more consumable:
 
 - package-level schemas for example bundles
 - graph export coverage beyond the first fixture contract and the current seed-data provenance export
+- graph export compatibility policy beyond the current alpha/internal contract
 - fixture coverage beyond the minimal package
 - populated dataset breadth beyond the first three RAG techniques
 - release packaging and version compatibility policy

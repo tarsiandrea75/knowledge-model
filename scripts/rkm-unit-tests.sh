@@ -67,6 +67,9 @@ printf '==> Running export-fixtures-graph self-test\n'
 printf '==> Running export-data-graph self-test\n'
 "$PYTHON_BIN" scripts/export-data-graph.py --self-test
 
+printf '==> Running validate-graph-exports self-test\n'
+"$PYTHON_BIN" scripts/validate-graph-exports.py --self-test
+
 printf '==> Running rkm-release-check self-test\n'
 "$PYTHON_BIN" scripts/rkm-release-check.py --self-test
 
