@@ -1,0 +1,424 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/cost.schema.json",
+  "title": "RKM Cost Definition",
+  "description": "Defines reusable embedded cost knowledge for RAG entities, workflows, deployments, evaluations and operational observations. This schema does not provide a first-class entity envelope; it is intended for cost statements whose meaning depends on workload, unit, boundary, evidence and related claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "costType",
+    "costDrivers",
+    "measurementBoundary",
+    "unit"
+  ],
+  "properties": {
+    "costId": {
+      "type": "string",
+      "description": "Stable local identifier for this cost statement within the containing entity, workflow, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the cost statement.",
+      "minLength": 1
+    },
+    "costType": {
+      "$ref": "#/$defs/costType"
+    },
+    "costDrivers": {
+      "type": "array",
+      "description": "Factors that materially affect the measured, estimated or reported cost.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/costDriver"
+      },
+      "uniqueItems": true
+    },
+    "measurementBoundary": {
+      "$ref": "#/$defs/measurementBoundary"
+    },
+    "unit": {
+      "$ref": "#/$defs/costUnit"
+    },
+    "amount": {
+      "$ref": "#/$defs/costAmount"
+    },
+    "workloadContext": {
+      "$ref": "#/$defs/workloadContext"
+    },
+    "pricingContext": {
+      "$ref": "#/$defs/pricingContext"
+    },
+    "deploymentContext": {
+      "$ref": "deployment-context.schema.json"
+    },
+    "measuredEntities": {
+      "type": "array",
+      "description": "RKM entities whose behavior, operation or selection is explained by this cost statement.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "relatedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes that are traded off against or constrained by this cost statement.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships connecting this cost statement to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims about measured, estimated, comparative or operational cost.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the cost statement, measurement boundary, amount or comparison.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources that define, document or justify the cost statement.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "costType": {
+      "type": "string",
+      "description": "Primary semantic category of cost being represented.",
+      "enum": [
+        "Token Cost",
+        "Embedding Cost",
+        "Retrieval Cost",
+        "Reranking Cost",
+        "Indexing Cost",
+        "Storage Cost",
+        "Compute Cost",
+        "Network Cost",
+        "Tool Invocation Cost",
+        "Human Review Cost",
+        "Operational Cost",
+        "Evaluation Cost",
+        "Provider Pricing",
+        "Total Cost",
+        "Other"
+      ]
+    },
+    "costDriver": {
+      "type": "object",
+      "description": "A factor that materially changes cost.",
+      "additionalProperties": false,
+      "required": [
+        "driverType"
+      ],
+      "properties": {
+        "driverType": {
+          "type": "string",
+          "enum": [
+            "Input Tokens",
+            "Output Tokens",
+            "Embedding Tokens",
+            "Reranking Candidates",
+            "Retrieval Depth",
+            "Indexed Document Volume",
+            "Stored Vector Count",
+            "Graph Node Count",
+            "Graph Edge Count",
+            "Query Volume",
+            "Request Concurrency",
+            "Model Invocation Count",
+            "Tool Invocation Count",
+            "Storage Capacity",
+            "Compute Time",
+            "Network Transfer",
+            "Human Review Time",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of how the driver affects cost.",
+          "minLength": 1
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit for the driver value when applicable.",
+          "minLength": 1
+        }
+      }
+    },
+    "measurementBoundary": {
+      "type": "object",
+      "description": "Boundary that defines what the cost includes and excludes.",
+      "additionalProperties": false,
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "Single Query",
+            "Generated Answer",
+            "Document Ingestion",
+            "Index Build",
+            "Index Refresh",
+            "Workflow Run",
+            "Evaluation Task",
+            "Benchmark Run",
+            "Tenant Period",
+            "Deployment Period",
+            "Provider Usage",
+            "Other"
+          ]
+        },
+        "includedActivities": {
+          "type": "array",
+          "description": "Activities included in the cost boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "excludedActivities": {
+          "type": "array",
+          "description": "Activities explicitly excluded from the cost boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "timePeriod": {
+          "$ref": "#/$defs/timePeriod"
+        }
+      }
+    },
+    "costUnit": {
+      "type": "string",
+      "description": "Unit used to measure or normalize cost.",
+      "enum": [
+        "Cost Per Query",
+        "Cost Per Generated Answer",
+        "Cost Per Document Ingested",
+        "Cost Per Embedded Token",
+        "Cost Per Indexed Chunk",
+        "Cost Per Reranked Candidate",
+        "Cost Per Workflow Run",
+        "Cost Per Evaluation Task",
+        "Cost Per Stored Vector",
+        "Cost Per Tenant",
+        "Cost Per Time Period",
+        "Total Cost",
+        "Other"
+      ]
+    },
+    "costAmount": {
+      "type": "object",
+      "description": "Measured, estimated or cited cost amount.",
+      "additionalProperties": false,
+      "required": [
+        "amountType",
+        "value"
+      ],
+      "properties": {
+        "amountType": {
+          "type": "string",
+          "enum": [
+            "Measured",
+            "Estimated",
+            "Quoted",
+            "Reported",
+            "Calculated",
+            "Unknown"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code when the value is monetary.",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "range": {
+          "$ref": "#/$defs/numericRange"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Cost interpretation notes that do not replace structured fields.",
+          "minLength": 1
+        }
+      }
+    },
+    "workloadContext": {
+      "type": "object",
+      "description": "Workload assumptions under which the cost statement is meaningful.",
+      "additionalProperties": false,
+      "properties": {
+        "corpusSize": {
+          "type": "string",
+          "minLength": 1
+        },
+        "documentUpdateFrequency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "queryVolume": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retrievalDepth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rerankingDepth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contextWindowUsage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelInvocationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "toolInvocationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "concurrencyProfile": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "pricingContext": {
+      "type": "object",
+      "description": "Provider, region, date or pricing assumptions used to interpret monetary cost.",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pricingDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "pricingPlan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "discountsIncluded": {
+          "type": "boolean"
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "Provider Documentation",
+            "Invoice",
+            "Cost Report",
+            "Benchmark Measurement",
+            "Operational Log",
+            "Paper",
+            "Estimate",
+            "Other"
+          ]
+        }
+      }
+    },
+    "timePeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string",
+          "description": "ISO 8601 duration or documented period label.",
+          "minLength": 1
+        }
+      }
+    },
+    "numericRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an existing RKM entity.",
+      "additionalProperties": false,
+      "required": [
+        "entityId",
+        "entityType"
+      ],
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "pattern": "^[A-Z]+(?:-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "entityType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
