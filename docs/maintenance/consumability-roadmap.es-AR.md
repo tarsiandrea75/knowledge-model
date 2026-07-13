@@ -6,9 +6,9 @@ RAG Knowledge Model ya demostró que se puede construir: existe una arquitectura
 
 La pregunta siguiente es distinta: **cómo lo convertimos en algo consumible por otros**.
 
-La respuesta corta es que RKM necesita pasar de ser una base técnica sólida a ser un paquete entendible, usable y verificable por personas y sistemas externos. Para eso hacen falta ejemplos, fixtures, datos representativos, exportación a grafo, documentación para consumidores y releases versionadas.
+La respuesta corta es que RKM necesita pasar de ser una base técnica sólida a ser un paquete entendible, usable y verificable por personas y sistemas externos. Ya existe una primera exportación mínima a grafo derivada de fixtures y verificada por validación, pero todavía hacen falta datos reales representativos, ejemplos más ricos, documentación para consumidores y releases versionadas.
 
-El estado actual es bueno como fundación, pero todavía no conviene presentarlo como producto terminado. La madurez general está alrededor de 3.1 / 5. El modelo conceptual y el tooling están bastante más avanzados que el contenido poblado y la experiencia de consumo.
+El estado actual es bueno como fundación, pero todavía no conviene presentarlo como producto terminado. La madurez general está alrededor de 3.3 / 5. El modelo conceptual y el tooling están bastante más avanzados que el contenido poblado y la experiencia de consumo.
 
 ## Estado actual
 
@@ -20,6 +20,9 @@ RKM cuenta con una base importante:
 - Definitions reutilizables para conceptos compartidos.
 - Registries para tipos de entidad y tipos de relación.
 - Validación de contratos de schema.
+- Validación de instancias de fixtures.
+- Primera exportación mínima a grafo derivada de fixtures.
+- Chequeo de consistencia de graph export durante `make validate`.
 - Validación de relaciones en documentación.
 - Comandos operativos como `make validate`, `make cockpit-summary`, `make autopilot`, `make autocycle`, `make safe-push`, `make recovery-plan` y `make autopilot-recover`.
 - Control de presupuesto, force mode, working target cap, budget grace y ledger operativo.
@@ -27,7 +30,7 @@ RKM cuenta con una base importante:
 
 Esto ubica al proyecto por encima de un prototipo. Ya hay estructura, reglas y automatización real.
 
-El punto débil principal es que todavía falta convertir esa base en una experiencia clara para terceros. Hoy el repo es entendible para quien viene trabajando en el proyecto, pero todavía requiere demasiado contexto para una persona nueva, un equipo consumidor o una integración automatizada.
+`make validate` ahora verifica validez de schemas, validez de instancias de fixtures y consistencia de graph export. Esto mejora la consumibilidad inicial, aunque el punto débil principal sigue siendo convertir esa base en una experiencia clara para terceros. Hoy el repo es entendible para quien viene trabajando en el proyecto, pero todavía requiere demasiado contexto para una persona nueva, un equipo consumidor o una integración automatizada.
 
 ## Qué valor tiene
 
@@ -51,7 +54,7 @@ Para que RKM sea consumible por otros, faltan piezas concretas:
 - Ejemplos completos que muestren entidades, relaciones, claims, evidencia y referencias válidas.
 - Fixtures, es decir, datos pequeños y representativos que sirvan para pruebas, demos e integraciones.
 - Un dataset inicial con contenido real suficiente para demostrar utilidad.
-- Graph export documentado, con reglas claras para nodos, aristas, identificadores, labels, relaciones, evidencia y procedencia.
+- Expansión del graph export actual, que hoy existe como exportación mínima derivada de fixtures, con reglas más completas para nodos, aristas, identificadores, labels, relaciones, evidencia y procedencia.
 - Guía de consumidor que explique cómo validar, cargar, inspeccionar y consultar el contenido.
 - Guía de contribución orientada a personas nuevas, no solo a asistentes automatizados.
 - Releases versionadas con notas, alcance y compatibilidad esperada.
@@ -78,7 +81,8 @@ Ese MVP debería incluir:
 - Un fixture mínimo validado que muestre una entidad, una relación, un claim, evidencia y referencias conectadas de manera consistente.
 - Un dataset inicial chico, con contenido real y representativo, suficiente para probar lectura, validación e inspección.
 - Una guía de consumidor que explique cómo validar el repo, dónde mirar los schemas, cómo interpretar los registros y qué partes todavía están evolucionando.
-- Un graph export inicial con contrato explícito para nodos, aristas, identificadores, labels, predicados, evidencia y procedencia.
+- Un graph export inicial, ya presente, que se mantenga explícitamente como mínimo y derivado de fixtures.
+- Un contrato de graph export más completo para nodos, aristas, identificadores, labels, predicados, evidencia y procedencia.
 - Un quickstart que permita clonar, validar, revisar un ejemplo y entender el flujo básico en pocos pasos.
 - Un release tag con alcance claro, notas de release y expectativas de compatibilidad.
 
@@ -94,6 +98,7 @@ Entregables:
 
 - Fixture mínimo con entidades, relaciones, claims, evidencia y referencias.
 - Guía breve para validar el repo con `make validate`.
+- Explicación breve de que `make validate` chequea schemas, fixtures y consistencia del graph export.
 - Guía breve para interpretar schemas, definitions y registries.
 - Ejemplos de registros válidos.
 - Mapa actualizado del repo y comandos operativos.
@@ -109,21 +114,22 @@ Entregables:
 - Dataset inicial pequeño pero representativo.
 - Script o procedimiento de carga documentado.
 - Validación aplicada sobre fixtures y datos de ejemplo.
+- Fixtures más ricos que muestren más de un patrón de consumo.
 - Documentación de errores comunes y cómo corregirlos.
 - Separación clara entre arquitectura, schemas, fixtures y datos poblados.
 
 Resultado esperado: otro equipo puede probar RKM sin tener que reconstruir las decisiones de modelado.
 
-### Fase 3: Graph export
+### Fase 3: Expansión de graph export
 
-Objetivo: habilitar el uso de RKM como fuente para grafos de conocimiento.
+Objetivo: ampliar la primera exportación mínima ya existente para habilitar el uso de RKM como fuente para grafos de conocimiento.
 
 Entregables:
 
-- Contrato de exportación a grafo.
+- Contrato ampliado de exportación a grafo.
 - Definición de nodos, aristas, labels, identificadores y propiedades.
 - Reglas para claims, evidencia, referencias y provenance.
-- Ejemplo de export sobre fixtures.
+- Ejemplos de export sobre fixtures más ricos y, luego, sobre el dataset inicial.
 - Documentación de consultas esperadas.
 
 Resultado esperado: RKM puede conectarse con herramientas de grafo o pipelines analíticos sin interpretaciones ambiguas.
@@ -165,7 +171,7 @@ RKM no es todavía un producto listo para adopción amplia. No es un catálogo c
 
 Lo que se puede probar ahora es la estructura: cómo están definidos los schemas, cómo funcionan las validaciones, cómo se modelan entidades y relaciones, y cómo el repo sostiene cambios con disciplina operativa. También se puede evaluar si el enfoque sirve como base para conocimiento estructurado, grafo de conocimiento o corpus RAG.
 
-Lo que todavía necesita trabajo es el paquete consumible: fixtures claros, dataset inicial, guía de consumidor, graph export, quickstart y release tag. Por eso la próxima fase debería enfocarse en consumibilidad antes de expandir mucho más el modelo.
+Lo que todavía necesita trabajo es el paquete consumible: dataset inicial chico con contenido real, fixtures más ricos, guía de consumidor, expansión del graph export, quickstart y release tag. Por eso la próxima fase debería enfocarse en consumibilidad antes de expandir mucho más el modelo.
 
 ## Riesgos
 
@@ -177,13 +183,13 @@ Si se agregan schemas y definitions sin revisar el modelo, el mismo concepto pue
 
 Algunas definitions pueden acumular identidad, relaciones o evidencia. Cuando eso pasa, quizás deban pasar a ser entidades de primera clase o relaciones explícitas.
 
-**Falta de ejemplos**
+**Ejemplos todavía limitados**
 
-Sin ejemplos completos, el repo puede ser correcto pero difícil de entender. Los ejemplos son parte de la interfaz del proyecto.
+Sin ejemplos más completos, el repo puede ser correcto pero difícil de entender. Los ejemplos son parte de la interfaz del proyecto.
 
-**Falta de graph export**
+**Graph export todavía mínimo**
 
-El modelo apunta a ser base para grafo de conocimiento, pero sin export documentado cada consumidor podría interpretarlo de manera distinta.
+El modelo apunta a ser base para grafo de conocimiento y ya tiene una primera exportación mínima derivada de fixtures. El riesgo ahora es que esa exportación todavía es chica: si no se amplía y documenta mejor, cada consumidor podría interpretar los casos más ricos de manera distinta.
 
 **Complejidad del tooling**
 
@@ -197,12 +203,12 @@ RKM mezcla modelado conceptual, JSON Schema, validaciones, automatización y flu
 
 Los próximos entregables recomendados son:
 
-1. Fixture mínimo validado.
-2. Guía de consumidor para validar, cargar e inspeccionar RKM.
-3. Ejemplos completos de entidades y relaciones.
-4. Contrato inicial de graph export.
-5. Dataset inicial pequeño con contenido real representativo.
-6. Release notes para una primera versión consumible.
+1. Dataset inicial pequeño con contenido real representativo.
+2. Fixtures más ricos que muestren entidades, relaciones, claims, evidencia, referencias y exportación a grafo.
+3. Guía de consumidor para validar, cargar e inspeccionar RKM.
+4. Quickstart de consumidor con `make validate` y `make graph-export`.
+5. Release notes para una primera versión consumible.
+6. Expansión del contrato de graph export.
 7. Guía corta para explicar el repo a nuevos colaboradores.
 
 Estos entregables deberían priorizar claridad y uso real antes que volumen. Es mejor tener pocos ejemplos completos y validados que muchos registros incompletos.
@@ -211,6 +217,6 @@ Estos entregables deberían priorizar claridad y uso real antes que volumen. Es 
 
 Ya tenemos una base técnica fuerte para RKM: modelo conceptual, schemas, validación, registries y automatización. No es solo una idea ni un prototipo suelto.
 
-Lo que falta para que otros lo usen es empaquetarlo como producto consumible: ejemplos, fixtures, dataset inicial, exportación a grafo, documentación de uso y una release versionada.
+Ya existe una primera exportación mínima a grafo derivada de fixtures y chequeada por `make validate`. Lo que falta para que otros lo usen es empaquetarlo como producto consumible: dataset inicial chico con contenido real, ejemplos más ricos, documentación de uso, expansión del graph export y una release versionada.
 
 La recomendación es invertir el próximo tramo en consumibilidad, no solamente en ampliar el modelo. Eso convierte el trabajo actual en un activo reutilizable por equipos técnicos, liderazgo y sistemas externos.

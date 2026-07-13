@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This guide explains how another team can inspect and validate the first small RAG Knowledge Model fixture package.
+This guide explains how another team can inspect, validate, and export the first small RAG Knowledge Model fixture package.
 
 RKM is a structured knowledge model for the Retrieval-Augmented Generation ecosystem. Consumers should treat entities, relationships, claims, evidence, references, and metadata as separate but connected concepts.
 
@@ -28,7 +28,7 @@ EVIDENCE-9001 derived from REFERENCE-9001
 
 ## Minimal Graph Export
 
-The same fixture package can be exported to a minimal graph representation under `examples/graph-export/`.
+The same fixture package can be exported to a minimal graph representation under `examples/graph-export/`. The current graph export is intentionally minimal and fixture-derived. It proves the first export contract path and validation wiring, but it is not a complete or production-grade graph product.
 
 The graph export is derived from the committed fixtures. It contains:
 
@@ -47,7 +47,7 @@ Check that the committed export still matches the fixtures:
 python3 scripts/export-fixtures-graph.py --check
 ```
 
-The repository validator runs this check, so stale graph export files fail `make validate`.
+The repository validator runs this consistency check, so stale graph export files fail `make validate`.
 
 ## How To Validate
 
@@ -57,7 +57,7 @@ Run repository validation from the project root:
 make validate
 ```
 
-This runs:
+This runs schema validity checks, fixture instance validity checks, graph export consistency checks, and the rest of the repository validation suite:
 
 - whitespace validation
 - file encoding and line ending checks
@@ -68,11 +68,23 @@ This runs:
 - schema contract validation
 - registry validation
 - fixture instance validation using `examples/fixtures/fixture-manifest.json`
-- graph export validation using `scripts/export-fixtures-graph.py --check`
+- graph export consistency validation using `scripts/export-fixtures-graph.py --check`
 - RKM unit tests
 - documentation relationship validation
 
 Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fixture and schema paths from the repository root, and validates each fixture instance against its declared schema. The claim package fixture is an envelope, so its `claim`, `evidence`, and `reference` objects are validated against their corresponding definition schemas.
+
+Graph export generation is handled by:
+
+```bash
+make graph-export
+```
+
+Graph export consistency is checked by:
+
+```bash
+make validate
+```
 
 Consumers that want direct fixture validation outside the repository scripts can use a JSON Schema Draft 2020-12 validator:
 

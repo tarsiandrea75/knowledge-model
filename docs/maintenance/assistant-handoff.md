@@ -33,7 +33,7 @@ Use these documents together:
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
-For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong, but external users still need fixtures, data, export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
+For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and the first minimal fixture-derived graph export exists, but external users still need a small real dataset, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
 
 ## Repository Discipline
 
@@ -71,6 +71,8 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 ```
 
 `make validate` is the standard validation entry point.
+
+`make validate` checks schema validity, fixture instance validity, and graph export consistency. New assistants should know that graph export is already wired into validation, so stale fixture-derived export files are validation failures rather than optional cleanup.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
@@ -126,16 +128,20 @@ RKM is a strong foundation and production-oriented repository system, but it is 
 
 Current maturity is approximately:
 
-- Overall maturity: 3.1 / 5
+- Overall maturity: 3.3 / 5
 - Conceptual and model maturity: 3.3 / 5
 - Tooling and automation maturity: 3.7 / 5
-- Populated knowledge base maturity: 1.5 / 5
+- Consumability maturity: 3.0 / 5
+- Populated knowledge base maturity: 1.9 / 5
+- Release readiness: 2.7 / 5
 
-The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project still needs examples, populated data, fixtures, exports, releases, and consumer-facing documentation before outside users can adopt it easily.
+The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation. The project still needs a small real dataset, richer examples, a release package, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
 
 ## Known Patterns and Hardening History
 
 The schema contract validator catches recurring semantic schema mistakes, not only syntax errors.
+
+Fixture validation and graph export consistency checks are part of the normal validation path. Treat the committed minimal graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export.
 
 Recurring mistakes that have been hardened include:
 
@@ -181,8 +187,9 @@ Then re-run validation and the cockpit summary before continuing.
 
 The next natural work should improve consumability:
 
-- Add clear examples and fixtures that demonstrate valid entities, relationships, claims, evidence, and references.
-- Add graph export paths so the model can be consumed outside the repository.
-- Add release documentation and consumer-oriented guides.
+- Add a small real dataset with representative populated content.
+- Add richer examples and fixtures that demonstrate valid entities, relationships, claims, evidence, references, and graph export behavior.
+- Add release documentation, release packaging, and consumer-oriented guides.
+- Expand the current minimal graph export so the model can be consumed more broadly outside the repository.
 - Keep schema expansion disciplined so embedded reusable concepts do not drift into implicit entity models.
 - Continue using validation and cockpit output as the source of truth for readiness.
