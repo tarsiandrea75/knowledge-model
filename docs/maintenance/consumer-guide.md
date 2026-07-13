@@ -4,6 +4,10 @@
 
 This guide explains how another team can inspect, validate, and export the first small RAG Knowledge Model fixture package and the first small populated dataset.
 
+For the shortest operational path, start with `QUICKSTART.md`. For package scope, validation expectations, limitations, and next milestones, read `docs/releases/v0.1.0-alpha.md`.
+
+`v0.1.0-alpha` is the first internal consumable RKM package. It is intended for internal evaluation, onboarding, and consumer feedback. It is not production-ready and should not be presented as a stable public API or complete RAG catalog.
+
 RKM is a structured knowledge model for the Retrieval-Augmented Generation ecosystem. Consumers should treat entities, relationships, claims, evidence, references, and metadata as separate but connected concepts.
 
 ## Fixture Package

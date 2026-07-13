@@ -15,7 +15,7 @@ The project has moved beyond the question of whether this can be built. The curr
 A new assistant or maintainer should start with this sequence from the repository root:
 
 1. Read this file.
-2. Read `README.md`, `AGENTS.md`, and `Makefile`.
+2. Read `README.md`, `AGENTS.md`, `Makefile`, `QUICKSTART.md`, and `docs/releases/v0.1.0-alpha.md`.
 3. Run `make cockpit-summary N=5`.
 4. Run `make validate`.
 5. Inspect the recent git log with `git log --oneline -n 10`.
@@ -34,6 +34,8 @@ Use these documents together:
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
 For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and the first minimal fixture-derived graph export exists, but external users still need a small real dataset, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
+
+When discussing consumability, onboarding, release scope, or alpha packaging, inspect `QUICKSTART.md` and `docs/releases/v0.1.0-alpha.md` before answering. These files define the current internal alpha consumption path, validation commands, release limitations, and the fact that `v0.1.0-alpha` is documentation for an internal package rather than an automatically created git tag.
 
 ## Repository Discipline
 

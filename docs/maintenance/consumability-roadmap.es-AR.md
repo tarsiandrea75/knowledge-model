@@ -6,7 +6,7 @@ RAG Knowledge Model ya demostró que se puede construir: existe una arquitectura
 
 La pregunta siguiente es distinta: **cómo lo convertimos en algo consumible por otros**.
 
-La respuesta corta es que RKM necesita pasar de ser una base técnica sólida a ser un paquete entendible, usable y verificable por personas y sistemas externos. Ya existe una primera exportación mínima a grafo derivada de fixtures y verificada por validación, y también existe un primer dataset chico validado. Todavía hacen falta datos representativos más amplios, ejemplos más ricos, documentación para consumidores y releases versionadas.
+La respuesta corta es que RKM necesita pasar de ser una base técnica sólida a ser un paquete entendible, usable y verificable por personas y sistemas externos. Ya existe una primera exportación mínima a grafo derivada de fixtures y verificada por validación, y también existe un primer dataset chico validado. El siguiente paso de empaquetado es `v0.1.0-alpha`, un primer paquete interno para evaluación, onboarding y feedback de consumidores. No debe presentarse como producto final ni como adopción externa amplia.
 
 El estado actual es bueno como fundación, pero todavía no conviene presentarlo como producto terminado. La madurez general está alrededor de 3.3 / 5. El modelo conceptual y el tooling están bastante más avanzados que el contenido poblado y la experiencia de consumo.
 
@@ -59,7 +59,7 @@ Para que RKM sea consumible por otros, faltan piezas concretas:
 - Expansión del graph export actual, que hoy existe como exportación mínima derivada de fixtures, con reglas más completas para nodos, aristas, identificadores, labels, relaciones, evidencia y procedencia.
 - Guía de consumidor que explique cómo validar, cargar, inspeccionar y consultar el contenido.
 - Guía de contribución orientada a personas nuevas, no solo a asistentes automatizados.
-- Releases versionadas con notas, alcance y compatibilidad esperada.
+- Release notes y paquetes versionados con alcance y compatibilidad esperada, empezando por `v0.1.0-alpha` como paquete interno de evaluación antes de crear un tag.
 - Ejemplos de uso en escenarios concretos, como búsqueda semántica, carga en base de grafos o uso como corpus RAG.
 
 La clave es que alguien externo pueda responder sin ayuda estas preguntas:
@@ -86,9 +86,9 @@ Ese MVP debería incluir:
 - Un graph export inicial, ya presente, que se mantenga explícitamente como mínimo y derivado de fixtures.
 - Un contrato de graph export más completo para nodos, aristas, identificadores, labels, predicados, evidencia y procedencia.
 - Un quickstart que permita clonar, validar, revisar un ejemplo y entender el flujo básico en pocos pasos.
-- Un release tag con alcance claro, notas de release y expectativas de compatibilidad.
+- Documentación de release con alcance claro, notas y expectativas de compatibilidad. Para `v0.1.0-alpha`, el objetivo es recolectar feedback interno antes de crear un tag.
 
-Ese paquete no convertiría a RKM en un producto maduro. Sí lo convertiría en algo evaluable por terceros: un equipo podría probarlo, hacer preguntas concretas y decidir si le sirve como base para una integración o una contribución.
+Ese paquete no convertiría a RKM en un producto maduro. Sí lo convertiría en algo evaluable: un equipo interno podría probarlo, hacer preguntas concretas y decidir si le sirve como base para una integración o una contribución.
 
 ## Roadmap por fases
 
@@ -138,18 +138,19 @@ Resultado esperado: RKM puede conectarse con herramientas de grafo o pipelines a
 
 ### Fase 4: Release inicial
 
-Objetivo: publicar una versión utilizable con alcance claro.
+Objetivo: preparar una versión utilizable con alcance claro, empezando por un paquete interno `v0.1.0-alpha` para feedback antes de una publicación más amplia.
 
 Entregables:
 
-- Versión inicial etiquetada.
+- Documentación de `v0.1.0-alpha` sin tag automático.
+- Tag de release creado de manera intencional cuando el equipo lo decida.
 - Release notes.
 - Validación reproducible.
 - Guía de uso para consumidores.
 - Matriz de alcance que diga qué incluye y qué no incluye la release.
 - Criterios de compatibilidad para cambios futuros.
 
-Resultado esperado: RKM puede ser evaluado como artefacto versionado, no solo como repo en desarrollo.
+Resultado esperado: RKM puede ser evaluado primero como paquete interno documentado y, después, como artefacto versionado cuando exista un tag creado de manera deliberada.
 
 ### Fase 5: Expansión controlada
 
@@ -173,7 +174,7 @@ RKM no es todavía un producto listo para adopción amplia. No es un catálogo c
 
 Lo que se puede probar ahora es la estructura: cómo están definidos los schemas, cómo funcionan las validaciones, cómo se modelan entidades y relaciones, y cómo el repo sostiene cambios con disciplina operativa. También se puede evaluar si el enfoque sirve como base para conocimiento estructurado, grafo de conocimiento o corpus RAG.
 
-Lo que todavía necesita trabajo es el paquete consumible: dataset más rico, fixtures más completos, guía de consumidor, expansión del graph export, quickstart y release tag. Por eso la próxima fase debería enfocarse en consumibilidad antes de expandir mucho más el modelo.
+Lo que todavía necesita trabajo es el paquete consumible: dataset más rico, fixtures más completos, guía de consumidor, expansión del graph export, quickstart y release tag. El primer paquete interno `v0.1.0-alpha` sirve para ordenar esa conversación y recolectar feedback, no para declarar que el producto está terminado. Por eso la próxima fase debería enfocarse en consumibilidad antes de expandir mucho más el modelo.
 
 ## Riesgos
 
@@ -209,7 +210,7 @@ Los próximos entregables recomendados son:
 2. Fixtures más ricos que muestren entidades, relaciones, claims, evidencia, referencias y exportación a grafo.
 3. Guía de consumidor para validar, cargar e inspeccionar RKM.
 4. Quickstart de consumidor con `make validate` y `make graph-export`.
-5. Release notes para una primera versión consumible.
+5. Release notes para `v0.1.0-alpha` como primera versión interna consumible.
 6. Expansión del contrato de graph export.
 7. Guía corta para explicar el repo a nuevos colaboradores.
 
@@ -219,6 +220,6 @@ Estos entregables deberían priorizar claridad y uso real antes que volumen. Es 
 
 Ya tenemos una base técnica fuerte para RKM: modelo conceptual, schemas, validación, registries y automatización. No es solo una idea ni un prototipo suelto.
 
-Ya existe una primera exportación mínima a grafo derivada de fixtures y chequeada por `make validate`. También existe un primer dataset chico validado, que sirve como semilla y no como catálogo completo. Lo que falta para que otros lo usen es empaquetarlo como producto consumible: release package, dataset más rico, ejemplos más completos, documentación de uso, expansión del graph export y una release versionada.
+Ya existe una primera exportación mínima a grafo derivada de fixtures y chequeada por `make validate`. También existe un primer dataset chico validado, que sirve como semilla y no como catálogo completo. El próximo paso de empaquetado es `v0.1.0-alpha`, una release interna para evaluación y feedback sin tag automático. Lo que falta para que otros lo usen de manera más amplia es convertirlo en un producto consumible: dataset más rico, ejemplos más completos, documentación de uso, expansión del graph export y una release versionada creada intencionalmente.
 
 La recomendación es invertir el próximo tramo en consumibilidad, no solamente en ampliar el modelo. Eso convierte el trabajo actual en un activo reutilizable por equipos técnicos, liderazgo y sistemas externos.
