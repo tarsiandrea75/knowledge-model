@@ -54,3 +54,11 @@ The current graph export is intentionally minimal. It proves the first export pa
 ## 7. Read the Consumer Guide
 
 Read `docs/maintenance/consumer-guide.md` for the current consumption contract, stability expectations, validation details, and guidance for internal evaluation of `v0.1.0-alpha`.
+
+## 8. Optional Pre-Tag Readiness Check
+
+```bash
+make release-check
+```
+
+`make release-check` is a stricter maintainer command for final `v0.1.0-alpha` pre-tag readiness. It requires a clean repository, checks local alignment with `origin/main` when that ref is available, runs validation, regenerates the graph export, and validates again. Use it before intentionally creating a git tag, not during ordinary dirty-worktree development.

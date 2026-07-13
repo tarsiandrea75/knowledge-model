@@ -18,7 +18,7 @@ AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 
-.PHONY: validate data-validate graph-export status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate data-validate graph-export release-check status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -28,6 +28,9 @@ data-validate:
 
 graph-export:
 	python3 scripts/export-fixtures-graph.py
+
+release-check:
+	python3 scripts/rkm-release-check.py
 
 status:
 	git status --short
@@ -162,6 +165,7 @@ help:
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
 	@printf '  make data-validate               Validate data instances declared in data/manifest.json.\n'
 	@printf '  make graph-export                Generate minimal graph export files from fixtures.\n'
+	@printf '  make release-check               Run the strict pre-tag readiness check for v0.1.0-alpha.\n'
 	@printf '  make status                      Show git status --short.\n'
 	@printf '  make log                         Show the 10 most recent commits.\n'
 	@printf '  make cycle [N=3]                 Run scripts/rkm-cycle.sh N, save stdout to /tmp/rkm-cycle-output.txt, print exit code, output tail, and status.\n'

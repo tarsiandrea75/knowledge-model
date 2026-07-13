@@ -76,6 +76,8 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` checks schema validity, fixture instance validity, data instance validity, and graph export consistency. New assistants should know that data validation and graph export are already wired into validation, so malformed populated data or stale fixture-derived export files are validation failures rather than optional cleanup.
 
+`make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
+
 Fixtures and populated data serve different purposes. `examples/fixtures/` contains minimal pedagogical examples and validation fixtures. `data/` contains the first small populated knowledge dataset for consumer testing and release packaging. Do not describe fixtures as the real dataset, and do not describe the seed dataset as a complete RAG catalog.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
