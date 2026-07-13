@@ -1,0 +1,403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/anti-pattern.schema.json",
+  "title": "RKM Anti Pattern Definition",
+  "description": "Defines a reusable structured anti pattern that describes a recurring RAG design, implementation, evaluation or operational practice that tends to produce poor outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "antiPatternType",
+    "statement",
+    "scope",
+    "harmfulOutcome"
+  ],
+  "properties": {
+    "antiPatternId": {
+      "type": "string",
+      "description": "Stable local identifier for the anti pattern within the containing entity, comparison, claim or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "antiPatternType": {
+      "$ref": "#/$defs/antiPatternType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the recurring harmful practice.",
+      "minLength": 1
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "harmfulOutcome": {
+      "$ref": "#/$defs/harmfulOutcome"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions under which the anti pattern is likely to appear or become harmful.",
+      "items": {
+        "$ref": "#/$defs/condition"
+      },
+      "uniqueItems": true
+    },
+    "signals": {
+      "type": "array",
+      "description": "Observable signs that the anti pattern may be present.",
+      "items": {
+        "$ref": "#/$defs/signal"
+      },
+      "uniqueItems": true
+    },
+    "affectedQualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes degraded, obscured or made harder to govern by this anti pattern.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedProblems": {
+      "type": "array",
+      "description": "Problems caused, exposed or intensified by this anti pattern.",
+      "items": {
+        "$ref": "problem.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedLimitations": {
+      "type": "array",
+      "description": "Limitations that make the anti pattern more likely or more damaging.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "recommendedAlternatives": {
+      "type": "array",
+      "description": "Techniques, patterns, controls or practices that can replace or mitigate the anti pattern.",
+      "items": {
+        "$ref": "#/$defs/recommendedAlternative"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that express, justify or qualify this anti pattern.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the existence, scope or impact of the anti pattern.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the anti pattern.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "antiPatternType": {
+      "type": "string",
+      "description": "Primary area where the anti pattern occurs.",
+      "enum": [
+        "Retrieval Anti Pattern",
+        "Ranking Anti Pattern",
+        "Chunking Anti Pattern",
+        "Indexing Anti Pattern",
+        "Context Assembly Anti Pattern",
+        "Prompting Anti Pattern",
+        "Generation Anti Pattern",
+        "Citation Anti Pattern",
+        "Evaluation Anti Pattern",
+        "Data Governance Anti Pattern",
+        "Security Anti Pattern",
+        "Observability Anti Pattern",
+        "Operational Anti Pattern",
+        "Other"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "description": "Boundary where the anti pattern applies.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "appliesTo"
+          ]
+        },
+        {
+          "required": [
+            "entityClass"
+          ]
+        }
+      ],
+      "properties": {
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "entityClass": {
+          "type": "string",
+          "description": "Class of entities affected when the anti pattern is not tied to a single entity.",
+          "enum": [
+            "Technique",
+            "Framework",
+            "Paper",
+            "Component",
+            "Pattern",
+            "Dataset",
+            "Benchmark",
+            "EmbeddingModel",
+            "LanguageModel",
+            "VectorDatabase",
+            "GraphDatabase",
+            "Retriever",
+            "Reranker",
+            "ChunkingStrategy",
+            "EvaluationMetric",
+            "PromptTechnique",
+            "Agent",
+            "Provider",
+            "Workflow",
+            "Tool",
+            "Use Case",
+            "Other"
+          ]
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the anti pattern is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "useCaseReferences": {
+          "type": "array",
+          "description": "Use cases where the anti pattern materially affects suitability, risk or evaluation.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "harmfulOutcome": {
+      "type": "object",
+      "description": "Primary harmful result associated with the anti pattern.",
+      "additionalProperties": false,
+      "required": [
+        "outcomeType",
+        "description"
+      ],
+      "properties": {
+        "outcomeType": {
+          "type": "string",
+          "enum": [
+            "Lower Recall",
+            "Lower Precision",
+            "Poor Grounding",
+            "Citation Failure",
+            "Higher Latency",
+            "Higher Cost",
+            "Reduced Scalability",
+            "Reduced Freshness",
+            "Weaker Explainability",
+            "Weaker Observability",
+            "Governance Risk",
+            "Security Risk",
+            "Operational Fragility",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Context Dependent",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Contextual factor that makes the anti pattern likely or harmful.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Corpus Type",
+            "Query Style",
+            "Language",
+            "Modality",
+            "Document Freshness",
+            "Source Trust Level",
+            "Benchmark",
+            "Dataset",
+            "Model Version",
+            "Provider Behavior",
+            "Latency Budget",
+            "Cost Budget",
+            "Governance Requirement",
+            "Deployment Environment",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "description": "Observable sign that may indicate the anti pattern is present.",
+      "additionalProperties": false,
+      "required": [
+        "signalType",
+        "description"
+      ],
+      "properties": {
+        "signalType": {
+          "type": "string",
+          "enum": [
+            "Evaluation Result",
+            "Trace Event",
+            "Metric Movement",
+            "User Feedback",
+            "Citation Inspection",
+            "Retrieval Inspection",
+            "Operational Incident",
+            "Code Review Finding",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observableSignal": {
+          "$ref": "observable-signal.schema.json"
+        }
+      }
+    },
+    "recommendedAlternative": {
+      "type": "object",
+      "description": "A replacement, mitigation or design correction for the anti pattern.",
+      "additionalProperties": false,
+      "required": [
+        "alternativeType",
+        "description"
+      ],
+      "properties": {
+        "alternativeType": {
+          "type": "string",
+          "enum": [
+            "Technique",
+            "Pattern",
+            "Workflow",
+            "Evaluation Practice",
+            "Governance Control",
+            "Operational Practice",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entityReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "expectedEffect": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Reference to an RKM entity, candidate entity or named concept.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Prompting",
+        "Generation",
+        "Citation",
+        "Evaluation",
+        "Monitoring",
+        "Governance",
+        "Other"
+      ]
+    }
+  }
+}
