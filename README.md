@@ -1,233 +1,135 @@
 # RAG Knowledge Model (RKM)
 
-> An open, structured and extensible knowledge base describing Retrieval-Augmented Generation (RAG) techniques, architectures, components, frameworks and best practices.
+RAG Knowledge Model (RKM) is a structured, extensible knowledge model for the Retrieval-Augmented Generation ecosystem.
 
-## Mission
+RKM is designed to be human-readable, machine-readable, and validation-oriented. It models RAG entities, relationships, claims, evidence, references, metadata, registries, and schemas as connected knowledge artifacts rather than as a simple list of techniques.
 
-The purpose of this project is to create the most comprehensive machine-readable and human-readable knowledge base about Retrieval-Augmented Generation (RAG).
+The long-term goal is to provide a domain model, ontology, and knowledge graph foundation that can support documentation, onboarding, validation, graph export, downstream loaders, and future RAG ecosystem analysis.
 
-Unlike a traditional document or a collection of notes, this repository is designed to be:
+RKM is not production-ready and is not a complete catalog of the RAG ecosystem.
 
-- searchable
-- queryable
-- versionable
-- extensible
-- framework-agnostic
-- suitable for LLMs
-- suitable for software developers
-- suitable for academic research
+## Current Status
 
-Every concept is represented using structured JSON documents validated through JSON Schema.
+The current package is `v0.1.0-alpha`.
 
-The repository can therefore be used as:
+This alpha package is intended for internal evaluation, onboarding, and consumer feedback. It contains a strong foundation, but it should not be treated as a stable public API, production dependency, or comprehensive RAG knowledge base.
 
-- documentation
-- educational material
-- dataset
-- RAG corpus
-- benchmarking dataset
-- semantic search corpus
-- graph database source
-- JSONB source
-- vector database source
+The package currently includes schemas, fixtures, seed data, a minimal graph export, validation commands, and documentation for consumers, maintainers, and future assistants.
 
----
+## What RKM Currently Includes
 
-# Design Principles
+- Schema foundation using JSON Schema Draft 2020-12.
+- Validated fixtures under `examples/fixtures/`.
+- Validated seed dataset under `data/`.
+- Minimal fixture-derived graph export under `examples/graph-export/`.
+- Validation pipeline through `make validate`.
+- Consumer, release, maturity, roadmap, and assistant handoff documentation.
 
-The project follows several fundamental principles.
+## Quick Start
 
-## 1. Structured Information
+For the shortest operational path, start with [QUICKSTART.md](QUICKSTART.md).
 
-Every concept is represented as structured data.
+Run the full validation suite:
 
-No free-form documents are required for automated processing.
-
----
-
-## 2. One Object = One File
-
-Every entity has its own JSON document.
-
-Examples:
-
-```
-techniques/hyde.json
-
-techniques/self-rag.json
-
-frameworks/spring-ai.json
-
-frameworks/langchain.json
-
-papers/crag-paper.json
+```bash
+make validate
 ```
 
-This minimizes merge conflicts and makes the repository Git-friendly.
+Regenerate the minimal fixture-derived graph export:
 
----
-
-## 3. Stable Identifiers
-
-Every object owns a stable identifier that never changes.
-
-Names may evolve.
-
-Identifiers do not.
-
----
-
-## 4. Extensibility
-
-The schema is designed to allow new fields without breaking compatibility.
-
-Older clients should continue to work correctly.
-
----
-
-## 5. Human Readable
-
-Although optimized for machines, every description should also be understandable by developers.
-
----
-
-## 6. Vendor Neutral
-
-This project is not tied to any company or framework.
-
-Spring AI
-
-LangChain
-
-LlamaIndex
-
-Haystack
-
-Semantic Kernel
-
-OpenAI
-
-Anthropic
-
-Google
-
-Azure AI
-
-are all first-class citizens.
-
----
-
-## 7. Citation Friendly
-
-Whenever possible, information should reference:
-
-- research papers
-- official documentation
-- RFCs
-- standards
-- academic publications
-
----
-
-## Repository Structure
-
-```
-metadata/
-
-schema/
-
-techniques/
-
-families/
-
-frameworks/
-
-patterns/
-
-components/
-
-papers/
-
-examples/
-
-evaluation/
-
-glossary/
-
-diagrams/
-
-images/
+```bash
+make graph-export
 ```
 
----
+## Repository Map
 
-## Versioning
+- `schema/`: specialized entity schemas and top-level schema contracts.
+- `schema/definitions/`: reusable schema definitions for shared concepts such as identity, metadata, descriptions, relationships, claims, evidence, and references.
+- `registries/`: controlled entity type and relationship type registries.
+- `docs/architecture/`: domain, entity, relationship, evidence, metadata, ontology, naming, versioning, and specialized model documentation.
+- `docs/maintenance/`: consumer guidance, maturity reporting, roadmap notes, graph export contract, repository map, and assistant handoff documentation.
+- `examples/fixtures/`: small validated examples that demonstrate valid schema shape and validation behavior.
+- `examples/graph-export/`: minimal graph nodes and edges derived from fixtures.
+- `data/`: small validated seed dataset for early consumer testing and inspection.
+- `scripts/`: validation, graph export, cockpit, automation, recovery, and maintenance scripts.
 
-The project follows Semantic Versioning.
+## Validation
 
+`make validate` is the primary repository health check.
+
+It checks:
+
+- schema validity
+- schema prerequisites
+- schema contracts
+- registries
+- fixture instances
+- data instances
+- graph export consistency
+- unit tests
+- documentation relationship usage
+- repository hygiene
+
+The validator is intentionally broad because RKM treats schemas, documentation, fixtures, data, registries, and graph export artifacts as connected parts of one model.
+
+## Release and Alpha Package
+
+Read the `v0.1.0-alpha` release notes in [docs/releases/v0.1.0-alpha.md](docs/releases/v0.1.0-alpha.md).
+
+Release history is tracked in [CHANGELOG.md](CHANGELOG.md), and release documentation is indexed in [docs/releases/README.md](docs/releases/README.md).
+
+The `v0.1.0-alpha` documentation package does not imply that a git tag exists. Maintainers should create a tag only when they intentionally decide to publish a tagged release.
+
+## Consumer Documentation
+
+Start with [docs/maintenance/consumer-guide.md](docs/maintenance/consumer-guide.md) to understand the current consumption contract, validation path, fixture package, seed dataset, graph export, stability expectations, and evolving areas.
+
+Spanish-speaking stakeholders can use [docs/maintenance/consumability-roadmap.es-AR.md](docs/maintenance/consumability-roadmap.es-AR.md) for a Spanish explanation of consumability goals and next steps.
+
+## Maturity and Limitations
+
+The current maturity assessment is documented in [docs/maintenance/maturity-report.md](docs/maintenance/maturity-report.md).
+
+RKM has a strong foundation: architecture documents, JSON Schemas, reusable definitions, registries, fixtures, seed data, graph export validation, and automation are in place.
+
+RKM is not yet level 4 maturity. The main gaps are dataset breadth, graph export expansion beyond the minimal fixture-derived path, deliberate release packaging, and clearer downstream loader guidance for graph databases, search indexes, vector stores, JSON document stores, and other consumers.
+
+Current limitations include:
+
+- The populated dataset is small.
+- The graph export is intentionally minimal and fixture-derived.
+- Compatibility expectations are suitable for internal alpha evaluation, not stable public adoption.
+- Loader-specific guidance is still limited.
+- The project is not a complete RAG ecosystem catalog.
+
+## Maintainer and Assistant Handoff
+
+Future maintainers and assistants should start with [docs/maintenance/assistant-handoff.md](docs/maintenance/assistant-handoff.md), then run the cockpit and validation commands before making changes.
+
+Useful commands:
+
+```bash
+make cockpit-summary N=5
+make validate
 ```
-Major.Minor.Patch
-```
 
-Examples
+The handoff documentation explains the current repository state, operating constraints, validation expectations, and next recommended maintenance steps.
 
-```
-1.0.0
+## Design Principles
 
-1.1.0
+RKM preserves these core design principles:
 
-2.0.0
-```
-
----
-
-## License
-
-Apache 2.0 (recommended)
-
----
-
-## Contributing
-
-Contributions should preserve:
-
-- schema consistency
-- naming consistency
-- citation quality
-- technical accuracy
-
----
+- Prefer structured information over prose-only descriptions.
+- Use stable identifiers as durable references.
+- Represent entities, relationships, claims, evidence, references, and metadata as first-class concepts.
+- Keep metadata separate from domain knowledge.
+- Use registries for controlled vocabularies.
+- Preserve vendor neutrality across frameworks, providers, tools, and ecosystems.
+- Keep repository content readable for humans and useful for automated processing.
+- Link important claims to evidence and references whenever support is available.
 
 ## Long-Term Vision
 
-The long-term objective is to become a structured reference dataset describing the RAG ecosystem.
+RKM is intended to become a structured reference dataset and graph foundation for the RAG ecosystem.
 
-Rather than documenting only algorithms, the project aims to model the entire Retrieval-Augmented Generation landscape, including:
-
-- retrieval techniques
-- query transformations
-- chunking strategies
-- embedding models
-- rerankers
-- vector databases
-- graph databases
-- evaluation methodologies
-- prompt engineering techniques
-- orchestration patterns
-- agent architectures
-- benchmark datasets
-- implementation examples
-- production best practices
-
-The repository is intentionally designed so that it can later be transformed into:
-
-- PostgreSQL JSONB
-- Neo4j
-- RDF
-- OWL
-- GraphQL
-- REST APIs
-- Vector Databases
-- Knowledge Graphs
-
-without requiring structural changes.
+The model is designed so future versions can support exports and loaders for systems such as graph databases, RDF or OWL tooling, JSON document stores, REST APIs, GraphQL APIs, vector databases, semantic search indexes, and RAG evaluation workflows without changing the core modeling assumptions.
