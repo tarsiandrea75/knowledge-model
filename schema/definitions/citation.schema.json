@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/citation.schema.json",
+  "title": "RKM Citation Definition",
+  "description": "Defines a structured citation that links a statement, claim or evidence record to a specific source location and support role.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "referenceId",
+    "supportRole",
+    "status"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "statement"
+      ]
+    },
+    {
+      "required": [
+        "claimIds"
+      ]
+    },
+    {
+      "required": [
+        "evidenceIds"
+      ]
+    },
+    {
+      "required": [
+        "relationshipIds"
+      ]
+    }
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable citation identifier.",
+      "pattern": "^CITATION-[0-9]{4,}$",
+      "examples": [
+        "CITATION-0001"
+      ]
+    },
+    "referenceId": {
+      "type": "string",
+      "description": "Reference used by this citation.",
+      "pattern": "^REFERENCE-[0-9]{4,}$"
+    },
+    "claimIds": {
+      "type": "array",
+      "description": "Claims that this citation is used to support, contradict, qualify or contextualize.",
+      "items": {
+        "type": "string",
+        "pattern": "^CLAIM-[0-9]{4,}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "evidenceIds": {
+      "type": "array",
+      "description": "Evidence records that interpret this citation.",
+      "items": {
+        "type": "string",
+        "pattern": "^EVIDENCE-[0-9]{4,}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "relationshipIds": {
+      "type": "array",
+      "description": "Relationships for which this citation provides source attribution.",
+      "items": {
+        "type": "string",
+        "pattern": "^RELATIONSHIP-[0-9]{4,}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "statement": {
+      "type": "string",
+      "description": "Statement or assertion boundary that the citation is attached to.",
+      "minLength": 10
+    },
+    "supportRole": {
+      "$ref": "#/$defs/supportRole"
+    },
+    "location": {
+      "$ref": "#/$defs/citationLocation"
+    },
+    "retrievalContext": {
+      "$ref": "#/$defs/retrievalContext"
+    },
+    "quality": {
+      "$ref": "#/$defs/citationQuality"
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Maintainer explanation of how the cited source relates to the statement.",
+      "minLength": 10
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycleStatus"
+    },
+    "notes": {
+      "type": "array",
+      "description": "Maintainer notes about the citation boundary, interpretation or review status.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "metadata": {
+      "$ref": "metadata.schema.json"
+    }
+  },
+  "$defs": {
+    "supportRole": {
+      "type": "string",
+      "description": "How the cited source is used in relation to the cited statement.",
+      "enum": [
+        "Supports",
+        "Contradicts",
+        "Qualifies",
+        "Contextualizes",
+        "Defines",
+        "Introduces",
+        "Evaluates",
+        "Reports",
+        "Implements",
+        "Explains"
+      ]
+    },
+    "citationLocation": {
+      "type": "object",
+      "description": "Specific location of the cited material within the source.",
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "paragraph": {
+          "type": "string",
+          "minLength": 1
+        },
+        "table": {
+          "type": "string",
+          "minLength": 1
+        },
+        "figure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appendix": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repositoryPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "minLength": 7
+        },
+        "urlFragment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "datasetRecordId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "benchmarkTask": {
+          "type": "string",
+          "minLength": 1
+        },
+        "traceSpanId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retrievedPassageId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "retrievalContext": {
+      "type": "object",
+      "description": "RAG workflow context in which the citation was retrieved, selected, emitted or evaluated.",
+      "additionalProperties": false,
+      "properties": {
+        "queryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retrievalRunId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retrievalScore": {
+          "type": "number"
+        },
+        "wasRetrieved": {
+          "type": "boolean"
+        },
+        "wasIncludedInContext": {
+          "type": "boolean"
+        },
+        "wasCitedInAnswer": {
+          "type": "boolean"
+        },
+        "generatorArtifactId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluationArtifactId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "citationQuality": {
+      "type": "object",
+      "description": "Reviewable quality signals for the citation.",
+      "additionalProperties": false,
+      "properties": {
+        "sourceRelevance": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "sourceAuthority": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "locationPrecision": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "attributionFaithfulness": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "claimCoverage": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "sourceFreshness": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "sourceAccessibility": {
+          "$ref": "#/$defs/qualityRating"
+        },
+        "contextSufficiency": {
+          "$ref": "#/$defs/qualityRating"
+        }
+      }
+    },
+    "qualityRating": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Unknown"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Deprecated",
+        "Archived"
+      ],
+      "default": "Draft"
+    }
+  }
+}
