@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/model.schema.json",
+  "title": "RKM Embedded Model Fragment Definition",
+  "description": "Defines a reusable embedded model fragment for machine learning model capabilities represented inside first-class RKM entities. This schema does not provide the full knowledge entity envelope for a Model: it intentionally omits first-class identity, metadata, description and top-level relationships. RKM currently represents first-class model entities through specialized schemas such as Language Model, Embedding Model and Reranker.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "modelRole",
+    "modelKind",
+    "inputModalities",
+    "outputModalities"
+  ],
+  "properties": {
+    "modelId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded model fragment within the containing entity, workflow, benchmark, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable model name.",
+      "minLength": 1
+    },
+    "modelRole": {
+      "$ref": "#/$defs/modelRole"
+    },
+    "modelKind": {
+      "$ref": "#/$defs/modelKind"
+    },
+    "inputModalities": {
+      "type": "array",
+      "description": "Modalities consumed by the model.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modality"
+      },
+      "uniqueItems": true
+    },
+    "outputModalities": {
+      "type": "array",
+      "description": "Modalities produced by the model.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modality"
+      },
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Reusable capabilities exposed by the model.",
+      "items": {
+        "$ref": "capability.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "provider": {
+      "$ref": "entity-reference.schema.json"
+    },
+    "access": {
+      "$ref": "#/$defs/accessProfile"
+    },
+    "deployment": {
+      "$ref": "deployment-context.schema.json"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluationProfile"
+    },
+    "operationalCharacteristics": {
+      "$ref": "#/$defs/operationalCharacteristics"
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Embedded limitations that affect model selection, use, evaluation or governance.",
+      "items": {
+        "$ref": "limitation.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare model behavior, quality, cost, access, safety or limitations.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the model boundary, behavior or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the model.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "modelRole": {
+      "type": "string",
+      "description": "Primary RAG role served by the model.",
+      "enum": [
+        "Embedding",
+        "Generation",
+        "Reranking",
+        "Classification",
+        "Relevance Judging",
+        "Query Rewriting",
+        "Context Compression",
+        "Tool Use",
+        "Planning",
+        "Evaluation",
+        "Multimodal Understanding",
+        "Other"
+      ]
+    },
+    "modelKind": {
+      "type": "string",
+      "description": "General model family or implementation kind.",
+      "enum": [
+        "Language Model",
+        "Embedding Model",
+        "Reranker",
+        "Cross Encoder",
+        "Bi Encoder",
+        "Sparse Encoder",
+        "Multimodal Model",
+        "Classifier",
+        "Learning To Rank Model",
+        "Rule Based Scorer",
+        "Other"
+      ]
+    },
+    "modality": {
+      "type": "string",
+      "description": "Input or output modality.",
+      "enum": [
+        "Text",
+        "Code",
+        "Image",
+        "Audio",
+        "Video",
+        "Table",
+        "Graph",
+        "Vector",
+        "Structured Data",
+        "Tool Call",
+        "Multimodal",
+        "Other"
+      ]
+    },
+    "accessProfile": {
+      "type": "object",
+      "description": "How the model can be accessed or used.",
+      "additionalProperties": false,
+      "properties": {
+        "accessModes": {
+          "type": "array",
+          "description": "Supported access modes for the model.",
+          "items": {
+            "$ref": "#/$defs/accessMode"
+          },
+          "uniqueItems": true
+        },
+        "releaseChannel": {
+          "type": "string",
+          "description": "Named release channel, availability tier or stability track.",
+          "minLength": 1
+        },
+        "license": {
+          "type": "string",
+          "description": "License, usage terms or access agreement that materially affects model use.",
+          "minLength": 1
+        },
+        "versionLabel": {
+          "type": "string",
+          "description": "Version, checkpoint, model card label or hosted model identifier.",
+          "minLength": 1
+        }
+      }
+    },
+    "accessMode": {
+      "type": "string",
+      "description": "Mechanism by which the model is made available.",
+      "enum": [
+        "Hosted API",
+        "Managed Service",
+        "Open Weights",
+        "Local Deployment",
+        "Fine Tuning Endpoint",
+        "Research Release",
+        "Private Preview",
+        "Other"
+      ]
+    },
+    "evaluationProfile": {
+      "type": "object",
+      "description": "Evaluation context used to interpret model behavior or compare alternatives.",
+      "additionalProperties": false,
+      "properties": {
+        "benchmarks": {
+          "type": "array",
+          "description": "Benchmark entities used to evaluate the model.",
+          "items": {
+            "$ref": "entity-reference.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "datasets": {
+          "type": "array",
+          "description": "Dataset entities used to evaluate or characterize the model.",
+          "items": {
+            "$ref": "entity-reference.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "metrics": {
+          "type": "array",
+          "description": "Evaluation metric entities or named measures used in the evaluation context.",
+          "items": {
+            "$ref": "entity-reference.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "taskScope": {
+          "type": "string",
+          "description": "Task, corpus, workflow or configuration scope to which evaluation claims apply.",
+          "minLength": 1
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational properties that affect model selection or evidence interpretation.",
+      "additionalProperties": false,
+      "properties": {
+        "contextWindowTokens": {
+          "type": "integer",
+          "description": "Maximum supported context window in tokens when applicable.",
+          "minimum": 1
+        },
+        "embeddingDimensions": {
+          "type": "integer",
+          "description": "Number of embedding dimensions produced by the model when applicable.",
+          "minimum": 1
+        },
+        "latencyProfile": {
+          "type": "string",
+          "description": "Observed or expected latency behavior for a stated workload.",
+          "minLength": 1
+        },
+        "costProfile": {
+          "$ref": "cost.schema.json"
+        },
+        "safetyProfile": {
+          "type": "string",
+          "description": "Safety, policy or guardrail characteristics relevant to model use.",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
