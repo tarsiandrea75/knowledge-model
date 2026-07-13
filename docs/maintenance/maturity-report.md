@@ -6,9 +6,9 @@ RAG Knowledge Model is currently around **3.5 / 5** overall maturity.
 
 It is no longer an exploratory prototype. The repository has a coherent conceptual model, a broad schema foundation, validation discipline, automation, recovery tooling, registry checks, and an operational workflow. It should be treated as a strong foundation and production-oriented repository system.
 
-It is not yet a finished consumable product. The first minimal fixture-derived graph export now exists and is checked during validation, and the first small populated dataset now exists under `data/`. The first internal alpha release documentation for `v0.1.0-alpha` also exists, which improves release readiness slightly by making scope, commands, limitations, and consumer expectations explicit. The populated knowledge base is still thin. The repository still needs broader dataset coverage, intentional tagging, richer release packaging, and clearer downstream usage guidance before it can be adopted easily by people outside the immediate project.
+It is not yet a finished consumable product. The first minimal fixture-derived graph export now exists and is checked during validation, and the first small populated dataset now exists under `data/`. Post-alpha work on `main` also includes a deterministic data graph export for the validated seed dataset. The first internal alpha release documentation for `v0.1.0-alpha` exists, which improves release readiness slightly by making scope, commands, limitations, and consumer expectations explicit. The populated knowledge base is still thin. The repository still needs broader dataset coverage, richer release packaging, and clearer downstream usage guidance before it can be adopted easily by people outside the immediate project.
 
-`make validate` now checks schema validity, fixture instance validity, data instance validity, and graph export consistency.
+`make validate` now checks schema validity, fixture instance validity, data instance validity, fixture graph export consistency, and data graph export consistency.
 
 ## Scale
 
@@ -29,7 +29,7 @@ The maturity scale used here is:
 | Validation discipline | 4.0 / 5 | Validation covers schemas, schema prerequisites, schema contracts, registries, fixture instances, data instances, graph export consistency, and documentation relationship usage. Validation is part of normal operation rather than a late manual step. |
 | Automation | 3.7 / 5 | The repository has cockpit summaries, autopilot, autocycle, safe push, recovery planning, budget guardrails, force mode, budget grace, working target caps, and validated commit automation. |
 | Populated data/content | 2.1 / 5 | The model foundation is stronger than the actual populated knowledge base. RKM now has a first seed dataset with three validated RAG technique records, but still needs broader representative entities, claims, evidence, references, and examples. |
-| Consumability | 3.1 / 5 | Maintainers can work with the repo, and early consumers can inspect validated fixtures, a first seed dataset, and a minimal graph export. Outside consumers still need richer data, loading guidance, release packaging, and expanded export documentation. |
+| Consumability | 3.2 / 5 | Maintainers can work with the repo, and early consumers can inspect validated fixtures, a first seed dataset, a minimal fixture graph export, and a minimal data graph export. Outside consumers still need richer data, loading guidance, release packaging, and expanded export documentation. |
 | Release readiness | 3.0 / 5 | The repository can be validated and operated, and first alpha release documentation now describes scope, validation, limitations, and expected use. It still needs an intentional git tag, stronger compatibility policy, versioned examples, and downstream integration guidance. |
 
 ## Why RKM Is No Longer Level 2
@@ -45,6 +45,7 @@ RKM has moved beyond prototype maturity because the project now has:
 - Fixture instance validation.
 - Data instance validation for the first seed dataset.
 - Minimal fixture-derived graph export generation and consistency checks.
+- Minimal data graph export generation and consistency checks for the validated seed dataset.
 - A Makefile-based operational surface.
 - Cockpit summary and next-action automation.
 - Autopilot and autocycle flows.
@@ -107,7 +108,7 @@ Without richer representative examples and broader populated data, it is difficu
 
 **Minimal graph export scope**
 
-RKM now has a first minimal fixture-derived graph export, and validation checks that it stays consistent with the committed fixtures. Consumers still need expanded export coverage, documented semantics for broader content, and clearer guidance for loading the export into graph tooling.
+RKM now has a first minimal fixture-derived graph export and a first minimal data graph export. Validation checks that both stay consistent with their source files. Consumers still need expanded export coverage, documented semantics for broader content, and clearer guidance for loading the export into graph tooling.
 
 **Budget and automation complexity**
 
@@ -123,10 +124,10 @@ The project combines ontology design, JSON Schema, repository automation, valida
 2. Expand fixtures so they demonstrate richer valid entity, relationship, claim, evidence, reference, and graph export cases.
 3. Add a consumer quickstart that explains how to validate, load, inspect, and regenerate the minimal export.
 4. Use the `v0.1.0-alpha` internal package documentation to collect feedback, then prepare an intentionally tagged release when the package is ready for that step.
-5. Expand the graph export beyond the current minimal fixture-derived contract, including clearer node, edge, identifier, label, predicate, evidence link, reference, and provenance semantics.
+5. Expand the graph exports beyond the current minimal fixture-derived and seed-data provenance contracts, including clearer node, edge, identifier, label, predicate, evidence link, reference, and provenance semantics.
 6. Add documentation that explains the difference between architecture, schemas, definitions, registries, examples, fixtures, graph export, and populated knowledge data.
 7. Expand populated content in small validated increments, prioritizing representative coverage over volume.
 
 ## Current Bottom Line
 
-RKM is a validated and automated foundation for a structured RAG knowledge model, with a first minimal graph export already generated from fixtures, a first small seed dataset checked by validation, and first internal alpha release documentation for `v0.1.0-alpha`. Its next maturity step is not proving that populated data can exist. The next gap is dataset breadth, intentional release tagging, graph export expansion beyond fixtures, and clearer downstream consumption guidance.
+RKM is a validated and automated foundation for a structured RAG knowledge model, with a first minimal graph export generated from fixtures, a first small seed dataset checked by validation, a post-alpha data graph export generated from that seed dataset, and first internal alpha release documentation for `v0.1.0-alpha`. Its next maturity step is not proving that populated data can exist. The next gap is dataset breadth, release packaging, graph export expansion beyond minimal provenance, and clearer downstream consumption guidance.

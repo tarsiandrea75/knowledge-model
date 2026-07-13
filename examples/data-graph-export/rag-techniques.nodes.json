@@ -1,0 +1,95 @@
+[
+  {
+    "id": "SCHEMA-RAG_TECHNIQUE",
+    "type": "Schema",
+    "label": "schema/rag-technique.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/rag-technique.schema.json",
+      "schemaPath": "schema/rag-technique.schema.json",
+      "title": "RKM RAG Technique Schema"
+    }
+  },
+  {
+    "id": "TECHNIQUE-10001",
+    "type": "Technique",
+    "label": "Hybrid Retrieval",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "keywords": [
+        "keyword retrieval",
+        "semantic retrieval",
+        "rank fusion"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Retrieval",
+        "Context Assembly"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "hybrid-retrieval",
+      "status": "Draft",
+      "summary": "Hybrid Retrieval combines complementary retrieval signals so a RAG system can search with more than one matching strategy.",
+      "techniqueFamily": "Hybrid Retrieval",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "TECHNIQUE-10002",
+    "type": "Technique",
+    "label": "Query Rewriting",
+    "sourceDataFile": "data/rag-techniques/query-rewriting.json",
+    "properties": {
+      "keywords": [
+        "query transformation",
+        "query expansion",
+        "retrieval query"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Query Understanding",
+        "Retrieval"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "query-rewriting",
+      "status": "Draft",
+      "summary": "Query Rewriting changes a user query before retrieval so the retrieval step can search with a clearer or more targeted request.",
+      "techniqueFamily": "Query Transformation",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "TECHNIQUE-10003",
+    "type": "Technique",
+    "label": "Reranking",
+    "sourceDataFile": "data/rag-techniques/reranking.json",
+    "properties": {
+      "keywords": [
+        "candidate ranking",
+        "retrieval refinement",
+        "cross encoder"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Reranking",
+        "Context Assembly"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "reranking",
+      "status": "Draft",
+      "summary": "Reranking reorders retrieved candidates before context assembly so the RAG pipeline can prioritize more relevant context.",
+      "techniqueFamily": "Reranking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  }
+]

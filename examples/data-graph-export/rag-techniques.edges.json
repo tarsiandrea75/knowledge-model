@@ -1,0 +1,38 @@
+[
+  {
+    "id": "EDGE-TECHNIQUE-10001-VALIDATED_BY_SCHEMA-SCHEMA-RAG_TECHNIQUE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "TECHNIQUE-10001",
+    "targetId": "SCHEMA-RAG_TECHNIQUE",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/rag-technique.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-TECHNIQUE-10002-VALIDATED_BY_SCHEMA-SCHEMA-RAG_TECHNIQUE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "TECHNIQUE-10002",
+    "targetId": "SCHEMA-RAG_TECHNIQUE",
+    "sourceDataFile": "data/rag-techniques/query-rewriting.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/rag-technique.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-TECHNIQUE-10003-VALIDATED_BY_SCHEMA-SCHEMA-RAG_TECHNIQUE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "TECHNIQUE-10003",
+    "targetId": "SCHEMA-RAG_TECHNIQUE",
+    "sourceDataFile": "data/rag-techniques/reranking.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/rag-technique.schema.json"
+    }
+  }
+]

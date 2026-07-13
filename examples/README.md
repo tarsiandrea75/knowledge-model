@@ -8,6 +8,7 @@ The examples are intentionally compact. They show the shape of RKM artifacts wit
 
 - `fixtures/`: minimal JSON fixtures for entity, relationship, claim, evidence, and reference consumption.
 - `graph-export/`: reproducible nodes and edges generated from the minimal fixtures.
+- `data-graph-export/`: reproducible nodes and edges generated from the validated seed dataset under `data/`.
 
 ## Validation
 
@@ -33,6 +34,6 @@ Stable for consumers:
 Still evolving:
 
 - fixture package layout
-- graph export coverage beyond the minimal fixture package
+- graph export coverage beyond the minimal fixture package and current seed data
 - content coverage across the RAG ecosystem
 - additional consumer tooling for validating example packages as a group

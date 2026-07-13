@@ -14,7 +14,7 @@ The current package is `v0.1.0-alpha`.
 
 This alpha package is intended for internal evaluation, onboarding, and consumer feedback. It contains a strong foundation, but it should not be treated as a stable public API, production dependency, or comprehensive RAG knowledge base.
 
-The package currently includes schemas, fixtures, seed data, a minimal graph export, validation commands, and documentation for consumers, maintainers, and future assistants.
+The package currently includes schemas, fixtures, seed data, a minimal fixture graph export, validation commands, and documentation for consumers, maintainers, and future assistants. Post-alpha work on `main` also includes a seed-data graph export under `examples/data-graph-export/`.
 
 ## What RKM Currently Includes
 
@@ -22,6 +22,7 @@ The package currently includes schemas, fixtures, seed data, a minimal graph exp
 - Validated fixtures under `examples/fixtures/`.
 - Validated seed dataset under `data/`.
 - Minimal fixture-derived graph export under `examples/graph-export/`.
+- Post-alpha seed-data graph export under `examples/data-graph-export/`.
 - Validation pipeline through `make validate`.
 - Consumer, release, maturity, roadmap, and assistant handoff documentation.
 
@@ -41,6 +42,12 @@ Regenerate the minimal fixture-derived graph export:
 make graph-export
 ```
 
+Regenerate the post-alpha seed-data graph export:
+
+```bash
+make data-graph-export
+```
+
 ## Repository Map
 
 - `schema/`: specialized entity schemas and top-level schema contracts.
@@ -50,6 +57,7 @@ make graph-export
 - `docs/maintenance/`: consumer guidance, maturity reporting, roadmap notes, graph export contract, repository map, and assistant handoff documentation.
 - `examples/fixtures/`: small validated examples that demonstrate valid schema shape and validation behavior.
 - `examples/graph-export/`: minimal graph nodes and edges derived from fixtures.
+- `examples/data-graph-export/`: graph nodes and edges derived from the validated seed dataset.
 - `data/`: small validated seed dataset for early consumer testing and inspection.
 - `scripts/`: validation, graph export, cockpit, automation, recovery, and maintenance scripts.
 
@@ -65,7 +73,7 @@ It checks:
 - registries
 - fixture instances
 - data instances
-- graph export consistency
+- fixture and data graph export consistency
 - unit tests
 - documentation relationship usage
 - repository hygiene
@@ -97,7 +105,7 @@ RKM is not yet level 4 maturity. The main gaps are dataset breadth, graph export
 Current limitations include:
 
 - The populated dataset is small.
-- The graph export is intentionally minimal and fixture-derived.
+- The graph exports are intentionally minimal. The fixture export is pedagogical, and the seed-data export is early post-alpha work.
 - Compatibility expectations are suitable for internal alpha evaluation, not stable public adoption.
 - Loader-specific guidance is still limited.
 - The project is not a complete RAG ecosystem catalog.

@@ -33,9 +33,9 @@ Use these documents together:
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
-For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and the first minimal fixture-derived graph export exists, but external users still need a small real dataset, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
+For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and graph export paths now exist for both fixtures and seed data, but external users still need broader real data, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
 
-When discussing consumability, onboarding, release scope, or alpha packaging, inspect `QUICKSTART.md` and `docs/releases/v0.1.0-alpha.md` before answering. These files define the current internal alpha consumption path, validation commands, release limitations, and the fact that `v0.1.0-alpha` is documentation for an internal package rather than an automatically created git tag.
+When discussing consumability, onboarding, release scope, or alpha packaging, inspect `QUICKSTART.md` and `docs/releases/v0.1.0-alpha.md` before answering. `v0.1.0-alpha` has already been tagged. Do not confuse that already tagged alpha with post-alpha changes on `main`, such as the data graph export.
 
 ## Repository Discipline
 
@@ -74,11 +74,18 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` is the standard validation entry point.
 
-`make validate` checks schema validity, fixture instance validity, data instance validity, and graph export consistency. New assistants should know that data validation and graph export are already wired into validation, so malformed populated data or stale fixture-derived export files are validation failures rather than optional cleanup.
+`make validate` checks schema validity, fixture instance validity, data instance validity, fixture graph export consistency, and data graph export consistency. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data or stale export files are validation failures rather than optional cleanup.
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
 Fixtures and populated data serve different purposes. `examples/fixtures/` contains minimal pedagogical examples and validation fixtures. `data/` contains the first small populated knowledge dataset for consumer testing and release packaging. Do not describe fixtures as the real dataset, and do not describe the seed dataset as a complete RAG catalog.
+
+There are now two graph export paths:
+
+- `make graph-export` generates `examples/graph-export/` from the fixture package.
+- `make data-graph-export` generates `examples/data-graph-export/` from validated seed data declared in `data/manifest.json`.
+
+Keep these paths distinct. The fixture graph export is pedagogical and minimal. The data graph export is post-alpha work on `main` and is derived from the real seed dataset.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
@@ -134,20 +141,20 @@ RKM is a strong foundation and production-oriented repository system, but it is 
 
 Current maturity is approximately:
 
-- Overall maturity: 3.4 / 5
+- Overall maturity: 3.5 / 5
 - Conceptual and model maturity: 3.3 / 5
 - Tooling and automation maturity: 3.7 / 5
-- Consumability maturity: 3.0 / 5
+- Consumability maturity: 3.2 / 5
 - Populated knowledge base maturity: 2.1 / 5
-- Release readiness: 2.7 / 5
+- Release readiness: 3.0 / 5
 
-The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, plus a first small seed dataset checked during validation. The project still needs broader populated data, richer examples, a release package, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
+The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, a first small seed dataset checked during validation, and a post-alpha data graph export generated from that seed dataset. The project still needs broader populated data, richer examples, release packaging, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
 
 ## Known Patterns and Hardening History
 
 The schema contract validator catches recurring semantic schema mistakes, not only syntax errors.
 
-Fixture validation, data validation, and graph export consistency checks are part of the normal validation path. Treat the committed minimal graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
+Fixture validation, data validation, and graph export consistency checks are part of the normal validation path. Treat the committed fixture graph export as a generated contract artifact derived from fixtures, not as a complete production-grade export. Treat the committed data graph export as a generated contract artifact derived from `data/manifest.json`, not as a complete production-grade export. Treat `data/` as populated sample knowledge content, not as a complete ecosystem catalog.
 
 Recurring mistakes that have been hardened include:
 
@@ -196,6 +203,6 @@ The next natural work should improve consumability:
 - Broaden the first small seed dataset with representative populated content.
 - Add richer examples and fixtures that demonstrate valid entities, relationships, claims, evidence, references, and graph export behavior.
 - Add release documentation, release packaging, and consumer-oriented guides.
-- Expand the current minimal graph export so the model can be consumed more broadly outside the repository.
+- Expand the current minimal graph exports so the model can be consumed more broadly outside the repository.
 - Keep schema expansion disciplined so embedded reusable concepts do not drift into implicit entity models.
 - Continue using validation and cockpit output as the source of truth for readiness.

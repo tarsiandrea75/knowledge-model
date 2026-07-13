@@ -48,16 +48,18 @@ Data validation is driven by `data/manifest.json`, which maps each data file to 
 make data-validate
 ```
 
-## Minimal Graph Export
+## Graph Exports
 
-The same fixture package can be exported to a minimal graph representation under `examples/graph-export/`. The current graph export is intentionally minimal and fixture-derived. It proves the first export contract path and validation wiring, but it is not a complete or production-grade graph product.
+RKM currently has two deterministic graph export paths.
 
-The graph export is derived from the committed fixtures. It contains:
+The fixture package can be exported to a minimal graph representation under `examples/graph-export/`. The fixture graph export is intentionally minimal and pedagogical. It proves the first export contract path and validation wiring, but it is not the populated seed dataset.
+
+The fixture graph export is derived from the committed fixtures. It contains:
 
 - `minimal-graph.nodes.json`: a deterministic array of graph nodes.
 - `minimal-graph.edges.json`: a deterministic array of graph edges.
 
-Generate the export from the project root:
+Generate the fixture graph export from the project root:
 
 ```bash
 make graph-export
@@ -69,7 +71,21 @@ Check that the committed export still matches the fixtures:
 python3 scripts/export-fixtures-graph.py --check
 ```
 
-The repository validator runs this consistency check, so stale graph export files fail `make validate`.
+The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, and provenance edges that state which schema validates each record. It does not invent RAG domain relationships that are not present in the seed data.
+
+Generate the data graph export from the project root:
+
+```bash
+make data-graph-export
+```
+
+Check that the committed data graph export still matches the seed dataset:
+
+```bash
+python3 scripts/export-data-graph.py --check
+```
+
+The repository validator runs both consistency checks, so stale graph export files fail `make validate`.
 
 ## How To Validate
 
@@ -91,7 +107,8 @@ This runs schema validity checks, fixture instance validity checks, data instanc
 - registry validation
 - fixture instance validation using `examples/fixtures/fixture-manifest.json`
 - data instance validation using `data/manifest.json`
-- graph export consistency validation using `scripts/export-fixtures-graph.py --check`
+- fixture graph export consistency validation using `scripts/export-fixtures-graph.py --check`
+- data graph export consistency validation using `scripts/export-data-graph.py --check`
 - RKM unit tests
 - documentation relationship validation
 
@@ -99,10 +116,16 @@ Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fix
 
 Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema.
 
-Graph export generation is handled by:
+Fixture graph export generation is handled by:
 
 ```bash
 make graph-export
+```
+
+Data graph export generation is handled by:
+
+```bash
+make data-graph-export
 ```
 
 Graph export consistency is checked by:
@@ -130,14 +153,14 @@ The following contracts are stable enough for early consumers:
 - Evidence links to references through `referenceIds`.
 - Metadata is separated from domain knowledge.
 - Registries define controlled entity and relationship vocabularies.
-- The minimal graph export uses stable IDs as node IDs and edge endpoints.
+- The graph exports use stable IDs as node IDs and edge endpoints.
 
 ## What Is Still Evolving
 
 The following areas are still expected to change as RKM becomes more consumable:
 
 - package-level schemas for example bundles
-- graph export coverage beyond the first minimal contract
+- graph export coverage beyond the first fixture contract and the current seed-data provenance export
 - fixture coverage beyond the minimal package
 - populated dataset breadth beyond the first three RAG techniques
 - release packaging and version compatibility policy

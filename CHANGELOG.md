@@ -4,7 +4,9 @@ All notable changes to RAG Knowledge Model are documented in this file.
 
 ## Unreleased
 
-- No released changes yet after `v0.1.0-alpha`.
+### Added
+
+- Deterministic data graph export for the validated seed dataset under `data/`, exposed through `make data-graph-export` and checked by `make validate`.
 
 ## v0.1.0-alpha - 2026-07-13
 

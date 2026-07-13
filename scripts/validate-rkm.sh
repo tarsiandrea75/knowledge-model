@@ -236,10 +236,15 @@ start_step "Running data instance validation..."
 "$PYTHON_BIN" scripts/validate-data.py
 pass_step
 
-start_step "Running graph export validation..."
+start_step "Running fixture graph export validation..."
 "$PYTHON_BIN" scripts/export-fixtures-graph.py --check
 pass_step
-printf 'Graph export validation passed.\n'
+printf 'Fixture graph export validation passed.\n'
+
+start_step "Running data graph export validation..."
+"$PYTHON_BIN" scripts/export-data-graph.py --check
+pass_step
+printf 'Data graph export validation passed.\n'
 
 start_step "Running RKM unit tests..."
 bash scripts/rkm-unit-tests.sh
