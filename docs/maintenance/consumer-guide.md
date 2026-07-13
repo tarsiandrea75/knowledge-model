@@ -26,6 +26,29 @@ EVIDENCE-9001 derived from REFERENCE-9001
 
 `COMPONENT-9001` is intentionally referenced but not expanded into a full component entity in this package. This keeps the first fixture small while showing that RKM relationships can point to stable identifiers outside the current fixture set.
 
+## Minimal Graph Export
+
+The same fixture package can be exported to a minimal graph representation under `examples/graph-export/`.
+
+The graph export is derived from the committed fixtures. It contains:
+
+- `minimal-graph.nodes.json`: a deterministic array of graph nodes.
+- `minimal-graph.edges.json`: a deterministic array of graph edges.
+
+Generate the export from the project root:
+
+```bash
+make graph-export
+```
+
+Check that the committed export still matches the fixtures:
+
+```bash
+python3 scripts/export-fixtures-graph.py --check
+```
+
+The repository validator runs this check, so stale graph export files fail `make validate`.
+
 ## How To Validate
 
 Run repository validation from the project root:
@@ -45,6 +68,7 @@ This runs:
 - schema contract validation
 - registry validation
 - fixture instance validation using `examples/fixtures/fixture-manifest.json`
+- graph export validation using `scripts/export-fixtures-graph.py --check`
 - RKM unit tests
 - documentation relationship validation
 
@@ -69,13 +93,14 @@ The following contracts are stable enough for early consumers:
 - Evidence links to references through `referenceIds`.
 - Metadata is separated from domain knowledge.
 - Registries define controlled entity and relationship vocabularies.
+- The minimal graph export uses stable IDs as node IDs and edge endpoints.
 
 ## What Is Still Evolving
 
 The following areas are still expected to change as RKM becomes more consumable:
 
 - package-level schemas for example bundles
-- graph export contracts
+- graph export coverage beyond the first minimal contract
 - fixture coverage beyond the minimal package
 - release packaging and version compatibility policy
 - loader-specific guidance for databases, search indexes, and graph stores

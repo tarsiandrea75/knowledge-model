@@ -58,4 +58,7 @@ printf '==> Running validate-schema-contracts self-test\n'
 printf '==> Running validate-fixtures self-test\n'
 "$PYTHON_BIN" scripts/validate-fixtures.py --self-test
 
+printf '==> Running export-fixtures-graph self-test\n'
+"$PYTHON_BIN" scripts/export-fixtures-graph.py --self-test
+
 printf 'SUCCESS: RKM unit tests passed.\n'

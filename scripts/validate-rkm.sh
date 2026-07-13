@@ -232,6 +232,11 @@ start_step "Running fixture instance validation..."
 "$PYTHON_BIN" scripts/validate-fixtures.py
 pass_step
 
+start_step "Running graph export validation..."
+"$PYTHON_BIN" scripts/export-fixtures-graph.py --check
+pass_step
+printf 'Graph export validation passed.\n'
+
 start_step "Running RKM unit tests..."
 bash scripts/rkm-unit-tests.sh
 pass_step

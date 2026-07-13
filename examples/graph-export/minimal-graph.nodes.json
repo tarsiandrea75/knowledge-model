@@ -1,0 +1,78 @@
+[
+  {
+    "id": "CLAIM-9001",
+    "type": "Claim",
+    "label": "Hybrid Retrieval can improve retrieval coverage by combining lexical and semantic retrieval signals.",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "claimType": "Interpretive",
+      "confidence": "Medium",
+      "objectValue": "Improved retrieval coverage from complementary retrieval signals",
+      "predicate": "HAS_ADVANTAGE",
+      "status": "Draft",
+      "subjectId": "TECHNIQUE-9001",
+      "subjectType": "Entity"
+    }
+  },
+  {
+    "id": "COMPONENT-9001",
+    "type": "Component",
+    "label": "retriever",
+    "sourceFixture": "examples/fixtures/minimal-relationship.json",
+    "properties": {
+      "introducedByRelationship": "RELATIONSHIP-9001",
+      "slug": "retriever",
+      "status": "Referenced Endpoint"
+    }
+  },
+  {
+    "id": "EVIDENCE-9001",
+    "type": "Evidence",
+    "label": "The referenced OpenSearch documentation describes hybrid search as combining lexical and semantic search techniques.",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "confidence": "Medium",
+      "role": "Supports",
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-9001",
+          "section": "Hybrid search",
+          "locator": "https://docs.opensearch.org/docs/latest/vector-search/ai-search/hybrid-search/"
+        }
+      ],
+      "status": "Draft",
+      "strength": "Moderate"
+    }
+  },
+  {
+    "id": "REFERENCE-9001",
+    "type": "Reference",
+    "label": "Hybrid search",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "abstract": "The documentation describes hybrid search as combining lexical and semantic search techniques for retrieval.",
+      "accessedAt": "2026-07-13",
+      "citation": "OpenSearch Project. Hybrid search. OpenSearch documentation.",
+      "publisher": "OpenSearch Project",
+      "sourcePriority": "Primary",
+      "sourceType": "Official Documentation",
+      "url": "https://docs.opensearch.org/docs/latest/vector-search/ai-search/hybrid-search/"
+    }
+  },
+  {
+    "id": "TECHNIQUE-9001",
+    "type": "Technique",
+    "label": "Hybrid Retrieval",
+    "sourceFixture": "examples/fixtures/minimal-rag-technique.json",
+    "properties": {
+      "ragStage": [
+        "Retrieval",
+        "Context Assembly"
+      ],
+      "slug": "hybrid-retrieval",
+      "status": "Draft",
+      "summary": "Hybrid Retrieval combines lexical and vector retrieval so a RAG system can use exact term matching and semantic similarity together.",
+      "techniqueFamily": "Hybrid Retrieval"
+    }
+  }
+]

@@ -1,0 +1,60 @@
+[
+  {
+    "id": "EDGE-CLAIM-9001-CITES-REFERENCE-9001",
+    "predicate": "CITES",
+    "sourceId": "CLAIM-9001",
+    "targetId": "REFERENCE-9001",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "linkSource": "claim.referenceIds"
+    }
+  },
+  {
+    "id": "EDGE-EVIDENCE-9001-REFERENCES-REFERENCE-9001",
+    "predicate": "REFERENCES",
+    "sourceId": "EVIDENCE-9001",
+    "targetId": "REFERENCE-9001",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "linkSource": "evidence.referenceIds"
+    }
+  },
+  {
+    "id": "EDGE-EVIDENCE-9001-SUPPORTS-CLAIM-9001",
+    "predicate": "SUPPORTS",
+    "sourceId": "EVIDENCE-9001",
+    "targetId": "CLAIM-9001",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "linkSource": "claim.evidenceIds"
+    }
+  },
+  {
+    "id": "EDGE-TECHNIQUE-9001-HAS_ADVANTAGE-CLAIM-9001",
+    "predicate": "HAS_ADVANTAGE",
+    "sourceId": "TECHNIQUE-9001",
+    "targetId": "CLAIM-9001",
+    "sourceFixture": "examples/fixtures/minimal-claim-with-evidence.json",
+    "properties": {
+      "claimType": "Interpretive",
+      "confidence": "Medium",
+      "objectValue": "Improved retrieval coverage from complementary retrieval signals",
+      "statement": "Hybrid Retrieval can improve retrieval coverage by combining lexical and semantic retrieval signals."
+    }
+  },
+  {
+    "id": "RELATIONSHIP-9001",
+    "predicate": "DEPENDS_ON",
+    "sourceId": "TECHNIQUE-9001",
+    "targetId": "COMPONENT-9001",
+    "sourceFixture": "examples/fixtures/minimal-relationship.json",
+    "properties": {
+      "certainty": "Direct",
+      "confidence": "High",
+      "rationale": "Hybrid Retrieval depends on retriever components because it combines candidate results from multiple retrieval signals.",
+      "sourceType": "Technique",
+      "status": "Draft",
+      "targetType": "Component"
+    }
+  }
+]
