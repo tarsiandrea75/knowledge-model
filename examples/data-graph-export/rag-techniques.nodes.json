@@ -1,5 +1,129 @@
 [
   {
+    "id": "COMPONENT-10001",
+    "type": "Component",
+    "label": "Keyword Retriever",
+    "sourceDataFile": "data/components/keyword-retriever.json",
+    "properties": {
+      "abstractionLevel": "Conceptual",
+      "componentType": "Retriever",
+      "interfaceRole": "Producer",
+      "keywords": [
+        "keyword retrieval",
+        "lexical matching",
+        "retriever"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Retrieval"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/component.schema.json",
+      "slug": "keyword-retriever",
+      "status": "Draft",
+      "summary": "A Keyword Retriever retrieves candidates using lexical or keyword-oriented matching signals.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "COMPONENT-10002",
+    "type": "Component",
+    "label": "Semantic Retriever",
+    "sourceDataFile": "data/components/semantic-retriever.json",
+    "properties": {
+      "abstractionLevel": "Conceptual",
+      "componentType": "Retriever",
+      "interfaceRole": "Producer",
+      "keywords": [
+        "semantic retrieval",
+        "embedding retrieval",
+        "retriever"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Retrieval"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/component.schema.json",
+      "slug": "semantic-retriever",
+      "status": "Draft",
+      "summary": "A Semantic Retriever retrieves candidates using semantic representations such as embeddings.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "COMPONENT-10003",
+    "type": "Component",
+    "label": "Rank Fusion",
+    "sourceDataFile": "data/components/rank-fusion.json",
+    "properties": {
+      "abstractionLevel": "Conceptual",
+      "componentType": "Retriever",
+      "interfaceRole": "Transformer",
+      "keywords": [
+        "rank fusion",
+        "result merging",
+        "retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Retrieval"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/component.schema.json",
+      "slug": "rank-fusion",
+      "status": "Draft",
+      "summary": "Rank Fusion combines or reconciles ranked result lists from multiple retrieval signals.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "COMPONENT-10004",
+    "type": "Component",
+    "label": "Cross-Encoder Reranker",
+    "sourceDataFile": "data/components/cross-encoder-reranker.json",
+    "properties": {
+      "abstractionLevel": "Conceptual",
+      "componentType": "Reranker",
+      "interfaceRole": "Transformer",
+      "keywords": [
+        "cross encoder",
+        "reranker",
+        "candidate scoring"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStages": [
+        "Reranking"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/component.schema.json",
+      "slug": "cross-encoder-reranker",
+      "status": "Draft",
+      "summary": "A Cross-Encoder Reranker scores query-candidate pairs jointly for reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "SCHEMA-COMPONENT",
+    "type": "Schema",
+    "label": "schema/component.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/component.schema.json",
+      "schemaPath": "schema/component.schema.json",
+      "title": "RKM Component Schema"
+    }
+  },
+  {
     "id": "SCHEMA-RAG_TECHNIQUE",
     "type": "Schema",
     "label": "schema/rag-technique.schema.json",

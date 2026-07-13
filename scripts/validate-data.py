@@ -502,27 +502,29 @@ def run_self_test() -> None:
         }
         target_record = {
             "identity": {
-                "id": "TECHNIQUE-TEST-2",
+                "id": "COMPONENT-TEST-1",
             },
         }
         entity_files = build_entity_file_index(
             [
                 (REPOSITORY_ROOT / "data/rag-techniques/source-test.json", source_record),
-                (REPOSITORY_ROOT / "data/rag-techniques/target-test.json", target_record),
+                (REPOSITORY_ROOT / "data/components/target-test.json", target_record),
             ]
         )
         if entity_files["TECHNIQUE-TEST-1"] != "data/rag-techniques/source-test.json":
             raise DataValidationError("self-test failed: entity id to data file mapping returned the wrong path")
+        if entity_files["COMPONENT-TEST-1"] != "data/components/target-test.json":
+            raise DataValidationError("self-test failed: component entity id mapping returned the wrong path")
 
         valid_relationship_set = {
             "relationships": [
                 {
                     "id": "RELATIONSHIP-TEST-1",
-                    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                    "predicate": "OPTIONALLY_USES",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 }
             ]
         }
@@ -538,9 +540,9 @@ def run_self_test() -> None:
                     "id": "RELATIONSHIP-TEST-2",
                     "predicate": "UNREGISTERED_TEST_PREDICATE",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 }
             ]
         }
@@ -562,9 +564,9 @@ def run_self_test() -> None:
                     "id": "RELATIONSHIP-TEST-3",
                     "predicate": "CAN_PRECEDE_IN_PIPELINE",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/wrong-source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 }
             ]
         }
@@ -584,18 +586,18 @@ def run_self_test() -> None:
             "relationships": [
                 {
                     "id": "RELATIONSHIP-TEST-4",
-                    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                    "predicate": "OPTIONALLY_USES",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 },
                 {
                     "id": "RELATIONSHIP-TEST-4",
                     "predicate": "CAN_PROVIDE_CANDIDATES_TO",
-                    "sourceId": "TECHNIQUE-TEST-2",
+                    "sourceId": "COMPONENT-TEST-1",
                     "targetId": "TECHNIQUE-TEST-1",
-                    "sourceDataFile": "data/rag-techniques/target-test.json",
+                    "sourceDataFile": "data/components/target-test.json",
                     "targetDataFile": "data/rag-techniques/source-test.json",
                 },
             ]
@@ -616,19 +618,19 @@ def run_self_test() -> None:
             "relationships": [
                 {
                     "id": "RELATIONSHIP-TEST-5",
-                    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                    "predicate": "OPTIONALLY_USES",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 },
                 {
                     "id": "RELATIONSHIP-TEST-6",
-                    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                    "predicate": "OPTIONALLY_USES",
                     "sourceId": "TECHNIQUE-TEST-1",
-                    "targetId": "TECHNIQUE-TEST-2",
+                    "targetId": "COMPONENT-TEST-1",
                     "sourceDataFile": "data/rag-techniques/source-test.json",
-                    "targetDataFile": "data/rag-techniques/target-test.json",
+                    "targetDataFile": "data/components/target-test.json",
                 },
             ]
         }

@@ -42,7 +42,16 @@ Current seed data includes three RAG technique records:
 
 These records are intentionally small and conservative. They are not a complete RAG technique catalog and should not be presented as comprehensive coverage of the RAG ecosystem.
 
-The seed dataset also includes declared relationship instances under `data/relationships/`. These relationship sets connect existing data records by stable ID and are validated through `data/manifest.json`. Validation checks both JSON Schema shape and relationship semantics: predicates must exist in `registries/relationship-type-registry.json`, source and target IDs must resolve to declared data entity records, source and target data file fields must match the records that contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. Consumers should interpret these domain relationship edges as alpha dataset declarations with conservative scope, not as universal statements about every RAG system.
+The seed dataset also includes four Component records:
+
+- `data/components/keyword-retriever.json`
+- `data/components/semantic-retriever.json`
+- `data/components/rank-fusion.json`
+- `data/components/cross-encoder-reranker.json`
+
+Component nodes represent reusable architectural roles in RAG pipelines. Consumers should treat these records as first-class entities with their own stable IDs and schema validation, not as strings embedded inside technique descriptions.
+
+The seed dataset also includes declared relationship instances under `data/relationships/`. These relationship sets connect existing data records by stable ID and are validated through `data/manifest.json`. Validation checks both JSON Schema shape and relationship semantics: predicates must exist in `registries/relationship-type-registry.json`, source and target IDs must resolve to declared data entity records, source and target data file fields must match the records that contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. Consumers should interpret these domain relationship edges as alpha dataset declarations with conservative scope, not as universal statements about every RAG system. Technique-component edges such as `OPTIONALLY_USES` mean that a technique can use a component in some implementations; they do not mean the component is mandatory.
 
 Relationship support sets live under `data/relationship-support/`. They connect declared relationship IDs to structured references, claims, and evidence. The first support set uses maintainer analysis as conservative internal support for seed dataset modeling rationale. Consumers should treat this metadata as traceability for why the seed relationship was included, not as external proof, mandatory RAG architecture, or benchmark-backed evidence.
 
@@ -75,7 +84,7 @@ Check that the committed export still matches the fixtures:
 python3 scripts/export-fixtures-graph.py --check
 ```
 
-The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits data record nodes, a schema node, provenance edges that state which schema validates each record, and declared domain relationship edges from relationship-set files that have been validated against the relationship type registry and declared data records. Supported domain relationship edges can carry alpha/internal metadata such as `claimIds`, `evidenceIds`, `referenceIds`, `supportStatus`, and `supportSourceTypes`. It does not invent RAG domain relationships or support metadata that are not present in the seed data.
+The validated seed dataset can be exported to a separate graph representation under `examples/data-graph-export/`. The data graph export is derived from the files declared in `data/manifest.json`. It currently emits Technique nodes, Component nodes, schema nodes, provenance edges that state which schema validates each record, and declared domain relationship edges from relationship-set files that have been validated against the relationship type registry and declared data records. Supported domain relationship edges can carry alpha/internal metadata such as `claimIds`, `evidenceIds`, `referenceIds`, `declaredInRelationshipSupportSets`, `supportStatus`, and `supportSourceTypes`. It does not invent RAG domain relationships or support metadata that are not present in the seed data.
 
 Generate the data graph export from the project root:
 
@@ -179,7 +188,7 @@ The following areas are still expected to change as RKM becomes more consumable:
 - relationship-set coverage beyond the first conservative seed technique relationships
 - graph export compatibility policy beyond the current alpha/internal contract
 - fixture coverage beyond the minimal package
-- populated dataset breadth beyond the first three RAG techniques
+- populated dataset breadth beyond the first seed techniques and components
 - release packaging and version compatibility policy
 - loader-specific guidance for databases, search indexes, and graph stores
 
@@ -191,7 +200,9 @@ Load RKM content by stable identifier first. Slugs and names are useful for disp
 
 Preserve relationship direction. For example, `TECHNIQUE-9001 DEPENDS_ON COMPONENT-9001` means the technique depends on the component. Inverse views should be generated by consumers only when needed for queries.
 
-Preserve the distinction between provenance and domain relationships in graph exports. `VALIDATED_BY_SCHEMA` edges describe validation provenance. Relationship-set predicates such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, and `CAN_REFINE_RESULTS_FROM` describe declared seed dataset relationships and should be treated as conservative alpha content.
+Preserve the distinction between provenance and domain relationships in graph exports. `VALIDATED_BY_SCHEMA` edges describe validation provenance. Relationship-set predicates such as `CAN_PRECEDE_IN_PIPELINE`, `CAN_PROVIDE_CANDIDATES_TO`, `CAN_REFINE_RESULTS_FROM`, and `OPTIONALLY_USES` describe declared seed dataset relationships and should be treated as conservative alpha content.
+
+Interpret Component nodes as reusable RAG architectural roles. For example, a Technique node connected to a Component node by `OPTIONALLY_USES` states that the technique can use that component in some implementations. It is not a requirement edge and should not be loaded as a universal architecture rule.
 
 Interpret relationship support metadata as declared traceability. `claimIds`, `evidenceIds`, and `referenceIds` on a domain relationship edge point back to support objects in `data/relationship-support/`; they are not new graph nodes in the current data export and should not be treated as a stable public API yet.
 

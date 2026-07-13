@@ -1,6 +1,22 @@
 {
   "data": [
     {
+      "file": "data/components/cross-encoder-reranker.json",
+      "schema": "schema/component.schema.json"
+    },
+    {
+      "file": "data/components/keyword-retriever.json",
+      "schema": "schema/component.schema.json"
+    },
+    {
+      "file": "data/components/rank-fusion.json",
+      "schema": "schema/component.schema.json"
+    },
+    {
+      "file": "data/components/semantic-retriever.json",
+      "schema": "schema/component.schema.json"
+    },
+    {
       "file": "data/rag-techniques/hybrid-retrieval.json",
       "schema": "schema/rag-technique.schema.json"
     },
@@ -15,6 +31,14 @@
     {
       "file": "data/relationships/rag-technique-relationships.json",
       "schema": "schema/relationship-set.schema.json"
+    },
+    {
+      "file": "data/relationships/rag-technique-component-relationships.json",
+      "schema": "schema/relationship-set.schema.json"
+    },
+    {
+      "file": "data/relationship-support/rag-technique-component-relationship-support.json",
+      "schema": "schema/relationship-support-set.schema.json"
     },
     {
       "file": "data/relationship-support/rag-technique-relationship-support.json",

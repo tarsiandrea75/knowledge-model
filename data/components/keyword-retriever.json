@@ -1,0 +1,69 @@
+{
+  "identity": {
+    "id": "COMPONENT-10001",
+    "slug": "keyword-retriever",
+    "name": {
+      "official": "Keyword Retriever",
+      "display": "Keyword Retriever"
+    },
+    "entityType": "Component",
+    "keywords": [
+      "keyword retrieval",
+      "lexical matching",
+      "retriever"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "A Keyword Retriever retrieves candidates using lexical or keyword-oriented matching signals.",
+    "description": "A Keyword Retriever is a RAG component that retrieves candidate documents or chunks by applying lexical, term-based, or keyword-oriented matching signals against a retrievable collection."
+  },
+  "component": {
+    "componentType": "Retriever",
+    "ragStages": [
+      "Retrieval"
+    ],
+    "abstractionLevel": "Conceptual",
+    "interfaceRole": "Producer",
+    "responsibilities": [
+      "Retrieve candidate records using lexical or keyword-oriented matching signals."
+    ],
+    "inputs": [
+      {
+        "name": "Query",
+        "dataType": "Query",
+        "required": true,
+        "description": "The search query used to match lexical or keyword signals."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "Candidate ranking",
+        "dataType": "Ranking",
+        "required": true,
+        "description": "A ranked candidate list produced by lexical or keyword-oriented matching."
+      }
+    ]
+  }
+}

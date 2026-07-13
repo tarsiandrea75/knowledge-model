@@ -1,0 +1,179 @@
+{
+  "id": "RELATIONSHIP-SUPPORT-SET-10101",
+  "title": "Seed RAG Technique Component Relationship Support",
+  "description": "Conservative support objects for the seed RAG technique to component relationships. This support records maintainer rationale for including declared technique-component edges in the seed dataset and does not claim external factual proof, benchmark superiority, or universal RAG architecture behavior.",
+  "references": [
+    {
+      "id": "REFERENCE-10002",
+      "sourceType": "Maintainer Analysis",
+      "sourcePriority": "Tertiary",
+      "title": "RKM Seed Technique Component Modeling Rationale",
+      "publisher": "RAG Knowledge Model maintainers",
+      "updatedAt": "2026-07-13",
+      "abstract": "Internal maintainer analysis describing why the first seed technique-component relationships are modeled as conservative optional component-use relationships rather than mandatory architecture rules or benchmark-supported claims.",
+      "notes": [
+        "This reference records seed dataset modeling rationale and should not be treated as external factual proof."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-10101",
+      "statement": "RELATIONSHIP-10101 is included as a conservative seed dataset relationship because Hybrid Retrieval can use a Keyword Retriever in some implementations.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10101"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10101"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting that every hybrid retrieval system must use this component."
+    },
+    {
+      "id": "CLAIM-10102",
+      "statement": "RELATIONSHIP-10102 is included as a conservative seed dataset relationship because Hybrid Retrieval can use a Semantic Retriever in some implementations.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10102"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10102"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting that semantic retrieval is mandatory in every implementation labeled as hybrid retrieval."
+    },
+    {
+      "id": "CLAIM-10103",
+      "statement": "RELATIONSHIP-10103 is included as a conservative seed dataset relationship because Hybrid Retrieval can use Rank Fusion in some implementations.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10103"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10103"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting that all hybrid retrieval pipelines require rank fusion."
+    },
+    {
+      "id": "CLAIM-10104",
+      "statement": "RELATIONSHIP-10104 is included as a conservative seed dataset relationship because Reranking can use a Cross-Encoder Reranker in some implementations.",
+      "claimType": "Interpretive",
+      "subject": {
+        "type": "Relationship",
+        "id": "RELATIONSHIP-10104"
+      },
+      "confidence": "Low",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-10104"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "rationale": "The claim explains seed dataset modeling rationale and avoids asserting benchmark superiority or universal reranking architecture behavior."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-10101",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Keyword Retriever as a component that Hybrid Retrieval can use in some seed dataset relationships.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10101"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10101"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and should not be interpreted as a universal RAG architecture rule."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10102",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Semantic Retriever as a component that Hybrid Retrieval can use in some seed dataset relationships.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10102"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10102"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not claim benchmark superiority."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10103",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Rank Fusion as a component that Hybrid Retrieval can use in some seed dataset relationships.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10103"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10103"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not require every hybrid retrieval implementation to use this component."
+      ]
+    },
+    {
+      "id": "EVIDENCE-10104",
+      "role": "Motivates",
+      "strength": "Weak",
+      "summary": "The maintainer analysis motivates modeling Cross-Encoder Reranker as a component that Reranking can use in some seed dataset relationships.",
+      "interpretation": "This evidence supports inclusion of the relationship as seed dataset modeling rationale only and does not establish external factual proof.",
+      "claimIds": [
+        "CLAIM-10104"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipIds": [
+        "RELATIONSHIP-10104"
+      ],
+      "confidence": "Low",
+      "status": "Draft",
+      "limitations": [
+        "Internal maintainer rationale is weak support and does not claim universal reranking behavior."
+      ]
+    }
+  ]
+}

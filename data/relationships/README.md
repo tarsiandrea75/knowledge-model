@@ -26,4 +26,5 @@ Declared relationship instances can be supported by relationship support sets un
 
 Current relationship sets:
 
+- `rag-technique-component-relationships.json`: conservative technique-component relationships from seed RAG techniques to seed Component records.
 - `rag-technique-relationships.json`: conservative workflow relationships among the seed RAG technique records.

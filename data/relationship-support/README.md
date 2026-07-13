@@ -12,10 +12,11 @@ make data-validate
 
 Validation has two layers. First, each support-set file is JSON-schema validated against `schema/relationship-support-set.schema.json`. Second, each support object is semantically validated so relationship, claim, evidence, and reference identifiers resolve inside the declared dataset and support set.
 
-The first support file uses a `Maintainer Analysis` reference. This is conservative internal support for seed dataset modeling rationale, not an external factual source and not a benchmark claim. It explains why these relationships are included as possible seed dataset relationships without claiming that every RAG system uses the same sequence.
+The first support files use `Maintainer Analysis` references. This is conservative internal support for seed dataset modeling rationale, not an external factual source and not a benchmark claim. These files explain why relationships are included as possible seed dataset relationships without claiming that every RAG system uses the same sequence or the same components.
 
 Relationship support is declared and validated. It is not inferred from relationship descriptions, technique names, pipeline stages, or graph export behavior.
 
 Current relationship support sets:
 
+- `rag-technique-component-relationship-support.json`: conservative internal support for the seed technique-component relationships.
 - `rag-technique-relationship-support.json`: conservative internal support for the seed RAG technique relationships.

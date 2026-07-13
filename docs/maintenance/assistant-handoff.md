@@ -78,9 +78,9 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
-Fixtures and populated data serve different purposes. `examples/fixtures/` contains minimal pedagogical examples and validation fixtures. `data/` contains the first small populated knowledge dataset for consumer testing and release packaging. Do not describe fixtures as the real dataset, and do not describe the seed dataset as a complete RAG catalog.
+Fixtures and populated data serve different purposes. `examples/fixtures/` contains minimal pedagogical examples and validation fixtures. `data/` contains the first small populated knowledge dataset for consumer testing and release packaging. `data/components/` now contains first-class seed Component records. Do not describe fixtures as the real dataset, and do not describe the seed dataset as a complete RAG catalog.
 
-Relationship instances for populated data are declared in `data/relationships/` and validated through `data/manifest.json`. Relationship-set validation checks that predicates are registered in `registries/relationship-type-registry.json`, source and target IDs exist in declared data entity records, source and target data file fields point to the files that actually contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. The data graph exporter may emit domain graph edges only from declared, validated relationship-set files. Future assistants must not infer domain graph edges from record names, descriptions, stages, or other fields unless those relationships are first represented in validated data.
+Relationship instances for populated data are declared in `data/relationships/` and validated through `data/manifest.json`. Relationship-set validation checks that predicates are registered in `registries/relationship-type-registry.json`, source and target IDs exist in declared data entity records, source and target data file fields point to the files that actually contain those IDs, and duplicate relationship IDs or duplicate semantic triples are rejected. Technique-component edges are declared relationship records and supported by relationship support data; they are not inferred from technique or component content. The data graph exporter may emit domain graph edges only from declared, validated relationship-set files. Future assistants must not infer domain graph edges from record names, descriptions, stages, component roles, or other fields unless those relationships are first represented in validated data.
 
 Relationship support for populated data lives in `data/relationship-support/` and is validated through `data/manifest.json`. Support-set validation checks that references, claims, and evidence have unique IDs across support sets and that every relationship, claim, evidence, and reference link resolves. The data graph exporter may enrich declared domain relationship edges with support metadata only when that support is declared and validated. Future assistants must not infer support from relationship descriptions, technique records, or graph export behavior.
 
@@ -96,7 +96,7 @@ Graph exports have formal node and edge schemas:
 - `schema/graph-node.schema.json`
 - `schema/graph-edge.schema.json`
 
-Use `make graph-export-validate` or `python3 scripts/validate-graph-exports.py` to validate both fixture and data graph export files against those schemas. This validation also checks duplicate node IDs, duplicate edge IDs, and edge endpoints that must exist among nodes in the same export. The current fixture artifact still uses `sourceFixture`; the graph export validator maps that fixture provenance field into the formal `sourceDataFile` contract for schema validation.
+Use `make graph-export-validate` or `python3 scripts/validate-graph-exports.py` to validate both fixture and data graph export files against those schemas. This validation also checks duplicate node IDs, duplicate edge IDs, and edge endpoints that must exist among nodes in the same export. The current fixture artifact still uses `sourceFixture`; the graph export validator maps that fixture provenance field into the formal `sourceDataFile` contract for schema validation. The data graph export now emits both Technique and Component nodes, plus schema nodes and declared domain edges from relationship sets.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
@@ -156,10 +156,10 @@ Current maturity is approximately:
 - Conceptual and model maturity: 3.3 / 5
 - Tooling and automation maturity: 3.7 / 5
 - Consumability maturity: 3.3 / 5
-- Populated knowledge base maturity: 2.2 / 5
+- Populated knowledge base maturity: 2.4 / 5
 - Release readiness: 3.0 / 5
 
-The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, a first small seed dataset checked during validation, relationship-set semantics checked against the registry and declared data records, validated relationship support semantics, and a post-alpha data graph export generated from that seed dataset with declared domain relationship edges and support metadata. The project still needs broader populated data, richer examples, release packaging, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
+The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project also has a first minimal graph export generated from fixtures and checked during validation, a first small seed dataset checked during validation, seed Component records, relationship-set semantics checked against the registry and declared data records, validated relationship support semantics, and a post-alpha data graph export generated from that seed dataset with declared domain relationship edges and support metadata. The project still needs broader populated data, richer examples, release packaging, expanded graph export coverage, and consumer-facing documentation before outside users can adopt it easily.
 
 ## Known Patterns and Hardening History
 
@@ -211,7 +211,7 @@ Then re-run validation and the cockpit summary before continuing.
 
 The next natural work should improve consumability:
 
-- Broaden the first small seed dataset with representative populated content.
+- Broaden the first small seed dataset with representative populated content beyond the initial techniques and components.
 - Add richer examples and fixtures that demonstrate valid entities, relationships, claims, evidence, references, and graph export behavior.
 - Add release documentation, release packaging, and consumer-oriented guides.
 - Expand the current minimal graph exports so the model can be consumed more broadly outside the repository.

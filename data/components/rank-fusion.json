@@ -1,0 +1,69 @@
+{
+  "identity": {
+    "id": "COMPONENT-10003",
+    "slug": "rank-fusion",
+    "name": {
+      "official": "Rank Fusion",
+      "display": "Rank Fusion"
+    },
+    "entityType": "Component",
+    "keywords": [
+      "rank fusion",
+      "result merging",
+      "retrieval"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Rank Fusion combines or reconciles ranked result lists from multiple retrieval signals.",
+    "description": "Rank Fusion is a RAG component that combines or reconciles ranked result lists produced by multiple retrieval signals before downstream context assembly or reranking."
+  },
+  "component": {
+    "componentType": "Retriever",
+    "ragStages": [
+      "Retrieval"
+    ],
+    "abstractionLevel": "Conceptual",
+    "interfaceRole": "Transformer",
+    "responsibilities": [
+      "Combine or reconcile ranked result lists from multiple retrieval signals."
+    ],
+    "inputs": [
+      {
+        "name": "Ranked result lists",
+        "dataType": "Ranking",
+        "required": true,
+        "description": "Ranked candidate lists produced by one or more retrieval signals."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "Fused ranking",
+        "dataType": "Ranking",
+        "required": true,
+        "description": "A combined ranked candidate list."
+      }
+    ]
+  }
+}

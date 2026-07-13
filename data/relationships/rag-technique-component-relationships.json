@@ -1,0 +1,71 @@
+{
+  "id": "RELATIONSHIP-SET-10101",
+  "title": "Seed RAG Technique Component Relationships",
+  "description": "Conservative declared relationships from seed RAG technique records to seed component records. These relationships describe components that techniques can use in some implementations or pipeline designs and do not state that every system uses these components.",
+  "relationships": [
+    {
+      "id": "RELATIONSHIP-10101",
+      "predicate": "OPTIONALLY_USES",
+      "sourceId": "TECHNIQUE-10001",
+      "targetId": "COMPONENT-10001",
+      "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+      "targetDataFile": "data/components/keyword-retriever.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Hybrid Retrieval can use a Keyword Retriever in some implementations when a pipeline includes lexical or keyword-oriented retrieval signals.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    },
+    {
+      "id": "RELATIONSHIP-10102",
+      "predicate": "OPTIONALLY_USES",
+      "sourceId": "TECHNIQUE-10001",
+      "targetId": "COMPONENT-10002",
+      "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+      "targetDataFile": "data/components/semantic-retriever.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Hybrid Retrieval can use a Semantic Retriever in some implementations when a pipeline includes embedding-based or other semantic retrieval signals.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    },
+    {
+      "id": "RELATIONSHIP-10103",
+      "predicate": "OPTIONALLY_USES",
+      "sourceId": "TECHNIQUE-10001",
+      "targetId": "COMPONENT-10003",
+      "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+      "targetDataFile": "data/components/rank-fusion.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Hybrid Retrieval can use Rank Fusion in some implementations when multiple ranked result lists are combined or reconciled.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    },
+    {
+      "id": "RELATIONSHIP-10104",
+      "predicate": "OPTIONALLY_USES",
+      "sourceId": "TECHNIQUE-10003",
+      "targetId": "COMPONENT-10004",
+      "sourceDataFile": "data/rag-techniques/reranking.json",
+      "targetDataFile": "data/components/cross-encoder-reranker.json",
+      "relationshipKind": "Domain Relationship",
+      "description": "Reranking can use a Cross-Encoder Reranker in some implementations when a pipeline scores query-candidate pairs jointly before final context assembly.",
+      "properties": {
+        "confidence": "Conservative",
+        "edgeKind": "Domain Relationship",
+        "scope": "Seed Dataset",
+        "status": "Draft"
+      }
+    }
+  ]
+}

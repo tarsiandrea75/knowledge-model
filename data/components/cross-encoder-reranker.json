@@ -1,0 +1,75 @@
+{
+  "identity": {
+    "id": "COMPONENT-10004",
+    "slug": "cross-encoder-reranker",
+    "name": {
+      "official": "Cross-Encoder Reranker",
+      "display": "Cross-Encoder Reranker"
+    },
+    "entityType": "Component",
+    "keywords": [
+      "cross encoder",
+      "reranker",
+      "candidate scoring"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "A Cross-Encoder Reranker scores query-candidate pairs jointly for reranking.",
+    "description": "A Cross-Encoder Reranker is a RAG component that jointly scores a query and candidate item pair so a reranking step can reorder candidates before context assembly."
+  },
+  "component": {
+    "componentType": "Reranker",
+    "ragStages": [
+      "Reranking"
+    ],
+    "abstractionLevel": "Conceptual",
+    "interfaceRole": "Transformer",
+    "responsibilities": [
+      "Score query-candidate pairs jointly for reranking."
+    ],
+    "inputs": [
+      {
+        "name": "Query",
+        "dataType": "Query",
+        "required": true,
+        "description": "The query used when scoring candidate pairs."
+      },
+      {
+        "name": "Candidate ranking",
+        "dataType": "Ranking",
+        "required": true,
+        "description": "The candidate list to be reranked."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "Reranked candidates",
+        "dataType": "Ranking",
+        "required": true,
+        "description": "A candidate list reordered by joint query-candidate scores."
+      }
+    ]
+  }
+}

@@ -12,6 +12,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 - Relationship support sets under `data/relationship-support/` for connecting declared relationship instances to references, claims, and evidence.
 - Data graph export now includes declared domain relationship edges from validated relationship-set files without inferring undeclared relationships.
 - Data graph export now enriches declared domain relationship edges with declared support metadata when relationship support is available.
+- Validated seed Component data records under `data/components/` and declared technique-component relationships connecting seed techniques to reusable components.
 - Semantic validation for data relationship instances, including registered predicate checks, source and target data record integrity checks, data file consistency checks, duplicate relationship ID checks, and duplicate semantic triple checks.
 - Semantic validation for relationship support sets, including relationship, claim, evidence, and reference identifier integrity checks.
 

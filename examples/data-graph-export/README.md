@@ -6,10 +6,10 @@ The data graph export is separate from `examples/graph-export/`, which is genera
 
 ## Files
 
-- `rag-techniques.nodes.json`: graph nodes derived from seed RAG technique records and their declared schema.
+- `rag-techniques.nodes.json`: graph nodes derived from seed RAG technique records, seed Component records, and their declared schemas.
 - `rag-techniques.edges.json`: graph edges derived from export provenance and declared domain relationships.
 
-The current export emits RAG technique nodes, a schema node, `VALIDATED_BY_SCHEMA` provenance edges, and declared domain relationship edges from `data/relationships/rag-technique-relationships.json`. Domain relationship edges may include support metadata from `data/relationship-support/`, such as claim, evidence, and reference identifiers. It does not fabricate relationships between techniques or infer support.
+The current export emits RAG technique nodes, Component nodes, schema nodes, `VALIDATED_BY_SCHEMA` provenance edges, and declared domain relationship edges from relationship-set files under `data/relationships/`. Domain relationship edges may include support metadata from `data/relationship-support/`, such as claim, evidence, and reference identifiers, support status values, source types, and support-set file paths. It does not fabricate relationships between techniques, infer technique-component relationships, or infer support.
 
 ## Generation
 
@@ -51,4 +51,4 @@ Schema-level validation checks node and edge shape, duplicate IDs, and edge endp
 
 ## Current Scope
 
-This export is minimal post-alpha work on `main`. It proves a deterministic graph export path for validated seed data and declared relationship sets, but it is not a complete downstream graph product and is not part of the already tagged `v0.1.0-alpha` package.
+This export is minimal post-alpha work on `main`. It proves a deterministic graph export path for validated seed data, multiple entity types, declared relationship sets, and relationship support metadata, but it is not a complete downstream graph product and is not part of the already tagged `v0.1.0-alpha` package.

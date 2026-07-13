@@ -1,5 +1,53 @@
 [
   {
+    "id": "EDGE-COMPONENT-10001-VALIDATED_BY_SCHEMA-SCHEMA-COMPONENT",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "COMPONENT-10001",
+    "targetId": "SCHEMA-COMPONENT",
+    "sourceDataFile": "data/components/keyword-retriever.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/component.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-COMPONENT-10002-VALIDATED_BY_SCHEMA-SCHEMA-COMPONENT",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "COMPONENT-10002",
+    "targetId": "SCHEMA-COMPONENT",
+    "sourceDataFile": "data/components/semantic-retriever.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/component.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-COMPONENT-10003-VALIDATED_BY_SCHEMA-SCHEMA-COMPONENT",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "COMPONENT-10003",
+    "targetId": "SCHEMA-COMPONENT",
+    "sourceDataFile": "data/components/rank-fusion.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/component.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-COMPONENT-10004-VALIDATED_BY_SCHEMA-SCHEMA-COMPONENT",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "COMPONENT-10004",
+    "targetId": "SCHEMA-COMPONENT",
+    "sourceDataFile": "data/components/cross-encoder-reranker.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/component.schema.json"
+    }
+  },
+  {
     "id": "EDGE-TECHNIQUE-10001-VALIDATED_BY_SCHEMA-SCHEMA-RAG_TECHNIQUE",
     "predicate": "VALIDATED_BY_SCHEMA",
     "sourceId": "TECHNIQUE-10001",
@@ -138,6 +186,146 @@
         "Draft"
       ],
       "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10101",
+    "predicate": "OPTIONALLY_USES",
+    "sourceId": "TECHNIQUE-10001",
+    "targetId": "COMPONENT-10001",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10101"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-component-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-component-relationship-support.json"
+      ],
+      "description": "Hybrid Retrieval can use a Keyword Retriever in some implementations when a pipeline includes lexical or keyword-oriented retrieval signals.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10101"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/keyword-retriever.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10102",
+    "predicate": "OPTIONALLY_USES",
+    "sourceId": "TECHNIQUE-10001",
+    "targetId": "COMPONENT-10002",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10102"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-component-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-component-relationship-support.json"
+      ],
+      "description": "Hybrid Retrieval can use a Semantic Retriever in some implementations when a pipeline includes embedding-based or other semantic retrieval signals.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10102"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/semantic-retriever.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10103",
+    "predicate": "OPTIONALLY_USES",
+    "sourceId": "TECHNIQUE-10001",
+    "targetId": "COMPONENT-10003",
+    "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10103"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-component-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-component-relationship-support.json"
+      ],
+      "description": "Hybrid Retrieval can use Rank Fusion in some implementations when multiple ranked result lists are combined or reconciled.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10103"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/rank-fusion.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10104",
+    "predicate": "OPTIONALLY_USES",
+    "sourceId": "TECHNIQUE-10003",
+    "targetId": "COMPONENT-10004",
+    "sourceDataFile": "data/rag-techniques/reranking.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10104"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-component-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-component-relationship-support.json"
+      ],
+      "description": "Reranking can use a Cross-Encoder Reranker in some implementations when a pipeline scores query-candidate pairs jointly before final context assembly.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10104"
+      ],
+      "referenceIds": [
+        "REFERENCE-10002"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/components/cross-encoder-reranker.json"
     }
   }
 ]

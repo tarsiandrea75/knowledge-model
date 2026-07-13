@@ -155,28 +155,49 @@ def record_node(record: dict[str, Any], source_data_file: str, schema_file: str)
     identity = require_object(record.get("identity"), f"{context} identity")
     description = require_object(record.get("description"), f"{context} description")
     metadata = require_object(record.get("metadata"), f"{context} metadata")
-    technique = require_object(record.get("technique"), f"{context} technique")
     record_id = require_string(identity.get("id"), f"{context} identity.id")
+    entity_type = require_string(identity.get("entityType"), f"{context} identity.entityType")
+    properties: dict[str, Any] = {
+        "keywords": identity.get("keywords"),
+        "language": identity.get("language"),
+        "metadataStatus": metadata.get("status"),
+        "reviewState": metadata.get("reviewState"),
+        "schema": schema_file,
+        "slug": identity.get("slug"),
+        "status": identity.get("status"),
+        "summary": description.get("summary"),
+        "version": identity.get("version"),
+        "visibility": identity.get("visibility"),
+    }
+
+    technique = record.get("technique")
+    if technique is not None:
+        technique_object = require_object(technique, f"{context} technique")
+        properties.update(
+            {
+                "ragStage": technique_object.get("ragStage"),
+                "techniqueFamily": technique_object.get("techniqueFamily"),
+            }
+        )
+
+    component = record.get("component")
+    if component is not None:
+        component_object = require_object(component, f"{context} component")
+        properties.update(
+            {
+                "abstractionLevel": component_object.get("abstractionLevel"),
+                "componentType": component_object.get("componentType"),
+                "interfaceRole": component_object.get("interfaceRole"),
+                "ragStages": component_object.get("ragStages"),
+            }
+        )
 
     return node(
         record_id,
-        require_string(identity.get("entityType"), f"{context} identity.entityType"),
+        entity_type,
         record_label(record, context),
         source_data_file,
-        {
-            "keywords": identity.get("keywords"),
-            "language": identity.get("language"),
-            "metadataStatus": metadata.get("status"),
-            "ragStage": technique.get("ragStage"),
-            "reviewState": metadata.get("reviewState"),
-            "schema": schema_file,
-            "slug": identity.get("slug"),
-            "status": identity.get("status"),
-            "summary": description.get("summary"),
-            "techniqueFamily": technique.get("techniqueFamily"),
-            "version": identity.get("version"),
-            "visibility": identity.get("visibility"),
-        },
+        properties,
     )
 
 
@@ -524,17 +545,54 @@ def run_self_test() -> None:
     if not rendered.endswith("\n") or "Sample Technique" not in rendered:
         raise DataGraphExportError("self-test failed: deterministic JSON rendering changed")
 
+    component_record = {
+        "identity": {
+            "id": "COMPONENT-0001",
+            "slug": "sample-component",
+            "name": {
+                "display": "Sample Component",
+            },
+            "entityType": "Component",
+            "status": "Draft",
+            "visibility": "Public",
+            "language": "en",
+            "version": "1.0.0",
+        },
+        "metadata": {
+            "status": "Draft",
+            "reviewState": "Not Reviewed",
+        },
+        "description": {
+            "summary": "Sample component for exporter self-test.",
+        },
+        "component": {
+            "componentType": "Retriever",
+            "ragStages": ["Retrieval"],
+            "abstractionLevel": "Conceptual",
+            "interfaceRole": "Producer",
+        },
+    }
+    component_node = record_node(
+        component_record,
+        "data/components/sample-component.json",
+        "schema/component.schema.json",
+    )
+    if component_node["type"] != "Component":
+        raise DataGraphExportError("self-test failed: component node type was not exported")
+    if component_node["properties"].get("componentType") != "Retriever":
+        raise DataGraphExportError("self-test failed: component properties were not exported")
+
     relationship_set = {
         "relationships": [
             {
                 "id": "RELATIONSHIP-0001",
-                "predicate": "CAN_PRECEDE_IN_PIPELINE",
+                "predicate": "OPTIONALLY_USES",
                 "sourceId": "TECHNIQUE-0001",
-                "targetId": "TECHNIQUE-0002",
+                "targetId": "COMPONENT-0001",
                 "sourceDataFile": "data/rag-techniques/sample-technique.json",
-                "targetDataFile": "data/rag-techniques/next-technique.json",
+                "targetDataFile": "data/components/sample-component.json",
                 "relationshipKind": "Domain Relationship",
-                "description": "Sample relationship for exporter self-test.",
+                "description": "Sample technique can use sample component in some implementations.",
                 "properties": {
                     "edgeKind": "Domain Relationship"
                 }
@@ -544,7 +602,7 @@ def run_self_test() -> None:
     declared_edges = declared_relationship_edges(
         relationship_set,
         "data/relationships/sample-relationships.json",
-        {"TECHNIQUE-0001", "TECHNIQUE-0002"},
+        {"TECHNIQUE-0001", "COMPONENT-0001"},
         {
             "RELATIONSHIP-0001": {
                 "claimIds": ["CLAIM-0001"],

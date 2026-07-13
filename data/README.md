@@ -10,6 +10,8 @@ Data files are declared in `data/manifest.json`. Each manifest entry maps a repo
 
 `data/relationship-support/` contains declared support objects for relationship instances. These files connect relationship IDs to references, claims, and evidence so consumers can inspect why a relationship appears in the seed dataset. Support is validated through the manifest and is not inferred.
 
+`data/components/` contains first-class seed Component records. These records validate against `schema/component.schema.json` and can be connected to techniques through declared relationship sets.
+
 Run direct data validation from the repository root:
 
 ```bash
@@ -24,8 +26,14 @@ make validate
 
 Current populated data scope:
 
+- `data/components/cross-encoder-reranker.json`
+- `data/components/keyword-retriever.json`
+- `data/components/rank-fusion.json`
+- `data/components/semantic-retriever.json`
 - `data/rag-techniques/hybrid-retrieval.json`
 - `data/rag-techniques/query-rewriting.json`
 - `data/rag-techniques/reranking.json`
+- `data/relationships/rag-technique-component-relationships.json`
 - `data/relationships/rag-technique-relationships.json`
+- `data/relationship-support/rag-technique-component-relationship-support.json`
 - `data/relationship-support/rag-technique-relationship-support.json`
