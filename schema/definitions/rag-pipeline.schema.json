@@ -1,0 +1,490 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/rag-pipeline.schema.json",
+  "title": "RKM RAG Pipeline Definition",
+  "description": "Defines a reusable embedded RAG pipeline fragment for describing ordered, conditional, iterative or parallel Retrieval-Augmented Generation process stages. This schema does not provide a first-class entity envelope and intentionally omits identity, metadata and top-level entity description.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pipelineType",
+    "boundary",
+    "stages"
+  ],
+  "properties": {
+    "pipelineId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded pipeline fragment within the containing entity, workflow, evidence record or architecture record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable pipeline name.",
+      "minLength": 1
+    },
+    "pipelineType": {
+      "$ref": "#/$defs/pipelineType"
+    },
+    "scope": {
+      "$ref": "#/$defs/pipelineScope"
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Artifacts that enter the pipeline boundary.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Artifacts produced at the pipeline boundary or terminal state.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "participants": {
+      "type": "array",
+      "description": "Entities, embedded capabilities or human roles that execute, support, evaluate or govern pipeline stages.",
+      "items": {
+        "$ref": "#/$defs/participant"
+      },
+      "uniqueItems": true
+    },
+    "stages": {
+      "type": "array",
+      "description": "Named processing stages inside the RAG pipeline.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/stage"
+      },
+      "uniqueItems": true
+    },
+    "stageOrder": {
+      "type": "array",
+      "description": "Explicit ordering, branching, iteration or parallelism between pipeline stages.",
+      "items": {
+        "$ref": "#/$defs/stageTransition"
+      },
+      "uniqueItems": true
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Important artifacts consumed, produced, transformed, stored or evaluated across pipeline stages.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evaluation": {
+      "type": "array",
+      "description": "Evaluation hooks associated with stages, artifacts or the end-to-end pipeline.",
+      "items": {
+        "$ref": "#/$defs/evaluationHook"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this embedded pipeline fragment to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare pipeline behavior, quality, cost, latency, safety or tradeoffs.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the pipeline structure, behavior, evaluation results or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the pipeline.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "pipelineType": {
+      "type": "string",
+      "description": "Primary kind of RAG process represented by the pipeline.",
+      "enum": [
+        "Ingestion Pipeline",
+        "Indexing Pipeline",
+        "Retrieval Pipeline",
+        "Generation Pipeline",
+        "Evaluation Pipeline",
+        "Monitoring Pipeline",
+        "Governance Pipeline",
+        "End To End RAG Pipeline",
+        "Other"
+      ]
+    },
+    "pipelineScope": {
+      "type": "string",
+      "description": "How the pipeline is intended to be interpreted.",
+      "enum": [
+        "Conceptual",
+        "Implementation Specific",
+        "Operational",
+        "Experimental",
+        "Reference Architecture",
+        "Other"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Scope boundary for the RAG pipeline.",
+      "additionalProperties": false,
+      "required": [
+        "trigger",
+        "startState",
+        "terminalState"
+      ],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "description": "Condition, event or request that starts the pipeline.",
+          "minLength": 1
+        },
+        "startState": {
+          "type": "string",
+          "description": "First state or stage inside the pipeline boundary.",
+          "minLength": 1
+        },
+        "terminalState": {
+          "type": "string",
+          "description": "Final output, completion state or terminal condition of the pipeline.",
+          "minLength": 1
+        },
+        "responsibilities": {
+          "type": "array",
+          "description": "Responsibilities inside the pipeline boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "externalAssumptions": {
+          "type": "array",
+          "description": "Assumptions, inputs, dependencies or governance concerns intentionally outside the pipeline boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "description": "A participant that executes, supports, evaluates or governs one or more pipeline stages.",
+      "additionalProperties": false,
+      "required": [
+        "participantType",
+        "role"
+      ],
+      "properties": {
+        "participantId": {
+          "type": "string",
+          "description": "Stable local participant identifier.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "participantType": {
+          "$ref": "#/$defs/participantType"
+        },
+        "entity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable participant name when no first-class entity reference is available.",
+          "minLength": 1
+        },
+        "role": {
+          "$ref": "#/$defs/participantRole"
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "description": "A named processing phase inside a RAG pipeline.",
+      "additionalProperties": false,
+      "required": [
+        "stageId",
+        "name",
+        "stageFamily"
+      ],
+      "properties": {
+        "stageId": {
+          "type": "string",
+          "description": "Stable local stage identifier.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable stage name.",
+          "minLength": 1
+        },
+        "stageFamily": {
+          "$ref": "#/$defs/stageFamily"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the stage boundary and RAG-relevant semantics.",
+          "minLength": 1
+        },
+        "participants": {
+          "type": "array",
+          "description": "Local participant identifiers or stable entity identifiers involved in the stage.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Artifacts consumed by the stage.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Artifacts produced by the stage.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions that affect whether or how the stage executes.",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "stageTransition": {
+      "type": "object",
+      "description": "Explicit movement, dependency or control flow between pipeline stages.",
+      "additionalProperties": false,
+      "required": [
+        "fromStage",
+        "toStage",
+        "orderingType"
+      ],
+      "properties": {
+        "fromStage": {
+          "type": "string",
+          "description": "Source stage identifier.",
+          "minLength": 1
+        },
+        "toStage": {
+          "type": "string",
+          "description": "Target stage identifier.",
+          "minLength": 1
+        },
+        "orderingType": {
+          "$ref": "#/$defs/orderingType"
+        },
+        "condition": {
+          "$ref": "#/$defs/condition"
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "A condition that gates, routes or qualifies pipeline execution.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "$ref": "#/$defs/conditionType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Verifiable condition statement.",
+          "minLength": 1
+        },
+        "observedSignal": {
+          "$ref": "observable-signal.schema.json"
+        }
+      }
+    },
+    "evaluationHook": {
+      "type": "object",
+      "description": "Evaluation associated with a pipeline stage, artifact or end-to-end boundary.",
+      "additionalProperties": false,
+      "required": [
+        "evaluationTarget",
+        "evaluationRole"
+      ],
+      "properties": {
+        "evaluationTarget": {
+          "type": "string",
+          "description": "Stage identifier, artifact identifier or pipeline boundary being evaluated.",
+          "minLength": 1
+        },
+        "evaluationRole": {
+          "$ref": "#/$defs/evaluationRole"
+        },
+        "metric": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "benchmark": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Evaluation protocol, procedure or setup.",
+          "minLength": 1
+        },
+        "supportedClaims": {
+          "type": "array",
+          "description": "Claim identifiers supported or challenged by this evaluation hook.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "participantType": {
+      "type": "string",
+      "description": "Kind of pipeline participant.",
+      "enum": [
+        "Component",
+        "Agent",
+        "Framework",
+        "Technique",
+        "Pattern",
+        "Retriever",
+        "Reranker",
+        "Embedding Model",
+        "Language Model",
+        "Vector Database",
+        "Graph Database",
+        "Evaluation Metric",
+        "Provider",
+        "Embedded Tool",
+        "Human Role",
+        "External Service",
+        "Other"
+      ]
+    },
+    "participantRole": {
+      "type": "string",
+      "description": "Role played by the participant in the pipeline.",
+      "enum": [
+        "Executor",
+        "Coordinator",
+        "Producer",
+        "Consumer",
+        "Transformer",
+        "Retriever",
+        "Reranker",
+        "Generator",
+        "Evaluator",
+        "Observer",
+        "Governor",
+        "Other"
+      ]
+    },
+    "stageFamily": {
+      "type": "string",
+      "description": "Canonical family for a RAG pipeline stage.",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Enrichment",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Prompt Construction",
+        "Generation",
+        "Citation Selection",
+        "Verification",
+        "Evaluation",
+        "Monitoring",
+        "Feedback",
+        "Governance",
+        "Other"
+      ]
+    },
+    "orderingType": {
+      "type": "string",
+      "description": "Control flow relationship between stages.",
+      "enum": [
+        "Sequential",
+        "Conditional",
+        "Iterative",
+        "Parallel",
+        "Fallback",
+        "Merge",
+        "Terminal"
+      ]
+    },
+    "conditionType": {
+      "type": "string",
+      "description": "Kind of condition that affects pipeline execution.",
+      "enum": [
+        "Always",
+        "If",
+        "Unless",
+        "Threshold",
+        "Policy Gate",
+        "Human Approval",
+        "Error",
+        "Timeout",
+        "Other"
+      ]
+    },
+    "evaluationRole": {
+      "type": "string",
+      "description": "Purpose of the evaluation hook.",
+      "enum": [
+        "Retrieval Quality",
+        "Reranking Quality",
+        "Context Quality",
+        "Citation Quality",
+        "Generation Quality",
+        "Faithfulness",
+        "Latency",
+        "Cost",
+        "Safety",
+        "End To End Quality",
+        "Other"
+      ]
+    }
+  }
+}
