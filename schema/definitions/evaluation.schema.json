@@ -1,0 +1,637 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/evaluation.schema.json",
+  "title": "RKM Evaluation Definition",
+  "description": "Defines a reusable embedded evaluation record that represents what was evaluated, how it was evaluated and what the result means in the RAG Knowledge Model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluationId",
+    "target",
+    "task",
+    "protocol",
+    "results"
+  ],
+  "properties": {
+    "evaluationId": {
+      "type": "string",
+      "description": "Stable local identifier for the evaluation within the containing entity, benchmark, paper, evidence record or workflow.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable evaluation name.",
+      "minLength": 1
+    },
+    "target": {
+      "$ref": "#/$defs/evaluationTarget"
+    },
+    "task": {
+      "$ref": "#/$defs/evaluationTask"
+    },
+    "datasets": {
+      "type": "array",
+      "description": "Datasets or dataset slices used by this evaluation.",
+      "items": {
+        "$ref": "#/$defs/datasetRole"
+      },
+      "uniqueItems": true
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Metrics used to produce or interpret the evaluation results.",
+      "items": {
+        "$ref": "#/$defs/metricRole"
+      },
+      "uniqueItems": true
+    },
+    "protocol": {
+      "$ref": "#/$defs/evaluationProtocol"
+    },
+    "results": {
+      "type": "array",
+      "description": "Observed outputs of applying metrics under the evaluation protocol.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evaluationResult"
+      },
+      "uniqueItems": true
+    },
+    "comparability": {
+      "$ref": "#/$defs/comparabilityProfile"
+    },
+    "interpretation": {
+      "$ref": "#/$defs/interpretation"
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims supported by this evaluation record.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records that document the evaluation setup, execution or results.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the evaluation.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "evaluationTarget": {
+      "type": "object",
+      "description": "Entity, system behavior or artifact being assessed.",
+      "additionalProperties": false,
+      "required": [
+        "targetType"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "entity"
+          ]
+        },
+        {
+          "required": [
+            "artifact"
+          ]
+        },
+        {
+          "required": [
+            "externalTargetName"
+          ]
+        }
+      ],
+      "properties": {
+        "targetType": {
+          "$ref": "#/$defs/targetType"
+        },
+        "entity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "artifact": {
+          "$ref": "artifact.schema.json"
+        },
+        "externalTargetName": {
+          "type": "string",
+          "description": "Name of an evaluated target that is not represented as a first-class RKM entity.",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "description": "Version, release, configuration or observation context of the evaluated target.",
+          "minLength": 1
+        }
+      }
+    },
+    "targetType": {
+      "type": "string",
+      "description": "Kind of target being evaluated.",
+      "enum": [
+        "Retriever",
+        "Reranker",
+        "Embedding Model",
+        "Language Model",
+        "Generated Answer",
+        "Retrieved Context",
+        "Citation",
+        "Agent",
+        "Workflow",
+        "End To End RAG System",
+        "Component",
+        "Framework",
+        "Other"
+      ]
+    },
+    "evaluationTask": {
+      "type": "object",
+      "description": "Capability or behavior under assessment.",
+      "additionalProperties": false,
+      "required": [
+        "taskType",
+        "description"
+      ],
+      "properties": {
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "Document Retrieval",
+            "Passage Retrieval",
+            "Reranking",
+            "Grounded Question Answering",
+            "Citation Faithfulness",
+            "Answer Correctness",
+            "Hallucination Detection",
+            "Context Relevance",
+            "Agent Tool Use",
+            "Workflow Reliability",
+            "End To End RAG Evaluation",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Precise description of the assessed behavior.",
+          "minLength": 10
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Inputs consumed by the evaluation task.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "expectedOutputs": {
+          "type": "array",
+          "description": "Expected outputs, labels or observations for the evaluation task.",
+          "items": {
+            "$ref": "artifact.schema.json"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "datasetRole": {
+      "type": "object",
+      "description": "Role played by a dataset in this evaluation.",
+      "additionalProperties": false,
+      "required": [
+        "role"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "dataset"
+          ]
+        },
+        {
+          "required": [
+            "externalDatasetName"
+          ]
+        }
+      ],
+      "properties": {
+        "dataset": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "externalDatasetName": {
+          "type": "string",
+          "description": "Name of a dataset that is not represented as a first-class RKM entity.",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "Source Corpus",
+            "Query Set",
+            "Reference Answers",
+            "Relevance Judgments",
+            "Citation Labels",
+            "Preference Labels",
+            "Conversation Traces",
+            "Tool Use Traces",
+            "Safety Labels",
+            "Other"
+          ]
+        },
+        "split": {
+          "type": "string",
+          "description": "Dataset split used by the evaluation.",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "description": "Dataset version, release date or revision identifier.",
+          "minLength": 1
+        }
+      }
+    },
+    "metricRole": {
+      "type": "object",
+      "description": "Role played by a metric in this evaluation.",
+      "additionalProperties": false,
+      "required": [
+        "role"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "metric"
+          ]
+        },
+        {
+          "required": [
+            "externalMetricName"
+          ]
+        }
+      ],
+      "properties": {
+        "metric": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "externalMetricName": {
+          "type": "string",
+          "description": "Name of a metric that is not represented as a first-class RKM entity.",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "Primary Metric",
+            "Secondary Metric",
+            "Diagnostic Metric",
+            "Efficiency Metric",
+            "Cost Metric",
+            "Safety Metric",
+            "Other"
+          ]
+        },
+        "aggregation": {
+          "$ref": "#/$defs/aggregationMethod"
+        }
+      }
+    },
+    "evaluationProtocol": {
+      "type": "object",
+      "description": "Procedure used to produce evaluation results.",
+      "additionalProperties": false,
+      "required": [
+        "protocolType"
+      ],
+      "properties": {
+        "protocolType": {
+          "type": "string",
+          "enum": [
+            "Benchmark Protocol",
+            "Offline Experiment",
+            "Human Evaluation",
+            "LLM Judge Evaluation",
+            "Automated Test",
+            "A/B Test",
+            "Production Observation",
+            "Other"
+          ]
+        },
+        "benchmark": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "datasetSplit": {
+          "type": "string",
+          "description": "Dataset split or partition used by the protocol.",
+          "minLength": 1
+        },
+        "retrievalDepth": {
+          "type": "integer",
+          "description": "Number of retrieved candidates considered by the protocol.",
+          "minimum": 1
+        },
+        "rerankingDepth": {
+          "type": "integer",
+          "description": "Number of candidates passed into reranking.",
+          "minimum": 1
+        },
+        "configuration": {
+          "type": "array",
+          "description": "Important configuration parameters that affect comparability or reproducibility.",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          },
+          "uniqueItems": true
+        },
+        "judge": {
+          "$ref": "#/$defs/judge"
+        },
+        "randomSeedPolicy": {
+          "type": "string",
+          "description": "How randomness was controlled or reported.",
+          "minLength": 1
+        },
+        "executionDate": {
+          "type": "string",
+          "description": "Date when the evaluation was executed or observed.",
+          "format": "date"
+        }
+      }
+    },
+    "evaluationResult": {
+      "type": "object",
+      "description": "Observed output of an evaluation metric under a protocol.",
+      "additionalProperties": false,
+      "required": [
+        "resultType",
+        "value"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "metric"
+          ]
+        },
+        {
+          "required": [
+            "externalMetricName"
+          ]
+        }
+      ],
+      "properties": {
+        "resultId": {
+          "type": "string",
+          "description": "Stable local identifier for this evaluation result.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "metric": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "externalMetricName": {
+          "type": "string",
+          "description": "Metric name when the metric is not represented as a first-class RKM entity.",
+          "minLength": 1
+        },
+        "resultType": {
+          "type": "string",
+          "enum": [
+            "Scalar Score",
+            "Rank",
+            "Categorical Judgment",
+            "Pass Fail",
+            "Latency",
+            "Cost",
+            "Confidence Interval",
+            "Error Category",
+            "Qualitative Judgment",
+            "Other"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/resultValue"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Measurement unit for the result value.",
+          "minLength": 1
+        },
+        "sampleSize": {
+          "type": "integer",
+          "description": "Number of evaluation examples, traces or observations represented by the result.",
+          "minimum": 1
+        },
+        "confidenceInterval": {
+          "$ref": "#/$defs/confidenceInterval"
+        },
+        "higherIsBetter": {
+          "type": "boolean",
+          "description": "Whether larger result values indicate better performance for this metric."
+        }
+      }
+    },
+    "resultValue": {
+      "description": "Measured or judged evaluation result value.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "confidenceInterval": {
+      "type": "object",
+      "description": "Uncertainty interval for a numeric evaluation result.",
+      "additionalProperties": false,
+      "required": [
+        "lower",
+        "upper"
+      ],
+      "properties": {
+        "lower": {
+          "type": "number"
+        },
+        "upper": {
+          "type": "number"
+        },
+        "level": {
+          "type": "number",
+          "description": "Confidence level as a decimal value.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "comparabilityProfile": {
+      "type": "object",
+      "description": "Conditions that determine whether this evaluation can be compared with another result.",
+      "additionalProperties": false,
+      "properties": {
+        "comparableWithPublishedLeaderboard": {
+          "type": "boolean"
+        },
+        "knownComparabilityConstraints": {
+          "type": "array",
+          "description": "Known conditions that limit direct comparison.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "alignedDimensions": {
+          "type": "array",
+          "description": "Dimensions known to align with comparable evaluations.",
+          "items": {
+            "$ref": "#/$defs/comparabilityDimension"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "comparabilityDimension": {
+      "type": "string",
+      "enum": [
+        "Target Type",
+        "Task Definition",
+        "Dataset Version",
+        "Dataset Split",
+        "Metric",
+        "Protocol",
+        "Implementation Constraints",
+        "Model Version",
+        "Reporting Date",
+        "Aggregation Method"
+      ]
+    },
+    "interpretation": {
+      "type": "object",
+      "description": "Maintainer interpretation of what the evaluation result means.",
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Concise interpretation of the evaluation result.",
+          "minLength": 10
+        },
+        "supportsClaims": {
+          "type": "array",
+          "description": "Stable claim identifiers supported by this evaluation.",
+          "items": {
+            "type": "string",
+            "pattern": "^CLAIM-[0-9]{4,}$"
+          },
+          "uniqueItems": true
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Limitations that affect how the result should be used.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "aggregationMethod": {
+      "type": "string",
+      "enum": [
+        "Mean",
+        "Median",
+        "Maximum",
+        "Minimum",
+        "Sum",
+        "Micro Average",
+        "Macro Average",
+        "Weighted Average",
+        "Percentile",
+        "Majority Vote",
+        "Other"
+      ]
+    },
+    "judge": {
+      "type": "object",
+      "description": "Human, model or automated judge used by the protocol.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "judgeType"
+          ]
+        },
+        {
+          "required": [
+            "judgeEntity"
+          ]
+        },
+        {
+          "required": [
+            "rubric"
+          ]
+        }
+      ],
+      "properties": {
+        "judgeType": {
+          "type": "string",
+          "enum": [
+            "Human",
+            "Language Model",
+            "Rule Based",
+            "Hybrid",
+            "Other"
+          ]
+        },
+        "judgeEntity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "rubric": {
+          "type": "string",
+          "description": "Rubric, instruction or judgment criterion used by the judge.",
+          "minLength": 1
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "description": "Named protocol or configuration parameter.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
