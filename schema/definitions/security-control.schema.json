@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/security-control.schema.json",
+  "title": "RKM Embedded Security Control Fragment Definition",
+  "description": "Defines a reusable embedded security control fragment for protected assets, threats, mitigations, enforcement boundaries and verification evidence inside first-class RKM schemas. This schema does not provide the full knowledge entity envelope for a Security Control: it intentionally omits first-class identity, metadata, description and top-level relationships. A standalone Security Control entity can be introduced separately after shared identity, registry and relationship support exists for that entity type.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "controlType",
+    "statement",
+    "boundary",
+    "protectedAssets"
+  ],
+  "properties": {
+    "securityControlId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded security control fragment within the containing entity, workflow, deployment, tool contract, policy or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the security control.",
+      "minLength": 1
+    },
+    "controlType": {
+      "$ref": "#/$defs/controlType"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Concise statement of the security mechanism, boundary or requirement represented by this control.",
+      "minLength": 1
+    },
+    "boundary": {
+      "$ref": "#/$defs/securityBoundary"
+    },
+    "protectedAssets": {
+      "type": "array",
+      "description": "Assets, artifacts or operational capabilities protected by this security control.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/protectedAsset"
+      },
+      "uniqueItems": true
+    },
+    "threats": {
+      "type": "array",
+      "description": "Security-relevant threats or failure modes addressed by this control.",
+      "items": {
+        "$ref": "#/$defs/threat"
+      },
+      "uniqueItems": true
+    },
+    "mitigations": {
+      "type": "array",
+      "description": "Mitigations implemented, required or supported by this security control.",
+      "items": {
+        "$ref": "#/$defs/mitigation"
+      },
+      "uniqueItems": true
+    },
+    "applicability": {
+      "type": "array",
+      "description": "Conditions under which this security control applies.",
+      "items": {
+        "$ref": "#/$defs/applicabilityCondition"
+      },
+      "uniqueItems": true
+    },
+    "verification": {
+      "type": "array",
+      "description": "Methods or observations used to verify that the security control exists, applies or is effective.",
+      "items": {
+        "$ref": "#/$defs/verification"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern this security control or define its requirements.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "relatedEntities": {
+      "type": "array",
+      "description": "Existing RKM entities that implement, require, enforce, evaluate, observe or are governed by this security control.",
+      "items": {
+        "$ref": "#/$defs/entityReference"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims about this security control, its applicability or its effectiveness.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting this security control, its boundary or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources that define, document or justify this security control.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "controlType": {
+      "type": "string",
+      "description": "Primary security mechanism represented by the control.",
+      "enum": [
+        "Authentication Control",
+        "Authorization Control",
+        "Access Control",
+        "Data Redaction Control",
+        "Encryption Control",
+        "Network Isolation Control",
+        "Tenant Isolation Control",
+        "Prompt Injection Mitigation",
+        "Source Trust Control",
+        "Citation Verification Control",
+        "Tool Permission Control",
+        "Credential Management Control",
+        "Audit Logging Control",
+        "Retention Control",
+        "Human Approval Control",
+        "Other"
+      ]
+    },
+    "securityBoundary": {
+      "type": "object",
+      "description": "Boundary where the control applies and where protected data, artifacts or capabilities may cross trust limits.",
+      "additionalProperties": false,
+      "required": [
+        "boundaryType"
+      ],
+      "properties": {
+        "boundaryType": {
+          "type": "string",
+          "enum": [
+            "Entity Boundary",
+            "Workflow Boundary",
+            "Workflow Step Boundary",
+            "Tool Invocation Boundary",
+            "Provider Boundary",
+            "Deployment Boundary",
+            "Dataset Boundary",
+            "Artifact Boundary",
+            "User Boundary",
+            "Tenant Boundary",
+            "Network Boundary",
+            "Other"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "target": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "dataCrossingBoundary": {
+          "type": "array",
+          "description": "Data, artifacts or capabilities that cross the boundary.",
+          "items": {
+            "$ref": "#/$defs/protectedAsset"
+          },
+          "uniqueItems": true
+        },
+        "ragStages": {
+          "type": "array",
+          "description": "RAG pipeline stages where the boundary is relevant.",
+          "items": {
+            "$ref": "#/$defs/ragStage"
+          },
+          "uniqueItems": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of the control boundary.",
+          "minLength": 1
+        }
+      }
+    },
+    "protectedAsset": {
+      "type": "object",
+      "description": "Entity, artifact, data item or operational capability protected by the security control.",
+      "additionalProperties": false,
+      "required": [
+        "assetType"
+      ],
+      "properties": {
+        "assetType": {
+          "type": "string",
+          "enum": [
+            "Source Document",
+            "Parsed Document",
+            "Chunk",
+            "Embedding Vector",
+            "Metadata Filter",
+            "Retrieval Result",
+            "Prompt",
+            "Generated Answer",
+            "Citation Set",
+            "Trace Record",
+            "Evaluation Result",
+            "Tool Credential",
+            "Provider Configuration",
+            "Operational Capability",
+            "Other"
+          ]
+        },
+        "asset": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "sensitivity": {
+          "type": "string",
+          "enum": [
+            "Public",
+            "Internal",
+            "Confidential",
+            "Restricted",
+            "Regulated",
+            "Unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "threat": {
+      "type": "object",
+      "description": "Security-relevant failure mode or adversarial condition addressed by the control.",
+      "additionalProperties": false,
+      "required": [
+        "threatType",
+        "description"
+      ],
+      "properties": {
+        "threatType": {
+          "type": "string",
+          "enum": [
+            "Unauthorized Access",
+            "Prompt Injection",
+            "Data Leakage",
+            "Credential Exposure",
+            "Insecure Provider Dependency",
+            "Missing Audit Trail",
+            "Tenant Isolation Failure",
+            "Untrusted Source Material",
+            "Unauthorized Retrieval",
+            "Unverified Citation",
+            "Trace Data Exposure",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affectedAsset": {
+          "$ref": "#/$defs/protectedAsset"
+        },
+        "likelihood": {
+          "$ref": "#/$defs/riskLevel"
+        },
+        "impact": {
+          "$ref": "#/$defs/riskLevel"
+        }
+      }
+    },
+    "mitigation": {
+      "type": "object",
+      "description": "Mechanism, workflow behavior or governance action that reduces a security threat.",
+      "additionalProperties": false,
+      "required": [
+        "mitigationType",
+        "description"
+      ],
+      "properties": {
+        "mitigationType": {
+          "type": "string",
+          "enum": [
+            "Source Filtering",
+            "Instruction Separation",
+            "Answer Verification",
+            "Metadata Authorization Filter",
+            "Scoped Tool Permission",
+            "Credential Isolation",
+            "Audit Logging",
+            "Trace Redaction",
+            "Retention Limit",
+            "Provider Review",
+            "Human Approval",
+            "Fail Closed Behavior",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mitigatedThreatType": {
+          "type": "string",
+          "description": "Threat type or local threat identifier mitigated by this mechanism.",
+          "minLength": 1
+        },
+        "implementedBy": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "applicabilityCondition": {
+      "type": "object",
+      "description": "Condition that determines when the security control applies.",
+      "additionalProperties": false,
+      "required": [
+        "conditionType",
+        "description"
+      ],
+      "properties": {
+        "conditionType": {
+          "type": "string",
+          "enum": [
+            "Data Sensitivity",
+            "User Authorization",
+            "Corpus Scope",
+            "Query Type",
+            "Tool Capability",
+            "Provider Boundary",
+            "Deployment Environment",
+            "Tenant Context",
+            "Workflow Stage",
+            "Jurisdiction",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appliesTo": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "description": "Method or observation used to verify the control.",
+      "additionalProperties": false,
+      "required": [
+        "verificationType"
+      ],
+      "properties": {
+        "verificationType": {
+          "type": "string",
+          "enum": [
+            "Policy Definition",
+            "Provider Documentation",
+            "Audit Log",
+            "Validation Report",
+            "Evaluation Result",
+            "Configuration Snapshot",
+            "Workflow Trace",
+            "Human Review Record",
+            "Source Reference",
+            "Runtime Check",
+            "Other"
+          ]
+        },
+        "verificationState": {
+          "type": "string",
+          "enum": [
+            "Verified",
+            "Partially Verified",
+            "Not Verified",
+            "Contradicted",
+            "Unknown"
+          ]
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifactReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "description": "Stable reference to an existing RKM entity related to this security control. The id is required and authoritative for graph export; slug, name and entityType are optional display or discovery aids only.",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "relationship.schema.json#/$defs/entityId",
+          "description": "Stable RKM identifier of the referenced entity. Identifiers follow the project convention of an uppercase entity prefix and four or more digits."
+        },
+        "slug": {
+          "$ref": "relationship.schema.json#/$defs/slug",
+          "description": "Optional filesystem-safe slug for readability and discovery; it is not the stable graph identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional human-readable display name of the referenced entity; it is not the stable graph identifier.",
+          "minLength": 1
+        },
+        "entityType": {
+          "$ref": "relationship.schema.json#/$defs/entityType",
+          "description": "Known RKM entity type of the referenced entity, constrained to the shared relationship entity-type vocabulary."
+        }
+      }
+    },
+    "artifactReference": {
+      "type": "object",
+      "description": "Reference to a local or external artifact used to verify a security control.",
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactType": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "artifactId"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "Very Low",
+        "Low",
+        "Medium",
+        "High",
+        "Very High",
+        "Unknown"
+      ]
+    },
+    "ragStage": {
+      "type": "string",
+      "enum": [
+        "Ingestion",
+        "Parsing",
+        "Chunking",
+        "Embedding",
+        "Indexing",
+        "Query Understanding",
+        "Retrieval",
+        "Reranking",
+        "Context Assembly",
+        "Generation",
+        "Evaluation",
+        "Orchestration",
+        "Monitoring"
+      ]
+    }
+  }
+}
