@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/entity-reference.schema.json",
+  "title": "RKM Entity Reference Definition",
+  "description": "Defines a reusable stable reference to an existing RKM entity for embedded structures that need to point to first-class graph nodes without embedding the full entity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "relationship.schema.json#/$defs/entityId",
+      "description": "Globally unique immutable identifier of the referenced RKM entity. This value is authoritative for graph export and cross-file linking."
+    },
+    "entityType": {
+      "$ref": "identity.schema.json#/properties/entityType",
+      "description": "Known RKM entity type of the referenced entity, constrained to the shared identity entity-type vocabulary."
+    },
+    "slug": {
+      "$ref": "relationship.schema.json#/$defs/slug",
+      "description": "Optional filesystem-safe slug for readability, lookup and contributor review. The stable id remains authoritative."
+    },
+    "name": {
+      "type": "string",
+      "description": "Optional human-readable display name for the referenced entity.",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "description": "Optional role played by the referenced entity in the local context.",
+      "minLength": 1
+    }
+  }
+}
