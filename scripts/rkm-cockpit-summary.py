@@ -20,6 +20,8 @@ sys.dont_write_bytecode = True
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET = 3
 DEFAULT_WORKING_TARGET_MAX = 5
+DEFAULT_BUDGET_GRACE_TOKENS = 10000
+DEFAULT_BUDGET_GRACE_RATIO = 0.02
 TRUTHY_VALUES = {"true", "1", "yes", "y", "on"}
 FALSEY_VALUES = {"false", "0", "no", "n", "off", ""}
 STOP_RECOVERY_STATUSES = {
@@ -60,6 +62,26 @@ def positive_int(value: str) -> int:
         raise argparse.ArgumentTypeError("must be a positive integer") from exc
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def non_negative_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a non-negative integer") from exc
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be a non-negative integer")
+    return parsed
+
+
+def non_negative_float(value: str) -> float:
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a non-negative number") from exc
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be a non-negative number")
     return parsed
 
 
@@ -232,6 +254,17 @@ def safe_text(value: Any, fallback: str = "unknown") -> str:
         return fallback
     text = str(value)
     return text if text else fallback
+
+
+def format_percent(value: float) -> str:
+    percent = value * 100
+    if percent.is_integer():
+        return f"{int(percent)}%"
+    return f"{percent:g}%"
+
+
+def budget_grace_text(grace_tokens: int, grace_ratio: float) -> str:
+    return f"{grace_tokens} tokens or {format_percent(grace_ratio)}"
 
 
 def row(icon: str, label: str, value: Any, color: bool = False, color_name: str = "cyan") -> str:
@@ -519,6 +552,8 @@ def render_dashboard(
     state: dict[str, Any] | None = None,
     ledger_entries: list[dict[str, Any]] | None = None,
     force: bool = False,
+    budget_grace_tokens: int = DEFAULT_BUDGET_GRACE_TOKENS,
+    budget_grace_ratio: float = DEFAULT_BUDGET_GRACE_RATIO,
 ) -> str:
     global COLOR
     COLOR = color_enabled(no_color)
@@ -560,6 +595,7 @@ def render_dashboard(
     lines.extend(
         [
         row(icons["budget"], "budget", budget_text(next_action, budget, target, force=force)),
+        row(icons["budget"], "budget grace", budget_grace_text(budget_grace_tokens, budget_grace_ratio)),
         row(icons["target"], "recommended max target", recommended_max_target(budget, next_action)),
         row(icons["next"], f"next-action status T={target}", next_action.get("status")),
         row(icons["cmd"], "current recommended command", next_action.get("command") or recovery.get("recommendedCommand")),
@@ -583,10 +619,25 @@ def print_dashboard(
     target: int,
     no_color: bool,
     force: bool,
+    budget_grace_tokens: int,
+    budget_grace_ratio: float,
 ) -> None:
     state = read_json_file(REPOSITORY_ROOT / ".rkm" / "autopilot-state.json")
     ledger_entries = read_jsonl_file(REPOSITORY_ROOT / ".rkm" / "run-ledger.jsonl")
-    print(render_dashboard(next_action, budget, recovery, target, no_color, state, ledger_entries, force=force))
+    print(
+        render_dashboard(
+            next_action,
+            budget,
+            recovery,
+            target,
+            no_color,
+            state,
+            ledger_entries,
+            force=force,
+            budget_grace_tokens=budget_grace_tokens,
+            budget_grace_ratio=budget_grace_ratio,
+        )
+    )
 
 
 def collect(target: int, *, force: bool, working_target_max: int) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -854,6 +905,7 @@ def run_self_test() -> int:
         True,
     )
     assert_contains("over budget row", over_budget_dashboard, "target 3 blocked; max safe target 1")
+    assert_contains("budget grace row", over_budget_dashboard, "budget grace                -> 10000 tokens or 2%")
 
     allowed_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE"},
@@ -891,6 +943,7 @@ def run_self_test() -> int:
     assert_contains("forced budget row", forced_dashboard, "target 24 forced; budget guard may warn")
     assert_contains("forced run", forced_dashboard, "run                         -> make autopilot N=24 FORCE=true")
     assert_contains("forced row", forced_dashboard, "force                       -> enabled")
+    assert_contains("forced grace row", forced_dashboard, "budget grace                -> 10000 tokens or 2%")
 
     stale_revise_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE", "repoStatus": "clean"},
@@ -1160,6 +1213,18 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
     )
     parser.add_argument("--no-color", action="store_true", help="disable ANSI color output")
+    parser.add_argument(
+        "--budget-grace-tokens",
+        type=non_negative_int,
+        default=non_negative_int(os.environ.get("BUDGET_GRACE_TOKENS", str(DEFAULT_BUDGET_GRACE_TOKENS))),
+        help=f"token budget grace threshold (default: {DEFAULT_BUDGET_GRACE_TOKENS})",
+    )
+    parser.add_argument(
+        "--budget-grace-ratio",
+        type=non_negative_float,
+        default=non_negative_float(os.environ.get("BUDGET_GRACE_RATIO", str(DEFAULT_BUDGET_GRACE_RATIO))),
+        help=f"token budget grace ratio (default: {DEFAULT_BUDGET_GRACE_RATIO})",
+    )
     parser.add_argument("--self-test", action="store_true", help="run decision-rule tests without shelling out")
     return parser.parse_args()
 
@@ -1172,7 +1237,16 @@ def main() -> int:
         return run_self_test()
 
     next_action, budget, recovery = collect(args.target, force=args.force, working_target_max=args.working_target_max)
-    print_dashboard(next_action, budget, recovery, args.target, args.no_color, args.force)
+    print_dashboard(
+        next_action,
+        budget,
+        recovery,
+        args.target,
+        args.no_color,
+        args.force,
+        args.budget_grace_tokens,
+        args.budget_grace_ratio,
+    )
     return 0
 
 

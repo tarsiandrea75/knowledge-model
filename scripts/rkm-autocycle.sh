@@ -12,7 +12,10 @@ TAIL_LINES="${TAIL_LINES:-80}"
 LEDGER_SCRIPT="scripts/rkm-run-ledger.py"
 REVIEW_VERDICT_SCRIPT="scripts/rkm-review-verdict.py"
 BUDGET_SAFETY_FACTOR="${BUDGET_SAFETY_FACTOR:-1.25}"
+BUDGET_GRACE_TOKENS="${BUDGET_GRACE_TOKENS:-10000}"
+BUDGET_GRACE_RATIO="${BUDGET_GRACE_RATIO:-0.02}"
 FORCE="${FORCE:-false}"
+BUDGET_ESTIMATE_OUTPUT=""
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -65,6 +68,20 @@ format_elapsed() {
 require_command() {
   local command_name="$1"
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
+}
+
+validate_non_negative_number() {
+  local label="$1"
+  local value="$2"
+
+  awk -v value="$value" -v label="$label" '
+    BEGIN {
+      if (value !~ /^[0-9]+([.][0-9]+)?$/) {
+        printf("ERROR: %s must be a non-negative number: %s\n", label, value) > "/dev/stderr"
+        exit 1
+      }
+    }
+  ' || exit 1
 }
 
 ensure_clean_worktree() {
@@ -155,6 +172,8 @@ run_budget_estimate() {
   local estimate_output
   local estimate_result
 
+  BUDGET_ESTIMATE_OUTPUT=""
+
   if [[ -z "${TOKEN_BUDGET:-}" ]]; then
     return 0
   fi
@@ -179,6 +198,7 @@ run_budget_estimate() {
   if [[ -n "$estimate_output" ]]; then
     printf '%s\n' "$estimate_output"
   fi
+  BUDGET_ESTIMATE_OUTPUT="$estimate_output"
 
   if [[ "$estimate_result" -eq 2 ]] && [[ "$estimate_output" == Estimation\ unavailable:* ]]; then
     warn "Token budget estimate history is unavailable; continuing without budget guard."
@@ -186,6 +206,60 @@ run_budget_estimate() {
   fi
 
   return "$estimate_result"
+}
+
+budget_estimate_field() {
+  local field="$1"
+
+  awk -F': ' -v field="$field" '$1 == field { print $2; exit }' <<<"$BUDGET_ESTIMATE_OUTPUT"
+}
+
+budget_near_miss_within_grace() {
+  local estimated_tokens
+  local remaining_budget
+
+  estimated_tokens="$(budget_estimate_field "estimatedTokens")"
+  remaining_budget="$(budget_estimate_field "remainingBudget")"
+
+  if [[ -z "$estimated_tokens" || -z "$remaining_budget" ]]; then
+    return 1
+  fi
+
+  awk \
+    -v estimated_tokens="$estimated_tokens" \
+    -v remaining_budget="$remaining_budget" \
+    -v grace_tokens="$BUDGET_GRACE_TOKENS" \
+    -v grace_ratio="$BUDGET_GRACE_RATIO" '
+      BEGIN {
+        shortfall = estimated_tokens - remaining_budget
+        ratio_grace_tokens = estimated_tokens * grace_ratio
+        grace_allowed = grace_tokens > ratio_grace_tokens ? grace_tokens : ratio_grace_tokens
+        if (shortfall <= grace_allowed) {
+          printf("[rkm-autocycle] WARNING: token budget guard near miss; shortfall %.2f within grace %.2f; continuing.\n", shortfall, grace_allowed) > "/dev/stderr"
+          exit 0
+        }
+        exit 1
+      }
+    '
+}
+
+handle_budget_result() {
+  local budget_result="$1"
+  local stop_message="$2"
+
+  if [[ "$budget_result" -eq 3 ]]; then
+    if [[ "$force_enabled" == "true" ]]; then
+      warn "token budget guard would stop here, but FORCE=true; continuing."
+      return 0
+    fi
+    if budget_near_miss_within_grace; then
+      return 0
+    fi
+    printf '%s\n' "$stop_message" >&2
+    return 1
+  fi
+
+  return 0
 }
 
 if ! [[ "$TARGET_ACCEPTED_FILES" =~ ^[0-9]+$ ]] || [[ "$TARGET_ACCEPTED_FILES" -lt 1 ]]; then
@@ -197,8 +271,11 @@ require_command bash
 require_command make
 require_command tail
 require_command wc
+require_command awk
 
 ensure_clean_worktree
+validate_non_negative_number "BUDGET_GRACE_TOKENS" "$BUDGET_GRACE_TOKENS"
+validate_non_negative_number "BUDGET_GRACE_RATIO" "$BUDGET_GRACE_RATIO"
 
 force_enabled=false
 if parse_bool "$FORCE"; then
@@ -220,12 +297,10 @@ if [[ -n "${TOKEN_BUDGET:-}" ]]; then
   fi
 
   if [[ "$initial_budget_result" -eq 3 ]]; then
-    if [[ "$force_enabled" == "true" ]]; then
-      warn "token budget guard would stop here, but FORCE=true; continuing."
-    else
-      printf 'ERROR: Token budget guard stopped before work: budget is insufficient for %s accepted file(s).\n' "$TARGET_ACCEPTED_FILES" >&2
+    if ! handle_budget_result "$initial_budget_result" "ERROR: Token budget guard stopped before work: budget is insufficient for $TARGET_ACCEPTED_FILES accepted file(s)."; then
       exit 1
     fi
+    initial_budget_result=0
   fi
 
   if [[ "$initial_budget_result" -ne 0 ]]; then
@@ -263,14 +338,12 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
         budget_result="$?"
       fi
       if [[ "$budget_result" -eq 3 ]]; then
-        if [[ "$force_enabled" == "true" ]]; then
-          warn "token budget guard would stop here, but FORCE=true; continuing."
-        else
-          printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+        if ! handle_budget_result "$budget_result" "ERROR: Token budget guard stopped after iteration $iteration: remaining budget is insufficient for $remaining_target more accepted file(s)."; then
           print_ledger_report
           git status --short
           exit 1
         fi
+        budget_result=0
       fi
       if [[ "$budget_result" -ne 0 ]]; then
         fail "Token budget estimate failed after iteration $iteration."
@@ -329,14 +402,12 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
         budget_result="$?"
       fi
       if [[ "$budget_result" -eq 3 ]]; then
-        if [[ "$force_enabled" == "true" ]]; then
-          warn "token budget guard would stop here, but FORCE=true; continuing."
-        else
-          printf 'ERROR: Token budget guard stopped after iteration %s: remaining budget is insufficient for %s more accepted file(s).\n' "$iteration" "$remaining_target" >&2
+        if ! handle_budget_result "$budget_result" "ERROR: Token budget guard stopped after iteration $iteration: remaining budget is insufficient for $remaining_target more accepted file(s)."; then
           print_ledger_report
           git status --short
           exit 1
         fi
+        budget_result=0
       fi
       if [[ "$budget_result" -ne 0 ]]; then
         fail "Token budget estimate failed after iteration $iteration."

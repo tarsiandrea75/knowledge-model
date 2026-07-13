@@ -9,6 +9,8 @@ DAILY_BUDGET ?= 300000
 BUDGET_SAFETY_FACTOR ?= 1.25
 BUDGET_RESERVE_RATIO ?= 0.20
 BUDGET_WINDOW_HOURS ?= 24
+BUDGET_GRACE_TOKENS ?= 10000
+BUDGET_GRACE_RATIO ?= 0.02
 BUDGET_TARGET ?= $(AUTOCYCLE_N)
 NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
@@ -37,7 +39,7 @@ cycle:
 	exit "$$exit_code"
 
 autocycle:
-	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" FORCE="$(FORCE)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
+	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" BUDGET_GRACE_TOKENS="$(BUDGET_GRACE_TOKENS)" BUDGET_GRACE_RATIO="$(BUDGET_GRACE_RATIO)" FORCE="$(FORCE)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
 
 discover:
 	set +e; \
@@ -142,7 +144,7 @@ cockpit:
 
 cockpit-summary: N ?= 3
 cockpit-summary:
-	python3 scripts/rkm-cockpit-summary.py --target "$(N)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
+	python3 scripts/rkm-cockpit-summary.py --target "$(N)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --budget-grace-tokens "$(BUDGET_GRACE_TOKENS)" --budget-grace-ratio "$(BUDGET_GRACE_RATIO)"
 
 help:
 	@printf 'RKM developer commands:\n'
