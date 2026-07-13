@@ -1,0 +1,473 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/query.schema.json",
+  "title": "RKM Query Definition",
+  "description": "Defines a reusable structured query artifact with context, intent, constraints and transformation metadata for RAG retrieval, routing, evaluation and generation workflows.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "queryType",
+    "intent",
+    "content",
+    "lifecycleRole"
+  ],
+  "properties": {
+    "queryId": {
+      "type": "string",
+      "description": "Stable local identifier for this query artifact within the containing workflow, evidence record, benchmark example, trace or entity document.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the query artifact.",
+      "minLength": 1
+    },
+    "queryType": {
+      "$ref": "#/$defs/queryType"
+    },
+    "intent": {
+      "$ref": "#/$defs/queryIntent"
+    },
+    "content": {
+      "$ref": "#/$defs/queryContent"
+    },
+    "lifecycleRole": {
+      "$ref": "#/$defs/lifecycleRole"
+    },
+    "origin": {
+      "$ref": "#/$defs/queryOrigin"
+    },
+    "context": {
+      "type": "array",
+      "description": "Context available when the query is created, interpreted or evaluated.",
+      "items": {
+        "$ref": "#/$defs/contextItem"
+      },
+      "uniqueItems": true
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Structured restrictions that affect acceptable retrieval targets, sources, formats or decisions.",
+      "items": {
+        "$ref": "#/$defs/queryConstraint"
+      },
+      "uniqueItems": true
+    },
+    "retrievalPlan": {
+      "$ref": "#/$defs/retrievalPlan"
+    },
+    "transformation": {
+      "$ref": "#/$defs/queryTransformation"
+    },
+    "evaluationContext": {
+      "$ref": "#/$defs/evaluationContext"
+    },
+    "qualityAttributes": {
+      "type": "array",
+      "description": "Quality attributes affected by this query artifact or its transformation.",
+      "items": {
+        "$ref": "quality-attribute.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims about this query artifact, transformation quality, retrieval suitability or evaluation role.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting claims about this query artifact or its effects.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources associated with the query artifact.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "queryType": {
+      "type": "string",
+      "description": "Primary form of the query artifact.",
+      "enum": [
+        "User Query",
+        "Conversation Query",
+        "Standalone Retrieval Query",
+        "Rewritten Query",
+        "Expanded Query",
+        "Decomposed Subquery",
+        "Hypothetical Document Query",
+        "Structured Query",
+        "Routing Query",
+        "Evaluation Query",
+        "Diagnostic Query",
+        "Other"
+      ]
+    },
+    "queryIntent": {
+      "type": "string",
+      "description": "Information need, decision or action requested by the query.",
+      "enum": [
+        "Factual Lookup",
+        "Explanatory Answer",
+        "Comparison",
+        "Summarization",
+        "Troubleshooting",
+        "Citation Request",
+        "Source Discovery",
+        "Entity Lookup",
+        "Relationship Lookup",
+        "Multi Hop Reasoning",
+        "Evaluation Judgment",
+        "Tool Selection",
+        "Retriever Selection",
+        "Other"
+      ]
+    },
+    "queryContent": {
+      "type": "object",
+      "description": "Textual or structured representation of the query.",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "text"
+          ]
+        },
+        {
+          "required": [
+            "structuredFields"
+          ]
+        }
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Natural-language or query-language text.",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language of the query content.",
+          "default": "en",
+          "minLength": 2
+        },
+        "structuredFields": {
+          "type": "array",
+          "description": "Machine-readable fields that define the query shape.",
+          "items": {
+            "$ref": "#/$defs/structuredField"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "structuredField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "valueType"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Stable field name.",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Array",
+            "Object",
+            "URI",
+            "Date Time",
+            "Duration"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "description": "Representative or literal value for the structured query field."
+        }
+      }
+    },
+    "lifecycleRole": {
+      "type": "string",
+      "description": "Role played by the query artifact in a RAG process.",
+      "enum": [
+        "Original Input",
+        "Intermediate",
+        "Transformed Output",
+        "Retrieval Input",
+        "Routing Input",
+        "Evaluation Target",
+        "Benchmark Input",
+        "Trace Record"
+      ]
+    },
+    "queryOrigin": {
+      "type": "object",
+      "description": "Source that produced or supplied the query artifact.",
+      "additionalProperties": false,
+      "required": [
+        "originType"
+      ],
+      "properties": {
+        "originType": {
+          "type": "string",
+          "enum": [
+            "User",
+            "Conversation Turn",
+            "Workflow Step",
+            "Agent Action",
+            "Prompt Technique",
+            "Tool Invocation",
+            "Benchmark Example",
+            "Dataset Record",
+            "Monitoring Process",
+            "Other"
+          ]
+        },
+        "sourceReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "workflowStep": {
+          "type": "string",
+          "description": "Stable local workflow step identifier when the query was produced by a workflow step.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        }
+      }
+    },
+    "contextItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contextType",
+        "description"
+      ],
+      "properties": {
+        "contextType": {
+          "type": "string",
+          "enum": [
+            "Conversation History",
+            "User Role",
+            "Task Instruction",
+            "Selected Corpus",
+            "Document Metadata",
+            "Access Policy",
+            "Locale",
+            "Time Range",
+            "Previous Retrieval Result",
+            "Evaluation Rubric",
+            "Benchmark Task",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/entityReference"
+        }
+      }
+    },
+    "queryConstraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraintType"
+      ],
+      "properties": {
+        "constraintType": {
+          "type": "string",
+          "enum": [
+            "Corpus Boundary",
+            "Metadata Filter",
+            "Date Range",
+            "Version Range",
+            "Language",
+            "Modality",
+            "Access Control",
+            "Freshness Requirement",
+            "Source Type",
+            "Retrieval Depth",
+            "Ranking Objective",
+            "Citation Requirement",
+            "Abstention Policy",
+            "Other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the constraint must be enforced for the query to remain valid.",
+          "default": true
+        },
+        "value": {
+          "description": "Machine-readable or representative value for the constraint."
+        }
+      }
+    },
+    "retrievalPlan": {
+      "type": "object",
+      "description": "Expected retrieval behavior driven by the query.",
+      "additionalProperties": false,
+      "properties": {
+        "targetEntityTypes": {
+          "type": "array",
+          "description": "Entity or artifact classes expected as retrieval targets.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "retrievalDepth": {
+          "type": "integer",
+          "description": "Requested or expected number of candidates to retrieve.",
+          "minimum": 1
+        },
+        "rankingObjective": {
+          "type": "string",
+          "description": "Primary objective used to rank retrieval candidates.",
+          "minLength": 1
+        },
+        "requiresReranking": {
+          "type": "boolean",
+          "description": "Whether the query is expected to be followed by reranking.",
+          "default": false
+        }
+      }
+    },
+    "queryTransformation": {
+      "type": "object",
+      "description": "Transformation that produced this query from another query artifact.",
+      "additionalProperties": false,
+      "required": [
+        "transformationType"
+      ],
+      "properties": {
+        "transformationType": {
+          "type": "string",
+          "enum": [
+            "Rewrite",
+            "Expansion",
+            "Decomposition",
+            "Hypothetical Document Generation",
+            "Translation",
+            "Normalization",
+            "Filter Extraction",
+            "Structured Query Translation",
+            "Routing Query Generation",
+            "Other"
+          ]
+        },
+        "inputQueryReference": {
+          "type": "string",
+          "description": "Stable local identifier of the input query when available.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "methodReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "responsibleEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "qualityRationale": {
+          "type": "string",
+          "description": "Explanation of why the transformation is expected to improve or preserve retrieval, routing or evaluation quality.",
+          "minLength": 1
+        }
+      }
+    },
+    "evaluationContext": {
+      "type": "object",
+      "description": "Evaluation setup in which this query artifact is used or assessed.",
+      "additionalProperties": false,
+      "properties": {
+        "datasetReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "benchmarkReference": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "metricReferences": {
+          "type": "array",
+          "description": "Metrics used to assess this query artifact or downstream behavior.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "evaluationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "expectedOutput": {
+          "type": "string",
+          "description": "Expected answer, source set, decision or output shape when known.",
+          "minLength": 1
+        }
+      }
+    },
+    "entityReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable RKM identifier when the target is represented as an entity.",
+          "pattern": "^[A-Z]+(-[A-Z]+)*-[0-9]{4,}$"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Filesystem-safe slug when a stable identifier is not available.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for targets that are not yet represented as RKM entities.",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "slug"
+          ]
+        },
+        {
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    }
+  }
+}
