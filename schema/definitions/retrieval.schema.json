@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/retrieval.schema.json",
+  "title": "RKM Embedded Retrieval Definition",
+  "description": "Defines a reusable embedded retrieval fragment for candidate selection, ranking, filtering and retrieval context in RAG systems. This schema does not provide the full knowledge entity envelope for Retriever or Reranker: it intentionally omits first-class identity, metadata, description and top-level relationships.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "retrievalType",
+    "retrievalApproach",
+    "retrievalTargets"
+  ],
+  "properties": {
+    "retrievalId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded retrieval fragment within the containing entity, workflow, evaluation or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable retrieval fragment name.",
+      "minLength": 1
+    },
+    "retrievalType": {
+      "$ref": "#/$defs/retrievalType"
+    },
+    "retrievalApproach": {
+      "$ref": "#/$defs/retrievalApproach"
+    },
+    "retrievalTargets": {
+      "type": "array",
+      "description": "Artifacts selected, returned, reranked or filtered by the retrieval process.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/retrievalTarget"
+      },
+      "uniqueItems": true
+    },
+    "inputQueries": {
+      "type": "array",
+      "description": "Query artifacts consumed by this retrieval process.",
+      "items": {
+        "$ref": "query.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "candidateSources": {
+      "type": "array",
+      "description": "Stores, indexes, services or corpora from which candidates are selected.",
+      "items": {
+        "$ref": "#/$defs/candidateSource"
+      },
+      "uniqueItems": true
+    },
+    "indexing": {
+      "type": "array",
+      "description": "Indexing structures, strategies or constraints that affect retrieval behavior.",
+      "items": {
+        "$ref": "indexing.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "storage": {
+      "type": "array",
+      "description": "Embedded storage fragments used by the retrieval process.",
+      "items": {
+        "$ref": "storage.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "queryProcessing": {
+      "type": "array",
+      "description": "Transformations, routing decisions or interpretation steps applied before candidate selection.",
+      "items": {
+        "$ref": "#/$defs/queryProcessingStep"
+      },
+      "uniqueItems": true
+    },
+    "ranking": {
+      "$ref": "#/$defs/rankingProfile"
+    },
+    "filtering": {
+      "$ref": "#/$defs/filteringProfile"
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Artifacts emitted by the retrieval process.",
+      "items": {
+        "$ref": "#/$defs/retrievalOutput"
+      },
+      "uniqueItems": true
+    },
+    "evaluationContext": {
+      "$ref": "#/$defs/evaluationContext"
+    },
+    "operationalCharacteristics": {
+      "$ref": "#/$defs/operationalCharacteristics"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this embedded retrieval fragment to RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare retrieval behavior, quality, latency, cost, limitations or tradeoffs.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting retrieval behavior, configuration, evaluation results or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the retrieval fragment.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "usageGuidance": {
+      "type": "array",
+      "description": "Guidance for modeling, configuring, evaluating or composing this retrieval process in RAG systems.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "retrievalType": {
+      "type": "string",
+      "description": "Primary retrieval role represented by the fragment.",
+      "enum": [
+        "Initial Retrieval",
+        "Reranking",
+        "Hybrid Retrieval",
+        "Graph Retrieval",
+        "Federated Retrieval",
+        "Router Retrieval",
+        "Self Query Retrieval",
+        "Parent Document Retrieval",
+        "Multi Vector Retrieval",
+        "Citation Candidate Retrieval",
+        "Other"
+      ]
+    },
+    "retrievalApproach": {
+      "type": "string",
+      "description": "How candidates are selected, scored, reordered or filtered.",
+      "enum": [
+        "Similarity Search",
+        "Maximum Marginal Relevance",
+        "Lexical Search",
+        "Boolean Search",
+        "Hybrid Search",
+        "Graph Traversal",
+        "Metadata Filtering",
+        "Structured Query",
+        "Full Text Search",
+        "Rank Fusion",
+        "Learned Retrieval",
+        "Generative Relevance Judging",
+        "Heuristic Retrieval",
+        "Other"
+      ]
+    },
+    "retrievalTarget": {
+      "type": "string",
+      "description": "Artifact type returned or ranked by retrieval.",
+      "enum": [
+        "Document",
+        "Chunk",
+        "Passage",
+        "Node",
+        "Triple",
+        "Table Row",
+        "Image",
+        "Code Snippet",
+        "Search Result",
+        "Citation Candidate",
+        "External Resource",
+        "Other"
+      ]
+    },
+    "candidateSource": {
+      "type": "object",
+      "description": "Source from which retrieval candidates are selected.",
+      "additionalProperties": false,
+      "required": [
+        "sourceType"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "description": "Stable local source identifier.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "Vector Index",
+            "Graph Store",
+            "Full Text Index",
+            "Document Store",
+            "Relational Database",
+            "Web Search Service",
+            "Metadata Catalog",
+            "External API",
+            "Other"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "queryProcessingStep": {
+      "type": "object",
+      "description": "A query processing behavior applied before retrieval or reranking.",
+      "additionalProperties": false,
+      "required": [
+        "stepType"
+      ],
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "description": "Stable local query processing step identifier.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "stepType": {
+          "type": "string",
+          "enum": [
+            "Query Rewriting",
+            "Query Expansion",
+            "Query Decomposition",
+            "Intent Classification",
+            "Metadata Filter Extraction",
+            "Structured Query Translation",
+            "Retriever Routing",
+            "Other"
+          ]
+        },
+        "input": {
+          "$ref": "query.schema.json"
+        },
+        "output": {
+          "$ref": "query.schema.json"
+        },
+        "performedBy": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rankingProfile": {
+      "type": "object",
+      "description": "Candidate scoring and ordering behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "scoringMethods": {
+          "type": "array",
+          "description": "Methods used to score or combine candidates.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Vector Similarity",
+              "BM25",
+              "Cosine Similarity",
+              "Dot Product",
+              "Euclidean Distance",
+              "Reciprocal Rank Fusion",
+              "Cross Encoder Score",
+              "LLM Relevance Judgment",
+              "Graph Proximity",
+              "Metadata Boost",
+              "Freshness Boost",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "scoreDirection": {
+          "type": "string",
+          "enum": [
+            "Higher Is Better",
+            "Lower Is Better",
+            "Unordered",
+            "Depends On Method"
+          ]
+        },
+        "topK": {
+          "type": "integer",
+          "description": "Maximum number of candidates selected or returned.",
+          "minimum": 1
+        },
+        "rerankingDepth": {
+          "type": "integer",
+          "description": "Number of initially retrieved candidates considered by a reranking step.",
+          "minimum": 1
+        },
+        "diversityStrategy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "filteringProfile": {
+      "type": "object",
+      "description": "Eligibility constraints applied to retrieval candidates.",
+      "additionalProperties": false,
+      "properties": {
+        "filterTypes": {
+          "type": "array",
+          "description": "Kinds of filters applied during retrieval.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Metadata",
+              "Access Control",
+              "Time Window",
+              "Source Type",
+              "Jurisdiction",
+              "Tenant",
+              "Language",
+              "Score Threshold",
+              "Deduplication",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "requiresRuntimeContext": {
+          "type": "boolean",
+          "description": "Whether filtering depends on request, user, tenant, policy or session context."
+        },
+        "filterExpressionLanguage": {
+          "type": "string",
+          "description": "Named filter expression or query language, when applicable.",
+          "minLength": 1
+        }
+      }
+    },
+    "retrievalOutput": {
+      "type": "object",
+      "description": "Output emitted by a retrieval process.",
+      "additionalProperties": false,
+      "required": [
+        "artifactType"
+      ],
+      "properties": {
+        "artifactType": {
+          "$ref": "#/$defs/retrievalTarget"
+        },
+        "artifact": {
+          "$ref": "artifact.schema.json"
+        },
+        "includesScore": {
+          "type": "boolean"
+        },
+        "includesRank": {
+          "type": "boolean"
+        },
+        "includesCitationMetadata": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evaluationContext": {
+      "type": "object",
+      "description": "Context needed to interpret retrieval evaluation claims.",
+      "additionalProperties": false,
+      "properties": {
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "benchmark": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "metrics": {
+          "type": "array",
+          "description": "Metrics used to evaluate retrieval behavior.",
+          "items": {
+            "$ref": "#/$defs/entityReference"
+          },
+          "uniqueItems": true
+        },
+        "retrievalDepth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evaluationDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational characteristics relevant to retrieval selection and use.",
+      "additionalProperties": false,
+      "properties": {
+        "latencySensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "costSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "throughputSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "freshnessSensitivity": {
+          "$ref": "#/$defs/level"
+        },
+        "explainabilityRequirement": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "entityReference": {
+      "$ref": "entity-reference.schema.json"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Variable",
+        "Unknown"
+      ]
+    }
+  }
+}
