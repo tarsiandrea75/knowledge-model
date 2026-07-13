@@ -2,13 +2,13 @@
 
 ## Purpose
 
-This guide explains how another team can inspect, validate, and export the first small RAG Knowledge Model fixture package.
+This guide explains how another team can inspect, validate, and export the first small RAG Knowledge Model fixture package and the first small populated dataset.
 
 RKM is a structured knowledge model for the Retrieval-Augmented Generation ecosystem. Consumers should treat entities, relationships, claims, evidence, references, and metadata as separate but connected concepts.
 
 ## Fixture Package
 
-The minimal consumer package lives under `examples/fixtures/`.
+The minimal fixture package lives under `examples/fixtures/`. Fixtures are minimal examples for learning the schema shape and testing validation mechanics. They are not the populated knowledge dataset.
 
 It contains:
 
@@ -25,6 +25,24 @@ EVIDENCE-9001 derived from REFERENCE-9001
 ```
 
 `COMPONENT-9001` is intentionally referenced but not expanded into a full component entity in this package. This keeps the first fixture small while showing that RKM relationships can point to stable identifiers outside the current fixture set.
+
+## Populated Data
+
+The first populated RKM dataset lives under `data/`. It is separate from fixtures and is intended for consumer testing, validation, and release packaging.
+
+Current seed data includes three RAG technique records:
+
+- `data/rag-techniques/hybrid-retrieval.json`
+- `data/rag-techniques/query-rewriting.json`
+- `data/rag-techniques/reranking.json`
+
+These records are intentionally small and conservative. They are not a complete RAG technique catalog and should not be presented as comprehensive coverage of the RAG ecosystem.
+
+Data validation is driven by `data/manifest.json`, which maps each data file to its validating schema. Direct data validation is available through:
+
+```bash
+make data-validate
+```
 
 ## Minimal Graph Export
 
@@ -57,7 +75,7 @@ Run repository validation from the project root:
 make validate
 ```
 
-This runs schema validity checks, fixture instance validity checks, graph export consistency checks, and the rest of the repository validation suite:
+This runs schema validity checks, fixture instance validity checks, data instance validity checks, graph export consistency checks, and the rest of the repository validation suite:
 
 - whitespace validation
 - file encoding and line ending checks
@@ -68,11 +86,14 @@ This runs schema validity checks, fixture instance validity checks, graph export
 - schema contract validation
 - registry validation
 - fixture instance validation using `examples/fixtures/fixture-manifest.json`
+- data instance validation using `data/manifest.json`
 - graph export consistency validation using `scripts/export-fixtures-graph.py --check`
 - RKM unit tests
 - documentation relationship validation
 
 Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fixture and schema paths from the repository root, and validates each fixture instance against its declared schema. The claim package fixture is an envelope, so its `claim`, `evidence`, and `reference` objects are validated against their corresponding definition schemas.
+
+Data validation loads `data/manifest.json`, resolves data and schema paths from the repository root, and validates each populated data instance against its declared schema.
 
 Graph export generation is handled by:
 
@@ -114,6 +135,7 @@ The following areas are still expected to change as RKM becomes more consumable:
 - package-level schemas for example bundles
 - graph export coverage beyond the first minimal contract
 - fixture coverage beyond the minimal package
+- populated dataset breadth beyond the first three RAG techniques
 - release packaging and version compatibility policy
 - loader-specific guidance for databases, search indexes, and graph stores
 

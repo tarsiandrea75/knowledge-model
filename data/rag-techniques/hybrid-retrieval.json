@@ -1,0 +1,79 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10001",
+    "slug": "hybrid-retrieval",
+    "name": {
+      "official": "Hybrid Retrieval",
+      "display": "Hybrid Retrieval"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "keyword retrieval",
+      "semantic retrieval",
+      "rank fusion"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Hybrid Retrieval combines complementary retrieval signals so a RAG system can search with more than one matching strategy.",
+    "description": "Hybrid Retrieval is a RAG technique that retrieves candidates from more than one retrieval approach, commonly keyword matching and dense vector similarity, and then combines the candidate results before context assembly.",
+    "problemStatement": "A single retrieval method can miss useful context when a query depends on exact terminology, semantic similarity, or both.",
+    "coreIdea": "Run complementary retrievers and merge their ranked candidates so later RAG stages can work from a broader candidate pool."
+  },
+  "technique": {
+    "techniqueFamily": "Hybrid Retrieval",
+    "ragStage": [
+      "Retrieval",
+      "Context Assembly"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Retrievable corpus",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "A corpus available through at least two retrieval signals or retriever configurations."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Merged retrieval candidates",
+        "artifactType": "Retrieval Result",
+        "description": "A candidate set produced by combining results from complementary retrieval methods."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Medium",
+      "costImpact": "Medium",
+      "complexityImpact": "Medium",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "Medium"
+    },
+    "implementationConsiderations": [
+      "Use a deterministic merge or fusion strategy so retrieval experiments can be compared consistently."
+    ],
+    "evaluationGuidance": [
+      "Compare retrieval recall and candidate quality against each individual retrieval method."
+    ]
+  }
+}

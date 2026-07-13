@@ -1,0 +1,79 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10003",
+    "slug": "reranking",
+    "name": {
+      "official": "Reranking",
+      "display": "Reranking"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "candidate ranking",
+      "retrieval refinement",
+      "cross encoder"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Reranking reorders retrieved candidates before context assembly so the RAG pipeline can prioritize more relevant context.",
+    "description": "Reranking is a RAG technique that takes an initial set of retrieved candidates and applies a second ranking step before the final context is assembled for generation.",
+    "problemStatement": "Initial retrieval may return a broad candidate set whose top order is not aligned with the final generation need.",
+    "coreIdea": "Score retrieved candidates with an additional ranking method and pass the reordered subset to context assembly."
+  },
+  "technique": {
+    "techniqueFamily": "Reranking",
+    "ragStage": [
+      "Reranking",
+      "Context Assembly"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Retrieved candidates",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "A candidate set returned by an upstream retrieval stage."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Reranked candidates",
+        "artifactType": "Retrieval Result",
+        "description": "A reordered candidate set prepared for context assembly."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Medium",
+      "costImpact": "Medium",
+      "complexityImpact": "Medium",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "Variable"
+    },
+    "implementationConsiderations": [
+      "Limit the candidate set passed to the reranking step to keep latency and cost bounded."
+    ],
+    "evaluationGuidance": [
+      "Evaluate whether reranking improves the quality of the final selected context compared with the initial retrieval order."
+    ]
+  }
+}

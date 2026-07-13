@@ -18,10 +18,13 @@ AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 
-.PHONY: validate graph-export status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate data-validate graph-export status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
+
+data-validate:
+	python3 scripts/validate-data.py
 
 graph-export:
 	python3 scripts/export-fixtures-graph.py
@@ -157,6 +160,7 @@ cockpit-summary:
 help:
 	@printf 'RKM developer commands:\n'
 	@printf '  make validate                    Run bash scripts/validate-rkm.sh.\n'
+	@printf '  make data-validate               Validate data instances declared in data/manifest.json.\n'
 	@printf '  make graph-export                Generate minimal graph export files from fixtures.\n'
 	@printf '  make status                      Show git status --short.\n'
 	@printf '  make log                         Show the 10 most recent commits.\n'

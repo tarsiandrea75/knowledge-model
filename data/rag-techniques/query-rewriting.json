@@ -1,0 +1,80 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10002",
+    "slug": "query-rewriting",
+    "name": {
+      "official": "Query Rewriting",
+      "display": "Query Rewriting"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "query transformation",
+      "query expansion",
+      "retrieval query"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-13T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Query Rewriting changes a user query before retrieval so the retrieval step can search with a clearer or more targeted request.",
+    "description": "Query Rewriting is a RAG technique that transforms, expands, decomposes, or clarifies an input query before it is sent to a retriever. The rewritten query is used as an intermediate artifact for retrieval rather than as the final answer.",
+    "problemStatement": "User queries may be ambiguous, underspecified, conversational, or expressed differently from the indexed corpus.",
+    "coreIdea": "Create one or more retrieval-oriented query forms that preserve the user intent while improving the retrieval request."
+  },
+  "technique": {
+    "techniqueFamily": "Query Transformation",
+    "ragStage": [
+      "Query Understanding",
+      "Retrieval"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Original user query",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "The input query or conversational turn that should be converted into a retrieval-oriented form."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Rewritten retrieval query",
+        "artifactType": "Query",
+        "description": "A transformed query used by the retrieval stage."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Variable",
+      "costImpact": "Variable",
+      "complexityImpact": "Medium",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "Variable"
+    },
+    "implementationConsiderations": [
+      "Preserve the user's intent when creating retrieval-oriented query variants.",
+      "Track the original query and rewritten query separately for evaluation."
+    ],
+    "evaluationGuidance": [
+      "Compare retrieval results for original and rewritten queries using the same corpus and retriever configuration."
+    ]
+  }
+}

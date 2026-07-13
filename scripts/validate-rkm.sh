@@ -232,6 +232,10 @@ start_step "Running fixture instance validation..."
 "$PYTHON_BIN" scripts/validate-fixtures.py
 pass_step
 
+start_step "Running data instance validation..."
+"$PYTHON_BIN" scripts/validate-data.py
+pass_step
+
 start_step "Running graph export validation..."
 "$PYTHON_BIN" scripts/export-fixtures-graph.py --check
 pass_step
