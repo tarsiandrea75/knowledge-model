@@ -1,0 +1,624 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/graph-export.schema.json",
+  "title": "RKM Graph Export Definition",
+  "description": "Defines a reusable graph export projection for canonical RKM knowledge without replacing repository source documents as the authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exportType",
+    "sourceAuthority",
+    "projectionBoundary",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "exportId": {
+      "type": "string",
+      "description": "Stable local identifier for this graph export specification.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the graph export projection.",
+      "minLength": 1
+    },
+    "exportType": {
+      "$ref": "#/$defs/exportType"
+    },
+    "sourceAuthority": {
+      "type": "string",
+      "description": "Canonical source of truth for the exported graph.",
+      "const": "RKM Repository Source"
+    },
+    "targetFormat": {
+      "$ref": "#/$defs/targetFormat"
+    },
+    "projectionBoundary": {
+      "$ref": "#/$defs/projectionBoundary"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Node projections included in the exported graph.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/nodeProjection"
+      },
+      "uniqueItems": true
+    },
+    "edges": {
+      "type": "array",
+      "description": "Edge projections included in the exported graph.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/edgeProjection"
+      },
+      "uniqueItems": true
+    },
+    "provenanceProjection": {
+      "type": "array",
+      "description": "Rules for preserving claims, evidence, references and source lineage in the exported graph.",
+      "items": {
+        "$ref": "#/$defs/provenanceProjection"
+      },
+      "uniqueItems": true
+    },
+    "metadataProjection": {
+      "type": "array",
+      "description": "Metadata fields exported when they affect trust, lifecycle, compatibility or review.",
+      "items": {
+        "$ref": "#/$defs/metadataProjection"
+      },
+      "uniqueItems": true
+    },
+    "validationExpectations": {
+      "type": "array",
+      "description": "Validation expectations that exporters should enforce or report.",
+      "items": {
+        "$ref": "#/$defs/validationExpectation"
+      },
+      "uniqueItems": true
+    },
+    "compatibility": {
+      "$ref": "#/$defs/compatibility"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this graph export specification to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims about graph export behavior, compatibility or preservation of ontology meaning.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting graph export behavior or compatibility claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the graph export specification.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "exportType": {
+      "type": "string",
+      "description": "Primary export projection category.",
+      "enum": [
+        "Canonical Graph Projection",
+        "Property Graph Projection",
+        "RDF Projection",
+        "OWL Projection",
+        "JSON-LD Projection",
+        "GraphQL Projection",
+        "SQL Graph View",
+        "Analysis Projection",
+        "Documentation Projection",
+        "Validation Projection",
+        "Other"
+      ]
+    },
+    "targetFormat": {
+      "type": "string",
+      "description": "Physical or logical graph representation targeted by the export.",
+      "enum": [
+        "Property Graph",
+        "RDF",
+        "OWL",
+        "JSON-LD",
+        "GraphQL",
+        "SQL",
+        "CSV Edge List",
+        "JSON",
+        "Other"
+      ]
+    },
+    "projectionBoundary": {
+      "type": "object",
+      "description": "Semantic boundary of the exported graph projection.",
+      "additionalProperties": false,
+      "required": [
+        "includedKnowledge",
+        "excludedConcerns"
+      ],
+      "properties": {
+        "includedKnowledge": {
+          "type": "array",
+          "description": "Canonical RKM knowledge included in the export.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/includedKnowledge"
+          },
+          "uniqueItems": true
+        },
+        "excludedConcerns": {
+          "type": "array",
+          "description": "Concerns intentionally excluded because they are presentation-only or not canonical graph knowledge.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/excludedConcern"
+          },
+          "uniqueItems": true
+        },
+        "sourcePaths": {
+          "type": "array",
+          "description": "Repository paths or path patterns consumed by the exporter.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "targetConsumers": {
+          "type": "array",
+          "description": "Expected consumers of the exported graph projection.",
+          "items": {
+            "$ref": "#/$defs/targetConsumer"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "includedKnowledge": {
+      "type": "string",
+      "enum": [
+        "Entities",
+        "Relationships",
+        "Claims",
+        "Evidence",
+        "References",
+        "External Links",
+        "Metadata",
+        "Registries",
+        "Ontology"
+      ]
+    },
+    "excludedConcern": {
+      "type": "string",
+      "enum": [
+        "Generated Page Layout",
+        "Table Ordering",
+        "Editorial Section Heading",
+        "Local Navigation",
+        "Rendering Label",
+        "Presentation Styling",
+        "Temporary Build State",
+        "Other"
+      ]
+    },
+    "targetConsumer": {
+      "type": "string",
+      "enum": [
+        "Graph Database",
+        "RDF Store",
+        "Graph Analysis Tool",
+        "Documentation Generator",
+        "Validation Tool",
+        "Search Index",
+        "Application API",
+        "Other"
+      ]
+    },
+    "nodeProjection": {
+      "type": "object",
+      "description": "Rule for projecting canonical RKM knowledge into graph nodes.",
+      "additionalProperties": false,
+      "required": [
+        "nodeKind",
+        "identifierSource"
+      ],
+      "properties": {
+        "nodeKind": {
+          "$ref": "#/$defs/nodeKind"
+        },
+        "identifierSource": {
+          "type": "string",
+          "description": "Canonical field used as the node identifier.",
+          "enum": [
+            "identity.id",
+            "claimId",
+            "evidenceId",
+            "referenceId",
+            "localId",
+            "derivedId"
+          ]
+        },
+        "requiredProperties": {
+          "type": "array",
+          "description": "Properties that must be emitted for this node kind.",
+          "items": {
+            "$ref": "#/$defs/exportedProperty"
+          },
+          "uniqueItems": true
+        },
+        "optionalProperties": {
+          "type": "array",
+          "description": "Properties that may be emitted for readability, indexing or compatibility.",
+          "items": {
+            "$ref": "#/$defs/exportedProperty"
+          },
+          "uniqueItems": true
+        },
+        "firstClass": {
+          "type": "boolean",
+          "description": "Whether the projected node represents a first-class RKM concept.",
+          "default": true
+        },
+        "derivation": {
+          "$ref": "#/$defs/derivation"
+        }
+      }
+    },
+    "nodeKind": {
+      "type": "string",
+      "enum": [
+        "Entity",
+        "Claim",
+        "Evidence",
+        "Reference",
+        "External Link",
+        "Metadata",
+        "Registry Entry",
+        "Ontology Concept",
+        "Derived Convenience Node"
+      ]
+    },
+    "edgeProjection": {
+      "type": "object",
+      "description": "Rule for projecting canonical RKM knowledge into graph edges.",
+      "additionalProperties": false,
+      "required": [
+        "edgeKind",
+        "typeSource",
+        "direction"
+      ],
+      "properties": {
+        "edgeKind": {
+          "$ref": "#/$defs/edgeKind"
+        },
+        "typeSource": {
+          "type": "string",
+          "description": "Source of the exported edge type.",
+          "enum": [
+            "relationship.type",
+            "canonical-provenance-pattern",
+            "metadata-link",
+            "derived-inverse"
+          ]
+        },
+        "direction": {
+          "$ref": "#/$defs/edgeDirection"
+        },
+        "requiredProperties": {
+          "type": "array",
+          "description": "Properties that must be emitted for this edge kind.",
+          "items": {
+            "$ref": "#/$defs/exportedProperty"
+          },
+          "uniqueItems": true
+        },
+        "derived": {
+          "type": "boolean",
+          "description": "Whether this edge is generated for query convenience rather than stored as canonical source knowledge.",
+          "default": false
+        },
+        "derivation": {
+          "$ref": "#/$defs/derivation"
+        }
+      }
+    },
+    "edgeKind": {
+      "type": "string",
+      "enum": [
+        "Canonical Relationship",
+        "Provenance Relationship",
+        "Metadata Relationship",
+        "Registry Relationship",
+        "Derived Inverse Relationship",
+        "Other"
+      ]
+    },
+    "edgeDirection": {
+      "type": "string",
+      "enum": [
+        "Canonical Direction",
+        "Source To Target",
+        "Evidence To Claim",
+        "Evidence To Reference",
+        "Entity To Claim",
+        "Derived Inverse Direction"
+      ]
+    },
+    "exportedProperty": {
+      "type": "object",
+      "description": "A property projected onto a node or edge.",
+      "additionalProperties": false,
+      "required": [
+        "propertyName",
+        "source"
+      ],
+      "properties": {
+        "propertyName": {
+          "type": "string",
+          "description": "Name of the exported property.",
+          "pattern": "^[a-z][A-Za-z0-9]*$"
+        },
+        "source": {
+          "type": "string",
+          "description": "Canonical source field, registry field or derivation rule for the exported property.",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the property is required for this projection.",
+          "default": false
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Reason the property is exported.",
+          "enum": [
+            "Stable Identity",
+            "Readability",
+            "Indexing",
+            "Filtering",
+            "Provenance",
+            "Lifecycle",
+            "Compatibility",
+            "Validation",
+            "Other"
+          ]
+        }
+      }
+    },
+    "provenanceProjection": {
+      "type": "object",
+      "description": "Rule for preserving provenance semantics in the exported graph.",
+      "additionalProperties": false,
+      "required": [
+        "sourceConcept",
+        "projectionStrategy"
+      ],
+      "properties": {
+        "sourceConcept": {
+          "type": "string",
+          "enum": [
+            "Claim",
+            "Evidence",
+            "Reference",
+            "External Link",
+            "Metadata Provenance"
+          ]
+        },
+        "projectionStrategy": {
+          "type": "string",
+          "enum": [
+            "Node",
+            "Edge",
+            "Edge Property",
+            "Node Property",
+            "Connected Provenance Subgraph"
+          ]
+        },
+        "relationshipTypes": {
+          "type": "array",
+          "description": "Canonical relationship predicates used by this provenance projection.",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]+(?:_[A-Z]+)*$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "metadataProjection": {
+      "type": "object",
+      "description": "Rule for exporting metadata without mixing lifecycle information with domain semantics.",
+      "additionalProperties": false,
+      "required": [
+        "metadataField",
+        "projectionPurpose"
+      ],
+      "properties": {
+        "metadataField": {
+          "type": "string",
+          "enum": [
+            "version",
+            "schemaVersion",
+            "repositoryVersion",
+            "status",
+            "reviewState",
+            "createdAt",
+            "updatedAt",
+            "createdBy",
+            "license",
+            "provenance"
+          ]
+        },
+        "projectionPurpose": {
+          "type": "string",
+          "enum": [
+            "Trust",
+            "Lifecycle",
+            "Compatibility",
+            "Review",
+            "Lineage",
+            "Filtering",
+            "Audit"
+          ]
+        },
+        "projectionStrategy": {
+          "type": "string",
+          "enum": [
+            "Node Property",
+            "Edge Property",
+            "Metadata Node",
+            "Omitted"
+          ]
+        }
+      }
+    },
+    "validationExpectation": {
+      "type": "object",
+      "description": "Validation condition that graph exporters should enforce or report.",
+      "additionalProperties": false,
+      "required": [
+        "validationType",
+        "severity"
+      ],
+      "properties": {
+        "validationType": {
+          "type": "string",
+          "enum": [
+            "Known Entity Type",
+            "Known Relationship Predicate",
+            "Resolvable Source Identifier",
+            "Resolvable Target Identifier",
+            "Canonical Direction",
+            "Claim Evidence Link",
+            "Evidence Reference Link",
+            "Stable Identifier Required",
+            "Schema Valid Source Document",
+            "Registry Consistency",
+            "Other"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Error",
+            "Warning",
+            "Information"
+          ]
+        },
+        "failureBehavior": {
+          "type": "string",
+          "description": "How the exporter should behave when this expectation is not met.",
+          "enum": [
+            "Reject Export",
+            "Report Finding",
+            "Omit Invalid Projection",
+            "Mark As Unresolved"
+          ]
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "description": "Versioning and compatibility rules for the exported graph projection.",
+      "additionalProperties": false,
+      "properties": {
+        "compatibleWithOntologyVersion": {
+          "type": "string",
+          "description": "RKM ontology version expected by this graph export projection.",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "breakingChanges": {
+          "type": "array",
+          "description": "Changes that must be treated as breaking for downstream graph consumers.",
+          "items": {
+            "$ref": "#/$defs/breakingChange"
+          },
+          "uniqueItems": true
+        },
+        "backwardCompatibleChanges": {
+          "type": "array",
+          "description": "Changes that are generally backward compatible for downstream graph consumers.",
+          "items": {
+            "$ref": "#/$defs/backwardCompatibleChange"
+          },
+          "uniqueItems": true
+        },
+        "deprecationPolicy": {
+          "type": "string",
+          "description": "How deprecated graph fields, node labels or edge types should be handled.",
+          "minLength": 1
+        }
+      }
+    },
+    "breakingChange": {
+      "type": "string",
+      "enum": [
+        "Changed Entity Identifier",
+        "Changed Relationship Predicate",
+        "Reversed Canonical Relationship Direction",
+        "Removed Required Node Property",
+        "Removed Required Edge Property",
+        "Changed Node Kind Semantics",
+        "Changed Edge Kind Semantics",
+        "Other"
+      ]
+    },
+    "backwardCompatibleChange": {
+      "type": "string",
+      "enum": [
+        "Added Optional Node Property",
+        "Added Optional Edge Property",
+        "Added Derived Convenience Edge",
+        "Added Metadata Projection",
+        "Added Target Format",
+        "Other"
+      ]
+    },
+    "derivation": {
+      "type": "object",
+      "description": "Explanation of how a derived graph element is produced from canonical RKM source data.",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "rule"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Canonical source field, document class or registry used for derivation.",
+          "minLength": 1
+        },
+        "rule": {
+          "type": "string",
+          "description": "Deterministic derivation rule used by the exporter.",
+          "minLength": 1
+        },
+        "preservesCanonicalMeaning": {
+          "type": "boolean",
+          "description": "Whether the derivation preserves canonical RKM ontology meaning.",
+          "default": true
+        }
+      }
+    }
+  }
+}
