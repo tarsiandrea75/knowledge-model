@@ -1,0 +1,550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/context-assembly.schema.json",
+  "title": "RKM Context Assembly Definition",
+  "description": "Defines a reusable embedded context assembly fragment for selecting, ordering, transforming and constraining candidate artifacts before they are supplied to a language model, evaluator, agent or downstream workflow step.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assemblyType",
+    "boundary",
+    "selectionStrategy",
+    "outputPackage"
+  ],
+  "properties": {
+    "contextAssemblyId": {
+      "type": "string",
+      "description": "Stable local identifier for this context assembly fragment within the containing entity, workflow, evidence record or evaluation trace.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the context assembly fragment.",
+      "minLength": 1
+    },
+    "assemblyType": {
+      "$ref": "#/$defs/assemblyType"
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "candidateArtifacts": {
+      "type": "array",
+      "description": "Artifacts available for selection, ordering or transformation before the context package is emitted.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "selectionStrategy": {
+      "$ref": "#/$defs/selectionStrategy"
+    },
+    "orderingStrategy": {
+      "$ref": "#/$defs/orderingStrategy"
+    },
+    "transformations": {
+      "type": "array",
+      "description": "Transformations applied to candidate or selected artifacts during assembly.",
+      "items": {
+        "$ref": "#/$defs/transformation"
+      },
+      "uniqueItems": true
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Constraints that govern which artifacts can be included, transformed or exposed downstream.",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      },
+      "uniqueItems": true
+    },
+    "outputPackage": {
+      "$ref": "#/$defs/contextPackage"
+    },
+    "downstreamConsumers": {
+      "type": "array",
+      "description": "Entities, workflow steps or systems that consume the assembled context package.",
+      "items": {
+        "$ref": "#/$defs/consumer"
+      },
+      "uniqueItems": true
+    },
+    "evaluationDimensions": {
+      "type": "array",
+      "description": "Evaluation dimensions that assess the quality, safety, traceability or efficiency of assembled context.",
+      "items": {
+        "$ref": "#/$defs/evaluationDimension"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this context assembly fragment to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare context assembly behavior, grounding effects, citation behavior, cost, latency, safety or quality.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the assembly boundary, package contents, evaluation results or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the context assembly fragment.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "assemblyType": {
+      "type": "string",
+      "description": "Primary assembly pattern used to construct the context package.",
+      "enum": [
+        "Ranked Context Assembly",
+        "Citation Oriented Assembly",
+        "Diversity Oriented Assembly",
+        "Policy Constrained Assembly",
+        "Graph Context Assembly",
+        "Conversational Context Assembly",
+        "Summary Based Assembly",
+        "Hybrid Context Assembly",
+        "Other"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Scope boundary for context assembly.",
+      "additionalProperties": false,
+      "required": [
+        "responsibilities",
+        "inputRole",
+        "outputRole"
+      ],
+      "properties": {
+        "responsibilities": {
+          "type": "array",
+          "description": "Responsibilities inside the context assembly boundary.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "inputRole": {
+          "type": "string",
+          "description": "Role played by candidate artifacts entering the assembly boundary.",
+          "minLength": 1
+        },
+        "outputRole": {
+          "type": "string",
+          "description": "Role played by the emitted context package.",
+          "minLength": 1
+        },
+        "excludedResponsibilities": {
+          "type": "array",
+          "description": "Responsibilities explicitly outside the context assembly boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "traceDataPreserved": {
+          "type": "array",
+          "description": "Trace data preserved for downstream citation, grounding, debugging or evaluation.",
+          "items": {
+            "$ref": "#/$defs/traceDataType"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "selectionStrategy": {
+      "type": "object",
+      "description": "Method used to decide which candidate artifacts are included in the context package.",
+      "additionalProperties": false,
+      "required": [
+        "selectionMethod"
+      ],
+      "properties": {
+        "selectionMethod": {
+          "$ref": "#/$defs/selectionMethod"
+        },
+        "signals": {
+          "type": "array",
+          "description": "Signals used to include or exclude candidate artifacts.",
+          "items": {
+            "$ref": "#/$defs/selectionSignal"
+          },
+          "uniqueItems": true
+        },
+        "inclusionRationaleRequired": {
+          "type": "boolean",
+          "description": "Whether included context items are expected to preserve inclusion rationale."
+        },
+        "exclusionRationaleRequired": {
+          "type": "boolean",
+          "description": "Whether excluded candidate artifacts are expected to preserve exclusion rationale."
+        }
+      }
+    },
+    "orderingStrategy": {
+      "type": "object",
+      "description": "Method used to order selected context items.",
+      "additionalProperties": false,
+      "required": [
+        "orderingMethod"
+      ],
+      "properties": {
+        "orderingMethod": {
+          "$ref": "#/$defs/orderingMethod"
+        },
+        "orderingRationale": {
+          "type": "string",
+          "description": "Reason the ordering method is suitable for the downstream consumer or task.",
+          "minLength": 1
+        }
+      }
+    },
+    "transformation": {
+      "type": "object",
+      "description": "Transformation applied to candidate or selected context artifacts.",
+      "additionalProperties": false,
+      "required": [
+        "transformationType",
+        "sourceTraceability"
+      ],
+      "properties": {
+        "transformationType": {
+          "$ref": "#/$defs/transformationType"
+        },
+        "description": {
+          "type": "string",
+          "description": "Explanation of how the transformation changes context artifacts.",
+          "minLength": 1
+        },
+        "sourceTraceability": {
+          "$ref": "#/$defs/sourceTraceability"
+        },
+        "risk": {
+          "type": "string",
+          "description": "Known risk introduced by the transformation.",
+          "minLength": 1
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "description": "Constraint that affects context inclusion, ordering, transformation or downstream exposure.",
+      "additionalProperties": false,
+      "required": [
+        "constraintType",
+        "statement"
+      ],
+      "properties": {
+        "constraintType": {
+          "$ref": "#/$defs/constraintType"
+        },
+        "statement": {
+          "type": "string",
+          "description": "Constraint statement.",
+          "minLength": 1
+        },
+        "enforcementPoint": {
+          "type": "string",
+          "description": "Where the constraint is enforced.",
+          "enum": [
+            "Before Selection",
+            "During Selection",
+            "During Ordering",
+            "During Transformation",
+            "Before Downstream Consumption",
+            "After Downstream Consumption",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "contextPackage": {
+      "type": "object",
+      "description": "Structured artifact produced by context assembly.",
+      "additionalProperties": false,
+      "required": [
+        "packageType",
+        "containsOrderedItems"
+      ],
+      "properties": {
+        "packageType": {
+          "type": "string",
+          "enum": [
+            "Prompt Context",
+            "Structured Model Input",
+            "Citation Candidate Set",
+            "Evaluation Context",
+            "Agent Observation",
+            "Hybrid Package",
+            "Other"
+          ]
+        },
+        "containsOrderedItems": {
+          "type": "boolean",
+          "description": "Whether the package preserves explicit context item order."
+        },
+        "containsSourceReferences": {
+          "type": "boolean",
+          "description": "Whether the package preserves references to source material."
+        },
+        "containsCitationCandidates": {
+          "type": "boolean",
+          "description": "Whether the package exposes citation candidates to downstream consumers."
+        },
+        "tokenBudget": {
+          "type": "integer",
+          "description": "Maximum token budget available to the assembled context package when known.",
+          "minimum": 0
+        },
+        "items": {
+          "type": "array",
+          "description": "Structured context items included in the package.",
+          "items": {
+            "$ref": "#/$defs/contextItem"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "contextItem": {
+      "type": "object",
+      "description": "Selected item inside an assembled context package.",
+      "additionalProperties": false,
+      "required": [
+        "itemRole"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "description": "Stable local identifier for the context item.",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "itemRole": {
+          "$ref": "#/$defs/contextItemRole"
+        },
+        "artifact": {
+          "$ref": "artifact.schema.json"
+        },
+        "sourceReference": {
+          "$ref": "reference.schema.json"
+        },
+        "rank": {
+          "type": "integer",
+          "description": "Order or rank of the item in the assembled context package.",
+          "minimum": 1
+        },
+        "score": {
+          "type": "number",
+          "description": "Selection, relevance, reranking or confidence score associated with the item."
+        },
+        "inclusionRationale": {
+          "type": "string",
+          "description": "Reason the item was included.",
+          "minLength": 1
+        }
+      }
+    },
+    "consumer": {
+      "type": "object",
+      "description": "Downstream consumer of an assembled context package.",
+      "additionalProperties": false,
+      "required": [
+        "consumerType"
+      ],
+      "properties": {
+        "consumerType": {
+          "$ref": "#/$defs/consumerType"
+        },
+        "entity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable consumer name when no first-class entity reference is available.",
+          "minLength": 1
+        }
+      }
+    },
+    "evaluationDimension": {
+      "type": "string",
+      "description": "Dimension used to evaluate assembled context.",
+      "enum": [
+        "Context Relevance",
+        "Context Sufficiency",
+        "Citation Coverage",
+        "Citation Faithfulness",
+        "Redundancy",
+        "Diversity",
+        "Source Freshness",
+        "Token Efficiency",
+        "Latency",
+        "Cost",
+        "Policy Compliance",
+        "Other"
+      ]
+    },
+    "selectionMethod": {
+      "type": "string",
+      "enum": [
+        "Top Ranked",
+        "Threshold Based",
+        "Reranker Based",
+        "Citation Support Based",
+        "Diversity Based",
+        "Metadata Filtered",
+        "Policy Filtered",
+        "Graph Neighborhood Based",
+        "Hybrid",
+        "Manual",
+        "Other"
+      ]
+    },
+    "selectionSignal": {
+      "type": "string",
+      "enum": [
+        "Retrieval Rank",
+        "Reranking Score",
+        "Citation Support",
+        "Source Authority",
+        "Source Freshness",
+        "Metadata Match",
+        "Source Diversity",
+        "Redundancy",
+        "Access Permission",
+        "Policy Constraint",
+        "Graph Proximity",
+        "Temporal Order",
+        "Other"
+      ]
+    },
+    "orderingMethod": {
+      "type": "string",
+      "enum": [
+        "Retrieval Rank",
+        "Reranking Score",
+        "Source Authority",
+        "Source Freshness",
+        "Chronological",
+        "Document Structure",
+        "Citation Priority",
+        "Graph Traversal",
+        "Prompt Section",
+        "Policy Priority",
+        "Hybrid",
+        "Other"
+      ]
+    },
+    "transformationType": {
+      "type": "string",
+      "enum": [
+        "Passage Trimming",
+        "Chunk Merging",
+        "Deduplication",
+        "Summarization",
+        "Quote Extraction",
+        "Metadata Normalization",
+        "Citation Formatting",
+        "Table Serialization",
+        "Graph Serialization",
+        "Prompt Formatting",
+        "Other"
+      ]
+    },
+    "sourceTraceability": {
+      "type": "string",
+      "enum": [
+        "Preserved",
+        "Partially Preserved",
+        "Removed",
+        "Unknown"
+      ]
+    },
+    "constraintType": {
+      "type": "string",
+      "enum": [
+        "Token Budget",
+        "Maximum Item Count",
+        "Source Diversity",
+        "Source Freshness",
+        "Required Citation Metadata",
+        "Access Control",
+        "Privacy Policy",
+        "Safety Policy",
+        "Source Licensing",
+        "Context Window",
+        "Latency Budget",
+        "Cost Budget",
+        "Other"
+      ]
+    },
+    "traceDataType": {
+      "type": "string",
+      "enum": [
+        "Source Identifier",
+        "Source Location",
+        "Retrieval Score",
+        "Reranking Score",
+        "Selection Rationale",
+        "Exclusion Rationale",
+        "Transformation Notes",
+        "Access Decision",
+        "Policy Decision",
+        "Token Count",
+        "Other"
+      ]
+    },
+    "contextItemRole": {
+      "type": "string",
+      "enum": [
+        "Grounding Evidence",
+        "Citation Candidate",
+        "Instruction",
+        "Conversation History",
+        "Retrieved Passage",
+        "Retrieved Document",
+        "Graph Fact",
+        "Table Row",
+        "Summary",
+        "Tool Output",
+        "Metadata Record",
+        "Other"
+      ]
+    },
+    "consumerType": {
+      "type": "string",
+      "enum": [
+        "Language Model",
+        "Evaluator",
+        "Agent",
+        "Workflow Step",
+        "Prompt Technique",
+        "Component",
+        "Human Reviewer",
+        "Other"
+      ]
+    }
+  }
+}
