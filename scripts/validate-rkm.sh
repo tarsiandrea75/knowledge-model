@@ -228,6 +228,10 @@ start_step "Running registry validation..."
 "$PYTHON_BIN" scripts/validate-registries.py
 pass_step
 
+start_step "Running fixture instance validation..."
+"$PYTHON_BIN" scripts/validate-fixtures.py
+pass_step
+
 start_step "Running RKM unit tests..."
 bash scripts/rkm-unit-tests.sh
 pass_step

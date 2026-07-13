@@ -28,10 +28,12 @@ From the repository root, run:
 make validate
 ```
 
-Direct schema validation can be added by a consumer using any JSON Schema Draft 2020-12 validator:
+`make validate` reads `fixture-manifest.json` and validates each fixture against the schema contract declared there. Paths in the manifest are resolved from the repository root.
 
-- validate `minimal-rag-technique.json` against `schema/rag-technique.schema.json`
-- validate `minimal-relationship.json` against `schema/definitions/relationship.schema.json`
-- validate the inner `claim`, `evidence`, and `reference` objects in `minimal-claim-with-evidence.json` against their corresponding definition schemas
+The manifest maps:
 
-The combined claim package is a consumer fixture envelope. Its nested objects use existing RKM definition contracts, while a package-level schema is still evolving.
+- `minimal-rag-technique.json` to `schema/rag-technique.schema.json`
+- `minimal-relationship.json` to `schema/definitions/relationship.schema.json`
+- `minimal-claim-with-evidence.json` to separate validations for its `claim`, `evidence`, and `reference` objects
+
+The combined claim package is a consumer fixture envelope. Its nested objects use existing RKM definition contracts, so the validator checks those nested objects through JSON Pointer entries in the manifest.

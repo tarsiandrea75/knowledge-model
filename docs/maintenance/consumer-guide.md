@@ -44,10 +44,13 @@ This runs:
 - schema prerequisite validation
 - schema contract validation
 - registry validation
+- fixture instance validation using `examples/fixtures/fixture-manifest.json`
 - RKM unit tests
 - documentation relationship validation
 
-Consumers that want direct fixture validation can use a JSON Schema Draft 2020-12 validator:
+Fixture validation loads `examples/fixtures/fixture-manifest.json`, resolves fixture and schema paths from the repository root, and validates each fixture instance against its declared schema. The claim package fixture is an envelope, so its `claim`, `evidence`, and `reference` objects are validated against their corresponding definition schemas.
+
+Consumers that want direct fixture validation outside the repository scripts can use a JSON Schema Draft 2020-12 validator:
 
 - validate `examples/fixtures/minimal-rag-technique.json` against `schema/rag-technique.schema.json`
 - validate `examples/fixtures/minimal-relationship.json` against `schema/definitions/relationship.schema.json`

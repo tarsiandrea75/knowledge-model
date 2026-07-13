@@ -1,0 +1,29 @@
+{
+  "fixtures": [
+    {
+      "fixture": "examples/fixtures/minimal-rag-technique.json",
+      "schema": "schema/rag-technique.schema.json"
+    },
+    {
+      "fixture": "examples/fixtures/minimal-relationship.json",
+      "schema": "schema/definitions/relationship.schema.json"
+    },
+    {
+      "fixture": "examples/fixtures/minimal-claim-with-evidence.json",
+      "validations": [
+        {
+          "instancePointer": "/claim",
+          "schema": "schema/definitions/claim.schema.json"
+        },
+        {
+          "instancePointer": "/evidence",
+          "schema": "schema/definitions/evidence.schema.json"
+        },
+        {
+          "instancePointer": "/reference",
+          "schema": "schema/definitions/reference.schema.json"
+        }
+      ]
+    }
+  ]
+}
