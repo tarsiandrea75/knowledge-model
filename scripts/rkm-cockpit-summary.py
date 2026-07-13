@@ -398,6 +398,13 @@ def recent_run_text(summary: RecentRunSummary) -> str | None:
     state = "partial" if summary.partial else "completed"
     if summary.budget_stop:
         state = "budget-stop"
+    if summary.budget_stop and summary.pushed:
+        parts = [state, "partial progress pushed"]
+        if summary.recovered:
+            parts.append(f"recovered {summary.recovered}")
+        if summary.revise_pending:
+            parts.append(f"revise pending {summary.revise_pending}")
+        return "; ".join(parts)
     committed = summary.normal + summary.recovered
     if summary.exact_counts:
         parts = [state, f"committed {committed} total", f"normal {summary.normal}", f"recovered {summary.recovered}"]
@@ -422,7 +429,7 @@ def budget_text(next_action: dict[str, Any], budget: dict[str, Any], target: int
     if next_status == "OVER_BUDGET":
         return f"target {target} blocked"
     if next_status == "READY_TO_AUTOCYCLE":
-        return f"target {target} allowed"
+        return f"target {target} allowed to try"
     if next_status == "READY_TO_PUSH":
         if max_target > 0:
             return f"info; max safe target {max_target}"
@@ -652,10 +659,10 @@ def run_self_test() -> int:
         {"status": "READY_TO_AUTOCYCLE"},
         {},
         clean,
-        3,
+        5,
         True,
     )
-    assert_contains("allowed budget row", allowed_dashboard, "target 3 allowed")
+    assert_contains("allowed budget row", allowed_dashboard, "target 5 allowed to try")
 
     stale_revise_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE", "repoStatus": "clean"},
@@ -768,10 +775,8 @@ def run_self_test() -> int:
         ],
     )
     assert_contains("partial pushed budget stop", partial_pushed_dashboard, "budget-stop")
-    assert_contains("partial pushed total", partial_pushed_dashboard, "committed 4 total")
-    assert_contains("partial pushed normal", partial_pushed_dashboard, "normal 3")
+    assert_contains("partial pushed progress", partial_pushed_dashboard, "partial progress pushed")
     assert_contains("partial pushed recovered", partial_pushed_dashboard, "recovered 1")
-    assert_contains("partial pushed flag", partial_pushed_dashboard, "pushed")
 
     ambiguous_pushed_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE"},
@@ -795,8 +800,7 @@ def run_self_test() -> int:
         ],
     )
     assert_contains("ambiguous pushed budget stop", ambiguous_pushed_dashboard, "budget-stop")
-    assert_contains("ambiguous pushed progress", ambiguous_pushed_dashboard, "committed progress detected")
-    assert_contains("ambiguous pushed flag", ambiguous_pushed_dashboard, "pushed")
+    assert_contains("ambiguous pushed progress", ambiguous_pushed_dashboard, "partial progress pushed")
 
     missing_root = REPOSITORY_ROOT / ".missing-rkm-self-test"
     if read_json_file(missing_root / "autopilot-state.json") != {}:
