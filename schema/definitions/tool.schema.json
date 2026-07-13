@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/definitions/tool.schema.json",
+  "title": "RKM Embedded Tool Definition",
+  "description": "Defines a reusable embedded tool fragment for a bounded callable capability used by agents, workflows, frameworks, components or humans in a RAG system. This schema does not provide the full knowledge entity envelope for Tool: it intentionally omits first-class identity, metadata, description and top-level relationships. A complete first-class Tool entity schema must be introduced separately after shared identity, registry and relationship support exists for Tool.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "toolType",
+    "invocationModes",
+    "boundary"
+  ],
+  "properties": {
+    "toolId": {
+      "type": "string",
+      "description": "Stable local identifier for this embedded tool fragment within the containing entity, workflow, contract, execution trace or evidence record.",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable tool name.",
+      "minLength": 1
+    },
+    "toolType": {
+      "$ref": "#/$defs/toolType"
+    },
+    "invocationModes": {
+      "type": "array",
+      "description": "Supported ways the callable capability can be invoked.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/invocationMode"
+      },
+      "uniqueItems": true
+    },
+    "boundary": {
+      "$ref": "#/$defs/boundary"
+    },
+    "contract": {
+      "$ref": "tool-contract.schema.json"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Structured artifacts consumed by the tool.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Structured artifacts produced or emitted by the tool.",
+      "items": {
+        "$ref": "artifact.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Embedded capabilities exposed by the tool.",
+      "items": {
+        "$ref": "capability.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "policies": {
+      "type": "array",
+      "description": "Embedded policy fragments that govern tool invocation, inputs, outputs or side effects.",
+      "items": {
+        "$ref": "policy.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "securityControls": {
+      "type": "array",
+      "description": "Security controls relevant to invoking or operating the tool.",
+      "items": {
+        "$ref": "security-control.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "sideEffects": {
+      "type": "array",
+      "description": "State changes or external effects caused by invoking the tool.",
+      "items": {
+        "$ref": "#/$defs/sideEffect"
+      },
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "External systems, providers, services or first-class RKM entities the tool depends on.",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "uniqueItems": true
+    },
+    "operationalCharacteristics": {
+      "$ref": "#/$defs/operationalCharacteristics"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "First-class relationships that connect this embedded tool fragment to existing RKM entities when those links have reusable semantic value.",
+      "items": {
+        "$ref": "relationship.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "description": "Claims that assert, qualify or compare tool behavior, capability, safety, quality, cost or limitations.",
+      "items": {
+        "$ref": "claim.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence records supporting the tool boundary, contract, behavior or related claims.",
+      "items": {
+        "$ref": "evidence.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "array",
+      "description": "Structured sources cited for the tool.",
+      "items": {
+        "$ref": "reference.schema.json"
+      },
+      "uniqueItems": true
+    },
+    "usageGuidance": {
+      "type": "array",
+      "description": "Guidance for correctly invoking, composing or governing the tool in RAG systems.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "toolType": {
+      "type": "string",
+      "description": "Primary callable capability exposed by the tool.",
+      "enum": [
+        "Search Tool",
+        "Retrieval Tool",
+        "Database Tool",
+        "Transformation Tool",
+        "Evaluation Tool",
+        "Indexing Tool",
+        "Monitoring Tool",
+        "Validation Tool",
+        "Generation Tool",
+        "Routing Tool",
+        "Connector Tool",
+        "Human Approval Tool",
+        "Operational Tool",
+        "Other"
+      ]
+    },
+    "invocationMode": {
+      "type": "string",
+      "description": "How the callable capability is invoked.",
+      "enum": [
+        "Synchronous",
+        "Asynchronous",
+        "Streaming",
+        "Batch",
+        "Scheduled",
+        "Event Driven",
+        "Human Initiated",
+        "Agent Initiated",
+        "Workflow Initiated",
+        "Hybrid"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Scope boundary for the callable capability.",
+      "additionalProperties": false,
+      "required": [
+        "responsibilities",
+        "allowedInvokers"
+      ],
+      "properties": {
+        "responsibilities": {
+          "type": "array",
+          "description": "Responsibilities inside the tool boundary.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "allowedInvokers": {
+          "type": "array",
+          "description": "Actors or systems expected to invoke the tool.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/invokerType"
+          },
+          "uniqueItems": true
+        },
+        "excludedResponsibilities": {
+          "type": "array",
+          "description": "Responsibilities explicitly outside the tool boundary.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "authorizationRequirements": {
+          "type": "array",
+          "description": "Authorization requirements that must be satisfied before invocation.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "stateChangePolicy": {
+          "$ref": "#/$defs/stateChangePolicy"
+        }
+      }
+    },
+    "invokerType": {
+      "type": "string",
+      "description": "Type of actor or system that may invoke the tool.",
+      "enum": [
+        "Agent",
+        "Workflow",
+        "Framework",
+        "Component",
+        "Human",
+        "Scheduled Job",
+        "External Service",
+        "Other"
+      ]
+    },
+    "stateChangePolicy": {
+      "type": "string",
+      "description": "Whether tool invocation is expected to change external or persistent state.",
+      "enum": [
+        "Read Only",
+        "Writes Internal State",
+        "Writes External State",
+        "Triggers Downstream Work",
+        "Human Decision Required",
+        "Mixed",
+        "Unknown"
+      ]
+    },
+    "sideEffect": {
+      "type": "object",
+      "description": "State change or external effect caused by invocation.",
+      "additionalProperties": false,
+      "required": [
+        "effectType",
+        "description"
+      ],
+      "properties": {
+        "effectType": {
+          "$ref": "#/$defs/sideEffectType"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "description": "System, artifact, index, database, user or workflow affected by the side effect.",
+          "minLength": 1
+        },
+        "reversible": {
+          "type": "boolean",
+          "description": "Whether the side effect can be reversed through normal operation."
+        },
+        "evidenceRelevant": {
+          "type": "boolean",
+          "description": "Whether the side effect should be captured as evidence or audit data.",
+          "default": false
+        }
+      }
+    },
+    "sideEffectType": {
+      "type": "string",
+      "description": "Kind of state change or external effect.",
+      "enum": [
+        "Write Index",
+        "Update Database",
+        "Create Audit Record",
+        "Send Notification",
+        "Publish Artifact",
+        "Trigger Workflow",
+        "Change Access Control",
+        "Charge Usage",
+        "Human Approval State",
+        "Other"
+      ]
+    },
+    "dependency": {
+      "type": "object",
+      "description": "External system, provider, service or first-class RKM entity required by the tool.",
+      "additionalProperties": false,
+      "required": [
+        "dependencyType",
+        "name"
+      ],
+      "properties": {
+        "dependencyType": {
+          "type": "string",
+          "enum": [
+            "Provider",
+            "Framework",
+            "Component",
+            "Model",
+            "Database",
+            "Index",
+            "API",
+            "File System",
+            "Network Service",
+            "Human Role",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity": {
+          "$ref": "entity-reference.schema.json"
+        },
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
+        "availabilityImpact": {
+          "type": "string",
+          "description": "How dependency unavailability affects tool invocation.",
+          "enum": [
+            "Invocation Fails",
+            "Degraded Output",
+            "Fallback Available",
+            "Delayed Execution",
+            "Unknown"
+          ]
+        }
+      }
+    },
+    "operationalCharacteristics": {
+      "type": "object",
+      "description": "Operational properties relevant to invoking and governing the tool.",
+      "additionalProperties": false,
+      "properties": {
+        "latencyProfile": {
+          "type": "string",
+          "enum": [
+            "Low Latency",
+            "Interactive",
+            "Batch",
+            "Long Running",
+            "Variable",
+            "Unknown"
+          ]
+        },
+        "throughputProfile": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Medium",
+            "High",
+            "Elastic",
+            "Constrained",
+            "Unknown"
+          ]
+        },
+        "costProfile": {
+          "type": "string",
+          "enum": [
+            "Free",
+            "Low",
+            "Medium",
+            "High",
+            "Usage Based",
+            "Unknown"
+          ]
+        },
+        "observabilitySignals": {
+          "type": "array",
+          "description": "Signals that should be captured for monitoring, evaluation or audit.",
+          "items": {
+            "$ref": "observable-signal.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "failureModes": {
+          "type": "array",
+          "description": "Expected operational failures callers or workflows should handle.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
