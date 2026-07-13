@@ -1,16 +1,39 @@
 # Assistant Handoff
 
-## Project Identity
+## Purpose
 
-The project is **RAG Knowledge Model**, abbreviated **RKM**.
+This document is the starting point for future AI assistants and maintainers working on **RAG Knowledge Model**, abbreviated **RKM**.
 
 RKM is a structured, extensible, machine-readable and human-readable knowledge model of the Retrieval-Augmented Generation ecosystem. It is intended to support a domain model, ontology, and knowledge graph foundation for describing RAG entities, relationships, claims, evidence, references, and reusable structured knowledge.
 
 RKM is not a plain catalog of RAG techniques. It models the ecosystem through first-class concepts such as techniques, frameworks, papers, components, benchmarks, datasets, models, retrievers, databases, workflows, tools, providers, problems, tradeoffs, claims, evidence, references, and relationships.
 
+The project has moved beyond the question of whether this can be built. The current operating question is how to make the model consumable by other people and systems without overclaiming product maturity.
+
+## Start Here Protocol
+
+A new assistant or maintainer should start with this sequence from the repository root:
+
+1. Read this file.
+2. Read `README.md`, `AGENTS.md`, and `Makefile`.
+3. Run `make cockpit-summary N=5`.
+4. Run `make validate`.
+5. Inspect the recent git log with `git log --oneline -n 10`.
+6. Continue from the cockpit recommendation and the current user request.
+
+`make cockpit-summary N=5` and `make validate` are authoritative for current operational state because the automation budget, run ledger, recovery state, and working target guardrails change over time. Static documentation explains the system, but cockpit and validation report the live state.
+
+## Related Maintenance Documents
+
+Use these documents together:
+
+- `docs/maintenance/repo-map.md` explains the repository structure, how the main areas fit together, and the operational command map.
+- `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
+- `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
+
 ## Repository Discipline
 
-Repository content is written in English.
+Repository content is written in English unless a specific file intentionally targets another language.
 
 Schemas use JSON Schema Draft 2020-12. Schema files must declare the draft explicitly, use stable `$id` values that follow RKM naming conventions, and compose shared definitions where appropriate.
 
@@ -34,11 +57,13 @@ make validate
 make cockpit-summary N=5
 make autopilot N=5
 make autopilot N=24 FORCE=true
+make autocycle N=5
 make safe-push
 make recovery-plan
 make autopilot-recover
-make codex-commit FILE=docs/maintenance/assistant-handoff.md
-make codex-commit FILES="README.md AGENTS.md"
+make budget-report
+make codex-commit PROMPT_FILE=prompt.md FILE=docs/maintenance/assistant-handoff.md MESSAGE="Update assistant handoff"
+make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Update repository guidance"
 ```
 
 `make validate` is the standard validation entry point.
@@ -49,19 +74,21 @@ make codex-commit FILES="README.md AGENTS.md"
 
 `make autopilot N=24 FORCE=true` is an aggressive or stress run target that explicitly crosses normal budget or target guard boundaries.
 
+`make autocycle N=5` runs repeated bounded cycles through the shell automation layer.
+
 `make safe-push` validates before pushing and should be used instead of manual pushing.
 
 `make recovery-plan` inspects a dirty or interrupted state and reports a safe recovery path.
 
 `make autopilot-recover` runs the automated recovery workflow.
 
-`make codex-commit FILE=docs/maintenance/assistant-handoff.md` commits a single-file change through the repository commit automation.
+`make budget-report` reports current budget state from the local budget profile.
 
-`make codex-commit FILES="README.md AGENTS.md"` commits a coherent multi-file change through the repository commit automation.
+`make codex-commit` creates validated commits through repository automation. It supports both `FILE` for one file and `FILES` for a coherent multi-file change.
 
 ## Automation Architecture
 
-The automation system is organized around small operational scripts and make targets:
+The automation system is organized around small operational scripts and Make targets:
 
 - `rkm-cycle` runs one bounded RKM work cycle.
 - `rkm-autocycle` runs repeated cycles under automation control.
@@ -71,7 +98,7 @@ The automation system is organized around small operational scripts and make tar
 - `rkm-cockpit-summary` summarizes current state, recent activity, and recommended operation.
 - `rkm-codex-commit` creates validated commits for single-file or coherent multi-file changes.
 - `rkm-budget` enforces automation budget and target guardrails.
-- Validation scripts enforce schema validity, contract rules, documentation quality, naming rules, and repository consistency.
+- Validation scripts enforce schema validity, contract rules, documentation relationship rules, registry consistency, naming expectations, and repository consistency.
 
 The Makefile is the operational surface for maintainers and assistants. Prefer the Make targets over invoking lower-level scripts directly unless debugging the automation itself.
 
@@ -87,7 +114,20 @@ Validation cannot be bypassed. If validation fails, fix the cause before continu
 
 The working target maximum defaults to `N=5`. Larger targets require explicit force, such as `make autopilot N=24 FORCE=true`.
 
-Budget grace exists for small near-misses, but it is not permission to ignore validation or repository safety checks.
+Budget grace exists for small near misses, but it is not permission to ignore validation or repository safety checks.
+
+## Current Maturity
+
+RKM is a strong foundation and production-oriented repository system, but it is not yet a finished consumable product.
+
+Current maturity is approximately:
+
+- Overall maturity: 3.1 / 5
+- Conceptual and model maturity: 3.3 / 5
+- Tooling and automation maturity: 3.7 / 5
+- Populated knowledge base maturity: 1.5 / 5
+
+The architecture, schema base, validation system, registries, and automation are materially beyond an exploratory prototype. The project still needs examples, populated data, fixtures, exports, releases, and consumer-facing documentation before outside users can adopt it easily.
 
 ## Known Patterns and Hardening History
 
@@ -97,12 +137,12 @@ Recurring mistakes that have been hardened include:
 
 - `identity.entityType` values that reference unsupported entity types.
 - `oneOf` branches that confuse `number` and `integer` constraints.
-- identifier patterns that accidentally allow only four digits.
-- embedded definitions that should instead be represented as first-class relationships.
+- Identifier patterns that accidentally allow only four digits.
+- Embedded definitions that start behaving like first-class entities without explicit modeling decisions.
 
 Cockpit summary count bugs were fixed so summary totals and recent activity counts are more reliable.
 
-`rkm-codex-commit` now supports multi-file changes through the `FILES="README.md AGENTS.md"` interface while retaining single-file support through `FILE=docs/maintenance/assistant-handoff.md`.
+`rkm-codex-commit` supports multi-file changes through the `FILES="README.md AGENTS.md"` interface while retaining single-file support through `FILE=docs/maintenance/assistant-handoff.md`.
 
 ## Current Recommended Operation
 
@@ -133,31 +173,12 @@ make autopilot-recover
 
 Then re-run validation and the cockpit summary before continuing.
 
-## Handoff Protocol For A New Assistant
+## Near-Term Direction
 
-A new assistant or maintainer should start with this sequence:
+The next natural work should improve consumability:
 
-1. Read this file first.
-2. Inspect `README.md`, `AGENTS.md`, and `Makefile`.
-3. Run `make cockpit-summary N=5`.
-4. Run `make validate`.
-5. Inspect the recent git log.
-6. Continue from the cockpit recommendation.
-
-This sequence establishes project identity, repository rules, automation state, validation state, recent changes, and the next recommended operational action before new work begins.
-
-## Open Next Improvements
-
-Consider adding a validator rule for embedded definitions that include top-level relationships.
-
-Consider adding a `make repo-brief` target that prints the project identity, key rules, automation state, and next recommended action.
-
-Consider adding a `make doctor` target that checks local prerequisites, script executability, validation availability, git state, and automation readiness.
-
-Consider summarizing registries and schema coverage in a generated or maintained operational report.
-
-Continue expanding RKM content through:
-
-```bash
-make autopilot N=5
-```
+- Add clear examples and fixtures that demonstrate valid entities, relationships, claims, evidence, and references.
+- Add graph export paths so the model can be consumed outside the repository.
+- Add release documentation and consumer-oriented guides.
+- Keep schema expansion disciplined so embedded reusable concepts do not drift into implicit entity models.
+- Continue using validation and cockpit output as the source of truth for readiness.
