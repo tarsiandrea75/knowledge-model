@@ -319,6 +319,15 @@ def latest_ledger_cluster(entries: list[dict[str, Any]]) -> list[dict[str, Any]]
     return list(reversed(selected_reversed))
 
 
+def latest_ledger_cluster_before(entries: list[dict[str, Any]], boundary: datetime) -> list[dict[str, Any]]:
+    eligible = [
+        entry
+        for entry in entries
+        if (timestamp := entry_timestamp(entry)) is not None and timestamp <= boundary + LEDGER_TIMESTAMP_TOLERANCE
+    ]
+    return latest_ledger_cluster(eligible)
+
+
 def target_ledger_window(entries: list[dict[str, Any]], state: dict[str, Any]) -> list[dict[str, Any]]:
     target = int_value(state.get("target"), 0)
     meaningful = entries
@@ -361,8 +370,10 @@ def recent_entries_for_state(entries: list[dict[str, Any]], state: dict[str, Any
             )
             if has_entry_at_or_after_boundary:
                 return bounded, True
-            return target_ledger_window(entries, state), False
-        return target_ledger_window(entries, state), False
+        before_boundary = latest_ledger_cluster_before(entries, boundary)
+        if before_boundary:
+            return before_boundary, True
+        return [], False
 
     return target_ledger_window(entries, state), False
 
@@ -454,9 +465,12 @@ def recent_run_text(summary: RecentRunSummary) -> str | None:
         state = "budget-stop"
     if summary.budget_stop and summary.pushed:
         parts = [state, "partial progress pushed"]
-        if summary.recovered:
+        if summary.exact_counts:
+            committed = summary.normal + summary.recovered
+            parts.extend([f"committed {committed} total", f"normal {summary.normal}"])
+        if summary.exact_counts and summary.recovered:
             parts.append(f"recovered {summary.recovered}")
-        if summary.revise_pending:
+        if summary.exact_counts and summary.revise_pending:
             parts.append(f"revise pending {summary.revise_pending}")
         return "; ".join(parts)
     committed = summary.normal + summary.recovered
@@ -613,6 +627,11 @@ def run_self_test() -> int:
     def assert_not_contains(name: str, text: str, unexpected: str) -> None:
         if unexpected in text:
             raise AssertionError(f"{name}: expected not to find {unexpected!r} in:\n{text}")
+
+    def assert_contains_one(name: str, text: str, expected_options: list[str]) -> None:
+        if not any(expected in text for expected in expected_options):
+            formatted = ", ".join(repr(expected) for expected in expected_options)
+            raise AssertionError(f"{name}: expected to find one of {formatted} in:\n{text}")
 
     clean = {"isClean": True, "status": "NO_RECOVERY_NEEDED"}
     check("recover", {"status": "READY_TO_AUTOCYCLE"}, {}, {"status": "RECOVERY_AVAILABLE"}, Decision("RECOVER", "make autopilot-recover"))
@@ -986,6 +1005,106 @@ def run_self_test() -> int:
     assert_contains("partial pushed budget stop", partial_pushed_dashboard, "budget-stop")
     assert_contains("partial pushed progress", partial_pushed_dashboard, "partial progress pushed")
     assert_contains("partial pushed recovered", partial_pushed_dashboard, "recovered 1")
+
+    stale_recovery_ledger = [
+        {
+            "label": "autocycle-cycle",
+            "finalStatus": "REVISE_PENDING",
+            "acceptedFileCount": 0,
+            "files": [f"stale-{index}.md"],
+            "timestampUtc": f"2026-01-01T00:0{index}:00Z",
+        }
+        for index in range(1, 6)
+    ]
+    stale_recovery_ledger.extend(
+        {
+            "label": "autocycle-recovery",
+            "finalStatus": "RECOVERED",
+            "acceptedFileCount": 1,
+            "files": [f"stale-{index}.md"],
+            "timestampUtc": f"2026-01-01T00:0{index}:30Z",
+        }
+        for index in range(1, 6)
+    )
+    stale_recovery_ledger.append(
+        {
+            "label": "autocycle-cycle",
+            "finalStatus": "ACCEPTED",
+            "acceptedFileCount": 1,
+            "files": ["current.md"],
+            "timestampUtc": "2026-01-01T00:30:00Z",
+        }
+    )
+    stale_recovery_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        24,
+        True,
+        {
+            "target": 24,
+            "exitCode": 0,
+            "finalOutcome": "partial autocycle completed; accepted commits pushed",
+            "timestampUtc": "2026-01-01T00:30:10Z",
+            "commandsRun": [
+                "make autocycle N=24 TOKEN_BUDGET=100",
+                "python3 scripts/rkm-next-action.py --target 24 --json",
+                "make safe-push",
+            ],
+        },
+        stale_recovery_ledger,
+    )
+    assert_contains("stale recovery partial pushed", stale_recovery_dashboard, "partial progress pushed")
+    assert_not_contains("stale recovered count excluded", stale_recovery_dashboard, "recovered 5")
+    assert_contains_one(
+        "stale recovery conservative summary",
+        stale_recovery_dashboard,
+        ["committed 1 total; normal 1", "budget-stop; partial progress pushed"],
+    )
+
+    current_recovery_pair_dashboard = render_dashboard(
+        {"status": "READY_TO_AUTOCYCLE"},
+        {},
+        clean,
+        24,
+        True,
+        {
+            "target": 24,
+            "exitCode": 0,
+            "finalOutcome": "partial autocycle completed; accepted commits pushed",
+            "timestampUtc": "2026-01-01T00:40:10Z",
+            "commandsRun": [
+                "make autocycle N=24 TOKEN_BUDGET=100",
+                "python3 scripts/rkm-next-action.py --target 24 --json",
+                "make safe-push",
+            ],
+        },
+        [
+            {
+                "label": "autocycle-cycle",
+                "finalStatus": "REVISE_PENDING",
+                "acceptedFileCount": 0,
+                "files": ["current-recovered.md"],
+                "timestampUtc": "2026-01-01T00:40:00Z",
+            },
+            {
+                "label": "autocycle-recovery",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["current-recovered.md"],
+                "timestampUtc": "2026-01-01T00:40:02Z",
+            },
+            {
+                "label": "autocycle-recovery-review",
+                "finalStatus": "RECOVERED",
+                "acceptedFileCount": 1,
+                "files": ["current-recovered.md"],
+                "timestampUtc": "2026-01-01T00:40:02Z",
+            },
+        ],
+    )
+    assert_contains("current recovery pair recovered once", current_recovery_pair_dashboard, "recovered 1")
+    assert_not_contains("current recovery pair not double counted", current_recovery_pair_dashboard, "recovered 2")
 
     ambiguous_pushed_dashboard = render_dashboard(
         {"status": "READY_TO_AUTOCYCLE"},
