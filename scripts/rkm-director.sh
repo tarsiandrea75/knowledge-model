@@ -425,7 +425,6 @@ timeout \
     --strict-config \
     -c 'model_reasoning_effort="high"' \
     exec \
-    --ephemeral \
     --sandbox workspace-write \
     --output-last-message "$FINAL_REPORT" \
     - \
