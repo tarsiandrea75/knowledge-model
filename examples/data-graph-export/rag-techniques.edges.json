@@ -261,6 +261,111 @@
     }
   },
   {
+    "id": "RELATIONSHIP-10004",
+    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+    "sourceId": "TECHNIQUE-10004",
+    "targetId": "TECHNIQUE-10001",
+    "sourceDataFile": "data/rag-techniques/fixed-size-chunking.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10004"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
+      "description": "Fixed-Size Chunking can precede Hybrid Retrieval when a RAG pipeline prepares source content as chunks before retrieval-oriented processing, without making this ordering mandatory or sufficient for better retrieval quality.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10004"
+      ],
+      "referenceIds": [
+        "REFERENCE-10004"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10005",
+    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+    "sourceId": "TECHNIQUE-10005",
+    "targetId": "TECHNIQUE-10001",
+    "sourceDataFile": "data/rag-techniques/recursive-chunking.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10005"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
+      "description": "Recursive Chunking can precede Hybrid Retrieval when a RAG pipeline prepares source content as structure-aware chunks before retrieval-oriented processing, without making this ordering mandatory or sufficient for better retrieval quality.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10005"
+      ],
+      "referenceIds": [
+        "REFERENCE-10004"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
+  },
+  {
+    "id": "RELATIONSHIP-10006",
+    "predicate": "CAN_PRECEDE_IN_PIPELINE",
+    "sourceId": "TECHNIQUE-10006",
+    "targetId": "TECHNIQUE-10001",
+    "sourceDataFile": "data/rag-techniques/semantic-chunking.json",
+    "properties": {
+      "claimIds": [
+        "CLAIM-10006"
+      ],
+      "confidence": "Conservative",
+      "declaredInRelationshipSet": "data/relationships/rag-technique-relationships.json",
+      "declaredInRelationshipSupportSets": [
+        "data/relationship-support/rag-technique-relationship-support.json"
+      ],
+      "description": "Semantic Chunking can precede Hybrid Retrieval when a RAG pipeline prepares source content as meaning-oriented chunks before retrieval-oriented processing, without making this ordering mandatory or sufficient for better retrieval quality.",
+      "edgeKind": "Domain Relationship",
+      "evidenceIds": [
+        "EVIDENCE-10006"
+      ],
+      "referenceIds": [
+        "REFERENCE-10004"
+      ],
+      "relationshipKind": "Domain Relationship",
+      "scope": "Seed Dataset",
+      "status": "Draft",
+      "supportSourceTypes": [
+        "Maintainer Analysis"
+      ],
+      "supportStatus": [
+        "Draft"
+      ],
+      "targetDataFile": "data/rag-techniques/hybrid-retrieval.json"
+    }
+  },
+  {
     "id": "RELATIONSHIP-10101",
     "predicate": "OPTIONALLY_USES",
     "sourceId": "TECHNIQUE-10001",

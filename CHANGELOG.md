@@ -22,6 +22,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 - Validated seed Component data records under `data/components/` and declared technique-component relationships connecting seed techniques to reusable components.
 - Validated seed Retriever and Reranker data records under `data/retrievers/` and `data/rerankers/`, with declared `SPECIALIZES` relationships connecting them to existing Component records.
 - Initial chunking strategy seed data for fixed-size chunking, recursive chunking, and semantic chunking.
+- Conservative pipeline-ordering relationships and support metadata for the initial chunking strategy seed records.
 - Semantic validation for data relationship instances, including registered predicate checks, source and target data record integrity checks, data file consistency checks, duplicate relationship ID checks, and duplicate semantic triple checks.
 - Semantic validation for relationship support sets, including relationship, claim, evidence, and reference identifier integrity checks.
 - Documented unattended automation and recovery guardrails for run logs, failed newly added files, schema-definition duplication risks, valid documentation examples, and safer bounded autopilot rounds.

@@ -267,7 +267,7 @@ Each backlog entry uses this compact format:
 - `Priority`: `High`
 - `Area`: Modeling
 - `Reason`: Chunking is central to RAG behavior and should be represented in the seed dataset.
-- `Suggested implementation`: The first implemented seed records are `data/rag-techniques/fixed-size-chunking.json`, `data/rag-techniques/recursive-chunking.json`, and `data/rag-techniques/semantic-chunking.json`. Relationship expansion remains separate future work and should be routed through the relationship-set and relationship-support task guides before implementation.
+- `Suggested implementation`: The first implemented seed records are `data/rag-techniques/fixed-size-chunking.json`, `data/rag-techniques/recursive-chunking.json`, and `data/rag-techniques/semantic-chunking.json`. The first conservative relationship expansion has been added for the three chunking techniques as possible pipeline-ordering relationships before Hybrid Retrieval, with relationship support routed through the relationship-set and relationship-support task guides.
 - `Related files`: `data/`; `schema/`; `registries/`; `docs/maintenance/task-guides/adding-data-records.md`
 - `Depends on`: Repository maintainer prioritization.
 
