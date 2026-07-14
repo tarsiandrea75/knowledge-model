@@ -224,6 +224,10 @@ start_step "Running schema contract validation..."
 "$PYTHON_BIN" scripts/validate-schema-contracts.py
 pass_step
 
+start_step "Running schema duplicate contract validation"
+"$PYTHON_BIN" scripts/validate-schema-duplicate-contracts.py
+pass_step
+
 start_step "Running registry validation..."
 "$PYTHON_BIN" scripts/validate-registries.py
 pass_step

@@ -8,6 +8,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 
 - Distributed agent rule routing with local rule files and task-specific maintenance guides, so repository-wide invariants stay concise while detailed rules live near the areas they govern.
 - Automated validation for distributed agent rule routing, exposed through `make agent-routing-validate` and the standard `make validate` pipeline.
+- Duplicate schema contract validation, exposed through `make schema-duplicate-contracts-validate` and the standard `make validate` pipeline, so same-name reusable definitions must be composed by their first-class schemas.
 - Rule coverage report for distinguishing documented, partially validated, and validated governance rules.
 - Deterministic data graph export for the validated seed dataset under `data/`, exposed through `make data-graph-export` and checked by `make validate`.
 - JSON Schema validation for graph export node and edge files, including duplicate ID checks and edge endpoint integrity checks.

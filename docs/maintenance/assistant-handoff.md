@@ -71,6 +71,7 @@ Use these commands from the repository root:
 ```bash
 make validate
 make agent-routing-validate
+make schema-duplicate-contracts-validate
 make cockpit-summary N=5
 make autopilot N=5
 make autopilot N=24 FORCE=true
@@ -85,7 +86,7 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` is the standard validation entry point.
 
-`make validate` checks schema validity, fixture instance validity, data instance validity, relationship-set semantics, relationship support semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, graph endpoint integrity, documentation relationship rules, and distributed agent rule routing. New assistants should know that data validation, both graph exports, documentation relationships, and rule routing are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, relationship support links that do not resolve, stale export files, malformed graph node or edge files, duplicate graph IDs, missing graph edge endpoints, invalid documentation relationship usage, or broken rule routing are validation failures rather than optional cleanup.
+`make validate` checks schema validity, schema prerequisite and contract rules, duplicate schema contracts, fixture instance validity, data instance validity, relationship-set semantics, relationship support semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, graph endpoint integrity, documentation relationship rules, and distributed agent rule routing. New assistants should know that data validation, both graph exports, documentation relationships, duplicate schema contract checks, and rule routing are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, relationship support links that do not resolve, stale export files, malformed graph node or edge files, duplicate graph IDs, missing graph edge endpoints, invalid same-name schema definition extraction, invalid documentation relationship usage, or broken rule routing are validation failures rather than optional cleanup.
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
@@ -108,6 +109,8 @@ Graph exports have formal node and edge schemas:
 - `schema/graph-edge.schema.json`
 
 Use `make graph-export-validate` or `python3 scripts/validate-graph-exports.py` to validate both fixture and data graph export files against those schemas. This validation also checks duplicate node IDs, duplicate edge IDs, and edge endpoints that must exist among nodes in the same export. The current fixture artifact still uses `sourceFixture`; the graph export validator maps that fixture provenance field into the formal `sourceDataFile` contract for schema validation. The data graph export now emits Technique, Component, Retriever, and Reranker nodes, plus schema nodes and declared domain edges from relationship sets.
+
+Use `make schema-duplicate-contracts-validate` when schema contract work adds or changes reusable definitions. It rejects a same-name `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` exists unless the first-class schema visibly composes from the reusable definition.
 
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
@@ -139,7 +142,7 @@ The automation system is organized around small operational scripts and Make tar
 - `rkm-cockpit-summary` summarizes current state, recent activity, and recommended operation.
 - `rkm-codex-commit` creates validated commits for single-file or coherent multi-file changes.
 - `rkm-budget` enforces automation budget and target guardrails.
-- Validation scripts enforce schema validity, contract rules, documentation relationship rules, registry consistency, naming expectations, and repository consistency.
+- Validation scripts enforce schema validity, contract rules, duplicate schema contract rules, documentation relationship rules, registry consistency, naming expectations, and repository consistency.
 
 The Makefile is the operational surface for maintainers and assistants. Prefer the Make targets over invoking lower-level scripts directly unless debugging the automation itself.
 

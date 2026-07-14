@@ -21,6 +21,7 @@ Use this guide before adding or changing schemas under `schema/**`.
 - Validate schema syntax and JSON Schema Draft 2020-12 usage.
 - Run prerequisite validation for referenced definitions and identity support.
 - Run contract validation.
+- Run `make schema-duplicate-contracts-validate` when schema definitions are added or renamed.
 - Consider fixtures and populated data that must be added or updated.
 - Update examples, docs, and self-tests when consumers are affected.
 - Run `make validate`.
@@ -28,7 +29,7 @@ Use this guide before adding or changing schemas under `schema/**`.
 ## Common Failure Modes
 
 - Creating a specialized schema before identity support exists.
-- Duplicating an existing first-class schema as a definition.
+- Duplicating an existing first-class schema as a definition without composing the first-class schema from that same-name definition.
 - Adding a contract without fixture or data consideration.
 - Loosening a schema without documenting why.
 

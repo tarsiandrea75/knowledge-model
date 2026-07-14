@@ -31,8 +31,8 @@ The report helps maintainers decide which rules should become automated checks. 
 | `RECOVERY_FAILED_NEEDS_MANUAL_FIX` must stop further autopilot. | `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/unattended-autopilot.md` | Not Yet Automated | None | The stop rule is documented, but this report does not confirm a hard autopilot block for that state. |
 | Unattended autopilot should use repeated `make autopilot N=1` rounds. | `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/unattended-autopilot.md` | Partially Validated | Automation target caps and cockpit checks support bounded runs | The exact unattended loop pattern remains operator discipline. |
 | Schema, registry, validator, exporter, Makefile, release-process, graph-contract, and migration changes require explicit prompts. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Not Yet Automated | None | Prompt intent is contextual and currently reviewed by humans or agents. |
-| Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit performs an atomic refactor. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/refactoring-schema-definition.md` | Not Yet Automated | None | A dedicated schema duplicate contract validator would make this enforceable. |
-| Schema definition extraction must update first-class schema, examples, tests, docs, and validation coverage in the same commit. | `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/refactoring-schema-definition.md` | Not Yet Automated | None | Atomicity across files and intent still requires reviewer judgment. |
+| Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit performs an atomic refactor. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/refactoring-schema-definition.md` | Validated | `scripts/validate-schema-duplicate-contracts.py`; `make schema-duplicate-contracts-validate`; `make validate` | The validator requires a same-name first-class schema to visibly compose from the reusable definition. |
+| Schema definition extraction must update first-class schema, examples, tests, docs, and validation coverage in the same commit. | `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/refactoring-schema-definition.md` | Partially Validated | `scripts/validate-schema-duplicate-contracts.py`; `make schema-duplicate-contracts-validate`; `make validate` | Composition is validated for same-name schema pairs, but semantic equivalence, migration safety, examples, tests, and documentation coverage still require reviewer judgment. |
 | Relationship predicates must be reused before adding new ones. | `docs/maintenance/automation-guardrails.md`; `registries/AGENTS.md` | Not Yet Automated | None | Current validation can check registered predicates in data, but not semantic reuse before a new predicate is added. |
 | Hard dependency predicates such as `REQUIRES` require explicit justification. | `docs/maintenance/automation-guardrails.md`; relationship task guides | Not Yet Automated | None | The need for a hard dependency is semantic and reviewer-driven. |
 | Adding a new data entity type requires a complete package: records, manifest, validation compatibility, graph export support, schema provenance, docs, and self-test coverage. | `data/AGENTS.md`; `docs/maintenance/task-guides/adding-new-entity-type.md` | Not Yet Automated | None | Existing validators check pieces once wired, but do not detect package completeness for a new entity type. |
@@ -45,12 +45,11 @@ The report helps maintainers decide which rules should become automated checks. 
 
 ## Highest-Value Automation Candidates
 
-1. Schema duplicate contract validator.
-2. New entity type package validator.
-3. Relationship predicate reuse assistant or reviewer check.
-4. Task router CLI that maps changed paths to required AGENTS files and task guides.
-5. Recovery state validator that blocks autopilot when recovery failed.
-6. Runtime artifact detector for known log or scratch directories inside the repo.
+1. New entity type package validator.
+2. Relationship predicate reuse assistant or reviewer check.
+3. Task router CLI that maps changed paths to required AGENTS files and task guides.
+4. Recovery state validator that blocks autopilot when recovery failed.
+5. Runtime artifact detector for known log or scratch directories inside the repo.
 
 ## Maintenance Rules
 

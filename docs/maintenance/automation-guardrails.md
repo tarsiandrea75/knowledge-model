@@ -12,7 +12,7 @@ Automation and recovery work must route through root `AGENTS.md`, then the local
 
 Use the task guides for operational detail instead of expanding this file with every task-specific checklist. In particular, unattended runs use `docs/maintenance/task-guides/unattended-autopilot.md`, failed-new-file recovery uses `docs/maintenance/task-guides/recovering-failed-new-file.md`, schema work uses the schema task guides, and exporter or validator changes use the graph export or validation script guides.
 
-Distributed rule routing is validated automatically by `make validate` and can be checked directly with `make agent-routing-validate`.
+Distributed rule routing is validated automatically by `make validate` and can be checked directly with `make agent-routing-validate`. Duplicate schema contracts are also checked automatically through `make schema-duplicate-contracts-validate` and the standard validation pipeline.
 
 Use `docs/maintenance/rule-coverage-report.md` to see which governance rules are documented, partially validated, or validated. The report is the enforcement-level map; this document remains the operational guardrail source and does not duplicate that table.
 
@@ -105,6 +105,8 @@ done
 ## Schema Duplication and Atomic Refactor Rule
 
 Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit refactors the first-class schema to compose from the reusable definition.
+
+`make schema-duplicate-contracts-validate` enforces the same-name composition requirement by checking that the first-class schema visibly references the reusable definition.
 
 Reusable definition extraction must be atomic:
 
