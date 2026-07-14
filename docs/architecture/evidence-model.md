@@ -318,6 +318,29 @@ Use when evidence is speculative, anecdotal or based mainly on maintainer interp
 
 ---
 
+# Evidence Strength Calibration
+
+Evidence strength must be calibrated against the exact claim being supported, not against the general reputation of the source.
+
+Use the lowest strength justified by the source and the wording of the claim.
+
+Strength should decrease when:
+
+* the source is secondary or tertiary
+* the source only implies the claim
+* the claim generalizes beyond the evaluated context
+* the evidence depends on maintainer interpretation
+* benchmark conditions, versions or datasets are unclear
+* the claim combines multiple assertions but the source supports only one of them
+
+Strength should not be raised only because the source is well known, widely cited or produced by an authoritative organization.
+
+If strong evidence supports only a narrower statement, narrow the claim rather than assigning strong evidence to an overbroad claim.
+
+When evidence strength and maintainer confidence differ, preserve both values and explain the difference in notes. For example, direct primary-source support may justify `Strong` evidence while ambiguous terminology may still require `Medium` confidence.
+
+---
+
 # Confidence
 
 Confidence represents the maintainer's confidence in the claim or relationship.
