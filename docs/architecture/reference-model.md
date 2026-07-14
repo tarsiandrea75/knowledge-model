@@ -281,6 +281,45 @@ Version-specific claims should use evidence that points to versioned or dated re
 
 ---
 
+# Reference Freshness and Staleness
+
+Reference freshness describes whether a cited source is recent enough for the claim, evidence role or relationship it supports.
+
+Freshness is not the same as publication date. A foundational paper can remain fresh for a historical or definition claim, while a provider documentation page can become stale for an availability, pricing, API behavior or policy claim.
+
+Staleness should be evaluated against:
+
+* source type
+* source priority
+* claim type
+* source update behavior
+* implementation or provider release cadence
+* source version or access date
+* whether the claim affects adoption, governance, safety or operational behavior
+
+Use stronger freshness expectations for mutable sources such as:
+
+* official documentation for APIs, services, pricing, regions, quotas and policies
+* repositories when citing current implementation behavior
+* benchmark leaderboards or evaluation reports that change over time
+* provider pages that describe availability, access constraints or compliance posture
+* dataset pages that may receive new versions, corrections or license changes
+
+Use weaker freshness expectations for stable sources such as:
+
+* original papers cited for concepts they introduce
+* standards or specifications with explicit versions
+* archived release notes cited for historical behavior
+* books or papers cited for terminology, background or motivation
+
+A reference should record `accessedAt`, `updatedAt`, `version`, `canonicalUrl` or repository version context when freshness affects interpretation.
+
+When a source may be stale but is still useful, preserve the reference and narrow the supported claim instead of deleting the source. Evidence notes should explain the date-sensitive boundary.
+
+Claims that depend on rapidly changing sources should be reviewed when the source changes, when a new major version is released or when downstream use would rely on the claim for selection, deployment, governance or evaluation.
+
+---
+
 # URL and Canonical URL
 
 The `url` field records the location that can be accessed.
