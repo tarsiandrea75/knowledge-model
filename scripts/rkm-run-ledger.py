@@ -64,7 +64,10 @@ ERROR_MARKER = re.compile(r"\bERROR:")
 USAGE_LIMIT_MARKER = re.compile(r"\busage limit\b", re.IGNORECASE)
 ARGUMENT_LIST_TOO_LONG_MARKER = re.compile(r"\bArgument list too long\b", re.IGNORECASE)
 EXIT_NONZERO_MARKER = re.compile(r"\bexit nonzero\b", re.IGNORECASE)
-RECOVERY_FAILED_MARKER = re.compile(r"\brecovery failed\b", re.IGNORECASE)
+RECOVERY_FAILED_MARKER = re.compile(
+    r"(?:\bERROR:\s+REVISE recovery failed\b|\bCodex recovery failed\.)",
+    re.IGNORECASE,
+)
 MAKE_FATAL_MARKER = re.compile(r"(?:^|\s)make(?:\[\d+\])?: \*\*\* .*", re.IGNORECASE)
 TRACEBACK_MARKER = re.compile(r"\bTraceback \(most recent call last\):")
 COMPLETION_ACCEPTED_FILE_COUNT = re.compile(
@@ -75,6 +78,7 @@ ITERATION_ACCEPTED = re.compile(
     r"\bIteration\s+\d+\s+of\s+\d+\s+accepted\s+(?:by rkm-cycle\.sh|after recovery)\b",
     re.IGNORECASE,
 )
+COMMIT_COMPLETED_LINE = re.compile(r"\bCommit completed:\s+.+")
 
 
 def repository_relative(path: Path) -> str:
@@ -228,33 +232,66 @@ def extract_automation_kinds(text: str, label: str | None) -> list[str]:
     return kinds
 
 
-def failure_hints(text: str) -> list[str]:
-    hints: list[str] = []
+def append_unique(values: list[str], value: str) -> None:
+    if value not in values:
+        values.append(value)
+
+
+def failure_hint_events(text: str) -> list[dict[str, int | str]]:
+    events: list[dict[str, int | str]] = []
     verdicts = extract_verdicts(text)
     final_verdict = verdicts[-1] if verdicts else None
     accept_final = final_verdict == "ACCEPT"
 
-    for line in text.splitlines():
+    for line_number, line in enumerate(text.splitlines(), start=1):
         if re.search(r"\bReturn\s+ACCEPT,\s+REVISE,\s+or\s+STOP\b", line, re.IGNORECASE):
             continue
-        if not accept_final and ERROR_MARKER.search(line) and "ERROR:" not in hints:
-            hints.append("ERROR:")
-        if USAGE_LIMIT_MARKER.search(line) and "usage limit" not in hints:
-            hints.append("usage limit")
-        if ARGUMENT_LIST_TOO_LONG_MARKER.search(line) and "Argument list too long" not in hints:
-            hints.append("Argument list too long")
-        if EXIT_NONZERO_MARKER.search(line) and "exit nonzero" not in hints:
-            hints.append("exit nonzero")
-        if RECOVERY_FAILED_MARKER.search(line) and "recovery failed" not in hints:
-            hints.append("recovery failed")
-        if MAKE_FATAL_MARKER.search(line) and "make fatal error" not in hints:
-            hints.append("make fatal error")
-        if TRACEBACK_MARKER.search(line) and "uncaught traceback" not in hints:
-            hints.append("uncaught traceback")
+        if not accept_final and ERROR_MARKER.search(line):
+            events.append({"hint": "ERROR:", "line": line_number})
+        if USAGE_LIMIT_MARKER.search(line):
+            events.append({"hint": "usage limit", "line": line_number})
+        if ARGUMENT_LIST_TOO_LONG_MARKER.search(line):
+            events.append({"hint": "Argument list too long", "line": line_number})
+        if EXIT_NONZERO_MARKER.search(line):
+            events.append({"hint": "exit nonzero", "line": line_number})
+        if RECOVERY_FAILED_MARKER.search(line):
+            events.append({"hint": "recovery failed", "line": line_number})
+        if MAKE_FATAL_MARKER.search(line):
+            events.append({"hint": "make fatal error", "line": line_number})
+        if TRACEBACK_MARKER.search(line):
+            events.append({"hint": "uncaught traceback", "line": line_number})
 
-    if final_verdict == "STOP" and "STOP" not in hints:
-        hints.append("STOP")
+    if final_verdict == "STOP":
+        events.append({"hint": "STOP", "line": len(text.splitlines()) + 1})
+    return events
+
+
+def failure_hints_from_events(events: list[dict[str, int | str]]) -> list[str]:
+    hints: list[str] = []
+    for event in events:
+        hint = event.get("hint")
+        if isinstance(hint, str):
+            append_unique(hints, hint)
     return hints
+
+
+def failure_hints(text: str) -> list[str]:
+    return failure_hints_from_events(failure_hint_events(text))
+
+
+def success_anchor_lines(text: str) -> list[int]:
+    lines: list[int] = []
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if COMMIT_LINE.match(stripped):
+            lines.append(line_number)
+        elif COMMIT_COMPLETED_LINE.search(stripped):
+            lines.append(line_number)
+        elif COMPLETION_ACCEPTED_FILE_COUNT.search(stripped):
+            lines.append(line_number)
+        elif ITERATION_ACCEPTED.search(stripped):
+            lines.append(line_number)
+    return lines
 
 
 def has_recovery(text: str, label: str | None) -> bool:
@@ -281,19 +318,34 @@ def final_status(final_verdict: str | None, has_failure: bool, recovered: bool) 
     return "UNKNOWN"
 
 
-def has_unresolved_failure(hints: list[str], final_verdict: str | None, accepted_count: int) -> bool:
-    if not hints:
+def has_unresolved_failure(
+    hint_events: list[dict[str, int | str]], final_verdict: str | None, accepted_count: int, anchors: list[int]
+) -> bool:
+    if not hint_events:
         return False
-    if final_verdict == "ACCEPT" and accepted_count > 0:
-        severe_hints = {
-            "usage limit",
-            "Argument list too long",
-            "STOP",
-            "recovery failed",
-            "make fatal error",
-        }
-        return any(hint in severe_hints for hint in hints)
-    return True
+    severe_hints = {
+        "usage limit",
+        "Argument list too long",
+        "STOP",
+        "recovery failed",
+        "make fatal error",
+    }
+    transient_hints = {"recovery failed", "make fatal error"}
+    last_anchor = max(anchors) if anchors else None
+    accept_with_success = final_verdict == "ACCEPT" and accepted_count > 0 and last_anchor is not None
+
+    for event in hint_events:
+        hint = event.get("hint")
+        if not isinstance(hint, str):
+            continue
+        if final_verdict == "ACCEPT" and accepted_count > 0 and hint not in severe_hints:
+            continue
+        if accept_with_success and hint in transient_hints:
+            line = event.get("line")
+            if isinstance(line, int) and line < last_anchor:
+                continue
+        return True
+    return False
 
 
 def entry_final_status(entry: dict[str, Any]) -> str:
@@ -311,11 +363,12 @@ def build_entry(log_path: Path, text: str, label: str | None) -> dict[str, Any]:
     verdicts = extract_verdicts(text)
     commits = extract_commits(text)
     files = extract_files(text)
-    hints = failure_hints(text)
+    hint_events = failure_hint_events(text)
+    hints = failure_hints_from_events(hint_events)
     final_verdict = verdicts[-1] if verdicts else None
     recovered = has_recovery(text, label)
     accepted_count = accepted_file_count(text, label, final_verdict, files)
-    has_failure = has_unresolved_failure(hints, final_verdict, accepted_count)
+    has_failure = has_unresolved_failure(hint_events, final_verdict, accepted_count, success_anchor_lines(text))
 
     return {
         "timestampUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -761,15 +814,58 @@ def run_self_test() -> int:
         assert_equal(eighth_entry["hasFailure"], True, "accepted argument list too long failure detection")
         assert_equal(eighth_entry["finalStatus"], "FAILED", "accepted argument list too long final status")
 
+        ninth_log = root / "ninth.log"
+        ninth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    "Recovery state validator that blocks autopilot when recovery failed.",
+                    "Traceback (most recent call last):",
+                    "FileNotFoundError: [Errno 2] No such file or directory: '/tmp/rkm-missing'",
+                    "make[2]: *** [Makefile:25: validate] Error 1",
+                    "verdict: ACCEPT",
+                    "[main 123abcd] Add accepted RKM file",
+                    "Commit completed: Add docs/architecture/accepted-model.md.",
+                    "Cycle completed: 1 accepted file(s) committed.",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        ninth_entry = append_entry(ninth_log, ledger, None)
+        assert_equal("recovery failed" in ninth_entry["failureHints"], False, "prose recovery failed hint suppression")
+        assert_equal(ninth_entry["hadTraceback"], True, "accepted cycle traceback remains diagnostic")
+        assert_equal("make fatal error" in ninth_entry["failureHints"], True, "resolved make fatal hint remains diagnostic")
+        assert_equal(ninth_entry["hasFailure"], False, "accepted cycle resolved make fatal failure detection")
+        assert_equal(ninth_entry["finalStatus"], "ACCEPTED", "accepted cycle resolved make fatal final status")
+        assert_equal(ninth_entry["acceptedFileCount"], 1, "accepted cycle resolved make fatal file count")
+
+        tenth_log = root / "tenth.log"
+        tenth_log.write_text(
+            "\n".join(
+                [
+                    "[rkm-autocycle] start",
+                    "verdict: ACCEPT",
+                    "Autocycle completed: 1 accepted file(s) committed.",
+                    "make: *** [Makefile:25: validate] Error 1",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        tenth_entry = append_entry(tenth_log, ledger, None)
+        assert_equal("make fatal error" in tenth_entry["failureHints"], True, "post-success make fatal hint detection")
+        assert_equal(tenth_entry["hasFailure"], True, "post-success make fatal failure detection")
+        assert_equal(tenth_entry["finalStatus"], "FAILED", "post-success make fatal final status")
+        assert_equal(tenth_entry["acceptedFileCount"], 1, "post-success make fatal accepted file count")
+
         entries = read_ledger(ledger)
-        assert_equal(len(entries), 8, "append behavior")
+        assert_equal(len(entries), 10, "append behavior")
         report = report_text(entries)
         for expected in (
-            "total runs: 8",
+            "total runs: 10",
             "total token events: 3",
             "total tokens: 1734",
             "runs with recovery: 1",
-            "runs with failure hints: 3",
+            "runs with failure hints: 4",
             "recovered runs: 1",
             "stopped runs: 1",
         ):
@@ -777,17 +873,17 @@ def run_self_test() -> int:
                 raise AssertionError(f"report behavior: missing {expected!r}")
 
         estimate = estimate_values(entries, 3, 1.25, None)
-        assert_equal(estimate["historicalAcceptedFiles"], 5, "estimate historical accepted files")
+        assert_equal(estimate["historicalAcceptedFiles"], 6, "estimate historical accepted files")
         assert_equal(estimate["historicalTokens"], 1734, "estimate historical tokens")
         assert_equal(
             f"{estimate['averageTokensPerAcceptedFile']:.2f}",
-            "346.80",
+            "289.00",
             "estimate average tokens per accepted file",
         )
         assert_equal(f"{estimate['maxTokensPerAcceptedFile']:.2f}", "1234.00", "estimate max tokens per accepted file")
         assert_equal(estimate["targetAcceptedFiles"], 3, "estimate target accepted files")
         assert_equal(estimate["safetyFactor"], 1.25, "estimate safety factor")
-        assert_equal(f"{estimate['estimatedTokens']:.2f}", "1300.50", "estimate tokens")
+        assert_equal(f"{estimate['estimatedTokens']:.2f}", "1083.75", "estimate tokens")
 
         assert_equal(quiet_call(print_estimate, ledger, 3, 2000, None, 1.25), 0, "estimate budget within")
         assert_equal(quiet_call(print_estimate, ledger, 3, 1000, None, 1.25), 3, "estimate budget over")
