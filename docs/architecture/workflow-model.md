@@ -375,6 +375,43 @@ The agent is a participant. The workflow is the process structure in which the a
 
 ---
 
+# Agentic RAG Workflows
+
+An agentic RAG workflow is a workflow whose control flow depends on agent decisions about retrieval, tool use, evidence gathering, verification or stopping conditions.
+
+Model an agentic RAG workflow when the process structure matters independently from the agent entity. The workflow should describe the ordered, conditional or iterative execution pattern; the agent should describe the bounded decision-making capability that participates in that pattern.
+
+Agentic RAG workflow structure should make these responsibilities explicit when they affect behavior, cost, latency, governance or evaluation:
+
+* planning step that decomposes the user query, task goal or evidence need
+* tool or retriever selection step that chooses among available retrieval capabilities
+* retrieval step that gathers candidate evidence or context
+* verification step that checks grounding, citation candidates, source quality or policy compliance
+* loop or branch that decides whether to retrieve again, revise the query, rerank candidates, escalate to a human or stop
+* answer or artifact production step that consumes the verified context
+
+Retrieval loops should include their termination conditions. A loop that continues until sufficient evidence is found is not reproducible unless the workflow records the confidence threshold, maximum retrieval attempts, human approval point, policy rule or evaluation signal that stops the loop.
+
+Tool use inside an agentic workflow should identify the tool categories, side-effect boundaries and participant roles involved in each step. Tool-selection behavior belongs to the Agent Model when it describes autonomy or decision policy; step order, transition conditions and workflow outputs belong to the Workflow Model.
+
+Evidence use should distinguish gathered context from evidence that supports a claim about the workflow. Retrieved documents, chunks or citations may be workflow inputs or outputs. Evidence records are required when RKM asserts that the workflow improves quality, reduces hallucination, changes latency, satisfies a policy or supports another reusable claim.
+
+Use canonical relationships when connecting agentic workflows to the rest of RKM:
+
+```text
+Agent EXECUTES Workflow
+Workflow USES Retriever
+Workflow OPTIONALLY_USES Reranker
+Workflow USES Tool
+Workflow TRIGGERS Evaluation Step
+Evaluation Step BRANCHES_TO Retrieval Step
+Framework IMPLEMENTS Workflow
+```
+
+Do not create a separate architecture document for agentic RAG workflows unless the repository first establishes a distinct entity type or contract for them. Until then, agentic behavior is modeled through the existing Agent Model, Workflow Model, Tool Model, Retrieval Model, Claim Model and Evidence Model.
+
+---
+
 # Workflow Granularity
 
 Workflows should be modeled at the smallest level that remains useful.
