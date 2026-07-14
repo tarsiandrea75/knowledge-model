@@ -29,6 +29,8 @@ Maintenance documents provide strategic context, not operational truth. Use them
 
 Future assistants should route themselves through `AGENTS.md` first, then the nearest local `AGENTS.md` file for the affected directory, then the relevant task guide under `docs/maintenance/task-guides/`. Root rules define repository invariants; local rule files define area rules; task guides define operational checks for specific work types.
 
+Before proposing changes across unfamiliar areas, run `make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"` with the intended paths. Use its report to identify required readings, suggested task guides, risk notes, and required checks before editing.
+
 Use `make agent-routing-validate` to check the routing model directly. The same validation also runs through `make validate`.
 
 Before proposing new validators or guardrails, check `docs/maintenance/rule-coverage-report.md` to see whether the rule is already documented, partially validated, or validated.
@@ -74,6 +76,7 @@ Use these commands from the repository root:
 ```bash
 make validate
 make agent-routing-validate
+make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"
 make schema-duplicate-contracts-validate
 make cockpit-summary N=5
 make autopilot N=5

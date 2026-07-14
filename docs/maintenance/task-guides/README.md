@@ -8,6 +8,8 @@ Task guides provide operational instructions for common RKM change types. They k
 
 Use these guides after reading root `AGENTS.md` and any local `AGENTS.md` file that governs the files being changed.
 
+For intended file changes, `make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"` is the operational entry point for choosing required readings, suggested task guides, risk notes, and required checks.
+
 ## Routing Table
 
 | Task type | Guide |

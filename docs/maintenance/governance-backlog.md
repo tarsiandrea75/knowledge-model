@@ -48,7 +48,6 @@ Each backlog entry uses this compact format:
 ## Suggested Next Items
 
 - `GB-002` New entity type package validator.
-- `GB-005` Task router CLI.
 - `GB-007` Runtime artifact detector.
 - `GB-018` Chunking strategy seed data.
 - `GB-038` `v0.2.0` planning document.
@@ -108,13 +107,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-005`
 - `Title`: Task router CLI that maps paths to required rule files and task guides.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Tooling
 - `Reason`: Contributors need a quick way to identify the rule files and task guides required by a change.
-- `Suggested implementation`: Add a CLI that accepts changed paths and prints the required root rules, local `AGENTS.md` files, task guides, and validation commands.
+- `Suggested implementation`: Implemented by `scripts/rkm-route-task.py` and exposed through `make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"`.
 - `Related files`: `AGENTS.md`; `docs/maintenance/task-guides/README.md`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented on `main` after `v0.1.0-alpha`.
 
 ### GB-006 Recovery State Validator Or Autopilot Blocker
 

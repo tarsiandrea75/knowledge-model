@@ -7,6 +7,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 ### Added
 
 - Distributed agent rule routing with local rule files and task-specific maintenance guides, so repository-wide invariants stay concise while detailed rules live near the areas they govern.
+- Task router CLI exposed through `scripts/rkm-route-task.py` and `make route-task`, so maintainers and agents can map intended file changes to required readings, task guides, risk notes, and checks.
 - Automated validation for distributed agent rule routing, exposed through `make agent-routing-validate` and the standard `make validate` pipeline.
 - Duplicate schema contract validation, exposed through `make schema-duplicate-contracts-validate` and the standard `make validate` pipeline, so same-name reusable definitions must be composed by their first-class schemas.
 - Governance backlog for preserving deferred validation, governance, modeling, evidence, release, and tooling work.

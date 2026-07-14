@@ -27,6 +27,7 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 | Required task guides must exist. | `AGENTS.md`; `docs/maintenance/task-guides/README.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required task guide inventory. |
 | Task guides must use required headings. | `docs/maintenance/task-guides/README.md`; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required headings for task guides other than the index. |
 | Root `AGENTS.md` must route to local rule files and task guides. | `AGENTS.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks required root references, including local rule files and the task guide index. |
+| Intended file changes should map to required root rules, local `AGENTS.md` files, task guides, risk notes, and checks before editing. | `AGENTS.md`; `docs/maintenance/task-guides/README.md`; `docs/maintenance/governance-backlog.md` | Validated | `scripts/rkm-route-task.py --self-test`; `make route-task`; `scripts/rkm-unit-tests.sh`; `make validate` | The task router CLI is self-tested and wired into the standard unit test step. |
 | Local `AGENTS.md` files must reference relevant task guides. | Local `AGENTS.md` files; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks configured local-to-guide references. |
 | Architecture docs must not mix concrete `data/` paths with invented IDs. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/writing-architecture-doc.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | Current validation catches concrete `data/` paths combined with invented numeric example identifiers. |
 | Failed newly added files must be discarded from both index and filesystem when recovery fails and the file should not be kept. | `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/recovering-failed-new-file.md` | Not Yet Automated | None | This is an operational recovery procedure and still requires disciplined execution. |
@@ -50,9 +51,8 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 
 1. New entity type package validator.
 2. Relationship predicate reuse assistant or reviewer check.
-3. Task router CLI that maps changed paths to required AGENTS files and task guides.
-4. Recovery state validator that blocks autopilot when recovery failed.
-5. Runtime artifact detector for known log or scratch directories inside the repo.
+3. Recovery state validator that blocks autopilot when recovery failed.
+4. Runtime artifact detector for known log or scratch directories inside the repo.
 
 ## Maintenance Rules
 

@@ -8,6 +8,8 @@ Rule routing validation makes the distributed agent rules testable. It checks th
 
 Use this guide when changing root agent routing, local agent rules, task guides, architecture example rules, `scripts/validate-agent-routing.py`, `make agent-routing-validate`, or the validation pipeline step that runs agent rule routing validation.
 
+Also use this guide when changing `scripts/rkm-route-task.py` or `make route-task`. The task router CLI should stay aligned with distributed rule routing validation so its recommendations match root routing, local `AGENTS.md` files, and task-guide coverage.
+
 ## Required Readings
 
 - Root `AGENTS.md` for repository invariants and routing.
@@ -19,6 +21,7 @@ Use this guide when changing root agent routing, local agent rules, task guides,
 ## Required Checks
 
 - Run `python3 scripts/validate-agent-routing.py --self-test` after changing the validator.
+- Run `python3 scripts/rkm-route-task.py --self-test` after changing the task router CLI.
 - Run `make agent-routing-validate` after changing agent rules or task guides.
 - Run `make validate` before reporting the repository as ready.
 - Inspect `git status --short` before handoff.
