@@ -253,6 +253,14 @@ Some architecture-level entity types may be defined conceptually before they hav
 
 That state is allowed as long as later schema additions follow the required change order and do not introduce unsupported `identity.entityType` constants.
 
+Architecture coverage is semantic, not a one-to-one inventory of schema file names.
+
+Before adding a new architecture document for a schema-adjacent concept, contributors should inspect the existing architecture documents that define the concept boundary. An existing canonical document remains authoritative when it already explains the concept, even when its file name is broader, narrower or uses different wording than the schema name.
+
+Do not create a parallel architecture document by inventing a distinction such as concept model versus document-level contract unless that distinction is already established by the domain model, governance rules or an accepted architecture document.
+
+When semantic coverage already exists, the correct next step is to update the authoritative document if clarification is needed, or make no architecture change if the existing model is sufficient.
+
 ---
 
 # Acceptance Criteria
