@@ -58,6 +58,18 @@ The provider should be modeled when its role affects how an entity is selected, 
 
 ---
 
+# Provider as Role-Bearing Entity
+
+Provider is the RKM entity for a RAG-relevant source role, not a generic organization directory entry.
+
+An organization, project, community or individual should be represented as a Provider when it makes models, services, infrastructure, datasets, frameworks, tools, documentation or managed platforms available in a way that affects RAG selection, trust, access, operation, governance or evidence interpretation.
+
+RKM should not introduce a parallel Organization entity only to describe the same source at a different label. A separate organization-like entity type should be considered only when existing architecture establishes responsibilities that are not provider responsibilities, such as authorship, institutional affiliation, ownership history or non-RAG organizational metadata that must be related independently from any provided offering.
+
+This boundary keeps provider records focused on offerings and accountability while avoiding duplicate records for the same source.
+
+---
+
 # Provider Boundary
 
 Every provider should have a clear boundary.
