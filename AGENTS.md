@@ -42,6 +42,8 @@ Root `AGENTS.md` is the repository constitution and routing layer. It must stay 
 
 Distributed rule routing is validated by `make agent-routing-validate` and by the standard `make validate` pipeline. The task guide index is `docs/maintenance/task-guides/README.md`.
 
+Governance rule enforcement levels are tracked in `docs/maintenance/rule-coverage-report.md`.
+
 | Work type | Required routing |
 | --- | --- |
 | Tasks touching `data/**` | Read `data/AGENTS.md` and the relevant data task guide. |

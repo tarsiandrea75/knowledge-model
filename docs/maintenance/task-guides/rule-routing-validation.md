@@ -13,6 +13,7 @@ Use this guide when changing root agent routing, local agent rules, task guides,
 - Root `AGENTS.md` for repository invariants and routing.
 - The local `AGENTS.md` file for any affected area.
 - `docs/maintenance/automation-guardrails.md` for automation and handoff expectations.
+- `docs/maintenance/rule-coverage-report.md` for the current documented, partially validated, and validated governance rule map.
 - `docs/maintenance/task-guides/updating-validation-scripts.md` when changing the validator implementation.
 
 ## Required Checks

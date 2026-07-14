@@ -31,6 +31,8 @@ Future assistants should route themselves through `AGENTS.md` first, then the ne
 
 Use `make agent-routing-validate` to check the routing model directly. The same validation also runs through `make validate`.
 
+Before proposing new validators or guardrails, check `docs/maintenance/rule-coverage-report.md` to see whether the rule is already documented, partially validated, or validated.
+
 ## Related Maintenance Documents
 
 Use these documents together:
@@ -38,6 +40,7 @@ Use these documents together:
 - `docs/maintenance/repo-map.md` explains the repository structure, how the main areas fit together, and the operational command map.
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
 - `docs/maintenance/automation-guardrails.md` explains automation, recovery, schema-contract, and unattended-run rules that protect clean handoff and push readiness.
+- `docs/maintenance/rule-coverage-report.md` maps documented governance rules to their current automation coverage.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
 For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and graph export paths now exist for both fixtures and seed data, but external users still need broader real data, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.

@@ -33,6 +33,10 @@ Use these guides after reading root `AGENTS.md` and any local `AGENTS.md` file t
 - The task guide that matches the requested work.
 - `docs/maintenance/automation-guardrails.md` for automation, recovery, schema-contract, or unattended work.
 
+## Maintenance References
+
+- `docs/maintenance/rule-coverage-report.md` is a maintenance reference, not a task guide. Task guides may point to it when deciding whether a documented rule needs automation.
+
 ## Required Checks
 
 Run the validation command required by the current task. For normal repository work, use `make validate`.

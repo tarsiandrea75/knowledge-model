@@ -14,6 +14,8 @@ Use the task guides for operational detail instead of expanding this file with e
 
 Distributed rule routing is validated automatically by `make validate` and can be checked directly with `make agent-routing-validate`.
 
+Use `docs/maintenance/rule-coverage-report.md` to see which governance rules are documented, partially validated, or validated. The report is the enforcement-level map; this document remains the operational guardrail source and does not duplicate that table.
+
 ## Clean Worktree Invariant
 
 Passing validation is necessary but not sufficient.
