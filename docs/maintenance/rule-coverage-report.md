@@ -6,6 +6,8 @@ This report tracks RKM governance rules by enforcement level. It distinguishes r
 
 The report helps maintainers decide which rules should become automated checks. It should be treated as a conservative governance map, not as a maturity claim.
 
+Use `docs/maintenance/governance-backlog.md` for actionable deferred governance work. Rules that are not yet automated should have corresponding backlog entries when they represent concrete implementation work, but this report should not duplicate the backlog table.
+
 ## Coverage Levels
 
 - `Documented`: the rule exists in AGENTS files, maintenance docs, or task guides.
@@ -54,6 +56,7 @@ The report helps maintainers decide which rules should become automated checks. 
 ## Maintenance Rules
 
 - Update this report when a documented rule becomes validated.
+- Link actionable enforcement gaps to `docs/maintenance/governance-backlog.md` when the gap represents planned work.
 - Do not inflate maturity claims from documentation alone.
 - Prefer small validators with self-tests.
 - A rule may remain documented-only if it requires human architectural judgment.

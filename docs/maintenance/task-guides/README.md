@@ -36,6 +36,7 @@ Use these guides after reading root `AGENTS.md` and any local `AGENTS.md` file t
 ## Maintenance References
 
 - `docs/maintenance/rule-coverage-report.md` is a maintenance reference, not a task guide. Task guides may point to it when deciding whether a documented rule needs automation.
+- `docs/maintenance/governance-backlog.md` is a maintenance reference for deferred governance, validation, modeling, evidence, release, and tooling work. Task guides can create or reference backlog entries when a recommended improvement is postponed.
 
 ## Required Checks
 

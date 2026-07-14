@@ -33,6 +33,8 @@ Use `make agent-routing-validate` to check the routing model directly. The same 
 
 Before proposing new validators or guardrails, check `docs/maintenance/rule-coverage-report.md` to see whether the rule is already documented, partially validated, or validated.
 
+Before proposing new governance, validation, modeling, release, or evidence work, also check `docs/maintenance/governance-backlog.md`. Deferred ideas should be recorded there before being postponed.
+
 ## Related Maintenance Documents
 
 Use these documents together:
@@ -41,6 +43,7 @@ Use these documents together:
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
 - `docs/maintenance/automation-guardrails.md` explains automation, recovery, schema-contract, and unattended-run rules that protect clean handoff and push readiness.
 - `docs/maintenance/rule-coverage-report.md` maps documented governance rules to their current automation coverage.
+- `docs/maintenance/governance-backlog.md` preserves deferred governance, validation, modeling, evidence, release, and tooling work.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
 For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and graph export paths now exist for both fixtures and seed data, but external users still need broader real data, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
