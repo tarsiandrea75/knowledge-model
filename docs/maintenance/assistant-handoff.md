@@ -208,6 +208,8 @@ done
 
 Repeat that sequence as needed rather than leaving a larger target running while the operator is away. `N=1` limits budget spent on recovery attempts and leaves a validated, pushed checkpoint after each successful round.
 
+If an unattended run appears stuck on `cycle attempt still running`, check active processes, `/tmp/rkm-cycle-output.txt`, `git status --short`, and governance backlog item `GB-042` before deciding whether to interrupt or recover the run.
+
 Before handoff, run:
 
 ```bash

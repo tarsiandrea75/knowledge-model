@@ -20,6 +20,8 @@ Use this guide before any unattended or away-from-keyboard autopilot run.
 - Write logs to `/tmp/rkm-runs`.
 - Require validation, safe push, and cockpit summary after each round.
 
+Repeated `make autopilot N=1` is safer than larger unattended runs, but it does not currently guarantee a per-cycle timeout. Keep logs outside the repository and treat per-cycle wall-clock timeout enforcement as tracked deferred work under `GB-042`.
+
 ## Safe Command Loop
 
 ```bash

@@ -52,6 +52,7 @@ Each backlog entry uses this compact format:
 - `GB-007` Runtime artifact detector.
 - `GB-018` Chunking strategy seed data.
 - `GB-038` `v0.2.0` planning document.
+- `GB-042` Autopilot per-cycle timeout.
 
 ## Backlog Entries
 
@@ -545,4 +546,16 @@ Each backlog entry uses this compact format:
 - `Reason`: Release and governance changes should be recorded consistently under `CHANGELOG.md` `Unreleased`.
 - `Suggested implementation`: Add validation or release-check support that detects relevant changed files and requires an appropriate changelog entry.
 - `Related files`: `CHANGELOG.md`; `docs/maintenance/task-guides/preparing-release.md`; `scripts/`; `Makefile`
+- `Depends on`: Repository maintainer prioritization.
+
+### GB-042 Autopilot Per-Cycle Timeout
+
+- `ID`: `GB-042`
+- `Title`: Autopilot per-cycle timeout.
+- `Status`: `Proposed`
+- `Priority`: `High`
+- `Area`: Automation
+- `Reason`: `make autopilot N=1` can still run for many hours when the underlying cycle remains active.
+- `Suggested implementation`: Add a configurable per-cycle wall-clock timeout to the autopilot or autocycle layer, terminate the active cycle cleanly when the timeout is exceeded, record a clear run summary, preserve logs outside the repository, and leave the repo in a safe inspectable state.
+- `Related files`: `scripts/rkm-autopilot.py`; `scripts/rkm-autocycle.sh`; `scripts/rkm-cycle.sh`; `docs/maintenance/task-guides/unattended-autopilot.md`; `docs/maintenance/automation-guardrails.md`
 - `Depends on`: Repository maintainer prioritization.

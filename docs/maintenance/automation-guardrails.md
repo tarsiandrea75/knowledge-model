@@ -84,6 +84,8 @@ For unattended runs, prefer repeated `make autopilot N=1` rounds.
 
 Each round should validate, safe-push, and emit a cockpit summary. Larger targets may be used only when a maintainer is present to inspect recovery states.
 
+`N=1` limits accepted work count, not wall-clock duration. Until `GB-042` is implemented, unattended runs should be treated as bounded by iteration count but not by time. After any interrupted or suspended run, operators should inspect `/tmp/rkm-runs`, `/tmp/rkm-cycle-output.txt`, and `git status --short` before continuing.
+
 The recommended unattended pattern is:
 
 ```bash
