@@ -146,6 +146,33 @@ The working target maximum defaults to `N=5`. Larger targets require explicit fo
 
 Budget grace exists for small near misses, but it is not permission to ignore validation or repository safety checks.
 
+## Operational Guardrails
+
+Unattended run logs must be written outside the repository. Prefer `/tmp/rkm-runs` for local runtime logs and recovery transcripts. Do not create `.rkm-runs/` or any other runtime-log directory inside the repository, because generated logs make the worktree dirty and can pollute later recovery decisions.
+
+If a newly added file fails recovery and should be discarded, remove it from both the index and the filesystem:
+
+```bash
+git restore --staged path/to/file 2>/dev/null || true
+rm -f path/to/file
+```
+
+Do not use `git restore -- path/to/file` for a failed newly added file unless the file is known to be tracked in `HEAD`. Restoring an untracked or newly added failed file can preserve or reintroduce invalid content instead of discarding the failed attempt.
+
+Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit composes or refactors the first-class schema from the reusable definition. A separate reusable definition with the same domain name as an existing first-class schema creates a duplicate schema-contract risk.
+
+JSON examples that use concrete repository paths must use real seed IDs and matching files from the repository. Abstract examples must avoid concrete repository paths. This keeps examples complete and valid instead of combining invented identifiers with files that appear to be authoritative.
+
+For unattended work, prefer repeated bounded rounds:
+
+```bash
+make autopilot N=1
+make validate
+make safe-push
+```
+
+Repeat that sequence as needed rather than leaving a larger target running while the operator is away. `N=1` limits budget spent on recovery attempts and leaves a validated, pushed checkpoint after each successful round.
+
 ## Current Maturity
 
 RKM is a strong foundation and production-oriented repository system, but it is not yet a finished consumable product.
