@@ -10,6 +10,8 @@ Use these guides after reading root `AGENTS.md` and any local `AGENTS.md` file t
 
 For intended file changes, `make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"` is the operational entry point for choosing required readings, suggested task guides, risk notes, and required checks.
 
+For data work, `make route-task` also highlights expected side effects such as `data/manifest.json` and `examples/data-graph-export/` node and edge artifact updates.
+
 ## Routing Table
 
 | Task type | Guide |
@@ -50,6 +52,7 @@ Run the validation command required by the current task. For normal repository w
 - Editing generated examples without regenerating their source export.
 - Adding schema contracts without updating examples, tests, docs, or validation.
 - Adding data records without updating `data/manifest.json`.
+- Adding data records without refreshing affected data graph export artifacts.
 - Treating a task guide as a replacement for the local `AGENTS.md` file.
 
 ## Done Criteria

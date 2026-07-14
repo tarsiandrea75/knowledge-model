@@ -33,6 +33,8 @@ Before proposing changes across unfamiliar areas, run `make route-task PATHS="sc
 
 Use `make agent-routing-validate` to check the routing model directly. The same validation also runs through `make validate`.
 
+When proposing data-record commits, include `data/manifest.json` and affected `examples/data-graph-export/*.nodes.json` or `examples/data-graph-export/*.edges.json` artifacts in the explicit allowed file list when they are expected to change.
+
 Before proposing new validators or guardrails, check `docs/maintenance/rule-coverage-report.md` to see whether the rule is already documented, partially validated, or validated.
 
 Before proposing new governance, validation, modeling, release, or evidence work, also check `docs/maintenance/governance-backlog.md`. Deferred ideas should be recorded there before being postponed.

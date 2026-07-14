@@ -51,7 +51,7 @@ Each backlog entry uses this compact format:
 - `GB-007` Runtime artifact detector.
 - `GB-018` Chunking strategy seed data.
 - `GB-038` `v0.2.0` planning document.
-- `GB-042` Autopilot per-cycle timeout.
+- `GB-043` Data route side-effect guidance.
 
 ## Backlog Entries
 
@@ -559,3 +559,15 @@ Each backlog entry uses this compact format:
 - `Command examples`: `make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800`; `make autocycle N=1 PER_CYCLE_TIMEOUT_SECONDS=1800`
 - `Related files`: `scripts/rkm-autopilot.py`; `scripts/rkm-autocycle.sh`; `scripts/rkm-cycle.sh`; `docs/maintenance/task-guides/unattended-autopilot.md`; `docs/maintenance/automation-guardrails.md`
 - `Depends on`: Implemented.
+
+### GB-043 Data Route Side-Effect Guidance
+
+- `ID`: `GB-043`
+- `Title`: Data route side-effect guidance.
+- `Status`: `Implemented`
+- `Priority`: `Medium`
+- `Area`: Automation
+- `Reason`: Data-only commits can legitimately update `data/manifest.json` and generated data graph export artifacts.
+- `Suggested implementation`: Implemented through task router output and data-record task-guide guidance.
+- `Related files`: `scripts/rkm-route-task.py`; `docs/maintenance/task-guides/adding-data-records.md`; `data/manifest.json`; `examples/data-graph-export/`
+- `Depends on`: `GB-005 Task router CLI`.

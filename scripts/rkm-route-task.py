@@ -26,6 +26,15 @@ RISK_DATA = (
     "Data-only additions are lower risk only when using existing entity types and "
     "existing validation paths."
 )
+RISK_DATA_MANIFEST = (
+    "Adding data records may require updating data/manifest.json, even when the "
+    "primary intended change is data-only."
+)
+RISK_DATA_GRAPH_EXPORT = (
+    "Adding data records may require regenerating or updating "
+    "examples/data-graph-export/*.nodes.json and "
+    "examples/data-graph-export/*.edges.json."
+)
 RISK_ARCHITECTURE = (
     "Architecture docs require checking nearby existing docs to avoid duplicate authority."
 )
@@ -113,8 +122,8 @@ def route_one(path: str) -> RouteResult:
     if is_under(path, "data"):
         add_unique(readings, ("data/AGENTS.md",))
         add_unique(guides, ("docs/maintenance/task-guides/adding-data-records.md",))
-        add_unique(notes, (RISK_DATA,))
-        add_unique(checks, ("make data-validate",))
+        add_unique(notes, (RISK_DATA, RISK_DATA_MANIFEST, RISK_DATA_GRAPH_EXPORT))
+        add_unique(checks, ("make data-validate", "make data-graph-export", "make data-graph-export-validate"))
 
     if is_under(path, "data/relationships"):
         add_unique(readings, ("data/AGENTS.md",))
@@ -251,7 +260,16 @@ def run_self_test() -> None:
     cases = (
         (
             ["data/rag-techniques/hybrid-retrieval.json"],
-            ("data/AGENTS.md", "docs/maintenance/task-guides/adding-data-records.md", "make data-validate"),
+            (
+                "data/AGENTS.md",
+                "docs/maintenance/task-guides/adding-data-records.md",
+                "data/manifest.json",
+                "examples/data-graph-export/*.nodes.json",
+                "examples/data-graph-export/*.edges.json",
+                "make data-validate",
+                "make data-graph-export",
+                "make data-graph-export-validate",
+            ),
         ),
         (
             ["data/relationships/technique-component-relationships.json"],
@@ -312,6 +330,8 @@ def run_self_test() -> None:
     assert_occurs_once(mixed_report, "data/AGENTS.md")
     assert_occurs_once(mixed_report, "make validate")
     assert_occurs_once(mixed_report, "make data-validate")
+    assert_occurs_once(mixed_report, "make data-graph-export")
+    assert_occurs_once(mixed_report, "make data-graph-export-validate")
     assert_occurs_once(mixed_report, "make schema-duplicate-contracts-validate")
     assert_occurs_once(mixed_report, "docs/maintenance/task-guides/rule-routing-validation.md")
 
