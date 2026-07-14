@@ -187,6 +187,24 @@ For example, a citation policy may require source-backed answers, while a workfl
 
 ---
 
+# Policy As Data
+
+Repository governance rules may be represented as policy data when they need stable identifiers, structured metadata, enforcement-level tracking, validator links or review ownership.
+
+Policy-as-data records should preserve the same distinctions as domain policy records:
+
+* the rule is the policy requirement
+* the affected repository surface is the governed scope
+* the validation command, reviewer action or automation gate is the enforcement mechanism
+* the rule coverage report records current enforcement level
+* the governance backlog records planned implementation work
+
+Policy-as-data must not turn maintenance prose into a second architecture authority. Root and local rule files, task guides, the rule coverage report and the governance backlog remain the operational sources for repository governance. A structured policy registry, if introduced, should reference those sources, not replace them.
+
+Use policy-as-data only when a governance rule needs machine-readable traceability across rules, validators, reports, backlog entries or reviews.
+
+---
+
 # Compliance Evidence
 
 Compliance evidence records why a policy requirement is believed to be satisfied, violated or not applicable.
