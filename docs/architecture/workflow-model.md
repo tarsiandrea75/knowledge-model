@@ -429,7 +429,13 @@ This relationship does not require a workflow unless the supported behavior invo
 
 # Schema Implications
 
-A future workflow schema should compose the common Knowledge Entity envelope and add workflow-specific structured knowledge.
+The reusable embedded workflow definition is `schema/definitions/workflow.schema.json`.
+
+That definition represents workflow structure inside another entity, evaluation, evidence record or architecture record. It intentionally omits the full Knowledge Entity envelope: first-class identity, metadata, description and top-level entity relationships remain responsibilities of the containing document.
+
+Use the embedded definition when workflow structure is needed as supporting knowledge but the workflow is not yet an independently managed entity.
+
+A future first-class workflow schema should compose the common Knowledge Entity envelope and add workflow-specific structured knowledge.
 
 Expected workflow-specific fields include:
 
@@ -446,4 +452,4 @@ Expected workflow-specific fields include:
 * limitations
 * usage guidance
 
-The schema should also require the shared identity model to include `Workflow` as an allowed entity type before a specialized workflow schema is introduced.
+Before a specialized top-level workflow schema is introduced, the shared identity model and entity type registry must support `Workflow` as an allowed entity type. The specialized schema should then reuse or compose the embedded workflow definition for the workflow-specific structure instead of creating a parallel contract.
