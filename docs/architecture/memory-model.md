@@ -312,7 +312,13 @@ When uncertain, prefer modeling the memory strategy only when it can be named, b
 
 # Schema Implications
 
-A future memory strategy schema should compose the common Knowledge Entity envelope and add memory-specific structured knowledge.
+The reusable embedded memory definition is `schema/definitions/memory.schema.json`.
+
+That definition represents memory strategy structure inside another entity, workflow, agent, evaluation, evidence record or architecture record. It intentionally omits the full Knowledge Entity envelope: first-class identity, metadata, description and top-level entity relationships remain responsibilities of the containing document.
+
+Use the embedded definition when memory strategy structure is needed as supporting knowledge but the memory strategy is not yet an independently managed entity.
+
+A future first-class memory strategy schema should compose the common Knowledge Entity envelope and add memory-specific structured knowledge.
 
 Expected memory-specific fields include:
 
@@ -331,4 +337,4 @@ Expected memory-specific fields include:
 * limitations
 * usage guidance
 
-The schema should also require the shared identity model to include `MemoryStrategy` as an allowed entity type before a specialized memory strategy schema is introduced.
+Before a specialized top-level memory strategy schema is introduced, the shared identity model and entity type registry must support `MemoryStrategy` as an allowed entity type. The specialized schema should then reuse or compose the embedded memory definition for the memory-specific structure instead of creating a parallel contract.
