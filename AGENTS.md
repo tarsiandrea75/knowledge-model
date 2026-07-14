@@ -40,6 +40,8 @@ Unless the user explicitly instructs otherwise:
 
 Root `AGENTS.md` is the repository constitution and routing layer. It must stay concise and must not become the full operational manual. Detailed rules belong in the local `AGENTS.md` file closest to the affected area or in a task guide under `docs/maintenance/task-guides/`.
 
+Distributed rule routing is validated by `make agent-routing-validate` and by the standard `make validate` pipeline. The task guide index is `docs/maintenance/task-guides/README.md`.
+
 | Work type | Required routing |
 | --- | --- |
 | Tasks touching `data/**` | Read `data/AGENTS.md` and the relevant data task guide. |

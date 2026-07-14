@@ -49,6 +49,9 @@ printf '==> Running rkm-review-verdict self-test\n'
 printf '==> Running validate-doc-relationships self-test\n'
 "$PYTHON_BIN" scripts/validate-doc-relationships.py --self-test
 
+printf '==> Running validate-agent-routing self-test\n'
+"$PYTHON_BIN" scripts/validate-agent-routing.py --self-test
+
 printf '==> Running validate-schema-prerequisites self-test\n'
 "$PYTHON_BIN" scripts/validate-schema-prerequisites.py --self-test
 

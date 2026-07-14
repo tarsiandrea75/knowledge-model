@@ -12,6 +12,8 @@ Automation and recovery work must route through root `AGENTS.md`, then the local
 
 Use the task guides for operational detail instead of expanding this file with every task-specific checklist. In particular, unattended runs use `docs/maintenance/task-guides/unattended-autopilot.md`, failed-new-file recovery uses `docs/maintenance/task-guides/recovering-failed-new-file.md`, schema work uses the schema task guides, and exporter or validator changes use the graph export or validation script guides.
 
+Distributed rule routing is validated automatically by `make validate` and can be checked directly with `make agent-routing-validate`.
+
 ## Clean Worktree Invariant
 
 Passing validation is necessary but not sufficient.

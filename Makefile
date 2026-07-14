@@ -18,7 +18,7 @@ AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 
-.PHONY: validate data-validate graph-export data-graph-export graph-export-validate release-check status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate release-check status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -34,6 +34,9 @@ data-graph-export:
 
 graph-export-validate:
 	python3 scripts/validate-graph-exports.py
+
+agent-routing-validate:
+	python3 scripts/validate-agent-routing.py
 
 release-check:
 	python3 scripts/rkm-release-check.py
@@ -173,6 +176,7 @@ help:
 	@printf '  make graph-export                Generate minimal graph export files from fixtures.\n'
 	@printf '  make data-graph-export           Generate graph export files from validated seed data.\n'
 	@printf '  make graph-export-validate       Validate graph export node and edge files against schemas.\n'
+	@printf '  make agent-routing-validate      Validate distributed agent rule routing files and task guides.\n'
 	@printf '  make release-check               Run the strict pre-tag readiness check for v0.1.0-alpha.\n'
 	@printf '  make status                      Show git status --short.\n'
 	@printf '  make log                         Show the 10 most recent commits.\n'

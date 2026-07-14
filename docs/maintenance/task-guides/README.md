@@ -24,6 +24,7 @@ Use these guides after reading root `AGENTS.md` and any local `AGENTS.md` file t
 | Graph export behavior or generated export files | `updating-graph-export.md` |
 | Validation script behavior | `updating-validation-scripts.md` |
 | Release preparation | `preparing-release.md` |
+| Distributed agent rule routing validation | `rule-routing-validation.md` |
 
 ## Required Readings
 

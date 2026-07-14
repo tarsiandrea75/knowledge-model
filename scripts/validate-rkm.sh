@@ -259,4 +259,8 @@ start_step "Running documentation relationship validation..."
 "$PYTHON_BIN" scripts/validate-doc-relationships.py
 pass_step
 
+start_step "Running agent rule routing validation"
+"$PYTHON_BIN" scripts/validate-agent-routing.py
+pass_step
+
 printf '\nRKM validation passed. Total elapsed: %ss\n' "$(elapsed_seconds "$TOTAL_STARTED_AT")"

@@ -64,15 +64,16 @@ Example:
 
 ```json
 {
-  "id": "RELATIONSHIP-0001",
-  "predicate": "REQUIRES",
-  "sourceId": "TECHNIQUE-0001",
-  "targetId": "RETRIEVER-0001",
-  "sourceDataFile": "data/relationships/rag-technique-component-relationships.json",
+  "id": "RELATIONSHIP-10101",
+  "predicate": "OPTIONALLY_USES",
+  "sourceId": "TECHNIQUE-10001",
+  "targetId": "COMPONENT-10001",
+  "sourceDataFile": "data/rag-techniques/hybrid-retrieval.json",
   "properties": {
-    "relationshipKind": "Dependency",
-    "confidence": "High",
-    "status": "Published"
+    "declaredInRelationshipSet": "data/relationships/rag-technique-component-relationships.json",
+    "relationshipKind": "Domain Relationship",
+    "confidence": "Conservative",
+    "status": "Draft"
   }
 }
 ```

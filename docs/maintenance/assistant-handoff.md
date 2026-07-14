@@ -29,6 +29,8 @@ Maintenance documents provide strategic context, not operational truth. Use them
 
 Future assistants should route themselves through `AGENTS.md` first, then the nearest local `AGENTS.md` file for the affected directory, then the relevant task guide under `docs/maintenance/task-guides/`. Root rules define repository invariants; local rule files define area rules; task guides define operational checks for specific work types.
 
+Use `make agent-routing-validate` to check the routing model directly. The same validation also runs through `make validate`.
+
 ## Related Maintenance Documents
 
 Use these documents together:
@@ -65,6 +67,7 @@ Use these commands from the repository root:
 
 ```bash
 make validate
+make agent-routing-validate
 make cockpit-summary N=5
 make autopilot N=5
 make autopilot N=24 FORCE=true
@@ -79,7 +82,7 @@ make codex-commit PROMPT_FILE=prompt.md FILES="README.md AGENTS.md" MESSAGE="Upd
 
 `make validate` is the standard validation entry point.
 
-`make validate` checks schema validity, fixture instance validity, data instance validity, relationship-set semantics, relationship support semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, and graph endpoint integrity. New assistants should know that data validation and both graph exports are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, relationship support links that do not resolve, stale export files, malformed graph node or edge files, duplicate graph IDs, or missing graph edge endpoints are validation failures rather than optional cleanup.
+`make validate` checks schema validity, fixture instance validity, data instance validity, relationship-set semantics, relationship support semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, graph endpoint integrity, documentation relationship rules, and distributed agent rule routing. New assistants should know that data validation, both graph exports, documentation relationships, and rule routing are wired into validation, so malformed populated data, invalid declared relationship predicates, relationship endpoints that do not resolve to declared data records, relationship support links that do not resolve, stale export files, malformed graph node or edge files, duplicate graph IDs, missing graph edge endpoints, invalid documentation relationship usage, or broken rule routing are validation failures rather than optional cleanup.
 
 `make release-check` is a stricter pre-tag gate for `v0.1.0-alpha`. It requires a clean repository, checks local `origin/main` alignment when available, runs validation, regenerates the graph export, validates again, and fails if the worktree becomes dirty. It is not part of normal validation because ordinary development and `codex-commit` runs intentionally operate with temporary dirty worktrees.
 
