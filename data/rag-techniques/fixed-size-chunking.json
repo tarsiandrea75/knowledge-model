@@ -1,0 +1,80 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10004",
+    "slug": "fixed-size-chunking",
+    "name": {
+      "official": "Fixed-Size Chunking",
+      "display": "Fixed-Size Chunking"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "chunking",
+      "fixed window",
+      "document splitting"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-14T00:00:00Z",
+    "updatedAt": "2026-07-14T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Fixed-Size Chunking splits source content into uniform windows so ingestion can produce predictable retrieval units.",
+    "description": "Fixed-Size Chunking is a RAG technique that divides source content into character, token, or approximate-size windows before embedding, indexing, or retrieval.",
+    "problemStatement": "A RAG pipeline needs content units that are small enough to index and retrieve, but source documents may be too large or irregular for direct use.",
+    "coreIdea": "Split content into deterministic windows with a configured size and optional overlap so downstream stages receive consistent chunk artifacts."
+  },
+  "technique": {
+    "techniqueFamily": "Chunking",
+    "ragStage": [
+      "Ingestion",
+      "Chunking"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Source content",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "Documents or text content that should be divided into retrieval-ready chunks."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Fixed-size chunks",
+        "artifactType": "Chunk",
+        "description": "Uniform or approximately uniform content windows prepared for embedding or indexing."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Low",
+      "costImpact": "Low",
+      "complexityImpact": "Low",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "High"
+    },
+    "implementationConsiderations": [
+      "Choose chunk size and overlap deliberately because boundary cuts can reduce semantic coherence.",
+      "Use fixed-size chunks as a simple deterministic baseline before adopting more complex chunking strategies."
+    ],
+    "evaluationGuidance": [
+      "Compare retrieval quality across chunk sizes and overlap settings using the same corpus and retrieval configuration."
+    ]
+  }
+}

@@ -33,6 +33,18 @@
       "schema": "schema/rag-technique.schema.json"
     },
     {
+      "file": "data/rag-techniques/fixed-size-chunking.json",
+      "schema": "schema/rag-technique.schema.json"
+    },
+    {
+      "file": "data/rag-techniques/recursive-chunking.json",
+      "schema": "schema/rag-technique.schema.json"
+    },
+    {
+      "file": "data/rag-techniques/semantic-chunking.json",
+      "schema": "schema/rag-technique.schema.json"
+    },
+    {
       "file": "data/retrievers/embedding-retriever.json",
       "schema": "schema/retriever.schema.json"
     },

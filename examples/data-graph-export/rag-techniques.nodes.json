@@ -350,5 +350,87 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "TECHNIQUE-10004",
+    "type": "Technique",
+    "label": "Fixed-Size Chunking",
+    "sourceDataFile": "data/rag-techniques/fixed-size-chunking.json",
+    "properties": {
+      "keywords": [
+        "chunking",
+        "fixed window",
+        "document splitting"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Ingestion",
+        "Chunking"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "fixed-size-chunking",
+      "status": "Draft",
+      "summary": "Fixed-Size Chunking splits source content into uniform windows so ingestion can produce predictable retrieval units.",
+      "techniqueFamily": "Chunking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "TECHNIQUE-10005",
+    "type": "Technique",
+    "label": "Recursive Chunking",
+    "sourceDataFile": "data/rag-techniques/recursive-chunking.json",
+    "properties": {
+      "keywords": [
+        "chunking",
+        "recursive splitting",
+        "document structure"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Ingestion",
+        "Chunking"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "recursive-chunking",
+      "status": "Draft",
+      "summary": "Recursive Chunking splits source content through ordered structural or separator rules before falling back to smaller boundaries.",
+      "techniqueFamily": "Chunking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "TECHNIQUE-10006",
+    "type": "Technique",
+    "label": "Semantic Chunking",
+    "sourceDataFile": "data/rag-techniques/semantic-chunking.json",
+    "properties": {
+      "keywords": [
+        "chunking",
+        "semantic similarity",
+        "topic boundaries"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "ragStage": [
+        "Ingestion",
+        "Chunking",
+        "Embedding"
+      ],
+      "reviewState": "Not Reviewed",
+      "schema": "schema/rag-technique.schema.json",
+      "slug": "semantic-chunking",
+      "status": "Draft",
+      "summary": "Semantic Chunking splits source content around meaning-oriented boundaries so chunks can preserve topical coherence.",
+      "techniqueFamily": "Chunking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]

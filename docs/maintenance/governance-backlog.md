@@ -263,11 +263,11 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-018`
 - `Title`: Chunking strategy seed data.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Modeling
 - `Reason`: Chunking is central to RAG behavior and should be represented in the seed dataset.
-- `Suggested implementation`: Add validated chunking strategy records, relationships, claims, evidence, and references in small increments.
+- `Suggested implementation`: The first implemented seed records are `data/rag-techniques/fixed-size-chunking.json`, `data/rag-techniques/recursive-chunking.json`, and `data/rag-techniques/semantic-chunking.json`. Relationship expansion remains separate future work and should be routed through the relationship-set and relationship-support task guides before implementation.
 - `Related files`: `data/`; `schema/`; `registries/`; `docs/maintenance/task-guides/adding-data-records.md`
 - `Depends on`: Repository maintainer prioritization.
 

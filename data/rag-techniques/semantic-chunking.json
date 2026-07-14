@@ -1,0 +1,81 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10006",
+    "slug": "semantic-chunking",
+    "name": {
+      "official": "Semantic Chunking",
+      "display": "Semantic Chunking"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "chunking",
+      "semantic similarity",
+      "topic boundaries"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-14T00:00:00Z",
+    "updatedAt": "2026-07-14T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Semantic Chunking splits source content around meaning-oriented boundaries so chunks can preserve topical coherence.",
+    "description": "Semantic Chunking is a RAG technique that divides content using semantic similarity, topic shifts, embedding-based grouping, or other meaning-oriented boundary signals.",
+    "problemStatement": "Size-based chunking can produce retrieval units that are uniform but not aligned with the topics or meaning carried by the source content.",
+    "coreIdea": "Use semantic signals to group related content together and separate content when the topic or meaning changes enough to justify a boundary."
+  },
+  "technique": {
+    "techniqueFamily": "Chunking",
+    "ragStage": [
+      "Ingestion",
+      "Chunking",
+      "Embedding"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Source content with semantic boundary signals",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "Documents or text content that should be divided according to meaning-oriented boundaries."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Semantic chunks",
+        "artifactType": "Chunk",
+        "description": "Chunk artifacts grouped around topical or semantic coherence rather than only uniform size."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Medium",
+      "costImpact": "Medium",
+      "complexityImpact": "Medium",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "Variable"
+    },
+    "implementationConsiderations": [
+      "Account for higher computation and model or configuration dependence when deriving semantic boundaries.",
+      "Track chunking configuration because semantic grouping can be less deterministic than simple splitting strategies."
+    ],
+    "evaluationGuidance": [
+      "Evaluate whether semantic chunks improve retrieved context coherence compared with simpler chunking baselines."
+    ]
+  }
+}

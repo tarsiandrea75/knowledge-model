@@ -1,0 +1,80 @@
+{
+  "identity": {
+    "id": "TECHNIQUE-10005",
+    "slug": "recursive-chunking",
+    "name": {
+      "official": "Recursive Chunking",
+      "display": "Recursive Chunking"
+    },
+    "entityType": "Technique",
+    "keywords": [
+      "chunking",
+      "recursive splitting",
+      "document structure"
+    ],
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-14T00:00:00Z",
+    "updatedAt": "2026-07-14T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "Codex",
+        "role": "Seed data author"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en"
+  },
+  "description": {
+    "summary": "Recursive Chunking splits source content through ordered structural or separator rules before falling back to smaller boundaries.",
+    "description": "Recursive Chunking is a RAG technique that attempts to split content at higher-level boundaries such as sections or paragraphs, then falls back to smaller separators when chunks exceed the configured size.",
+    "problemStatement": "Naive fixed-size splitting can cut through paragraphs, sections, or other meaningful document structure that may be useful for retrieval.",
+    "coreIdea": "Apply an ordered hierarchy of separators or structural boundaries so chunks stay within size limits while preserving source structure when possible."
+  },
+  "technique": {
+    "techniqueFamily": "Chunking",
+    "ragStage": [
+      "Ingestion",
+      "Chunking"
+    ],
+    "inputRequirements": [
+      {
+        "name": "Structured or semi-structured source content",
+        "entityType": "Component",
+        "requirementLevel": "Required",
+        "description": "Documents or text content with separators, paragraphs, sections, or other boundaries that can guide splitting."
+      }
+    ],
+    "outputArtifacts": [
+      {
+        "name": "Structure-aware chunks",
+        "artifactType": "Chunk",
+        "description": "Chunk artifacts produced by applying ordered splitting rules to source content."
+      }
+    ],
+    "operationalCharacteristics": {
+      "latencyImpact": "Low",
+      "costImpact": "Low",
+      "complexityImpact": "Medium",
+      "qualityImpact": "Variable",
+      "scalabilityImpact": "High"
+    },
+    "implementationConsiderations": [
+      "Tune separator order and maximum chunk size for the document formats in the corpus.",
+      "Inspect source formatting because inconsistent separators can produce uneven or less coherent chunks."
+    ],
+    "evaluationGuidance": [
+      "Compare chunk coherence and retrieval results against a fixed-size baseline on representative documents."
+    ]
+  }
+}
