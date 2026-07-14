@@ -88,6 +88,28 @@ printf '==> Running rkm-release-check self-test\n'
 printf '==> Running rkm-route-task self-test\n'
 "$PYTHON_BIN" scripts/rkm-route-task.py --self-test
 
+printf '==> Running Creator prompt semantic duplication guardrail self-test\n'
+creator_prompt_scripts=(scripts/rkm-cycle.sh scripts/rkm-discover.sh)
+creator_prompt_guardrails=(
+  "Do not infer that an architecture document is missing solely from a schema name, file name, or one-to-one schema-to-document comparison."
+  "Before creating a new architecture document, inspect existing architecture documents for semantic coverage of the proposed concept."
+  "Treat an existing canonical document as authoritative when it already covers the concept, even when its file name is not an exact match for a schema name."
+  "Do not create a parallel document by inventing distinctions such as concept model versus document-level contract unless that distinction is explicitly established in existing repository architecture or governance."
+  "Ground the selected work in a concrete repository need such as the governance backlog, rule coverage report, task guides, an explicit architectural gap, or a demonstrably uncovered schema contract."
+  "When a candidate is already covered semantically, reject that candidate and choose another genuinely missing item."
+  "Prefer no change over creating a speculative or duplicate architecture contract when no safe candidate can be demonstrated."
+)
+for script in "${creator_prompt_scripts[@]}"; do
+  if ! grep -q 'CREATOR_PROMPT=' "$script"; then
+    fail "Creator prompt guardrail check could not find CREATOR_PROMPT in $script"
+  fi
+  for guardrail in "${creator_prompt_guardrails[@]}"; do
+    if ! grep -Fq "$guardrail" "$script"; then
+      fail "Creator prompt in $script is missing semantic duplication guardrail: $guardrail"
+    fi
+  done
+done
+
 printf '==> Running autocycle timeout validation self-test\n'
 if RKM_PER_CYCLE_TIMEOUT_SECONDS=0 bash scripts/rkm-autocycle.sh --validate-timeout-only >/tmp/rkm-autocycle-timeout-invalid.out 2>/tmp/rkm-autocycle-timeout-invalid.err; then
   fail "Invalid RKM_PER_CYCLE_TIMEOUT_SECONDS value was accepted"
