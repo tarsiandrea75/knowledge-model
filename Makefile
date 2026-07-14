@@ -17,6 +17,7 @@ NEXT_ACTION_TARGET ?= $(AUTOCYCLE_N)
 AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 FORCE ?= false
 WORKING_TARGET_MAX ?= 5
+PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
 
 .PHONY: validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate release-check status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
@@ -61,7 +62,7 @@ cycle:
 	exit "$$exit_code"
 
 autocycle:
-	TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" BUDGET_GRACE_TOKENS="$(BUDGET_GRACE_TOKENS)" BUDGET_GRACE_RATIO="$(BUDGET_GRACE_RATIO)" FORCE="$(FORCE)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
+	RKM_PER_CYCLE_TIMEOUT_SECONDS="$(PER_CYCLE_TIMEOUT_SECONDS)" TOKEN_BUDGET="$(TOKEN_BUDGET)" BUDGET_SAFETY_FACTOR="$(BUDGET_SAFETY_FACTOR)" BUDGET_GRACE_TOKENS="$(BUDGET_GRACE_TOKENS)" BUDGET_GRACE_RATIO="$(BUDGET_GRACE_RATIO)" FORCE="$(FORCE)" bash scripts/rkm-autocycle.sh "$(AUTOCYCLE_N)"
 
 discover:
 	set +e; \
@@ -146,13 +147,13 @@ next-action:
 	python3 scripts/rkm-next-action.py --target "$(NEXT_ACTION_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
 
 autopilot:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
+	RKM_PER_CYCLE_TIMEOUT_SECONDS="$(PER_CYCLE_TIMEOUT_SECONDS)" python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)"
 
 autopilot-dry-run:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --dry-run
+	RKM_PER_CYCLE_TIMEOUT_SECONDS="$(PER_CYCLE_TIMEOUT_SECONDS)" python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --dry-run
 
 autopilot-recover:
-	python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --allow-recovery
+	RKM_PER_CYCLE_TIMEOUT_SECONDS="$(PER_CYCLE_TIMEOUT_SECONDS)" python3 scripts/rkm-autopilot.py --target "$(AUTOPILOT_TARGET)" --force="$(FORCE)" --working-target-max "$(WORKING_TARGET_MAX)" --allow-recovery
 
 autopilot-status:
 	python3 scripts/rkm-autopilot.py status
@@ -186,7 +187,7 @@ help:
 	@printf '  make log                         Show the 10 most recent commits.\n'
 	@printf '  make cycle [N=3]                 Run scripts/rkm-cycle.sh N, save stdout to /tmp/rkm-cycle-output.txt, print exit code, output tail, and status.\n'
 	@printf '  make autocycle [N=3]             Run bash scripts/rkm-autocycle.sh N.\n'
-	@printf '                                   Examples: make autocycle N=5; make autocycle N=10 TOKEN_BUDGET=300000; add optional BUDGET_SAFETY_FACTOR=1.25.\n'
+	@printf '                                   Examples: make autocycle N=5; make autocycle N=1 PER_CYCLE_TIMEOUT_SECONDS=1800.\n'
 	@printf '  make discover [N=5]              Run scripts/rkm-discover.sh N, save stdout to /tmp/rkm-discovery-output.txt, keep stderr visible, print exit code, output tail, and status.\n'
 	@printf '  make push                        Run git push.\n'
 	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
@@ -204,7 +205,7 @@ help:
 	@printf '  make budget-reset-window         Reset the local budget accounting window while preserving the existing budget profile.\n'
 	@printf '  make next-action [N=3]           Print the next safe operational action without modifying files.\n'
 	@printf '  make autopilot [N=3]             Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET, defaulting to AUTOCYCLE_N.\n'
-	@printf '                                   Examples: make autopilot N=5; make autopilot N=24 FORCE=true.\n'
+	@printf '                                   Examples: make autopilot N=5; make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800; make autopilot N=24 FORCE=true.\n'
 	@printf '  make autopilot-dry-run [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --dry-run.\n'
 	@printf '  make autopilot-recover [N=3]     Run python3 scripts/rkm-autopilot.py using AUTOPILOT_TARGET with --allow-recovery.\n'
 	@printf '  make autopilot-status            Show the last autopilot decision from .rkm/autopilot-state.json.\n'

@@ -17,10 +17,23 @@ Use this guide before any unattended or away-from-keyboard autopilot run.
 
 - Confirm `git status --short` is clean before starting.
 - Prefer repeated `make autopilot N=1` rounds.
+- Set `PER_CYCLE_TIMEOUT_SECONDS` when a shorter per-cycle wall-clock limit is appropriate.
 - Write logs to `/tmp/rkm-runs`.
 - Require validation, safe push, and cockpit summary after each round.
 
-Repeated `make autopilot N=1` is safer than larger unattended runs, but it does not currently guarantee a per-cycle timeout. Keep logs outside the repository and treat per-cycle wall-clock timeout enforcement as tracked deferred work under `GB-042`.
+Repeated `make autopilot N=1` is safer than larger unattended runs. `N=1` limits accepted work count, while `PER_CYCLE_TIMEOUT_SECONDS` limits the wall-clock duration of each underlying cycle attempt. The default timeout is 3600 seconds. The Make variable flows to scripts as `RKM_PER_CYCLE_TIMEOUT_SECONDS`.
+
+For a single bounded round with a 30-minute per-cycle timeout:
+
+```bash
+make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800
+```
+
+The same timeout can be used with the shell autocycle layer:
+
+```bash
+make autocycle N=1 PER_CYCLE_TIMEOUT_SECONDS=1800
+```
 
 ## Safe Command Loop
 
@@ -32,7 +45,7 @@ do
   LOG="/tmp/rkm-runs/autopilot-away-round-${i}.log"
   echo "===== AUTOPILOT ROUND $i =====" | tee -a "$LOG"
   date | tee -a "$LOG"
-  make autopilot N=1 2>&1 | tee -a "$LOG" || break
+  make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800 2>&1 | tee -a "$LOG" || break
   make safe-push 2>&1 | tee -a "$LOG" || break
   make validate 2>&1 | tee -a "$LOG" || break
   make cockpit-summary N=5 2>&1 | tee -a "$LOG" || break

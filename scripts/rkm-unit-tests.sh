@@ -85,4 +85,19 @@ printf '==> Running validate-graph-exports self-test\n'
 printf '==> Running rkm-release-check self-test\n'
 "$PYTHON_BIN" scripts/rkm-release-check.py --self-test
 
+printf '==> Running autocycle timeout validation self-test\n'
+if RKM_PER_CYCLE_TIMEOUT_SECONDS=0 bash scripts/rkm-autocycle.sh --validate-timeout-only >/tmp/rkm-autocycle-timeout-invalid.out 2>/tmp/rkm-autocycle-timeout-invalid.err; then
+  fail "Invalid RKM_PER_CYCLE_TIMEOUT_SECONDS value was accepted"
+fi
+if ! grep -q 'RKM_PER_CYCLE_TIMEOUT_SECONDS must be a positive integer' /tmp/rkm-autocycle-timeout-invalid.err; then
+  fail "Invalid RKM_PER_CYCLE_TIMEOUT_SECONDS error message was not actionable"
+fi
+RKM_PER_CYCLE_TIMEOUT_SECONDS=1800 bash scripts/rkm-autocycle.sh --validate-timeout-only >/tmp/rkm-autocycle-timeout-valid.out 2>/tmp/rkm-autocycle-timeout-valid.err
+if RKM_PER_CYCLE_TIMEOUT_SECONDS=invalid "$PYTHON_BIN" scripts/rkm-autopilot.py --target 1 --dry-run >/tmp/rkm-autopilot-timeout-invalid.out 2>/tmp/rkm-autopilot-timeout-invalid.err; then
+  fail "Invalid autopilot RKM_PER_CYCLE_TIMEOUT_SECONDS value was accepted"
+fi
+if ! grep -q 'RKM_PER_CYCLE_TIMEOUT_SECONDS must be a positive integer' /tmp/rkm-autopilot-timeout-invalid.err; then
+  fail "Invalid autopilot RKM_PER_CYCLE_TIMEOUT_SECONDS error message was not actionable"
+fi
+
 printf 'SUCCESS: RKM unit tests passed.\n'

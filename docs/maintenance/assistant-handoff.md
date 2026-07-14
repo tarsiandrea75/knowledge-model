@@ -77,6 +77,7 @@ make agent-routing-validate
 make schema-duplicate-contracts-validate
 make cockpit-summary N=5
 make autopilot N=5
+make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800
 make autopilot N=24 FORCE=true
 make autocycle N=5
 make safe-push
@@ -118,6 +119,8 @@ Use `make schema-duplicate-contracts-validate` when schema contract work adds or
 `make cockpit-summary N=5` summarizes the current automation cockpit state and recommends the next operational step.
 
 `make autopilot N=5` is the normal production run target.
+
+`make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800` is the preferred unattended round shape when a shorter per-cycle wall-clock limit is desired.
 
 `make autopilot N=24 FORCE=true` is an aggressive or stress run target that explicitly crosses normal budget or target guard boundaries.
 
@@ -161,6 +164,8 @@ Validation cannot be bypassed. If validation fails, fix the cause before continu
 
 The working target maximum defaults to `N=5`. Larger targets require explicit force, such as `make autopilot N=24 FORCE=true`.
 
+Autopilot and autocycle use a per-cycle timeout. The Make variable is `PER_CYCLE_TIMEOUT_SECONDS`, the script environment variable is `RKM_PER_CYCLE_TIMEOUT_SECONDS`, and the default is 3600 seconds. Future assistants should set the Make variable explicitly for unattended runs that need a shorter wall-clock bound.
+
 Budget grace exists for small near misses, but it is not permission to ignore validation or repository safety checks.
 
 ## Operational Guardrails
@@ -198,7 +203,7 @@ do
   LOG="/tmp/rkm-runs/autopilot-away-round-${i}.log"
   echo "===== AUTOPILOT ROUND $i =====" | tee -a "$LOG"
   date | tee -a "$LOG"
-  make autopilot N=1 2>&1 | tee -a "$LOG" || break
+  make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800 2>&1 | tee -a "$LOG" || break
   make safe-push 2>&1 | tee -a "$LOG" || break
   make validate 2>&1 | tee -a "$LOG" || break
   make cockpit-summary N=5 2>&1 | tee -a "$LOG" || break
@@ -206,9 +211,9 @@ do
 done
 ```
 
-Repeat that sequence as needed rather than leaving a larger target running while the operator is away. `N=1` limits budget spent on recovery attempts and leaves a validated, pushed checkpoint after each successful round.
+Repeat that sequence as needed rather than leaving a larger target running while the operator is away. `N=1` limits accepted work count and budget spent on recovery attempts, while `PER_CYCLE_TIMEOUT_SECONDS` limits each underlying cycle attempt. Each successful round leaves a validated, pushed checkpoint.
 
-If an unattended run appears stuck on `cycle attempt still running`, check active processes, `/tmp/rkm-cycle-output.txt`, `git status --short`, and governance backlog item `GB-042` before deciding whether to interrupt or recover the run.
+If an unattended run stops after a timeout or appears stuck on `cycle attempt still running`, check active processes, `/tmp/rkm-cycle-output.txt`, and `git status --short` before deciding whether to recover the run.
 
 Before handoff, run:
 

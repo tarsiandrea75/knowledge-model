@@ -15,6 +15,7 @@ BUDGET_SAFETY_FACTOR="${BUDGET_SAFETY_FACTOR:-1.25}"
 BUDGET_GRACE_TOKENS="${BUDGET_GRACE_TOKENS:-10000}"
 BUDGET_GRACE_RATIO="${BUDGET_GRACE_RATIO:-0.02}"
 FORCE="${FORCE:-false}"
+PER_CYCLE_TIMEOUT_SECONDS="${RKM_PER_CYCLE_TIMEOUT_SECONDS:-3600}"
 BUDGET_ESTIMATE_OUTPUT=""
 
 fail() {
@@ -70,6 +71,15 @@ require_command() {
   command -v "$command_name" >/dev/null 2>&1 || fail "Required command not found: $command_name"
 }
 
+require_gnu_timeout() {
+  local timeout_version
+
+  require_command timeout
+  timeout_version="$(timeout --version 2>/dev/null || true)"
+  [[ "$timeout_version" == *"GNU coreutils"* ]] \
+    || fail "GNU timeout is required for per-cycle timeout enforcement. Install GNU coreutils timeout or run on an environment where it is available."
+}
+
 validate_non_negative_number() {
   local label="$1"
   local value="$2"
@@ -82,6 +92,15 @@ validate_non_negative_number() {
       }
     }
   ' || exit 1
+}
+
+validate_positive_integer() {
+  local label="$1"
+  local value="$2"
+
+  if ! [[ "$value" =~ ^[0-9]+$ ]] || [[ "$value" -lt 1 ]]; then
+    fail "$label must be a positive integer: $value"
+  fi
 }
 
 ensure_clean_worktree() {
@@ -112,7 +131,8 @@ append_ledger_log() {
 run_with_heartbeat() {
   local label="$1"
   local log_path="$2"
-  shift 2
+  local timeout_seconds="$3"
+  shift 3
 
   local start_epoch
   local next_heartbeat_elapsed
@@ -122,7 +142,11 @@ run_with_heartbeat() {
 
   start_epoch="$(current_epoch)"
   next_heartbeat_elapsed=30
-  "$@" >"$log_path" 2>&1 &
+  if [[ -n "$timeout_seconds" ]]; then
+    timeout --kill-after=30s "${timeout_seconds}s" "$@" >"$log_path" 2>&1 &
+  else
+    "$@" >"$log_path" 2>&1 &
+  fi
   child_pid="$!"
 
   while is_running_job "$child_pid"; do
@@ -262,6 +286,13 @@ handle_budget_result() {
   return 0
 }
 
+validate_positive_integer "RKM_PER_CYCLE_TIMEOUT_SECONDS" "$PER_CYCLE_TIMEOUT_SECONDS"
+
+if [[ "$TARGET_ACCEPTED_FILES" == "--validate-timeout-only" ]]; then
+  progress "Per-cycle timeout accepted: ${PER_CYCLE_TIMEOUT_SECONDS} seconds."
+  exit 0
+fi
+
 if ! [[ "$TARGET_ACCEPTED_FILES" =~ ^[0-9]+$ ]] || [[ "$TARGET_ACCEPTED_FILES" -lt 1 ]]; then
   fail "Accepted file target must be a positive integer."
 fi
@@ -269,6 +300,7 @@ fi
 require_command git
 require_command bash
 require_command make
+require_gnu_timeout
 require_command tail
 require_command wc
 require_command awk
@@ -316,13 +348,21 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   reviewer_verdict=""
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES started at $(current_time)."
 
-  if run_with_heartbeat "cycle attempt" "$CYCLE_OUTPUT" bash scripts/rkm-cycle.sh 1; then
+  if run_with_heartbeat "cycle attempt" "$CYCLE_OUTPUT" "$PER_CYCLE_TIMEOUT_SECONDS" bash scripts/rkm-cycle.sh 1; then
     cycle_result=0
   else
     cycle_result=$?
   fi
 
   append_ledger_log "$CYCLE_OUTPUT" "autocycle-cycle"
+
+  if [[ "$cycle_result" -eq 124 || "$cycle_result" -eq 137 ]]; then
+    printf 'ERROR: cycle attempt timed out after %s seconds during iteration %s of %s.\n' "$PER_CYCLE_TIMEOUT_SECONDS" "$iteration" "$TARGET_ACCEPTED_FILES" >&2
+    printf 'Log: %s\n' "$CYCLE_OUTPUT" >&2
+    printf 'Inspect git status --short before continuing.\n' >&2
+    git status --short
+    exit 124
+  fi
 
   if [[ "$cycle_result" -eq 0 ]]; then
     accepted_files=$((accepted_files + 1))
@@ -379,7 +419,7 @@ while [[ "$accepted_files" -lt "$TARGET_ACCEPTED_FILES" ]]; do
   tail -n "$TAIL_LINES" "$CYCLE_OUTPUT"
 
   progress "Iteration $iteration of $TARGET_ACCEPTED_FILES entering single-file REVISE recovery at $(current_time)."
-  if run_with_heartbeat "recovery attempt" "$RECOVER_OUTPUT" bash scripts/rkm-recover-revise.sh; then
+  if run_with_heartbeat "recovery attempt" "$RECOVER_OUTPUT" "" bash scripts/rkm-recover-revise.sh; then
     recovery_result=0
   else
     recovery_result=$?

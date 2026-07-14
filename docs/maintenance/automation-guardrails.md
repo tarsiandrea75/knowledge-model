@@ -84,7 +84,7 @@ For unattended runs, prefer repeated `make autopilot N=1` rounds.
 
 Each round should validate, safe-push, and emit a cockpit summary. Larger targets may be used only when a maintainer is present to inspect recovery states.
 
-`N=1` limits accepted work count, not wall-clock duration. Until `GB-042` is implemented, unattended runs should be treated as bounded by iteration count but not by time. After any interrupted or suspended run, operators should inspect `/tmp/rkm-runs`, `/tmp/rkm-cycle-output.txt`, and `git status --short` before continuing.
+`N=1` limits accepted work count. Per-cycle wall-clock duration is bounded separately by `PER_CYCLE_TIMEOUT_SECONDS`, which defaults to 3600 seconds and flows to scripts as `RKM_PER_CYCLE_TIMEOUT_SECONDS`. If a cycle attempt times out, automation stops without proceeding to the next iteration or running automatic `safe-push`; inspect `/tmp/rkm-cycle-output.txt` and `git status --short` before continuing.
 
 The recommended unattended pattern is:
 
@@ -96,7 +96,7 @@ do
   LOG="/tmp/rkm-runs/autopilot-away-round-${i}.log"
   echo "===== AUTOPILOT ROUND $i =====" | tee -a "$LOG"
   date | tee -a "$LOG"
-  make autopilot N=1 2>&1 | tee -a "$LOG" || break
+  make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800 2>&1 | tee -a "$LOG" || break
   make safe-push 2>&1 | tee -a "$LOG" || break
   make validate 2>&1 | tee -a "$LOG" || break
   make cockpit-summary N=5 2>&1 | tee -a "$LOG" || break

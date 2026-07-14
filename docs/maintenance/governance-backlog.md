@@ -552,10 +552,11 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-042`
 - `Title`: Autopilot per-cycle timeout.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Automation
 - `Reason`: `make autopilot N=1` can still run for many hours when the underlying cycle remains active.
-- `Suggested implementation`: Add a configurable per-cycle wall-clock timeout to the autopilot or autocycle layer, terminate the active cycle cleanly when the timeout is exceeded, record a clear run summary, preserve logs outside the repository, and leave the repo in a safe inspectable state.
+- `Implementation`: `Makefile` passes `PER_CYCLE_TIMEOUT_SECONDS` into `RKM_PER_CYCLE_TIMEOUT_SECONDS`, and `scripts/rkm-autocycle.sh` enforces that positive-integer timeout with GNU `timeout` around each underlying `rkm-cycle.sh` attempt. `scripts/rkm-autopilot.py` treats timeout exit 124 as an inspect-only stop and does not run automatic `safe-push` after that failure.
+- `Command examples`: `make autopilot N=1 PER_CYCLE_TIMEOUT_SECONDS=1800`; `make autocycle N=1 PER_CYCLE_TIMEOUT_SECONDS=1800`
 - `Related files`: `scripts/rkm-autopilot.py`; `scripts/rkm-autocycle.sh`; `scripts/rkm-cycle.sh`; `docs/maintenance/task-guides/unattended-autopilot.md`; `docs/maintenance/automation-guardrails.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented.

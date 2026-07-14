@@ -23,6 +23,7 @@ sys.dont_write_bytecode = True
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TARGET = 3
 DEFAULT_WORKING_TARGET_MAX = 5
+DEFAULT_PER_CYCLE_TIMEOUT_SECONDS = 3600
 DEFAULT_STATE_PATH = Path(".rkm/autopilot-state.json")
 TRUTHY_VALUES = {"true", "1", "yes", "y", "on"}
 FALSEY_VALUES = {"false", "0", "no", "n", "off", ""}
@@ -35,6 +36,7 @@ TARGET_TOO_AGGRESSIVE = "TARGET_TOO_AGGRESSIVE"
 NEEDS_BUDGET_PROFILE = "NEEDS_BUDGET_PROFILE"
 BLOCKED = "BLOCKED"
 NEEDS_MANUAL_REVIEW = "NEEDS_MANUAL_REVIEW"
+TIMEOUT_EXIT_CODES = {124, 137}
 
 RECOVERY_AVAILABLE = "RECOVERY_AVAILABLE"
 RECOVERY_FAILED_NEEDS_MANUAL_FIX = "RECOVERY_FAILED_NEEDS_MANUAL_FIX"
@@ -106,6 +108,14 @@ def positive_int(value: str) -> int:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
     return parsed
+
+
+def validate_per_cycle_timeout_environment() -> int:
+    value = os.environ.get("RKM_PER_CYCLE_TIMEOUT_SECONDS", str(DEFAULT_PER_CYCLE_TIMEOUT_SECONDS))
+    if not value.isdecimal() or int(value) <= 0:
+        print(f"ERROR: RKM_PER_CYCLE_TIMEOUT_SECONDS must be a positive integer: {value}", file=sys.stderr)
+        return 2
+    return 0
 
 
 def parse_bool(value: str | bool | None) -> bool:
@@ -456,6 +466,10 @@ def try_push_after_partial_autocycle(
     state_path: str | Path,
 ) -> int | None:
     if command_result.failed_command_label != "autocycle":
+        return None
+    if command_result.exit_code in TIMEOUT_EXIT_CODES:
+        print("autocycle timed out; safe-push will not run automatically.")
+        print("inspect /tmp/rkm-cycle-output.txt and git status --short before continuing.")
         return None
     if recovery_plan_blocks_post_failure_push(recovery_document):
         return None
@@ -984,7 +998,9 @@ def assert_partial_autocycle_result(
     *,
     expected_exit_code: int,
     expected_safe_push: bool,
+    autocycle_exit_code: int = 42,
     safe_push_exit_code: int = 0,
+    expected_post_failure_next_action: bool = True,
     expected_stdout: Sequence[str] = (),
     unexpected_stdout: Sequence[str] = (),
     expected_state: bool = True,
@@ -1015,7 +1031,7 @@ def assert_partial_autocycle_result(
             if len(commands) == 2 and commands[0].label == "autocycle":
                 command_calls.append(commands[0].label)
                 return CommandRunResult(
-                    42,
+                    autocycle_exit_code,
                     (command_text(commands[0]),),
                     (command_text(commands[1]),),
                     commands[0].label,
@@ -1060,8 +1076,10 @@ def assert_partial_autocycle_result(
         for unexpected in unexpected_stdout:
             if unexpected in actual_stdout:
                 raise AssertionError(f"{name}: expected stdout not to contain {unexpected!r}, got {actual_stdout!r}")
-        if bool(next_action_documents):
+        if expected_post_failure_next_action and bool(next_action_documents):
             raise AssertionError(f"{name}: expected post-failure next-action call")
+        if not expected_post_failure_next_action and len(next_action_documents) != 1:
+            raise AssertionError(f"{name}: unexpected post-failure next-action call")
         if not expected_state:
             if state_path.exists():
                 raise AssertionError(f"{name}: state file should not exist")
@@ -1322,6 +1340,23 @@ def run_self_test() -> int:
     )
     if forced_partial_state is None:
         raise AssertionError("forced partial autocycle READY_TO_PUSH runs safe-push: state missing")
+
+    partial_timeout_state = assert_partial_autocycle_result(
+        "partial autocycle timeout skips safe-push",
+        {"status": READY_TO_PUSH, "command": "make safe-push", "isClean": True, "repoStatus": "clean"},
+        expected_exit_code=124,
+        expected_safe_push=False,
+        autocycle_exit_code=124,
+        expected_post_failure_next_action=False,
+        expected_stdout=(
+            "autocycle timed out; safe-push will not run automatically.",
+            "inspect /tmp/rkm-cycle-output.txt and git status --short before continuing.",
+            "final outcome: autocycle failed with exit 124",
+        ),
+        unexpected_stdout=("partial progress detected; accepted commits are ready to push.",),
+    )
+    if partial_timeout_state is None or partial_timeout_state["postFailureNextActionJson"] is not None:
+        raise AssertionError("partial autocycle timeout skips safe-push: post-failure next-action should not run")
 
     partial_dirty_state = assert_partial_autocycle_result(
         "partial autocycle DIRTY_WORKTREE skips safe-push",
@@ -1689,6 +1724,9 @@ def run_cli(argv: list[str]) -> int:
     args = parser.parse_args(argv[1:])
     if args.self_test:
         return run_self_test()
+    timeout_status = validate_per_cycle_timeout_environment()
+    if timeout_status != 0:
+        return timeout_status
     return run_autopilot(
         args.target,
         dry_run=args.dry_run,
