@@ -25,6 +25,10 @@ A new assistant or maintainer should start with this sequence from the repositor
 
 Maintenance documents provide strategic context, not operational truth. Use them to understand direction and rationale, but treat `make cockpit-summary` and `make validate` as the current source of truth for readiness, validation, and next operational action.
 
+## Rule Routing Handoff
+
+Future assistants should route themselves through `AGENTS.md` first, then the nearest local `AGENTS.md` file for the affected directory, then the relevant task guide under `docs/maintenance/task-guides/`. Root rules define repository invariants; local rule files define area rules; task guides define operational checks for specific work types.
+
 ## Related Maintenance Documents
 
 Use these documents together:

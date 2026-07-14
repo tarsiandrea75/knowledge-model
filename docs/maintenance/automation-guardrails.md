@@ -6,6 +6,12 @@ This document codifies operational rules for RKM automation, recovery, schema-co
 
 These guardrails apply to post-alpha work on `main`. The `v0.1.0-alpha` tag already exists and must not be modified by routine automation.
 
+## Distributed Rule Routing
+
+Automation and recovery work must route through root `AGENTS.md`, then the local `AGENTS.md` file for the affected area, then the relevant task guide under `docs/maintenance/task-guides/`.
+
+Use the task guides for operational detail instead of expanding this file with every task-specific checklist. In particular, unattended runs use `docs/maintenance/task-guides/unattended-autopilot.md`, failed-new-file recovery uses `docs/maintenance/task-guides/recovering-failed-new-file.md`, schema work uses the schema task guides, and exporter or validator changes use the graph export or validation script guides.
+
 ## Clean Worktree Invariant
 
 Passing validation is necessary but not sufficient.

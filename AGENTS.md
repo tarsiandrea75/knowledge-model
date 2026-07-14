@@ -1,80 +1,21 @@
-# RAG Knowledge Model Codex Instructions
+# RAG Knowledge Model Agent Instructions
 
-We are building an open source project called RAG Knowledge Model (RKM).
+RAG Knowledge Model (RKM) is a structured, extensible, machine-readable and human-readable knowledge model of the Retrieval-Augmented Generation ecosystem. It is a domain model, ontology, and knowledge graph foundation for describing RAG entities, relationships, claims, evidence, references, and structured knowledge.
 
-RKM is a structured, extensible, machine-readable and human-readable knowledge model of the Retrieval-Augmented Generation ecosystem.
+## Repository Constitution
 
-The project is not a simple list of RAG techniques. It is a domain model, ontology and knowledge graph foundation for describing entities, relationships, claims, evidence, references and structured knowledge about the RAG ecosystem.
+These invariants apply to all repository work:
 
-## Repository Scope
-
-The repository models:
-
-* RAG techniques
-* frameworks
-* papers
-* components
-* benchmarks
-* datasets
-* embedding models
-* language models
-* rerankers
-* retrievers
-* vector databases
-* graph databases
-* chunking strategies
-* prompt techniques
-* evaluation metrics
-* agents
-* workflows
-* tools
-* providers
-* problems
-* advantages
-* limitations
-* tradeoffs
-* use cases
-* claims
-* evidence
-* references
-* relationships
-
-## Current Project State
-
-The repository already contains the initial RKM architecture and JSON Schema foundation.
-
-Existing architecture documents include:
-
-* README.md
-* docs/data-model.md
-* docs/architecture/ADR-0001-adopt-knowledge-entity-model.md
-* docs/architecture/domain-model.md
-* docs/architecture/entity-model.md
-* docs/architecture/evidence-model.md
-* docs/architecture/metadata-model.md
-* docs/architecture/naming-conventions.md
-* docs/architecture/ontology.md
-* docs/architecture/relationship-model.md
-* docs/architecture/ubiquitous-language.md
-* docs/architecture/versioning.md
-
-Existing schemas include:
-
-* schema/definitions/claim.schema.json
-* schema/definitions/description.schema.json
-* schema/definitions/entity-type.schema.json
-* schema/definitions/evidence.schema.json
-* schema/definitions/identity.schema.json
-* schema/definitions/knowledge-entity.schema.json
-* schema/definitions/metadata.schema.json
-* schema/definitions/reference.schema.json
-* schema/definitions/relationship-type.schema.json
-* schema/definitions/relationship.schema.json
-* schema/entity-type-registry.schema.json
-* schema/framework.schema.json
-* schema/ontology.schema.json
-* schema/rag-technique.schema.json
-* schema/relationship-type-registry.schema.json
+- Use the canonical project names: RAG Knowledge Model and RKM.
+- Do not use deprecated names such as RAG Knowledge Base, RAG-KB, or ragkb.
+- Use English for repository content unless a file intentionally targets another language.
+- Use Markdown for documentation and JSON Schema Draft 2020-12 for schemas.
+- Use lowercase kebab-case for file names and uppercase snake case for relationship types.
+- Treat entities, relationships, evidence, claims, references, and metadata as first-class concepts.
+- Prefer structured knowledge, stable identifiers, reusable definitions, registries, and explicit relationships over prose-only modeling.
+- Preserve the existing domain model, entity model, relationship model, evidence model, metadata model, ontology, naming conventions, and versioning rules.
+- Keep content directly usable. Do not add incomplete sections, filler content, unfinished-work markers, or invalid examples.
+- Do not commit changes unless the user explicitly requests a commit.
 
 ## Mandatory Execution Protocol
 
@@ -95,123 +36,58 @@ Unless the user explicitly instructs otherwise:
 13. Stop immediately after completing the single requested file and validation report.
 14. If the next natural step would require additional files, describe it instead of creating it.
 
+## Distributed Agent Rule Routing
+
+Root `AGENTS.md` is the repository constitution and routing layer. It must stay concise and must not become the full operational manual. Detailed rules belong in the local `AGENTS.md` file closest to the affected area or in a task guide under `docs/maintenance/task-guides/`.
+
+| Work type | Required routing |
+| --- | --- |
+| Tasks touching `data/**` | Read `data/AGENTS.md` and the relevant data task guide. |
+| Tasks touching `schema/**` | Read `schema/AGENTS.md` and either `docs/maintenance/task-guides/adding-schema-contract.md` or `docs/maintenance/task-guides/refactoring-schema-definition.md`. |
+| Tasks touching `registries/**` | Read `registries/AGENTS.md`. |
+| Tasks touching `scripts/**` | Read `scripts/AGENTS.md` and the relevant validation or graph export task guide. |
+| Tasks touching `docs/architecture/**` | Read `docs/architecture/AGENTS.md` and `docs/maintenance/task-guides/writing-architecture-doc.md`. |
+| Tasks touching `examples/**` | Read `examples/AGENTS.md` and `docs/maintenance/task-guides/updating-graph-export.md` when graph exports are involved. |
+| Unattended automation | Read `docs/maintenance/automation-guardrails.md` and `docs/maintenance/task-guides/unattended-autopilot.md`. |
+| Recovery from failed newly added files | Read `docs/maintenance/task-guides/recovering-failed-new-file.md`. |
+
 ## Reviewer Protocol
 
 When the user asks Codex to review the current RKM git diff, Codex acts only as a reviewer.
 
 Reviewer rules:
 
-1. Do not create, modify, delete, format or normalize files.
+1. Do not create, modify, delete, format, or normalize files.
 2. Review only the current git diff.
 3. Do not review unrelated repository content unless it appears in the current git diff.
 4. Do not commit changes.
-5. Return exactly one verdict: `ACCEPT`, `REVISE` or `STOP`.
+5. Return exactly one verdict: `ACCEPT`, `REVISE`, or `STOP`.
 
 Use `ACCEPT` when the current git diff is coherent with RKM architecture, follows repository rules, passes required validation or has only non-blocking issues, and is ready to commit.
 
-Use `REVISE` when the current git diff is directionally correct but needs specific fixes before commit. Examples include schema inconsistencies, broken references, invalid naming, incomplete validation, unclear modeling choices, missing required structure, or content that conflicts with RKM architecture.
+Use `REVISE` when the current git diff is directionally correct but needs specific fixes before commit.
 
-Use `STOP` when the current git diff should not be repaired as-is. Examples include changes outside the requested scope, multiple unrelated files when only one file was allowed, destructive changes, generated clutter, IDE files, temporary review files, severe architectural drift, or a validation failure that indicates the work should be abandoned and restarted.
+Use `STOP` when the current git diff should not be repaired as-is, such as changes outside scope, unrelated file batches, destructive changes, generated clutter, severe architectural drift, or validation failures that indicate restart is safer.
 
 Reviewer output must include:
 
-* verdict
-* touched files in the current git diff
-* reasons for the verdict
-* required fixes when the verdict is `REVISE` or `STOP`
-* whether commit is recommended
-* final `git status --short` output
+- verdict
+- touched files in the current git diff
+- reasons for the verdict
+- required fixes when the verdict is `REVISE` or `STOP`
+- whether commit is recommended
+- final `git status --short` output
 
-## Content Rules
+## Hard Rules
 
-* Use English for repository content.
-* Use Markdown for documentation.
-* Use JSON Schema Draft 2020-12 for schemas.
-* Use lowercase kebab-case for file names.
-* Use uppercase snake case for relationship types.
-* Treat entities, relationships, evidence, claims and references as first-class concepts.
-* Prefer structured knowledge over plain strings.
-* Preserve the RKM architecture already defined.
-* Keep repository content directly usable.
-* Do not use incomplete sections.
-* Do not use filler content.
-* Do not use ellipses.
-* Do not summarize when the task asks for a complete file.
+- `git status --short` must be clean before push, autopilot, or handoff.
+- Runtime logs, away-run logs, scratch files, and automation transcripts must be written outside the repository. Prefer `/tmp/rkm-runs`.
+- Do not create `.rkm-runs/` inside the repository.
+- Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit performs an atomic refactor and explains the contract relationship.
+- Schema, registry, validator, exporter, Makefile, release-process, graph-contract, and migration changes require explicit `codex-commit` prompts.
+- Architecture examples must be fully real or clearly abstract. Do not mix placeholder IDs with concrete repository paths.
+- Unattended autopilot should use repeated `make autopilot N=1` rounds with validation, safe push, and cockpit summary after each round.
 
-## Modeling Rules
+## Validation Standard
 
-Important knowledge should be represented structurally whenever it has reusable semantic meaning.
-
-Prefer this style:
-
-* entities over plain strings
-* relationship objects over prose-only relationships
-* claims linked to evidence
-* references as structured sources
-* metadata separated from domain knowledge
-* stable identifiers over names as references
-* registries for controlled vocabularies
-* schemas that can support graph export
-
-## Lessons Learned / Hard Rules
-
-* Specialized schemas must only use `identity.entityType` `const` values already supported by `schema/definitions/identity.schema.json`.
-* Add shared identity support before introducing specialized schemas for new entity types.
-* Architecture documents must use canonical relationship predicates from the relationship model.
-* Noncanonical relationship names may appear only as explicitly noncanonical, future candidate, deprecated, or rejected examples.
-* Reviewer `ACCEPT` must consider semantic coherence with RKM architecture, not only validation success.
-
-## Automation and Contract Guardrails
-
-Detailed automation, recovery, schema-contract, and unattended-run guardrails are documented in `docs/maintenance/automation-guardrails.md`.
-
-Hard rules:
-
-* `git status --short` must be clean before push, autopilot, or handoff.
-* Runtime logs, away-run logs, scratch files, and automation transcripts must be written outside the repository. Prefer `/tmp/rkm-runs`.
-* Do not create `.rkm-runs/` inside the repository.
-* Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit performs the atomic refactor and explains the contract relationship.
-* Schema, registry, validator, exporter, Makefile, release-process, graph-contract, and migration changes require explicit `codex-commit` prompts.
-* Architecture examples must be fully real or clearly abstract. Do not mix placeholder IDs with concrete repository paths.
-* Unattended autopilot should use repeated `make autopilot N=1` rounds with validation, safe push, and cockpit summary after each round.
-
-## Naming Rules
-
-Use these canonical project names:
-
-* Full project name: RAG Knowledge Model
-* Short project name: RKM
-* Do not use: RAG Knowledge Base
-* Do not use: RAG-KB
-* Do not use: ragkb
-
-## Quality Bar
-
-Every file must be coherent with:
-
-* the domain model
-* the entity model
-* the relationship model
-* the evidence model
-* the metadata model
-* the ontology
-* the naming conventions
-* the versioning rules
-
-When creating a schema, ensure that:
-
-* it declares JSON Schema Draft 2020-12
-* it uses stable $id values under the RKM naming convention
-* internal references resolve correctly
-* required fields are intentional
-* reusable concepts are placed under schema/definitions when appropriate
-* specialized schemas compose reusable definitions where possible
-
-When creating documentation, ensure that:
-
-* terminology matches the ubiquitous language
-* concepts are defined before being used
-* examples are complete and valid
-* relationships use uppercase snake case
-* the file can be read independently
-* the file fits naturally into the existing architecture
+`make validate` is the standard validation entry point for normal repository work unless the current task explicitly requires a narrower command. Validation failures must be fixed before work is reported as ready, except when the failure is clearly pre-existing and unrelated to the touched files.
