@@ -336,6 +336,31 @@ Deprecated claims should remain traceable when they have been used by relationsh
 
 ---
 
+# Claim Review Path
+
+Claim review checks whether a claim is worded narrowly enough for the available support.
+
+A claim should move from `Draft` to `Review` only after the author has checked:
+
+* the subject is explicit and uses a stable identifier when one exists
+* the claim type matches the nature of the assertion
+* qualifiers capture scope, version, task, dataset, benchmark, implementation or time boundaries when they affect interpretation
+* evidence links point to sources that actually support the statement
+* evidence strength is calibrated against the exact wording of the claim
+* confidence reflects maintainer interpretation after considering source authority, agreement between sources and ambiguity
+* relationship-facing claims state the relationship being justified instead of making a broader architectural assertion
+
+A claim should move from `Review` to `Published` only when reviewers can answer these questions:
+
+* What exact assertion would a graph consumer or generated document infer from this claim?
+* Which evidence supports, weakens, contradicts or contextualizes that assertion?
+* Is the claim narrower than the evidence when the evidence has limited scope?
+* Would a more precise claim, split claim or qualifier reduce ambiguity?
+
+When review finds that evidence supports only part of a statement, revise the claim instead of inflating evidence strength or confidence.
+
+---
+
 # Rationale
 
 A claim may include a rationale.
