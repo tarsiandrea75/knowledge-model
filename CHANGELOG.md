@@ -17,6 +17,7 @@ All notable changes to RAG Knowledge Model are documented in this file.
 - Semantic validation for data relationship instances, including registered predicate checks, source and target data record integrity checks, data file consistency checks, duplicate relationship ID checks, and duplicate semantic triple checks.
 - Semantic validation for relationship support sets, including relationship, claim, evidence, and reference identifier integrity checks.
 - Documented unattended automation and recovery guardrails for run logs, failed newly added files, schema-definition duplication risks, valid documentation examples, and safer bounded autopilot rounds.
+- Codified automation, recovery, schema-contract, and unattended-run guardrails for clean worktrees, runtime logs, failed new files, bounded autopilot rounds, schema duplication prevention, valid JSON examples, and handoff checks.
 
 ## v0.1.0-alpha - 2026-07-13
 

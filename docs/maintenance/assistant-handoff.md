@@ -31,6 +31,7 @@ Use these documents together:
 
 - `docs/maintenance/repo-map.md` explains the repository structure, how the main areas fit together, and the operational command map.
 - `docs/maintenance/maturity-report.md` explains the current maturity level, risks, and recommended next milestones.
+- `docs/maintenance/automation-guardrails.md` explains automation, recovery, schema-contract, and unattended-run rules that protect clean handoff and push readiness.
 - `docs/maintenance/consumability-roadmap.es-AR.md` explains the project in Spanish for human colleagues, technical leads, and managers, with emphasis on making RKM consumable by others.
 
 For product or managerial conversations, read `docs/maintenance/consumability-roadmap.es-AR.md` before explaining the next phase. Use it to describe why RKM should focus on consumability now: the foundation is strong and graph export paths now exist for both fixtures and seed data, but external users still need broader real data, richer examples, expanded export guidance, consumer documentation, and a release package. The Spanish roadmap is meant for human stakeholders, not automation.
@@ -148,6 +149,10 @@ Budget grace exists for small near misses, but it is not permission to ignore va
 
 ## Operational Guardrails
 
+The detailed operational source for automation, recovery, schema-contract, and unattended-run safety is `docs/maintenance/automation-guardrails.md`. Future assistants should read it before autopilot, recovery, schema-contract work, release-process work, or unattended runs.
+
+Passing validation is necessary but not sufficient. Before `make safe-push`, autopilot, or handoff, `git status --short` must be clean. If the worktree is dirty, stop automation and inspect.
+
 Unattended run logs must be written outside the repository. Prefer `/tmp/rkm-runs` for local runtime logs and recovery transcripts. Do not create `.rkm-runs/` or any other runtime-log directory inside the repository, because generated logs make the worktree dirty and can pollute later recovery decisions.
 
 If a newly added file fails recovery and should be discarded, remove it from both the index and the filesystem:
@@ -159,19 +164,43 @@ rm -f path/to/file
 
 Do not use `git restore -- path/to/file` for a failed newly added file unless the file is known to be tracked in `HEAD`. Restoring an untracked or newly added failed file can preserve or reintroduce invalid content instead of discarding the failed attempt.
 
+If recovery status is `RECOVERY_FAILED_NEEDS_MANUAL_FIX`, do not run autopilot again. Run `git status --short` and `make recovery-plan`, then manually fix the dirty file, run `make recover-revise` when appropriate, or discard the failed newly added file.
+
+Autopilot may expand low-risk content such as architecture documents, glossary-like documentation, and data records that follow an established pattern. It must not freely evolve structural contracts. Schema, registry, validator, exporter, Makefile, release-process, graph-contract, and migration changes require explicit `codex-commit` prompts.
+
 Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit composes or refactors the first-class schema from the reusable definition. A separate reusable definition with the same domain name as an existing first-class schema creates a duplicate schema-contract risk.
 
 JSON examples that use concrete repository paths must use real seed IDs and matching files from the repository. Abstract examples must avoid concrete repository paths. This keeps examples complete and valid instead of combining invented identifiers with files that appear to be authoritative.
 
-For unattended work, prefer repeated bounded rounds:
+For unattended work, prefer repeated bounded rounds with `N=1`. Each round should validate, safe-push, and emit a cockpit summary. Use this pattern:
 
 ```bash
-make autopilot N=1
-make validate
-make safe-push
+mkdir -p /tmp/rkm-runs
+set -o pipefail
+for i in 1 2 3 4 5 6 7 8 9 10
+do
+  LOG="/tmp/rkm-runs/autopilot-away-round-${i}.log"
+  echo "===== AUTOPILOT ROUND $i =====" | tee -a "$LOG"
+  date | tee -a "$LOG"
+  make autopilot N=1 2>&1 | tee -a "$LOG" || break
+  make safe-push 2>&1 | tee -a "$LOG" || break
+  make validate 2>&1 | tee -a "$LOG" || break
+  make cockpit-summary N=5 2>&1 | tee -a "$LOG" || break
+  echo "===== END ROUND $i =====" | tee -a "$LOG"
+done
 ```
 
 Repeat that sequence as needed rather than leaving a larger target running while the operator is away. `N=1` limits budget spent on recovery attempts and leaves a validated, pushed checkpoint after each successful round.
+
+Before handoff, run:
+
+```bash
+git status --short
+make validate
+make safe-push
+make cockpit-summary N=5
+git log --oneline --decorate -n 12
+```
 
 ## Current Maturity
 

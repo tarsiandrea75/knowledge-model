@@ -161,6 +161,20 @@ Prefer this style:
 * Noncanonical relationship names may appear only as explicitly noncanonical, future candidate, deprecated, or rejected examples.
 * Reviewer `ACCEPT` must consider semantic coherence with RKM architecture, not only validation success.
 
+## Automation and Contract Guardrails
+
+Detailed automation, recovery, schema-contract, and unattended-run guardrails are documented in `docs/maintenance/automation-guardrails.md`.
+
+Hard rules:
+
+* `git status --short` must be clean before push, autopilot, or handoff.
+* Runtime logs, away-run logs, scratch files, and automation transcripts must be written outside the repository. Prefer `/tmp/rkm-runs`.
+* Do not create `.rkm-runs/` inside the repository.
+* Do not add `schema/definitions/<name>.schema.json` when `schema/<name>.schema.json` already exists unless the same commit performs the atomic refactor and explains the contract relationship.
+* Schema, registry, validator, exporter, Makefile, release-process, graph-contract, and migration changes require explicit `codex-commit` prompts.
+* Architecture examples must be fully real or clearly abstract. Do not mix placeholder IDs with concrete repository paths.
+* Unattended autopilot should use repeated `make autopilot N=1` rounds with validation, safe push, and cockpit summary after each round.
+
 ## Naming Rules
 
 Use these canonical project names:
