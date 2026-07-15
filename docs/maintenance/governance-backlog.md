@@ -417,13 +417,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-031`
 - `Title`: Citation freshness and staleness policy.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Evidence
 - `Reason`: RAG tooling changes quickly, so evidence may need recency expectations or review cadence.
-- `Suggested implementation`: Define freshness guidance by source type and add optional metadata or review reports for stale references.
-- `Related files`: `schema/reference.schema.json`; `data/`; `docs/maintenance/`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented in `docs/architecture/reference-model.md` under `Reference Freshness and Staleness`, which evaluates freshness relative to the supported claim, evidence role, or relationship and applies source-sensitive expectations for mutable versus stable sources based on factors such as source type, source priority, update behavior, release cadence, version or access date, and downstream risk. It directs re-review when a source changes, a new major version is released, or downstream use depends on the claim, and recommends narrowing date-sensitive claims with evidence notes. `schema/definitions/reference.schema.json` supplies optional `updatedAt`, `accessedAt`, `version`, `canonicalUrl`, repository context, and `notes` metadata. This is documented review guidance plus optional metadata support, not automated staleness detection, reporting, or validator enforcement.
+- `Related files`: `docs/architecture/reference-model.md`; `schema/definitions/reference.schema.json`
+- `Depends on`: Implemented in commits `9d92683 Update docs/architecture/reference-model.md` and `5ed036d Add initial RKM architecture and JSON schemas`.
 
 ### GB-032 Task-Specific Command Generator
 
