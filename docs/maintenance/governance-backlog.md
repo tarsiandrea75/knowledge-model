@@ -405,13 +405,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-030`
 - `Title`: Claim review workflow.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Evidence
 - `Reason`: Claims need a repeatable review path for wording, support, scope, and source quality.
-- `Suggested implementation`: Add a task guide or validation-assisted checklist for adding and revising claim records.
-- `Related files`: `schema/claim.schema.json`; `data/relationship-support/`; `docs/maintenance/task-guides/`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented in `docs/architecture/claim-model.md` under `Claim Review Path`, which documents checks for claim wording and scope, subject identity, claim type, qualifiers, evidence linkage and strength, confidence, relationship-facing wording, `Draft` to `Review` to `Published` transitions, reviewer questions, and corrective narrowing or splitting.
+- `Related files`: `docs/architecture/claim-model.md`; `schema/claim.schema.json`; `data/relationship-support/`
+- `Depends on`: Implemented in commit `af7f991 Update docs/architecture/claim-model.md`.
 
 ### GB-031 Citation Freshness And Staleness Policy
 
