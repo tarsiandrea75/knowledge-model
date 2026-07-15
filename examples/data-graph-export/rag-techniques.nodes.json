@@ -291,7 +291,7 @@
       "schema": "schema/rag-technique.schema.json",
       "slug": "hybrid-retrieval",
       "status": "Draft",
-      "summary": "Hybrid Retrieval combines complementary retrieval signals so a RAG system can search with more than one matching strategy.",
+      "summary": "Hybrid Retrieval combines candidate sets or scores from multiple retrieval approaches, commonly lexical and semantic retrieval, before context assembly.",
       "techniqueFamily": "Hybrid Retrieval",
       "version": "1.0.0",
       "visibility": "Public"

@@ -24,7 +24,7 @@
     "status": "Draft",
     "reviewState": "Not Reviewed",
     "createdAt": "2026-07-13T00:00:00Z",
-    "updatedAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-15T00:00:00Z",
     "createdBy": [
       {
         "type": "Automation",
@@ -36,11 +36,1081 @@
     "language": "en"
   },
   "description": {
-    "summary": "Hybrid Retrieval combines complementary retrieval signals so a RAG system can search with more than one matching strategy.",
-    "description": "Hybrid Retrieval is a RAG technique that retrieves candidates from more than one retrieval approach, commonly keyword matching and dense vector similarity, and then combines the candidate results before context assembly.",
-    "problemStatement": "A single retrieval method can miss useful context when a query depends on exact terminology, semantic similarity, or both.",
-    "coreIdea": "Run complementary retrievers and merge their ranked candidates so later RAG stages can work from a broader candidate pool."
+    "summary": "Hybrid Retrieval combines candidate sets or scores from multiple retrieval approaches, commonly lexical and semantic retrieval, before context assembly.",
+    "description": "Hybrid Retrieval retrieves candidates through multiple paths and combines their ranks, normalized scores, or candidate sets. Multiple paths do not guarantee a gain: effectiveness depends on complementarity, standalone path quality, query and document characteristics, fusion method and parameters, and candidate depth. A fused candidate set may be passed to a later reranker, but hybrid retrieval and reranking are distinct stages whose effects must be measured separately.",
+    "problemStatement": "A single retrieval method can miss useful context when a query depends on exact terminology, semantic similarity, or both, while indiscriminately adding paths can introduce irrelevant candidates and operational cost.",
+    "coreIdea": "Measure complementary retrievers independently, combine their candidate evidence with an explicit fusion policy, and retain only combinations whose evaluated benefit justifies their latency and resource overhead.",
+    "limitations": [
+      "A weak or poorly matched path can degrade a fused result below the best constituent retriever.",
+      "Fusion effectiveness and operating cost can change with domain, query type, document structure, candidate depth, parameters, indexes, and deployment environment.",
+      "Retrieval-metric gains do not by themselves establish downstream RAG-generation gains."
+    ]
   },
+  "references": [
+    {
+      "id": "REFERENCE-12001",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods",
+      "authors": [
+        {
+          "name": "Gordon V. Cormack"
+        },
+        {
+          "name": "Charles L. A. Clarke"
+        },
+        {
+          "name": "Stefan Büttcher"
+        }
+      ],
+      "publisher": "ACM SIGIR",
+      "publishedAt": "2009-07-19",
+      "accessedAt": "2026-07-15",
+      "url": "https://cormack.uwaterloo.ca/cormacksigir09-rrf.pdf",
+      "canonicalUrl": "https://doi.org/10.1145/1571941.1572114",
+      "doi": "10.1145/1571941.1572114",
+      "citation": "Cormack, G. V.; Clarke, C. L. A.; Büttcher, S. Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods. SIGIR 2009. doi:10.1145/1571941.1572114.",
+      "notes": [
+        "This historical rank-fusion study covers TREC experiments and LETOR 3, not modern sparse-dense RAG pipelines generally."
+      ]
+    },
+    {
+      "id": "REFERENCE-12002",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "BGE M3-Embedding: Multi-Lingual, Multi-Functionality, Multi-Granularity Text Embeddings Through Self-Knowledge Distillation",
+      "authors": [
+        {
+          "name": "Jianlv Chen"
+        },
+        {
+          "name": "Shitao Xiao"
+        },
+        {
+          "name": "Peitian Zhang"
+        },
+        {
+          "name": "Kun Luo"
+        },
+        {
+          "name": "Defu Lian"
+        },
+        {
+          "name": "Zheng Liu"
+        }
+      ],
+      "publisher": "arXiv",
+      "publishedAt": "2024-02-05",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2402.03216v1",
+      "canonicalUrl": "https://arxiv.org/abs/2402.03216",
+      "arxivId": "2402.03216",
+      "version": "arXiv v1",
+      "citation": "Chen, J.; Xiao, S.; Zhang, P.; Luo, K.; Lian, D.; Liu, Z. BGE M3-Embedding: Multi-Lingual, Multi-Functionality, Multi-Granularity Text Embeddings Through Self-Knowledge Distillation. arXiv:2402.03216v1.",
+      "notes": [
+        "This record uses arXiv v1, submitted 2024-02-05, because that version has the recorded BGE M3-Embedding title and the cited MLDR Table 4 and NarrativeQA Table 5.",
+        "The hybrid results are specific to the BGE-M3 retrieval functions and evaluated long-document benchmarks."
+      ]
+    },
+    {
+      "id": "REFERENCE-12003",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "Balancing the Blend: An Experimental Analysis of Trade-offs in Hybrid Search",
+      "authors": [
+        {
+          "name": "Mengzhao Wang"
+        },
+        {
+          "name": "Boyu Tan"
+        },
+        {
+          "name": "Yunjun Gao"
+        },
+        {
+          "name": "Hai Jin"
+        },
+        {
+          "name": "Yingfeng Zhang"
+        },
+        {
+          "name": "Xiangyu Ke"
+        },
+        {
+          "name": "Xiaoliang Xu"
+        },
+        {
+          "name": "Yifan Zhu"
+        }
+      ],
+      "publisher": "arXiv",
+      "publishedAt": "2025-08-02",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2508.01405",
+      "canonicalUrl": "https://arxiv.org/abs/2508.01405",
+      "arxivId": "2508.01405",
+      "citation": "Wang, M.; Tan, B.; Gao, Y.; Jin, H.; Zhang, Y.; Ke, X.; Xu, X.; Zhu, Y. Balancing the Blend: An Experimental Analysis of Trade-offs in Hybrid Search. arXiv:2508.01405.",
+      "notes": [
+        "The study evaluates four retrieval paradigms and their eleven possible hybrid combinations across eleven datasets in one database environment."
+      ]
+    },
+    {
+      "id": "REFERENCE-12004",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "From BM25 to Corrective RAG: Benchmarking Retrieval Strategies for Text-and-Table Documents",
+      "authors": [
+        {
+          "name": "Meftun Akarsu"
+        },
+        {
+          "name": "Recep Kaan Karaman"
+        },
+        {
+          "name": "Christopher Mierbach"
+        }
+      ],
+      "publisher": "arXiv",
+      "publishedAt": "2026-04-02",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2604.01733",
+      "canonicalUrl": "https://arxiv.org/abs/2604.01733",
+      "arxivId": "2604.01733",
+      "citation": "Akarsu, M.; Karaman, R. K.; Mierbach, C. From BM25 to Corrective RAG: Benchmarking Retrieval Strategies for Text-and-Table Documents. arXiv:2604.01733.",
+      "notes": [
+        "The results are bounded to T2-RAGBench financial numerical QA over mixed text-and-table documents."
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-12001",
+      "statement": "In the reported TREC and LETOR 3 experiments, RRF generally outperformed the individual rankings being combined and Condorcet Fuse, with the paper reporting 4 to 5 percent average gains in its pilot and TREC experiments.",
+      "claimType": "Historical",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "Four Wumpus pilot collections, TREC 3, TREC 5, TREC 9, TREC 2004 Robust, and LETOR 3"
+        },
+        {
+          "name": "metric",
+          "value": "MAP"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion"
+        },
+        {
+          "name": "fusionParameter",
+          "value": "RRF k=60"
+        },
+        {
+          "name": "baseline",
+          "value": "Best individual ranking, Condorcet Fuse, and CombMNZ"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Historical rank-fusion experiments"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12001"
+      ],
+      "referenceIds": [
+        "REFERENCE-12001"
+      ],
+      "rationale": "The claim retains the historical experiment families, metric, parameter, and exceptions instead of generalizing RRF to arbitrary modern pipelines."
+    },
+    {
+      "id": "CLAIM-12002",
+      "statement": "On the BGE-M3 MLDR test set, integrated Dense+Sparse retrieval reached average nDCG@10 of 64.8, compared with 52.5 for Dense and 62.2 for Sparse; integrating all three BGE-M3 functions reached 65.0.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "MLDR multilingual long-document test set"
+        },
+        {
+          "name": "metric",
+          "value": "Average nDCG@10"
+        },
+        {
+          "name": "modelFamily",
+          "value": "BGE-M3"
+        },
+        {
+          "name": "retrievalFunctions",
+          "value": "Dense, sparse, and multi-vector"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Sum of BGE-M3 Dense and Sparse scores over their candidate union"
+        },
+        {
+          "name": "candidateDepth",
+          "value": "Top 1000 candidates from Dense and top 1000 candidates from Sparse"
+        },
+        {
+          "name": "multiVectorProcedure",
+          "value": "Optional later scoring; Multi-vec reranks the top 200 Dense candidates and is not a third initial candidate path"
+        },
+        {
+          "name": "allFunctionScoreIntegration",
+          "value": "Sum of Dense, Sparse, and Multi-vec scores"
+        },
+        {
+          "name": "paperVersion",
+          "value": "arXiv:2402.03216v1"
+        },
+        {
+          "name": "baseline",
+          "value": "BGE-M3 Dense and Sparse retrieval functions evaluated separately"
+        },
+        {
+          "name": "documentCharacteristics",
+          "value": "Multilingual long documents up to the evaluated 8192-token model length"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12002"
+      ],
+      "referenceIds": [
+        "REFERENCE-12002"
+      ],
+      "rationale": "The claim binds the measured gains to the BGE-M3 functions, MLDR, and nDCG@10."
+    },
+    {
+      "id": "CLAIM-12003",
+      "statement": "On NarrativeQA, BGE-M3 Dense+Sparse retrieval reached nDCG@10 of 60.1, compared with 48.7 for Dense and 57.5 for Sparse; integrating all three BGE-M3 functions reached 61.7.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "NarrativeQA"
+        },
+        {
+          "name": "metric",
+          "value": "nDCG@10"
+        },
+        {
+          "name": "modelFamily",
+          "value": "BGE-M3"
+        },
+        {
+          "name": "retrievalFunctions",
+          "value": "Dense, sparse, and multi-vector"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Sum of BGE-M3 Dense and Sparse scores over their candidate union"
+        },
+        {
+          "name": "candidateDepth",
+          "value": "Top 1000 candidates from Dense and top 1000 candidates from Sparse"
+        },
+        {
+          "name": "multiVectorProcedure",
+          "value": "Optional later scoring; Multi-vec reranks the top 200 Dense candidates and is not a third initial candidate path"
+        },
+        {
+          "name": "allFunctionScoreIntegration",
+          "value": "Sum of Dense, Sparse, and Multi-vec scores"
+        },
+        {
+          "name": "paperVersion",
+          "value": "arXiv:2402.03216v1"
+        },
+        {
+          "name": "baseline",
+          "value": "BGE-M3 Dense and Sparse retrieval functions evaluated separately"
+        },
+        {
+          "name": "language",
+          "value": "English"
+        },
+        {
+          "name": "documentCharacteristics",
+          "value": "Long-document retrieval"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12003"
+      ],
+      "referenceIds": [
+        "REFERENCE-12002"
+      ],
+      "rationale": "The second BGE-M3 result preserves a distinct benchmark, metric, language, model, and function combination."
+    },
+    {
+      "id": "CLAIM-12004",
+      "statement": "On DBPE(en), RRF fusion of FTS and SVS increased nDCG@10 to 0.608 from standalone scores of 0.565 for FTS and 0.479 for SVS.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "DBPE(en)"
+        },
+        {
+          "name": "domain",
+          "value": "Wikipedia entity retrieval"
+        },
+        {
+          "name": "metric",
+          "value": "nDCG@10"
+        },
+        {
+          "name": "lexicalRetriever",
+          "value": "Full-Text Search"
+        },
+        {
+          "name": "semanticRetriever",
+          "value": "Sparse Vector Search"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion"
+        },
+        {
+          "name": "fusionParameter",
+          "value": "RRF smoothing parameter 60"
+        },
+        {
+          "name": "numberOfRetrievalPaths",
+          "value": 2
+        },
+        {
+          "name": "candidateDepth",
+          "value": "10 candidates per path"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12004"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "rationale": "This claim provides a measured complementarity example with both constituent scores and the fused score."
+    },
+    {
+      "id": "CLAIM-12005",
+      "statement": "On TOUC(en), adding a weak DVS path at nDCG@10 0.390 to an FTS path at 0.650 reduced the RRF-fused result to 0.604.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "TOUC(en)"
+        },
+        {
+          "name": "domain",
+          "value": "Argument retrieval"
+        },
+        {
+          "name": "metric",
+          "value": "nDCG@10"
+        },
+        {
+          "name": "lexicalRetriever",
+          "value": "Full-Text Search"
+        },
+        {
+          "name": "semanticRetriever",
+          "value": "Dense Vector Search"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion"
+        },
+        {
+          "name": "fusionParameter",
+          "value": "RRF smoothing parameter 60"
+        },
+        {
+          "name": "pathQuality",
+          "value": "DVS was substantially weaker than FTS on this dataset"
+        },
+        {
+          "name": "candidateDepth",
+          "value": "10 candidates per path"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12005"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "rationale": "The claim keeps measurable degradation separate from successful hybrid combinations and identifies path quality as the evaluated failure mode."
+    },
+    {
+      "id": "CLAIM-12006",
+      "statement": "In the evaluated datasets, DVS outperformed FTS for long descriptive MCCN(zh) queries at nDCG@10 0.543 versus 0.222, while FTS outperformed DVS for short keyword-oriented TOUC(en) queries at 0.650 versus 0.390.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "MCCN(zh) and TOUC(en)"
+        },
+        {
+          "name": "metric",
+          "value": "nDCG@10"
+        },
+        {
+          "name": "queryCharacteristics",
+          "value": "Long descriptive queries in MCCN(zh) and short keyword-oriented queries in TOUC(en)"
+        },
+        {
+          "name": "retrievalPaths",
+          "value": "Dense Vector Search and Full-Text Search"
+        },
+        {
+          "name": "language",
+          "value": "Chinese for MCCN and English for TOUC"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12006"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "rationale": "The claim records query-dependent constituent-path quality without asserting that query length alone determines retrieval performance."
+    },
+    {
+      "id": "CLAIM-12007",
+      "statement": "In the MLDR(en) execution environment, adding RRF retrieval paths increased mean and P99 latency, while the study found that resource use scaled with path count and type and that one resource-intensive path could dominate total cost.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "MLDR(en) for the latency table; CQAD(en) and MLDR(en) for resource analysis"
+        },
+        {
+          "name": "metric",
+          "value": "Mean latency, P99 latency, memory, indexing time, and index size"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion"
+        },
+        {
+          "name": "executionMode",
+          "value": "Parallel retrieval paths followed by final fusion"
+        },
+        {
+          "name": "latencyRange",
+          "value": "RRF mean 0.50-0.65 ms and P99 0.58-0.91 ms versus single-path mean 0.26-0.37 ms and P99 0.45-0.63 ms on MLDR(en)"
+        },
+        {
+          "name": "retrievalPaths",
+          "value": "FTS, SVS, DVS, and resource-intensive TenS"
+        },
+        {
+          "name": "deploymentArchitecture",
+          "value": "Infinity disk-oriented database with concurrently executed operators"
+        },
+        {
+          "name": "candidateDepth",
+          "value": "10 candidates per path"
+        },
+        {
+          "name": "hardware",
+          "value": "Linux server with two Intel Xeon E5-2650 v4 CPUs at 2.20 GHz, 48 logical processors, and 125 GB RAM"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12007"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "rationale": "Operational costs are represented independently from effectiveness and bounded to the evaluated system."
+    },
+    {
+      "id": "CLAIM-12008",
+      "statement": "On T2-RAGBench financial text-and-table retrieval, vanilla BM25 plus text-embedding-3-large Hybrid RRF achieved Recall@5 of 0.695, compared with 0.644 for BM25 and 0.587 for dense retrieval, and exceeded BM25 by 8.1 percentage points on TAT-DQA.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "T2-RAGBench"
+        },
+        {
+          "name": "datasetSubset",
+          "value": "TAT-DQA for the 8.1 percentage-point result"
+        },
+        {
+          "name": "domain",
+          "value": "Financial numerical question answering"
+        },
+        {
+          "name": "documentCharacteristics",
+          "value": "7318 mixed text-and-markdown-table documents, indexed as whole documents"
+        },
+        {
+          "name": "metric",
+          "value": "Recall@5"
+        },
+        {
+          "name": "lexicalRetriever",
+          "value": "BM25"
+        },
+        {
+          "name": "semanticRetriever",
+          "value": "text-embedding-3-large with exact FAISS inner-product search"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion"
+        },
+        {
+          "name": "fusionParameter",
+          "value": "RRF smoothing constant 60"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Vanilla first-stage hybrid retrieval without cross-encoder reranking"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12008"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "rationale": "The claim separates vanilla hybrid retrieval from the paper's later Cohere reranking stage and limits the gain to the financial benchmark."
+    },
+    {
+      "id": "CLAIM-12009",
+      "statement": "In the T2-RAGBench fusion ablation, equal-weight convex combination reached Recall@5 of 0.726, compared with 0.695 for the default RRF configuration.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "T2-RAGBench"
+        },
+        {
+          "name": "domain",
+          "value": "Financial numerical question answering"
+        },
+        {
+          "name": "metric",
+          "value": "Recall@5"
+        },
+        {
+          "name": "retrievalPaths",
+          "value": "BM25 and text-embedding-3-large dense retrieval"
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Equal-weight convex combination versus Reciprocal Rank Fusion"
+        },
+        {
+          "name": "fusionWeighting",
+          "value": "Convex combination dense weight 0.5"
+        },
+        {
+          "name": "fusionParameter",
+          "value": "Default RRF smoothing constant 60"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12009"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "rationale": "The ablation isolates fusion choice and weighting from the constituent retrievers."
+    },
+    {
+      "id": "CLAIM-12010",
+      "statement": "With GPT-4.1-mini and the top five retrieved T2-RAGBench documents, Hybrid RRF achieved end-to-end Number Match of 0.282, compared with 0.251 for BM25 and 0.257 for dense retrieval.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10001",
+        "type": "Entity",
+        "name": "Hybrid Retrieval"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "T2-RAGBench"
+        },
+        {
+          "name": "domain",
+          "value": "Financial numerical question answering"
+        },
+        {
+          "name": "metric",
+          "value": "Number Match"
+        },
+        {
+          "name": "generationModel",
+          "value": "GPT-4.1-mini"
+        },
+        {
+          "name": "numberOfRetrievedContextDocuments",
+          "value": 5
+        },
+        {
+          "name": "fusionMethod",
+          "value": "Reciprocal Rank Fusion of BM25 and text-embedding-3-large retrieval"
+        },
+        {
+          "name": "baseline",
+          "value": "BM25-only and text-embedding-3-large dense-only retrieval with the same generator"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "End-to-end RAG generation without the later cross-encoder reranker"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-12010"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "rationale": "The downstream claim fixes the retriever, generator, top-k, benchmark, and metric so retrieval and generator effects remain distinguishable."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-12001",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "The SIGIR 2009 paper defines RRF with k=60 and reports that its pilot and TREC experiments beat Condorcet, CombMNZ, and the best system by 4 to 5 percent on average; its LETOR 3 meta-learner beat all individual rankings and Condorcet, while CombMNZ edged RRF non-significantly in that final experiment.",
+      "interpretation": "RRF has strong historical evidence as a rank-fusion baseline, but its success should be tested again for each modern sparse-dense candidate set rather than presumed.",
+      "claimIds": [
+        "CLAIM-12001"
+      ],
+      "referenceIds": [
+        "REFERENCE-12001"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12001",
+          "section": "1. Reciprocal Rank Fusion",
+          "page": 1,
+          "locator": "RRF definition and pilot/TREC experiment description"
+        },
+        {
+          "referenceId": "REFERENCE-12001",
+          "section": "1. Reciprocal Rank Fusion",
+          "page": 2,
+          "table": "Tables 2 and 3",
+          "locator": "TREC and LETOR 3 MAP results"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The evidence is limited to historical Wumpus pilot collections, TREC submitted-run fusion, and LETOR 3 learning-to-rank outputs.",
+        "TREC 9 included a human-in-the-loop best run that RRF did not beat; CombMNZ slightly exceeded RRF on LETOR 3 without a significant difference.",
+        "The experiments use MAP and do not evaluate current lexical-plus-embedding RAG pipelines, downstream generation, latency, storage, or indexing cost.",
+        "The reported significance tests do not establish universal improvement for every input ranking set."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12002",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "BGE M3-Embedding arXiv v1 Table 4 reports MLDR average nDCG@10 of 52.5 for Dense, 62.2 for Sparse, 64.8 for Dense+Sparse, and 65.0 when all three scores are summed; Dense+Sparse retrieves top-1000 candidates from each Dense and Sparse path and reranks their union by the sum of the two scores, while Multi-vec is optional later scoring rather than a third initial candidate path.",
+      "interpretation": "Within BGE-M3, the sparse path supplied complementary long-document evidence beyond the dense path, while the incremental average gain from adding multi-vector scoring after Dense+Sparse was smaller.",
+      "claimIds": [
+        "CLAIM-12002"
+      ],
+      "referenceIds": [
+        "REFERENCE-12002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12002",
+          "section": "3.2 Hybrid Retrieval",
+          "locator": "arXiv v1 hybrid process and score-sum integration"
+        },
+        {
+          "referenceId": "REFERENCE-12002",
+          "section": "4.1 Multi-Lingual Retrieval and 4.3 Multilingual Long-Doc Retrieval",
+          "table": "Table 4",
+          "locator": "arXiv v1 top-1000 Dense/Sparse candidate procedure and MLDR test-set nDCG@10 results"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The result is specific to BGE-M3's dense, sparse, and multi-vector functions and its integrated relevance-score implementation.",
+        "MLDR is a multilingual long-document benchmark built from Wikipedia, Wudao, and mC4; scores do not transfer numerically to unrelated corpora, languages, or embedding models.",
+        "The arXiv v1 Dense+Sparse procedure retrieves top-1000 candidates from Dense and top-1000 from Sparse and reranks their union by score sum; different depths or score integration can change the result.",
+        "Multi-vec is used as optional later scoring over the top 200 Dense candidates rather than as a third initial candidate-generation path; the paper does not establish that this procedure is identical to a separate general-purpose reranking technique.",
+        "The paper does not report a statistical-significance test for the differences in Table 4.",
+        "The result measures nDCG@10 retrieval effectiveness, not downstream RAG generation quality, latency, index size, or serving cost.",
+        "Multi-vector retrieval is described as heavy enough to omit from initial candidate retrieval and use during later scoring."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12003",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "BGE M3-Embedding arXiv v1 Table 5 reports NarrativeQA nDCG@10 of 48.7 for Dense, 57.5 for Sparse, 60.1 for Dense+Sparse, and 61.7 when all three scores are summed; Dense+Sparse retrieves top-1000 candidates from each Dense and Sparse path and reranks their union by score sum, while Multi-vec is optional later scoring rather than a third initial candidate path.",
+      "interpretation": "The NarrativeQA result confirms a second measured BGE-M3 context in which function combination improved over either dense or sparse alone, without proving the same ordering for other models or document collections.",
+      "claimIds": [
+        "CLAIM-12003"
+      ],
+      "referenceIds": [
+        "REFERENCE-12002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12002",
+          "section": "3.2 Hybrid Retrieval",
+          "locator": "arXiv v1 hybrid process and score-sum integration"
+        },
+        {
+          "referenceId": "REFERENCE-12002",
+          "section": "4.1 Multi-Lingual Retrieval and 4.3 Multilingual Long-Doc Retrieval",
+          "table": "Table 5",
+          "locator": "arXiv v1 top-1000 Dense/Sparse candidate procedure and NarrativeQA nDCG@10 results"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "NarrativeQA is an English long-document retrieval benchmark and does not represent every language, query form, or corpus.",
+        "The implementation and scores are specific to the BGE-M3 model family and its dense, sparse, and multi-vector functions.",
+        "The arXiv v1 Dense+Sparse procedure retrieves top-1000 candidates from Dense and top-1000 from Sparse and reranks their union by score sum; different depths or score integration can change the result.",
+        "Multi-vec is used as optional later scoring over the top 200 Dense candidates rather than as a third initial candidate-generation path; the paper does not establish that this procedure is identical to a separate general-purpose reranking technique.",
+        "The paper does not report a statistical-significance test for the Table 5 differences.",
+        "The result uses nDCG@10 rather than a downstream RAG-generation metric and does not quantify latency, memory, indexing, or storage costs.",
+        "The multi-vector function has heavier cost and may be reserved for later scoring rather than initial candidate retrieval."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12004",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "With the default candidate depth of 10 per path, the paper's Table 2 and Section 5.1 report a DBPE(en) nDCG@10 increase from 0.565 for FTS and 0.479 for SVS to 0.608 for their RRF combination.",
+      "interpretation": "The measured gain is evidence of complementary paths in this entity-retrieval dataset, not evidence that adding any lexical or semantic path will help.",
+      "claimIds": [
+        "CLAIM-12004"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "5.1 Retrieval Path Selection (RQ1)",
+          "table": "Table 2",
+          "locator": "DBPE(en) FTS, SVS, and FTS+SVS RRF nDCG@10 results"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "4.3.1 Implementation Details",
+          "locator": "Default candidate list size of 10 per retrieval path"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The result is specific to DBPE(en), Wikipedia entity retrieval, the study's FTS and SVS implementations, and RRF with smoothing parameter 60.",
+        "The reported hybrid result uses the default candidate list size of 10 per path; another candidate depth can alter candidate overlap, noise, latency, and nDCG@10.",
+        "The paper's eleven datasets do not cover all RAG corpora, languages, domains, query types, or index implementations.",
+        "The paper does not report a statistical-significance test for this specific DBPE(en) difference.",
+        "nDCG@10 measures retrieval effectiveness rather than downstream RAG generation quality.",
+        "Candidate depth and the evaluated database environment can affect the reproduced result."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12005",
+      "role": "Qualifies",
+      "strength": "Strong",
+      "summary": "With the default candidate depth of 10 per path, Section 5.1 reports that on TOUC(en), RRF fusion of FTS at nDCG@10 0.650 with the weaker DVS path at 0.390 produced 0.604, which the paper identifies as a weakest-link effect caused by irrelevant candidates from a low-quality path.",
+      "interpretation": "Standalone path quality is a gate for fusion: a path that is weak for the current query distribution can contribute high-ranked noise and erase the stronger path's advantage.",
+      "claimIds": [
+        "CLAIM-12005"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "5.1.1 The Weakest Link Effect",
+          "table": "Table 2",
+          "locator": "TOUC(en) FTS, DVS, and FTS+DVS RRF nDCG@10 results"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "6.1.1 The Weakest Link Effect: The Critical Role of Path Quality",
+          "locator": "Discussion of candidate-pool pollution and component validation"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "4.3.1 Implementation Details",
+          "locator": "Default candidate list size of 10 per retrieval path"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The degradation is specific to TOUC(en), its short keyword-oriented argument-retrieval queries, the evaluated FTS and DVS paths, and RRF with smoothing parameter 60.",
+        "The reported degradation uses the default candidate list size of 10 per path; changing depth can change the amount and rank of weak-path noise, although the study reports that increasing depth did not generally resolve the phenomenon.",
+        "A weak path under one dataset or query distribution may not be weak under another; path quality must be measured locally.",
+        "Fusion failure modes differ by method: the paper reports that RRF is sensitive to high ranks from weak paths while TRF can be sensitive to semantically similar hard negatives.",
+        "The paper does not report statistical testing for the specific TOUC(en) degradation.",
+        "The result measures retrieval nDCG@10 and not downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12006",
+      "role": "Qualifies",
+      "strength": "Moderate",
+      "summary": "Section 5.1.2 reports DVS nDCG@10 0.543 versus FTS 0.222 for long descriptive MCCN(zh) queries, but FTS 0.650 versus DVS 0.390 for short keyword-oriented TOUC(en) queries.",
+      "interpretation": "Query characteristics can change which path contributes useful evidence, so aggregate hybrid evaluation should be segmented by query type rather than assuming fixed lexical-semantic complementarity.",
+      "claimIds": [
+        "CLAIM-12006"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "5.1.2 Analysis of Influencing Factors",
+          "locator": "Query-length comparison for MCCN(zh) and TOUC(en)"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "4.1 Datasets",
+          "table": "Table 1",
+          "locator": "Dataset domains, tasks, corpus sizes, query counts, and document lengths"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The comparison spans different datasets, languages, domains, and tasks, so query length is correlated with rather than isolated from those factors.",
+        "The result covers the paper's FTS and DVS implementations and does not prove a deterministic routing rule for all keyword or descriptive queries.",
+        "No statistical-significance test is reported for the two path comparisons.",
+        "Document characteristics, tokenization, candidate depth, embedding model, and index configuration can change path quality.",
+        "The study evaluates retrieval effectiveness rather than downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12007",
+      "role": "Qualifies",
+      "strength": "Strong",
+      "summary": "Using the default candidate depth of 10 per path on a Linux server with two Intel Xeon E5-2650 v4 CPUs, 48 logical processors, and 125 GB RAM, Table 6 reports MLDR(en) RRF mean latency of 0.50 to 0.65 ms and P99 of 0.58 to 0.91 ms for two- and three-path combinations, versus single-path means of 0.26 to 0.37 ms and P99 of 0.45 to 0.63 ms; Section 5.2.2 reports that memory, index construction, and storage scale with path type and count, with TenS able to dominate resource cost.",
+      "interpretation": "Hybrid operating impact is variable: parallel execution still waits for the slowest path, and an otherwise useful path may be unacceptable when its extra index, memory, or construction cost dominates the deployment budget.",
+      "claimIds": [
+        "CLAIM-12007"
+      ],
+      "referenceIds": [
+        "REFERENCE-12003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "5.2.1 Accuracy-Latency Trade-off",
+          "table": "Table 6",
+          "locator": "MLDR(en) mean and P99 latency by path combination and fusion method"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "5.2.2 Resource Overhead",
+          "figure": "Figures 9 and 10",
+          "locator": "Online memory, index construction, and storage analysis"
+        },
+        {
+          "referenceId": "REFERENCE-12003",
+          "section": "4.3 Implementation and Environment",
+          "locator": "Default candidate depth and Linux retrieval hardware"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The absolute latency values depend on the Infinity implementation, disk-oriented indexes, concurrent execution model, default depth of 10 candidates per path, two Intel Xeon E5-2650 v4 CPUs with 48 logical processors, 125 GB RAM, batching, corpus, and query workload.",
+        "Table 6 covers MLDR(en); the resource figures focus on CQAD(en) and MLDR(en), so absolute values do not transfer to other deployments.",
+        "The slowest path, candidate count, number of paths, index type, cache state, and fusion work can all change mean and P99 latency.",
+        "TenS per-token storage and memory behavior is not representative of every dense or sparse path, but it demonstrates how one expensive path can dominate.",
+        "The source separately measures retrieval effectiveness and operational metrics; it does not reduce the trade-off to one universal optimum."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12008",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "T2-RAGBench Table I reports Recall@5 of 0.695 for vanilla BM25 plus text-embedding-3-large Hybrid RRF, 0.644 for BM25, and 0.587 for dense retrieval across 23,088 queries and 7,318 financial text-and-table documents; the subset analysis reports an 8.1 percentage-point gain over BM25 on TAT-DQA.",
+      "interpretation": "The financial benchmark supplies a measured lexical-semantic complementarity case, but the gain should be treated as domain- and representation-specific rather than a baseline mandate for every RAG system.",
+      "claimIds": [
+        "CLAIM-12008"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "III-B Retrieval Methods",
+          "locator": "Hybrid Retrieval (RRF) configuration"
+        },
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "IV-A Main Retrieval Results",
+          "table": "Table I",
+          "locator": "Full T2-RAGBench retrieval metrics"
+        },
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "IV-A Subset-Level Patterns",
+          "figure": "Figure 3",
+          "locator": "TAT-DQA Recall@5 comparison"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The benchmark is limited to financial numerical QA over mixed text and markdown tables drawn from SEC filings and annual reports.",
+        "The result uses BM25, text-embedding-3-large, exact FAISS search, whole-document indexing, RRF smoothing constant 60, and the T2-RAGBench split.",
+        "The 8.1 percentage-point comparison applies only to TAT-DQA; it must not be applied to other subsets or domains.",
+        "Paired bootstrap testing supports the reported retrieval differences, but it does not establish numerical transfer to other corpora, retrievers, chunking policies, or candidate depths.",
+        "Hybrid RRF still missed the gold document in its top five for 31.1 percent of queries, with table-structure mismatch and numerical reasoning prominent in the sampled failure analysis.",
+        "The 0.816 Hybrid-plus-Cohere-reranker Recall@5 is a separate two-stage result and is not evidence for vanilla Hybrid Retrieval alone."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12009",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "The T2-RAGBench fusion ablation reports Recall@5 of 0.726 for convex combination with equal BM25 and dense weighting, versus 0.695 for default RRF with smoothing constant 60; lower RRF constants also changed the result, with the best tested RRF reaching 0.716.",
+      "interpretation": "The same retrieval paths can produce materially different effectiveness after fusion, so method, normalization, weights, and parameters are experimental variables rather than implementation details to omit.",
+      "claimIds": [
+        "CLAIM-12009"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "IV-C Ablation Studies - Fusion method",
+          "figure": "Figure 5",
+          "locator": "Convex-combination weight and RRF smoothing-constant ablations"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The ablation is specific to BM25 and text-embedding-3-large on T2-RAGBench financial text-and-table retrieval.",
+        "Equal weighting was best among the tested convex-combination values in this benchmark, not a universal optimum for score fusion.",
+        "Score-based convex combination requires compatible or normalized scores; normalization behavior must be recorded when reproducing the result.",
+        "The result can vary with retriever calibration, candidate depth, query distribution, document representation, and fusion parameter grid.",
+        "Recall@5 is a retrieval metric and does not alone establish a downstream generation gain."
+      ]
+    },
+    {
+      "id": "EVIDENCE-12010",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "T2-RAGBench Table III reports Number Match of 0.282 for Hybrid RRF, 0.251 for BM25, and 0.257 for dense retrieval when GPT-4.1-mini generated answers from the top five retrieved documents.",
+      "interpretation": "In this evaluated RAG pipeline, the hybrid retrieval improvement was accompanied by a bounded downstream gain, while the paper's separate generator comparison shows that generator capability also changes end-to-end quality.",
+      "claimIds": [
+        "CLAIM-12010"
+      ],
+      "referenceIds": [
+        "REFERENCE-12004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "IV-B End-to-End Generation Results",
+          "table": "Table III",
+          "locator": "Number Match by retrieval method and generation model"
+        },
+        {
+          "referenceId": "REFERENCE-12004",
+          "section": "III-C Evaluation Metrics",
+          "locator": "Number Match generation metric"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The result is limited to T2-RAGBench financial numerical QA, GPT-4.1-mini, Number Match, and five retrieved context documents.",
+        "Only one generator value is compared across the three retrieval methods in this claim; other generators or metrics can change the ordering or magnitude.",
+        "The result does not isolate every causal mechanism between retrieval ranking and generation because the full end-to-end pipeline is evaluated.",
+        "The paper's GPT-5.4 comparison shows that a stronger generator also improves Number Match, so retrieval and generator effects must not be conflated.",
+        "Difficult table-structure and numerical-reasoning failures remain despite hybrid retrieval.",
+        "No cross-encoder reranker is part of these three Table III retrieval conditions; later Hybrid-plus-reranker scores are separate pipeline evidence."
+      ]
+    }
+  ],
   "technique": {
     "techniqueFamily": "Hybrid Retrieval",
     "ragStage": [
@@ -63,17 +1133,35 @@
       }
     ],
     "operationalCharacteristics": {
-      "latencyImpact": "Medium",
-      "costImpact": "Medium",
-      "complexityImpact": "Medium",
+      "latencyImpact": "Variable",
+      "costImpact": "Variable",
+      "complexityImpact": "Variable",
       "qualityImpact": "Variable",
-      "scalabilityImpact": "Medium"
+      "scalabilityImpact": "Variable"
     },
     "implementationConsiderations": [
-      "Use a deterministic merge or fusion strategy so retrieval experiments can be compared consistently."
+      "Measure every constituent retriever independently on the target query distribution before fusion; exclude or down-weight paths that are consistently weak.",
+      "Choose rank-based fusion versus score-based fusion deliberately: rank fusion avoids cross-retriever score calibration, while score fusion requires scores to be normalized onto compatible scales.",
+      "Record the fusion method, smoothing constants, score-normalization procedure, path weights, and any query-dependent routing or weighting so results can be reproduced.",
+      "Deduplicate merged candidates with stable document identifiers and preserve deterministic tie handling.",
+      "Choose candidate depth independently for each retrieval path and choose the retained post-fusion depth separately; candidate depth affects both recall and noise.",
+      "Measure the slowest retrieval path as well as fusion overhead because parallel paths still delay completion until the required results arrive; also evaluate sequential execution when the deployment uses it.",
+      "Account for construction time, update cost, storage, memory, and operational ownership of every additional index rather than treating a second path as cost-free.",
+      "Preserve each candidate's per-path rank, raw score, normalized score, and inclusion reason so gains and weakest-link failures can be diagnosed.",
+      "Treat later cross-encoder, multi-vector, or other reranking as a separate stage with separate candidate-depth, effectiveness, latency, and cost measurements.",
+      "Do not assume one fusion method is universally optimal; compare rank-based and score-based alternatives under the target retrievers, domain, and constraints."
     ],
     "evaluationGuidance": [
-      "Compare retrieval recall and candidate quality against each individual retrieval method."
+      "Record each constituent retriever, model and index configuration, and its standalone Recall, MRR, nDCG, or other retrieval metrics before reporting a hybrid gain.",
+      "Record candidate depth per path, merged candidate-pool size, retained post-fusion depth, and the duplicate-handling policy.",
+      "Record the fusion method, all fusion parameters and weights, and score normalization or calibration used by score-based fusion.",
+      "Record dataset, domain, query length or query type, language, and document type and length so complementarity and weakest-link behavior can be segmented rather than hidden in an aggregate.",
+      "Use controlled ablations that compare each path alone, the same paths under alternative fusion methods, and the complete fused system to distinguish path addition from fusion effects.",
+      "When a later reranker is applied, report its input and retained depths and compare both pre-rerank and post-rerank results so hybrid candidate generation is not credited with the reranker's gain.",
+      "When downstream generation is evaluated, record the generator, prompt or generation configuration, number of context documents, and generation metric, and hold them constant across retrieval comparisons.",
+      "Measure end-to-end mean and P99 latency where available, throughput, index-construction time, index size, peak memory, hardware, batching, cache state, and whether paths execute in parallel or sequence.",
+      "Inspect per-path ranks and scores for failed queries to identify weak-path pollution, duplicate effects, score-calibration errors, and relevant documents omitted before fusion.",
+      "Report statistical tests or confidence intervals when available and explicitly disclose their absence for numerical comparisons."
     ]
   }
 }
