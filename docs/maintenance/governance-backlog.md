@@ -49,9 +49,7 @@ Each backlog entry uses this compact format:
 
 - `GB-002` New entity type package validator.
 - `GB-007` Runtime artifact detector.
-- `GB-018` Chunking strategy seed data.
 - `GB-038` `v0.2.0` planning document.
-- `GB-043` Data route side-effect guidance.
 
 ## Backlog Entries
 
