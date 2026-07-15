@@ -456,8 +456,107 @@ def _reference_line(reference: dict[str, Any]) -> str:
     return " | ".join(details)
 
 
-def render_text(brief: dict[str, Any]) -> str:
-    """Render a human-readable decision brief without adding new conclusions."""
+def render_compact_text(brief: dict[str, Any]) -> str:
+    """Render a concise, traceable view of the complete decision brief."""
+    entity = brief["entity"]
+    lines = [
+        f"RKM Decision Brief: {entity['name']}",
+        "=" * (20 + len(str(entity["name"]))),
+        "",
+        "Entity identity and lifecycle state",
+        f"- ID: {entity['id']} | Slug: {entity['slug']} | "
+        f"Type: {_display_value(entity.get('entityType'))}",
+        f"- Status: {_display_value(entity.get('status'))} | "
+        f"Review state: {_display_value(entity.get('reviewState'))}",
+    ]
+    if entity.get("status") == "Draft" or entity.get("reviewState") == "Not Reviewed":
+        lines.append("- Review notice: Draft or Not Reviewed content has not received human review.")
+
+    lines.extend(("", "Summary", str(brief.get("summary") or "No summary is recorded.")))
+
+    lines.extend(("", "Operational characteristics"))
+    operational = brief.get("operationalCharacteristics", {})
+    if operational:
+        lines.extend(f"- {_label(key)}: {_display_value(value)}" for key, value in operational.items())
+    else:
+        lines.append("No operational characteristics are recorded.")
+
+    considerations = brief.get("implementationConsiderations", [])
+    if considerations:
+        lines.extend(("", "Implementation considerations"))
+        lines.extend(f"- {_display_value(item)}" for item in considerations)
+
+    lines.extend(("", "Evidence-backed findings"))
+    claims = brief.get("claims", [])
+    if not claims:
+        lines.append("No source-backed findings are recorded for this entity.")
+    for number, claim in enumerate(claims, start=1):
+        lines.extend(
+            (
+                "",
+                f"{number}. {claim['statement']}",
+                f"   Claim: {claim['id']} | Type: {_display_value(claim.get('claimType'))} | "
+                f"Confidence: {_display_value(claim.get('confidence'))}",
+            )
+        )
+        qualifiers = claim.get("qualifiers", [])
+        if qualifiers:
+            context = "; ".join(
+                f"{qualifier['name']}: {_display_value(qualifier['value'])}"
+                for qualifier in qualifiers
+            )
+            lines.append(f"   Context: {context}")
+        else:
+            lines.append("   Context: No contextual qualifiers are recorded.")
+        if not claim.get("evidence"):
+            lines.append("   Evidence: No embedded evidence is linked to this claim.")
+        for item in claim.get("evidence", []):
+            lines.extend(
+                (
+                    f"   Evidence: {item['id']} | Role: {_display_value(item.get('role'))} | "
+                    f"Strength: {_display_value(item.get('strength'))}",
+                    f"   Source-backed summary: {_display_value(item.get('summary'))}",
+                )
+            )
+            limitations = item.get("limitations", [])
+            if limitations:
+                lines.append(f"   Main limitation: {limitations[0]}")
+                if len(limitations) > 1:
+                    lines.append(f"   Last recorded limitation: {limitations[-1]}")
+                hidden_count = max(0, len(limitations) - 2)
+                if hidden_count:
+                    lines.append(
+                        f"   Additional recorded limitations not shown: {hidden_count}; "
+                        "use --detail full."
+                    )
+            else:
+                lines.append("   Main limitation: No limitation is recorded.")
+        reference_ids = [reference["id"] for reference in claim.get("references", [])]
+        if reference_ids:
+            lines.append(f"   Sources: {', '.join(reference_ids)}")
+        else:
+            lines.append("   Sources: No embedded references are linked to this claim.")
+
+    lines.extend(("", "Sources"))
+    if brief.get("references"):
+        lines.extend(f"- {_reference_line(reference)}" for reference in brief["references"])
+    else:
+        lines.append("No embedded references are recorded for this entity.")
+
+    lines.extend(("", "Evaluation guidance"))
+    if brief.get("evaluationGuidance"):
+        lines.extend(f"- {_display_value(item)}" for item in brief["evaluationGuidance"])
+    else:
+        lines.append("No evaluation guidance is recorded for this entity.")
+
+    if brief.get("warnings"):
+        lines.extend(("", "Warnings"))
+        lines.extend(f"- {_display_value(item)}" for item in brief["warnings"])
+    return "\n".join(lines) + "\n"
+
+
+def render_full_text(brief: dict[str, Any]) -> str:
+    """Render the complete human-readable decision brief."""
     entity = brief["entity"]
     lines = [
         f"RKM Decision Brief: {entity['name']}",
@@ -566,8 +665,24 @@ def render_text(brief: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_text(brief: dict[str, Any], detail: str = "compact") -> str:
+    """Render the requested text detail without changing the decision model."""
+    if detail == "compact":
+        return render_compact_text(brief)
+    if detail == "full":
+        return render_full_text(brief)
+    raise ValueError(f"Unsupported text detail mode: {detail}")
+
+
 def render_json(brief: dict[str, Any]) -> str:
     return json.dumps(brief, ensure_ascii=False, indent=2) + "\n"
+
+
+def render_output(brief: dict[str, Any], output_format: str, detail: str) -> str:
+    """Render JSON unchanged or select the requested text presentation."""
+    if output_format == "json":
+        return render_json(brief)
+    return render_text(brief, detail)
 
 
 def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: str = "Example") -> dict[str, Any]:
@@ -590,7 +705,16 @@ def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: st
                 "sourcePriority": "Primary",
                 "publishedAt": "2026-01-01",
                 "canonicalUrl": "https://example.invalid/source",
-            }
+            },
+            {
+                "id": "REFERENCE-2",
+                "title": "Unlinked fixture source",
+                "authors": [{"name": "Second Author"}],
+                "sourceType": "Documentation",
+                "sourcePriority": "Secondary",
+                "publishedAt": "2026-02-01",
+                "canonicalUrl": "https://example.invalid/unlinked",
+            },
         ],
         "claims": [
             {
@@ -598,7 +722,10 @@ def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: st
                 "statement": "Fixture finding.",
                 "claimType": "Factual",
                 "subject": {"id": entity_id, "type": "Entity"},
-                "qualifiers": [{"name": "dataset", "value": "Fixture data"}],
+                "qualifiers": [
+                    {"name": "dataset", "value": "Fixture data"},
+                    {"name": "metric", "value": "Fixture metric"},
+                ],
                 "confidence": "High",
                 "status": "Draft",
                 "evidenceIds": ["EVIDENCE-1"],
@@ -617,7 +744,11 @@ def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: st
                 "claimIds": ["CLAIM-1"],
                 "referenceIds": ["REFERENCE-1"],
                 "sourceFragments": [{"referenceId": "REFERENCE-1", "locator": "Section 1"}],
-                "limitations": ["Fixture limitation."],
+                "limitations": [
+                    "Fixture limitation.",
+                    "Hidden fixture limitation.",
+                    "Last fixture limitation.",
+                ],
             }
         ],
         "technique": {
@@ -673,9 +804,59 @@ def run_self_test() -> None:
         assert brief["entity"]["id"] == "ENTITY-1"
         assert brief["claims"][0]["evidence"][0]["id"] == "EVIDENCE-1"
         assert brief["claims"][0]["references"][0]["id"] == "REFERENCE-1"
-        text_output = render_text(brief)
-        assert "Evidence-backed findings" in text_output and "Fixture limitation" in text_output
-        assert json.loads(render_json(brief))["entity"]["slug"] == "example"
+        default_args = _parse_arguments(["--entity", "example"])
+        compact_args = _parse_arguments(["--entity", "example", "--detail", "compact"])
+        full_args = _parse_arguments(["--entity", "example", "--detail", "full"])
+        assert default_args.detail == "compact"
+        assert compact_args.detail == "compact" and full_args.detail == "full"
+
+        compact_output = render_text(brief)
+        explicit_compact_output = render_text(brief, "compact")
+        full_output = render_text(brief, "full")
+        assert compact_output == explicit_compact_output
+        assert "Evidence-backed findings" in compact_output
+        for claim in brief["claims"]:
+            assert claim["id"] in compact_output
+            assert claim["statement"] in compact_output
+            for qualifier in claim.get("qualifiers", []):
+                assert qualifier["name"] in compact_output
+                assert _display_value(qualifier["value"]) in compact_output
+            for evidence_item in claim.get("evidence", []):
+                assert evidence_item["id"] in compact_output
+                assert evidence_item["role"] in compact_output
+                assert evidence_item["strength"] in compact_output
+                assert evidence_item["limitations"][0] in compact_output
+                assert evidence_item["limitations"][-1] in compact_output
+                assert (
+                    "Additional recorded limitations not shown: 1; use --detail full."
+                    in compact_output
+                )
+            for reference in claim.get("references", []):
+                assert reference["id"] in compact_output
+        for reference in brief["references"]:
+            assert reference["id"] in compact_output
+            assert compact_output.count(_reference_line(reference)) == 1
+        for source_detail in (
+            "Fixture source",
+            "Fixture Author",
+            "2026-01-01",
+            "Primary/Paper",
+            "https://example.invalid/source",
+        ):
+            assert compact_output.count(source_detail) == 1
+        assert compact_output.index("Fixture source") > compact_output.index("\nSources\n")
+        assert "Fixture limitation." in full_output
+        assert "Hidden fixture limitation." in full_output
+        assert "Last fixture limitation." in full_output
+        assert "Section 1" in full_output
+        assert "Fixture interpretation." in full_output
+
+        compact_json = render_output(brief, "json", "compact")
+        full_json = render_output(brief, "json", "full")
+        assert compact_json == full_json == render_json(brief)
+        assert json.loads(compact_json) == json.loads(full_json) == brief
+        assert json.loads(render_output(brief, "json", compact_args.detail))["entity"]["slug"] == "example"
+        assert json.loads(render_output(brief, "json", full_args.detail))["entity"]["slug"] == "example"
 
         broken = copy.deepcopy(record)
         broken["claims"][0]["evidenceIds"] = ["EVIDENCE-MISSING"]
@@ -707,7 +888,8 @@ def run_self_test() -> None:
         empty["claims"] = []
         empty["evidence"] = []
         empty_brief = build_decision_brief(empty, source)
-        assert "No embedded claims" in render_text(empty_brief)
+        assert "No source-backed findings are recorded" in render_text(empty_brief, "compact")
+        assert "No embedded claims" in render_text(empty_brief, "full")
         assert empty_brief["claims"] == [] and empty_brief["references"] == []
 
         try:
@@ -726,7 +908,7 @@ def run_self_test() -> None:
             raise AssertionError("Ambiguous entity lookup unexpectedly succeeded")
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def _create_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--entity", help="Exact entity ID, slug, display name, or official name.")
     parser.add_argument(
@@ -735,7 +917,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         default="text",
         help="Output format (default: text).",
     )
+    parser.add_argument(
+        "--detail",
+        choices=("compact", "full"),
+        default="compact",
+        help="Text detail level (default: compact; JSON is always complete).",
+    )
     parser.add_argument("--self-test", action="store_true", help="Run built-in offline self-tests.")
+    return parser
+
+
+def _parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    return _create_argument_parser().parse_args(argv)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = _create_argument_parser()
     args = parser.parse_args(argv)
 
     try:
@@ -747,7 +944,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--entity is required unless --self-test is used")
         source, record = resolve_entity(args.entity, discover_entities())
         brief = build_decision_brief(record, source)
-        output = render_json(brief) if args.format == "json" else render_text(brief)
+        output = render_output(brief, args.format, args.detail)
         sys.stdout.write(output)
         return 0
     except DecisionQueryError as exc:
