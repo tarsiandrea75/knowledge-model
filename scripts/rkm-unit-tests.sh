@@ -88,6 +88,9 @@ printf '==> Running rkm-release-check self-test\n'
 printf '==> Running rkm-route-task self-test\n'
 "$PYTHON_BIN" scripts/rkm-route-task.py --self-test
 
+printf '==> Running rkm-decision-query self-test\n'
+"$PYTHON_BIN" scripts/rkm-decision-query.py --self-test
+
 printf '==> Running Creator prompt semantic duplication guardrail self-test\n'
 creator_prompt_scripts=(scripts/rkm-cycle.sh scripts/rkm-discover.sh)
 creator_prompt_guardrails=(
