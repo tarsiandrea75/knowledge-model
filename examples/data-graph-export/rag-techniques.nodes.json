@@ -345,7 +345,7 @@
       "schema": "schema/rag-technique.schema.json",
       "slug": "reranking",
       "status": "Draft",
-      "summary": "Reranking reorders retrieved candidates before context assembly so the RAG pipeline can prioritize more relevant context.",
+      "summary": "Reranking applies a second scoring step to reorder retrieved candidates before context assembly.",
       "techniqueFamily": "Reranking",
       "version": "1.0.0",
       "visibility": "Public"

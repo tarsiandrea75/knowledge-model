@@ -24,7 +24,7 @@
     "status": "Draft",
     "reviewState": "Not Reviewed",
     "createdAt": "2026-07-13T00:00:00Z",
-    "updatedAt": "2026-07-13T00:00:00Z",
+    "updatedAt": "2026-07-15T00:00:00Z",
     "createdBy": [
       {
         "type": "Automation",
@@ -36,11 +36,693 @@
     "language": "en"
   },
   "description": {
-    "summary": "Reranking reorders retrieved candidates before context assembly so the RAG pipeline can prioritize more relevant context.",
-    "description": "Reranking is a RAG technique that takes an initial set of retrieved candidates and applies a second ranking step before the final context is assembled for generation.",
+    "summary": "Reranking applies a second scoring step to reorder retrieved candidates before context assembly.",
+    "description": "Reranking is a RAG technique that rescores an initial candidate set before context assembly. Its effectiveness and operational impact depend on the first-stage retriever, evaluation domain, reranker model, candidate depth, hardware, deployment, and inference strategy.",
     "problemStatement": "Initial retrieval may return a broad candidate set whose top order is not aligned with the final generation need.",
     "coreIdea": "Score retrieved candidates with an additional ranking method and pass the reordered subset to context assembly."
   },
+  "references": [
+    {
+      "id": "REFERENCE-11001",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "Passage Re-ranking with BERT",
+      "authors": [
+        {
+          "name": "Rodrigo Nogueira"
+        },
+        {
+          "name": "Kyunghyun Cho"
+        }
+      ],
+      "publishedAt": "2019-01-13",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/1901.04085",
+      "canonicalUrl": "https://arxiv.org/abs/1901.04085",
+      "arxivId": "1901.04085",
+      "citation": "Nogueira, R.; Cho, K. Passage Re-ranking with BERT. arXiv:1901.04085.",
+      "notes": [
+        "The abstract reports the bounded MS MARCO passage retrieval result represented in this record."
+      ]
+    },
+    {
+      "id": "REFERENCE-11002",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models",
+      "authors": [
+        {
+          "name": "Nandan Thakur"
+        },
+        {
+          "name": "Nils Reimers"
+        },
+        {
+          "name": "Andreas Rücklé"
+        },
+        {
+          "name": "Abhishek Srivastava"
+        },
+        {
+          "name": "Iryna Gurevych"
+        }
+      ],
+      "publishedAt": "2021-04-17",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2104.08663",
+      "canonicalUrl": "https://arxiv.org/abs/2104.08663",
+      "arxivId": "2104.08663",
+      "citation": "Thakur, N.; Reimers, N.; Rücklé, A.; Srivastava, A.; Gurevych, I. BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models. arXiv:2104.08663.",
+      "notes": [
+        "The reported evaluation covers ten retrieval systems over eighteen heterogeneous datasets."
+      ]
+    },
+    {
+      "id": "REFERENCE-11003",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "In Defense of Cross-Encoders for Zero-Shot Retrieval",
+      "authors": [
+        {
+          "name": "Guilherme Rosa"
+        },
+        {
+          "name": "Luiz Bonifacio"
+        },
+        {
+          "name": "Vitor Jeronymo"
+        },
+        {
+          "name": "Hugo Abonizio"
+        },
+        {
+          "name": "Marzieh Fadaee"
+        },
+        {
+          "name": "Roberto Lotufo"
+        },
+        {
+          "name": "Rodrigo Nogueira"
+        }
+      ],
+      "publishedAt": "2022-12-12",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2212.06121",
+      "canonicalUrl": "https://arxiv.org/abs/2212.06121",
+      "arxivId": "2212.06121",
+      "citation": "Rosa, G.; Bonifacio, L.; Jeronymo, V.; Abonizio, H.; Fadaee, M.; Lotufo, R.; Nogueira, R. In Defense of Cross-Encoders for Zero-Shot Retrieval. arXiv:2212.06121."
+    },
+    {
+      "id": "REFERENCE-11004",
+      "sourceType": "Paper",
+      "sourcePriority": "Primary",
+      "title": "A Thorough Comparison of Cross-Encoders and LLMs for Reranking SPLADE",
+      "authors": [
+        {
+          "name": "Hervé Déjean"
+        },
+        {
+          "name": "Stéphane Clinchant"
+        },
+        {
+          "name": "Thibault Formal"
+        }
+      ],
+      "publishedAt": "2024-03-15",
+      "accessedAt": "2026-07-15",
+      "url": "https://arxiv.org/abs/2403.10407",
+      "canonicalUrl": "https://arxiv.org/abs/2403.10407",
+      "arxivId": "2403.10407",
+      "citation": "Déjean, H.; Clinchant, S.; Formal, T. A Thorough Comparison of Cross-Encoders and LLMs for Reranking SPLADE. arXiv:2403.10407."
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-11001",
+      "statement": "The evaluated BERT reranking system outperformed the previous state of the art on the MS MARCO passage retrieval task by 27 percent relative in MRR@10.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "MS MARCO passage retrieval task"
+        },
+        {
+          "name": "metric",
+          "value": "MRR@10"
+        },
+        {
+          "name": "baseline",
+          "value": "Previous state of the art reported by the paper"
+        },
+        {
+          "name": "modelFamily",
+          "value": "BERT passage reranker"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11001"
+      ],
+      "referenceIds": [
+        "REFERENCE-11001"
+      ],
+      "rationale": "The claim preserves the paper's system, benchmark, metric, historical baseline, and relative-improvement scope."
+    },
+    {
+      "id": "CLAIM-11002",
+      "statement": "Across the BEIR evaluation, reranking and late-interaction systems achieved the best average zero-shot effectiveness among the ten evaluated retrieval systems.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "BEIR benchmark with eighteen heterogeneous datasets"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Zero-shot"
+        },
+        {
+          "name": "domain",
+          "value": "Heterogeneous text retrieval tasks and domains"
+        },
+        {
+          "name": "baseline",
+          "value": "Ten evaluated lexical, sparse, dense, late-interaction, and reranking systems"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11002"
+      ],
+      "referenceIds": [
+        "REFERENCE-11002"
+      ],
+      "rationale": "The claim records the benchmark-level average effectiveness finding without converting it into a universal recommendation."
+    },
+    {
+      "id": "CLAIM-11003",
+      "statement": "The BEIR evaluation reported high computational costs for the evaluated reranking and late-interaction architectures.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "BEIR benchmark with eighteen heterogeneous datasets"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Zero-shot"
+        },
+        {
+          "name": "modelFamily",
+          "value": "Evaluated reranking and late-interaction architectures"
+        },
+        {
+          "name": "costDimension",
+          "value": "Computational cost"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11003"
+      ],
+      "referenceIds": [
+        "REFERENCE-11002"
+      ],
+      "rationale": "Computational cost is represented separately from effectiveness so consumers can assess the tradeoff explicitly."
+    },
+    {
+      "id": "CLAIM-11004",
+      "statement": "In zero-shot BEIR evaluation, monoT5-3B reranking the top 1000 BM25 candidates surpassed the SGPT-5.8B bi-encoder by more than four average nDCG@10 points.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "BEIR datasets evaluated zero-shot, with the average excluding MS MARCO"
+        },
+        {
+          "name": "metric",
+          "value": "Average nDCG@10"
+        },
+        {
+          "name": "baseline",
+          "value": "SGPT-5.8B state-of-the-art bi-encoder"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Zero-shot"
+        },
+        {
+          "name": "modelFamily",
+          "value": "monoT5-3B cross-encoder reranker compared with SGPT-5.8B bi-encoder"
+        },
+        {
+          "name": "firstStageRetriever",
+          "value": "BM25 for monoT5 reranking"
+        },
+        {
+          "name": "numberOfRerankedDocuments",
+          "value": 1000
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11004"
+      ],
+      "referenceIds": [
+        "REFERENCE-11003"
+      ],
+      "rationale": "The claim retains the verified metric, BM25 candidate source, top-1000 depth, named models, magnitude, and zero-shot BEIR context."
+    },
+    {
+      "id": "CLAIM-11005",
+      "statement": "For BM25 top-1000 candidates, scaling monoT5 from 60M through 220M to 3B parameters produced marginal MRR@10 gains on in-domain MS MARCO but larger average nDCG@10 gains on zero-shot BEIR datasets.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "MS MARCO in-domain and BEIR datasets excluding MS MARCO out-of-domain"
+        },
+        {
+          "name": "metric",
+          "value": "MRR@10 for MS MARCO; nDCG@10 for BEIR"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "In-domain MS MARCO versus zero-shot BEIR"
+        },
+        {
+          "name": "domain",
+          "value": "MS MARCO fine-tuning domain and heterogeneous domains not seen during fine-tuning"
+        },
+        {
+          "name": "modelFamily",
+          "value": "monoT5 cross-encoder rerankers with 60M, 220M, and 3B parameters"
+        },
+        {
+          "name": "baseline",
+          "value": "Smaller monoT5-60M and monoT5-220M rerankers"
+        },
+        {
+          "name": "firstStageRetriever",
+          "value": "BM25"
+        },
+        {
+          "name": "numberOfRerankedDocuments",
+          "value": 1000
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11005"
+      ],
+      "referenceIds": [
+        "REFERENCE-11003"
+      ],
+      "rationale": "The claim exposes verified metric, model-size, first-stage, depth, and domain dependence instead of treating scaling as uniformly beneficial."
+    },
+    {
+      "id": "CLAIM-11006",
+      "statement": "Across TREC DL19-DL23 on the MS MARCO passage collection, DeBERTa-v3-large and ELECTRA-large cross-encoders were difficult to distinguish in nDCG@10 when reranking the top 50, 100, or 200 candidates from three evaluated SPLADE-v3 variants.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "TREC Deep Learning 2019-2023 datasets on the MS MARCO passage collection"
+        },
+        {
+          "name": "metric",
+          "value": "nDCG@10"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "In-domain"
+        },
+        {
+          "name": "domain",
+          "value": "MS MARCO passage ranking"
+        },
+        {
+          "name": "firstStageRetriever",
+          "value": "SPLADE-v3, SPLADE-v3-DistilBERT, and SPLADE-v3-Doc"
+        },
+        {
+          "name": "modelFamily",
+          "value": "DeBERTa-v3-large and ELECTRA-large cross-encoder rerankers"
+        },
+        {
+          "name": "numberOfRerankedDocuments",
+          "value": "50, 100, or 200"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11006"
+      ],
+      "referenceIds": [
+        "REFERENCE-11004"
+      ],
+      "rationale": "The claim qualifies the difficult-to-distinguish finding with the verified metric, datasets, retriever variants, reranker models, and evaluated depths."
+    },
+    {
+      "id": "CLAIM-11007",
+      "statement": "Across the evaluated BEIR and LoTTE out-of-domain settings, cross-encoder model choice and reranking the top 50, 100, or 200 SPLADE-v3 candidates affected mean nDCG@10.",
+      "claimType": "Comparative",
+      "subject": {
+        "id": "TECHNIQUE-10003",
+        "type": "Entity",
+        "name": "Reranking"
+      },
+      "qualifiers": [
+        {
+          "name": "dataset",
+          "value": "BEIR, BEIR-12 excluding ArguAna, and LoTTE"
+        },
+        {
+          "name": "metric",
+          "value": "Mean nDCG@10"
+        },
+        {
+          "name": "evaluationMode",
+          "value": "Out-of-domain"
+        },
+        {
+          "name": "domain",
+          "value": "Domains outside the MS MARCO evaluation setting"
+        },
+        {
+          "name": "firstStageRetriever",
+          "value": "SPLADE-v3, SPLADE-v3-DistilBERT, and SPLADE-v3-Doc"
+        },
+        {
+          "name": "numberOfRerankedDocuments",
+          "value": "50, 100, or 200"
+        },
+        {
+          "name": "modelFamily",
+          "value": "DeBERTa-v3-large and ELECTRA-large cross-encoder rerankers"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-11007"
+      ],
+      "referenceIds": [
+        "REFERENCE-11004"
+      ],
+      "rationale": "The claim makes transferability conditional on the verified out-of-domain collections, mean nDCG@10 metric, SPLADE-v3 variants, cross-encoder choice, and top-50/100/200 depths."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-11001",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "The paper reports that its BERT passage reranker exceeded the previous state of the art on MS MARCO passage retrieval by 27 percent relative in MRR@10.",
+      "interpretation": "This is a measured benefit for one historical BERT system and benchmark setup, not an estimate of the gain from reranking in other pipelines.",
+      "claimIds": [
+        "CLAIM-11001"
+      ],
+      "referenceIds": [
+        "REFERENCE-11001"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11001",
+          "section": "Abstract",
+          "locator": "Abstract"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The result is limited to the reported BERT reranker and MS MARCO passage retrieval task.",
+        "The 27 percent value is relative to the paper's historical state-of-the-art baseline and uses MRR@10.",
+        "The abstract does not establish transfer to other first-stage retrievers, candidate depths, model families, hardware, or inference implementations.",
+        "The experiment evaluates passage retrieval rather than downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11002",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "BEIR evaluated ten lexical, sparse, dense, late-interaction, and reranking systems on eighteen heterogeneous datasets and found reranking and late-interaction systems best on average for zero-shot effectiveness.",
+      "interpretation": "The benchmark supports considering reranking when zero-shot retrieval effectiveness across heterogeneous domains is the decision criterion, subject to the evaluated system set and costs.",
+      "claimIds": [
+        "CLAIM-11002"
+      ],
+      "referenceIds": [
+        "REFERENCE-11002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11002",
+          "section": "Abstract",
+          "locator": "Abstract"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The average covers the eighteen BEIR datasets and ten retrieval systems evaluated in the paper, not all domains or current systems.",
+        "An average result can hide dataset-specific regressions and does not provide a universal ranking for every domain.",
+        "Effectiveness depends on the evaluated architecture, first-stage retrieval setup, and candidate depth.",
+        "The benchmark evaluates retrieval effectiveness rather than downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11003",
+      "role": "Qualifies",
+      "strength": "Moderate",
+      "summary": "The BEIR abstract characterizes the evaluated reranking and late-interaction systems as achieving strong average zero-shot effectiveness at high computational cost.",
+      "interpretation": "Effectiveness and computational expense must be evaluated as separate decision dimensions; the source does not justify assigning every reranker a fixed cost level.",
+      "claimIds": [
+        "CLAIM-11003"
+      ],
+      "referenceIds": [
+        "REFERENCE-11002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11002",
+          "section": "Abstract",
+          "locator": "Abstract"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The high-cost characterization applies to the architectures and BEIR evaluation represented by the paper.",
+        "The abstract does not provide a hardware-normalized cost that transfers across deployments.",
+        "Actual compute, latency, and monetary cost depend on model family, candidate count, rerank depth, hardware, batching, implementation, and inference strategy.",
+        "The study reports retrieval evaluation rather than end-to-end RAG generation cost or quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11004",
+      "role": "Benchmarks",
+      "strength": "Strong",
+      "summary": "The paper reports average zero-shot BEIR nDCG@10 of 0.532 for monoT5-3B reranking BM25's top 1000 candidates and 0.490 for SGPT-5.8B, a difference of 0.042 corresponding to the paper's more-than-four-average-points finding.",
+      "interpretation": "The result demonstrates a measurable zero-shot advantage for the evaluated monoT5-3B reranking pipeline over SGPT-5.8B; it does not establish superiority over every first-stage retriever, bi-encoder, or reranker.",
+      "claimIds": [
+        "CLAIM-11004"
+      ],
+      "referenceIds": [
+        "REFERENCE-11003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11003",
+          "section": "3 Experiments",
+          "locator": "3 Experiments"
+        },
+        {
+          "referenceId": "REFERENCE-11003",
+          "section": "4 Results",
+          "locator": "4 Results"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The comparison is between monoT5-3B reranking 1000 BM25 candidates and the SGPT-5.8B bi-encoder, not two otherwise identical pipelines.",
+        "The more-than-four-point result is an average over the zero-shot BEIR datasets excluding MS MARCO and can mask domain-level variation.",
+        "Transfer depends on the BM25 first stage, top-1000 candidate depth, model families, and domains not seen during MS MARCO fine-tuning.",
+        "The result does not directly measure latency, hardware-dependent compute, or downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11005",
+      "role": "Qualifies",
+      "strength": "Strong",
+      "summary": "For BM25 top-1000 reranking, monoT5-60M, monoT5-220M, and monoT5-3B scored 0.356, 0.381, and 0.398 MRR@10 on in-domain MS MARCO, while their average zero-shot BEIR nDCG@10 scores were 0.425, 0.478, and 0.532.",
+      "interpretation": "The larger observed scaling gains on zero-shot BEIR than on in-domain MS MARCO make model size a domain-dependent choice rather than a uniform effectiveness lever.",
+      "claimIds": [
+        "CLAIM-11005"
+      ],
+      "referenceIds": [
+        "REFERENCE-11003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11003",
+          "section": "3 Experiments",
+          "locator": "3 Experiments"
+        },
+        {
+          "referenceId": "REFERENCE-11003",
+          "section": "4 Results",
+          "locator": "4 Results"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The finding is bounded to monoT5 sizes of 60M, 220M, and 3B parameters, MS MARCO fine-tuning, and the evaluated BEIR domains.",
+        "Both in-domain and zero-shot monoT5 results rerank the top 1000 BM25 candidates, so the same scaling pattern is not established for other first-stage retrievers or depths.",
+        "MS MARCO uses MRR@10 while BEIR uses nDCG@10; the comparison concerns within-context scaling trends rather than direct equality of metric values.",
+        "Larger-model costs and latency remain hardware-, implementation-, batching-, and deployment-dependent.",
+        "The tests measure retrieval effectiveness rather than downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11006",
+      "role": "Qualifies",
+      "strength": "Moderate",
+      "summary": "On TREC DL19-DL23, the paper compares DeBERTa-v3-large and ELECTRA-large rerankers over SPLADE-v3, SPLADE-v3-DistilBERT, and SPLADE-v3-Doc at top-50, top-100, and top-200 depths and reports that which reranker is better varies by dataset in nDCG@10.",
+      "interpretation": "The observed lack of a consistent in-domain winner means reranker rankings should not be generalized without recording the first-stage variant, dataset, and rerank depth.",
+      "claimIds": [
+        "CLAIM-11006"
+      ],
+      "referenceIds": [
+        "REFERENCE-11004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.1 An Effective Retriever – SPLADE-v3",
+          "locator": "3.1 An Effective Retriever – SPLADE-v3"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.2 Rerankers Based on Cross-Encoders",
+          "locator": "3.2 Rerankers Based on Cross-Encoders"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.4 Datasets",
+          "locator": "3.4 Datasets"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "4 Results",
+          "locator": "4 Results"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "4.1.2 Comparing Rerankers",
+          "locator": "4.1.2 Comparing Rerankers"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The finding is specific to TREC DL19-DL23, three SPLADE-v3 first-stage variants, and the DeBERTa-v3-large and ELECTRA-large rerankers.",
+        "The paper evaluates top-50, top-100, and top-200 depths and reports no statistical significance tests, so difficult to distinguish does not mean proven equivalence.",
+        "Results can change outside the evaluated nDCG@10 datasets, model families, rerank depths, implementation, and hardware.",
+        "The comparison evaluates retrieval effectiveness rather than downstream RAG generation quality."
+      ]
+    },
+    {
+      "id": "EVIDENCE-11007",
+      "role": "Qualifies",
+      "strength": "Moderate",
+      "summary": "Across BEIR, BEIR-12, and LoTTE, the paper's mean nDCG@10 comparisons show different results for DeBERTa-v3-large versus ELECTRA-large and for top-50, top-100, and top-200 reranking over the three SPLADE-v3 variants.",
+      "interpretation": "Out-of-domain reranker choice must be evaluated jointly with the first-stage SPLADE variant and rerank depth; a result at one depth or on one collection does not establish a depth-independent ordering.",
+      "claimIds": [
+        "CLAIM-11007"
+      ],
+      "referenceIds": [
+        "REFERENCE-11004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.1 An Effective Retriever – SPLADE-v3",
+          "locator": "3.1 An Effective Retriever – SPLADE-v3"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.2 Rerankers Based on Cross-Encoders",
+          "locator": "3.2 Rerankers Based on Cross-Encoders"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "3.4 Datasets",
+          "locator": "3.4 Datasets"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "4 Results",
+          "locator": "4 Results"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "4.2.2 Comparing Rerankers",
+          "locator": "4.2.2 Comparing Rerankers"
+        },
+        {
+          "referenceId": "REFERENCE-11004",
+          "section": "4.2.3 Impact of k",
+          "locator": "4.2.3 Impact of k"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The finding is bounded to three SPLADE-v3 variants, two cross-encoder model families, top-50/100/200 depths, and the evaluated BEIR and LoTTE collections.",
+        "ArguAna behaved anomalously, so the paper reports both BEIR and BEIR-12 without ArguAna; neither aggregate establishes one optimum across all domains.",
+        "Latency, compute, and cost depend on candidate count, model family, implementation, batching, hardware, deployment, and inference strategy.",
+        "The evaluation measures retrieval effectiveness rather than downstream RAG generation quality."
+      ]
+    }
+  ],
   "technique": {
     "techniqueFamily": "Reranking",
     "ragStage": [
@@ -63,17 +745,24 @@
       }
     ],
     "operationalCharacteristics": {
-      "latencyImpact": "Medium",
-      "costImpact": "Medium",
+      "latencyImpact": "Variable",
+      "costImpact": "Variable",
       "complexityImpact": "Medium",
       "qualityImpact": "Variable",
       "scalabilityImpact": "Variable"
     },
     "implementationConsiderations": [
-      "Limit the candidate set passed to the reranking step to keep latency and cost bounded."
+      "Choose the candidate pool and rerank depth together because scoring more candidates can change effectiveness, latency, and compute use.",
+      "Evaluate model family, model size, batching, hardware, deployment, and inference strategy before assigning an operational impact.",
+      "Preserve first-stage retrieval scores and reranker scores when possible so changes in candidate recall can be distinguished from changes in ordering."
     ],
     "evaluationGuidance": [
-      "Evaluate whether reranking improves the quality of the final selected context compared with the initial retrieval order."
+      "Record the first-stage retriever, its candidate pool size, and the number of candidates passed to and retained after reranking.",
+      "Record the reranker model family and model size, including inference and deployment choices that affect comparisons.",
+      "Compare against a named baseline on a specified dataset and domain using the same effectiveness metric and candidate pool.",
+      "Report in-domain and out-of-domain results separately rather than relying only on an average across domains.",
+      "Measure end-to-end latency and compute or resource use alongside retrieval effectiveness, with hardware and batching context.",
+      "When the consumer is a RAG pipeline, evaluate selected-context and downstream generation outcomes separately from retrieval ranking metrics."
     ]
   }
 }
