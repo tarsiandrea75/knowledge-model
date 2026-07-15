@@ -8,6 +8,8 @@ EXPECTED_BRANCH="experiment/codex-director"
 EXPECTED_UPSTREAM="origin/experiment/codex-director"
 PROMPT_FILE="docs/maintenance/rkm-director-prompt.md"
 RUN_ROOT="/tmp/rkm-runs"
+INSTRUCTION_FILE=""
+EFFECTIVE_PROMPT_FILE=""
 
 HARD_TIMEOUT_SECONDS="${RKM_DIRECTOR_TIMEOUT_SECONDS:-7200}"
 HEARTBEAT_SECONDS="${RKM_DIRECTOR_HEARTBEAT_SECONDS:-30}"
@@ -40,6 +42,7 @@ usage() {
   cat >&2 <<'USAGE_EOF'
 Usage:
   bash scripts/rkm-director.sh
+  bash scripts/rkm-director.sh --instruction-file <path>
   bash scripts/rkm-director.sh --self-test
   bash scripts/rkm-director.sh --help
 
@@ -344,6 +347,12 @@ run_self_test() {
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
+    --instruction-file)
+      [[ "$#" -ge 2 ]]         || fail "--instruction-file requires a path."
+      [[ -z "$INSTRUCTION_FILE" ]]         || fail "--instruction-file may be provided only once."
+      INSTRUCTION_FILE="$2"
+      shift 2
+      ;;
     --self-test)
       SELF_TEST=true
       shift
@@ -376,6 +385,13 @@ if [[ "$SELF_TEST" == true ]]; then
   exit 0
 fi
 
+if [[ -n "$INSTRUCTION_FILE" ]]; then
+  [[ -f "$INSTRUCTION_FILE" ]]     || fail "Instruction file does not exist: $INSTRUCTION_FILE"
+  [[ -r "$INSTRUCTION_FILE" ]]     || fail "Instruction file is not readable: $INSTRUCTION_FILE"
+  [[ -s "$INSTRUCTION_FILE" ]]     || fail "Instruction file is empty: $INSTRUCTION_FILE"
+fi
+
+require_command cat
 require_command codex
 require_command date
 require_command git
@@ -417,6 +433,27 @@ progress "Final report: $FINAL_REPORT"
   printf 'finalReport=%s\n' "$FINAL_REPORT"
 } > "$STATUS_FILE"
 
+EFFECTIVE_PROMPT_FILE="$PROMPT_FILE"
+
+if [[ -n "$INSTRUCTION_FILE" ]]; then
+  EFFECTIVE_PROMPT_FILE="${FINAL_REPORT%-final.txt}-prompt.md"
+
+  {
+    cat "$PROMPT_FILE"
+    printf '\n\n---\n\n# Session Instruction\n\n'
+    cat "$INSTRUCTION_FILE"
+    printf '%s\n' \
+      "" \
+      "The session instruction above is mandatory." \
+      "Do not select, advance, or perform any alternative task." \
+      "If the assigned task cannot be completed safely within its authorized" \
+      "scope, stop and report the exact blocker without modifying other paths."
+  } > "$EFFECTIVE_PROMPT_FILE"
+
+  progress "Session instruction: $INSTRUCTION_FILE"
+  progress "Effective prompt: $EFFECTIVE_PROMPT_FILE"
+fi
+
 timeout \
   --signal=INT \
   --kill-after=60s \
@@ -428,7 +465,7 @@ timeout \
     --sandbox workspace-write \
     --output-last-message "$FINAL_REPORT" \
     - \
-  < "$PROMPT_FILE" \
+  < "$EFFECTIVE_PROMPT_FILE" \
   > "$LOG_FILE" 2>&1 &
 
 WATCHDOG_PID="$!"
