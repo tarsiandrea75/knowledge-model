@@ -6,7 +6,7 @@ RAG Knowledge Model is currently around **3.5 / 5** overall maturity.
 
 It is no longer an exploratory prototype. The repository has a coherent conceptual model, a broad schema foundation, validation discipline, automation, recovery tooling, registry checks, and an operational workflow. It should be treated as a strong foundation and production-oriented repository system.
 
-It is not yet a finished consumable product. The first minimal fixture-derived graph export now exists and is checked during validation, and the first small populated dataset now exists under `data/`. Post-alpha work on `main` also includes a deterministic data graph export for the validated seed dataset, declared relationship sets among seed techniques, declared technique-component relationships, and declared specialization relationships from Retriever and Reranker seed records to Component records. Graph and export readiness has improved because exported graph node and edge files now have JSON Schema validation plus duplicate ID and edge endpoint integrity checks. Populated content and graph usefulness improved because the seed graph now includes Component, Retriever, and Reranker nodes, conservative declared domain edges, support metadata, and provenance. Relationship and data integrity also improved modestly because relationship-set validation now checks registered predicates, source and target data record existence, declared source and target data files, duplicate relationship IDs, and duplicate semantic triples. Relationship quality and traceability improved modestly because declared relationship edges can now be connected to conservative maintainer-analysis claims, evidence, and references. Automation maturity improved through documented unattended-run and recovery guardrails for clean worktrees, runtime-log location, failed newly added files, schema-contract duplication, bounded autopilot rounds, distributed agent rule routing through root rules, local rule files, and task-specific maintenance guides, automated validation for that routing model, and duplicate schema contract validation for same-name first-class schemas and reusable definitions. Governance visibility also improved through the rule coverage report and a maintained governance backlog, but documentation, visibility, and one additional schema governance validator do not by themselves make RKM a level 4 consumable system. The first internal alpha release documentation for `v0.1.0-alpha` exists, which improves release readiness slightly by making scope, commands, limitations, and consumer expectations explicit. The populated knowledge base is still thin. The repository still needs broader dataset coverage, richer release packaging, and clearer downstream usage guidance before it can be adopted easily by people outside the immediate project.
+It is not yet a finished consumable product. RKM has validated fixtures, a small populated dataset, deterministic fixture and data graph exports, formal graph node and edge schemas, an internal alpha tag and release notes, and a consumer guide. The scorecard below separates those capabilities because they are not equally mature: validation and automation are comparatively strong, while populated data remains narrow, seed relationship evidence is mostly weak internal maintainer analysis, graph export compatibility remains alpha/internal, release packaging is limited, and loader-specific consumer guidance is still missing. These gaps keep the overall assessment below level 4.
 
 `make validate` now checks schema validity, schema prerequisites, schema contracts, duplicate schema contracts, fixture instance validity, data instance validity, relationship-set semantics, fixture graph export consistency, data graph export consistency, graph export schema validity, graph endpoint integrity, documentation relationship rules, and distributed agent rule routing.
 
@@ -20,17 +20,21 @@ The maturity scale used here is:
 - **4 / 5:** Consumable system. External users can understand, load, validate, test, and use releases with limited maintainer help.
 - **5 / 5:** Mature product or platform. Stable releases, rich content, strong compatibility guarantees, documented integrations, and proven downstream consumption.
 
-## Maturity Dimensions
+## Granular Maturity Scorecard
 
-| Dimension | Current Level | Assessment |
-| --- | ---: | --- |
-| Conceptual model | 3.3 / 5 | The domain model, entity model, relationship model, evidence model, metadata model, ontology, and naming conventions provide a coherent conceptual foundation. |
-| Schema coverage | 3.3 / 5 | Many entity and reusable definition schemas exist, with JSON Schema Draft 2020-12 as the contract format. Coverage is broad but still needs richer examples, fixtures, and clearer consumer contracts. |
-| Validation discipline | 4.0 / 5 | Validation covers schemas, schema prerequisites, schema contracts, duplicate schema contracts, registries, fixture instances, data instances, relationship-set semantics, graph export consistency, documentation relationship usage, and distributed agent rule routing. Validation is part of normal operation rather than a late manual step. |
-| Automation | 3.8 / 5 | The repository has cockpit summaries, autopilot, autocycle, safe push, recovery planning, budget guardrails, force mode, budget grace, working target caps, validated commit automation, documented unattended-run and recovery guardrails, distributed rule routing through local agent files and task guides, a rule coverage report and governance backlog for governance visibility, and automated checks that keep the routing model connected. Maturity remains conservative because documented and validated guardrails reduce operational risk but do not make unattended recovery self-sufficient. |
-| Populated data/content | 2.5 / 5 | The model foundation is stronger than the actual populated knowledge base. RKM now has a first seed dataset with validated RAG technique, Component, Retriever, and Reranker records, conservative relationship sets, and conservative relationship support metadata, but still needs broader representative entities, claims, evidence, references, and examples. |
-| Consumability | 3.4 / 5 | Maintainers can work with the repo, and early consumers can inspect validated fixtures, a first seed dataset, a minimal fixture graph export, and a minimal data graph export with Technique, Component, Retriever, and Reranker nodes, provenance, declared relationship edges, and support metadata. Outside consumers still need richer data, loading guidance, release packaging, and expanded export documentation. |
-| Release readiness | 3.0 / 5 | The repository can be validated and operated, and first alpha release documentation now describes scope, validation, limitations, and expected use. It still needs an intentional git tag, stronger compatibility policy, versioned examples, and downstream integration guidance. |
+The dimension scores are diagnostic signals, not values that are mechanically averaged into the overall score. The overall assessment remains a conservative judgment of whether the repository can be consumed with limited maintainer help.
+
+| Dimension | Current Level | Current Signals | Remaining Gap Or Advancement Condition |
+| --- | ---: | --- | --- |
+| Conceptual model | 3.3 / 5 | The domain, entity, relationship, evidence, metadata, ontology, and naming documents form a coherent conceptual foundation under `docs/architecture/`. | Demonstrate the model across broader populated content and integrations while preventing semantic duplication between adjacent concepts. |
+| Schema | 3.3 / 5 | JSON Schema Draft 2020-12 first-class schemas and reusable definitions cover a broad set of RKM concepts, and schema contract and duplicate-contract checks run in normal validation. | Add representative valid instances for more contracts, clarify compatibility expectations, and prove that broad schema coverage maps to real consumer use. |
+| Validation discipline | 4.0 / 5 | `make validate` checks repository hygiene, schemas, registries, fixtures, data, relationship and support semantics, deterministic graph exports, graph integrity, unit tests, documentation relationships, and agent rule routing. | Close demonstrated enforcement gaps such as new-entity package completeness, runtime artifacts, recovery-state blocking, and semantic predicate reuse without weakening current checks. |
+| Data | 2.5 / 5 | `data/manifest.json` declares six RAG techniques, four Components, two Retrievers, one Reranker, three relationship sets, and three relationship support sets, all on the standard validation path. | Expand beyond the small retrieval-oriented seed into representative frameworks, models, datasets, benchmarks, tools, providers, evaluations, and tradeoffs. |
+| Evidence | 2.3 / 5 | The fixture package demonstrates a claim supported by evidence and an official reference, and the three relationship support sets provide linked claims, evidence, references, and relationship IDs. Seed support is deliberately draft, low-confidence, weak maintainer analysis rather than external proof. | Add primary or authoritative external sources, stronger evidence, and supported claims across populated entities and relationships while preserving explicit limitations and provenance. |
+| Graph export | 3.3 / 5 | The fixture and data exporters produce deterministic node and edge arrays; committed outputs are checked for freshness, JSON Schema shape, duplicate IDs, endpoint integrity, provenance, and declared relationship support metadata. | Expand content coverage, export support claims, evidence, and references more completely, define package metadata and version compatibility, and provide tested loader mappings. |
+| Release | 3.0 / 5 | The `v0.1.0-alpha` tag, release notes, changelog, release index, and `make release-check` provide an intentional internal-alpha checkpoint and readiness path. | Produce richer versioned release artifacts, define compatibility and migration expectations, and demonstrate a repeatable downstream evaluation from a clean release package. |
+| Automation | 3.8 / 5 | Cockpit, bounded autopilot and autocycle flows, recovery planning, budget controls, safe push, commit automation, task routing, and distributed governance checks support disciplined operation. | Reduce dependence on operator judgment for recovery and artifact hygiene, and prove reliable unattended operation across repeated failure and recovery scenarios. |
+| Consumer documentation | 3.2 / 5 | `QUICKSTART.md`, `docs/maintenance/consumer-guide.md`, the graph export contract, example READMEs, and release notes explain validation, fixtures, seed data, exports, stability, and current limitations. | Add end-to-end loader examples for graph, document, search, and vector-oriented consumers; keep package scope synchronized; and document versioned compatibility boundaries. |
 
 ## Why RKM Is No Longer Level 2
 
@@ -66,12 +70,12 @@ RKM is not yet level 4 because external consumption is still underdeveloped.
 
 The project needs:
 
-- Complete examples showing valid entities, relationships, claims, evidence, and references.
-- Fixtures that can be used by tests, demos, importers, and downstream consumers.
+- Richer examples showing additional valid entities, relationships, claims, evidence, and references beyond the minimal fixture path.
+- Broader fixtures that can exercise tests, demos, importers, and downstream consumers across more modeling patterns.
 - Dataset breadth beyond the first seed RAG techniques and components.
 - Expansion of the current minimal graph export and first declared data relationships into a broader documented export contract.
-- Release artifacts, release notes, and an intentional git tag when maintainers decide to create one.
-- Consumer documentation for loading, validating, querying, and extending the model.
+- Release artifacts beyond repository documentation and the internal alpha tag, with compatibility and migration expectations.
+- Loader-specific consumer documentation for querying and integrating the model with downstream systems.
 - A clearer separation between model definitions, sample content, and production-ready data.
 - More populated knowledge content across RAG techniques, frameworks, models, datasets, benchmarks, tools, providers, and tradeoffs.
 
@@ -83,11 +87,11 @@ RKM should be considered level 4 only when an external user can evaluate and use
 
 The measurable criteria are:
 
-- Examples and fixtures exist for valid entities, relationships, claims, evidence, and references.
+- Examples and fixtures cover representative entities, relationships, claims, evidence, and references beyond one minimal package.
 - At least one validated dataset exists, with enough representative content to test loading and inspection.
-- A graph export contract exists for nodes, edges, identifiers, labels, predicates, evidence links, references, and provenance.
-- A consumer guide exists and explains validation, loading, inspection, schema location, registry usage, and expected stability.
-- A release tag exists with release notes, scope, validation instructions, and compatibility expectations.
+- The graph export contract covers nodes, edges, identifiers, labels, predicates, evidence links, references, provenance, package metadata, and version compatibility.
+- Consumer documentation explains validation, inspection, schema and registry usage, expected stability, and at least one end-to-end downstream loading path.
+- A versioned release package exists with a tag, release notes, scope, reproducible validation instructions, and actionable compatibility expectations.
 - Validation can be reproduced by a new user from a clean checkout using documented commands.
 - Schema, data, and registry coverage can be inspected through documented commands or reports.
 
@@ -95,7 +99,7 @@ These criteria preserve the distinction between a strong foundation and a consum
 
 ## Recommended Immediate Next Step
 
-Build the first consumable fixture and data package before expanding many more schemas. A small validated package with examples, a dataset, consumer guidance, and an initial export path will make the current foundation easier to evaluate and will expose the next modeling gaps more clearly than broad schema expansion alone.
+Broaden the existing consumable package with externally sourced evidence and one end-to-end loader walkthrough before expanding many more schemas. This will test whether the current data and export contracts work outside repository validation and will expose concrete modeling or compatibility gaps.
 
 ## Key Risks
 
@@ -109,7 +113,7 @@ Some reusable definitions may grow identity, relationships, evidence, or lifecyc
 
 **Limited examples, fixtures, and data breadth**
 
-Without richer representative examples and broader populated data, it is difficult for humans and programs to understand how the schemas should be used beyond the minimal fixture package and the first three seed RAG technique records. This also limits regression testing and makes onboarding slower.
+Without richer representative examples and broader populated data, it is difficult for humans and programs to understand how the schemas should be used beyond the minimal fixture package and the six seed RAG technique records plus their first Component, Retriever, and Reranker records. This also limits regression testing and makes onboarding slower.
 
 **Minimal graph export scope**
 
@@ -127,12 +131,12 @@ The project combines ontology design, JSON Schema, repository automation, valida
 
 1. Broaden the seed dataset with representative claims, evidence, references, and additional entity types.
 2. Expand fixtures so they demonstrate richer valid entity, relationship, claim, evidence, reference, and graph export cases.
-3. Add a consumer quickstart that explains how to validate, load, inspect, and regenerate the minimal export.
-4. Use the `v0.1.0-alpha` internal package documentation to collect feedback, then prepare an intentionally tagged release when the package is ready for that step.
+3. Add a tested consumer walkthrough that loads, queries, and inspects an export in at least one representative downstream system.
+4. Use the tagged `v0.1.0-alpha` internal package to collect feedback, then plan the next versioned release without changing the existing alpha tag.
 5. Expand the graph exports beyond the current minimal fixture-derived and seed-data provenance contracts, including clearer node, edge, identifier, label, predicate, evidence link, reference, and provenance semantics.
 6. Add documentation that explains the difference between architecture, schemas, definitions, registries, examples, fixtures, graph export, and populated knowledge data.
 7. Expand populated content in small validated increments, prioritizing representative coverage over volume.
 
 ## Current Bottom Line
 
-RKM is a validated and automated foundation for a structured RAG knowledge model, with a first minimal graph export generated from fixtures, a first small seed dataset checked by validation, seed Component, Retriever, and Reranker records, semantically checked relationship-set edges, conservative support metadata for those relationships, a post-alpha data graph export generated from that seed dataset, graph export schema and endpoint checks, and first internal alpha release documentation for `v0.1.0-alpha`. Its next maturity step is not proving that populated data can exist. The next gap is dataset breadth, release packaging, graph export expansion beyond the first conservative relationships, and clearer downstream consumption guidance.
+RKM is a validated and automated foundation for a structured RAG knowledge model, with deterministic fixture and seed-data graph exports, six seed RAG techniques plus Component, Retriever, and Reranker records, semantically checked relationship edges, conservative support metadata, graph schema and endpoint checks, consumer documentation, and a tagged internal alpha release. Its next maturity step is not proving that schemas, data, evidence, exports, automation, or release mechanics can exist. The next gaps are breadth, externally grounded evidence, versioned compatibility, richer release packaging, and demonstrated downstream loading.
