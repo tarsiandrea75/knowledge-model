@@ -393,13 +393,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-029`
 - `Title`: Primary versus secondary source policy.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Evidence
-- `Reason`: Source type affects claim confidence and review expectations.
-- `Suggested implementation`: Add documentation and schema or registry support for distinguishing primary, secondary, and maintainer-analysis sources.
-- `Related files`: `schema/reference.schema.json`; `schema/evidence.schema.json`; `docs/maintenance/`; `data/relationship-support/`
-- `Depends on`: Repository maintainer prioritization.
+- `Reason`: Source priority affects source preference and review expectations, while source type separately identifies what the source is, including maintainer analysis.
+- `Suggested implementation`: Implemented in `docs/architecture/reference-model.md` under `Source Priority`, which defines Primary, Secondary, and Tertiary source roles and preference guidance, and in `schema/definitions/reference.schema.json`, which represents that distinction with the `sourcePriority` enum while separately representing `Maintainer Analysis` in the `sourceType` enum. This is documented and structured schema support rather than validator enforcement.
+- `Related files`: `docs/architecture/reference-model.md`; `schema/definitions/reference.schema.json`
+- `Depends on`: Implemented in commits `940baa7 Add docs/architecture/reference-model.md` and `5ed036d Add initial RKM architecture and JSON schemas`.
 
 ### GB-030 Claim Review Workflow
 
