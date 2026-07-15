@@ -45,6 +45,28 @@ When a subagent is interrupted:
 - inspect repository state before continuing;
 - do not assume that interrupted work left the repository unchanged.
 
+## Invalid Worker Result
+
+Treat a Worker result as invalid when the Worker is interrupted, times out,
+reports an execution error, or finishes without the complete required report.
+
+For an invalid Worker result:
+
+1. stop and close the Worker thread and verify that no child agent remains
+   active;
+2. do not spawn the Reviewer;
+3. do not validate, stage, commit, or push the Worker changes;
+4. preserve `git diff --binary HEAD --` and `git status --short` under a unique
+   `/tmp/rkm-director-rejected/<run-id>/` directory;
+5. restore only task-authorized tracked paths to `HEAD`;
+6. preserve and remove only task-authorized untracked paths;
+7. verify that previously accepted commits remain intact and stop with
+   `WORKER_RESULT_INVALID`.
+
+When a child agent cannot be stopped or repository state cannot be restored
+safely, do not perform further repository mutation and stop with
+`ENVIRONMENT_ERROR`.
+
 Before finalization:
 
 - stop every active subagent;
