@@ -381,13 +381,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-028`
 - `Title`: Evidence strength calibration.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Evidence
 - `Reason`: Evidence strength should be applied consistently across claims and relationships.
-- `Suggested implementation`: Define calibration guidance and add review checks for strength labels, claim wording, and evidence type.
-- `Related files`: `schema/evidence.schema.json`; `schema/claim.schema.json`; `data/relationship-support/`; `docs/architecture/`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented in `docs/architecture/evidence-model.md` under `Evidence Strength Calibration`, which calibrates strength against the exact claim, requires the lowest justified strength, lists factors that lower strength, rejects source-authority or reputation inflation, prefers narrowing overbroad claims, and keeps evidence strength distinct from maintainer confidence. This is review guidance rather than schema or validator enforcement.
+- `Related files`: `docs/architecture/evidence-model.md`; `schema/evidence.schema.json`; `schema/claim.schema.json`; `data/relationship-support/`
+- `Depends on`: Implemented in commit `d26e165 Update docs/architecture/evidence-model.md`.
 
 ### GB-029 Primary Versus Secondary Source Policy
 
