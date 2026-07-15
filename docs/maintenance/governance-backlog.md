@@ -527,13 +527,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-040`
 - `Title`: Granular maturity scorecard.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Maturity
 - `Reason`: RKM maturity needs more precise signals than a single overall score.
-- `Suggested implementation`: Add a scorecard that tracks maturity by schema, data, evidence, graph export, release, automation, and consumer documentation.
+- `Suggested implementation`: Implemented in `docs/maintenance/maturity-report.md` with diagnostic scores for conceptual model, schema, validation discipline, data, evidence, graph export, release, automation, and consumer documentation.
 - `Related files`: `docs/maintenance/maturity-report.md`; `docs/maintenance/rule-coverage-report.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in commit `a2c302f Add granular RKM maturity scorecard`.
 
 ### GB-041 Changelog Discipline Validator
 
