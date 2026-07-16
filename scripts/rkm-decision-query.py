@@ -340,29 +340,157 @@ def _resolve_evidence(item: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def _entity_characteristics(record: dict[str, Any]) -> tuple[dict[str, Any], list[Any], list[Any]]:
+def _extend_unique_strings(target: list[str], values: Iterable[str]) -> None:
+    for value in values:
+        if value not in target:
+            target.append(value)
+
+
+def _vector_database_characteristics(
+    record: dict[str, Any], source: Path
+) -> tuple[dict[str, Any], list[str], list[str]]:
+    if "vectorDatabase" not in record:
+        return {}, [], []
+
+    details = _require_object(record["vectorDatabase"], f"vectorDatabase in {source}")
+    operational: dict[str, Any] = {}
+    considerations: list[str] = []
+    warnings: list[str] = []
+
+    operational["databaseType"] = _require_string(
+        details.get("databaseType"), f"vectorDatabase.databaseType in {source}"
+    )
+    operational["deploymentModels"] = copy.deepcopy(
+        _string_list(
+            details.get("deploymentModels"),
+            f"vectorDatabase.deploymentModels in {source}",
+        )
+    )
+    operational["supportedIndexTypes"] = copy.deepcopy(
+        _string_list(
+            details.get("supportedIndexTypes"),
+            f"vectorDatabase.supportedIndexTypes in {source}",
+        )
+    )
+
+    for field in ("distanceMetrics", "supportedModalities"):
+        if field in details:
+            operational[field] = copy.deepcopy(
+                _string_list(details[field], f"vectorDatabase.{field} in {source}")
+            )
+
+    for field in (
+        "metadataFiltering",
+        "hybridSearch",
+        "scalability",
+        "consistency",
+        "integration",
+        "operations",
+    ):
+        if field in details:
+            operational[field] = copy.deepcopy(
+                _require_object(details[field], f"vectorDatabase.{field} in {source}")
+            )
+
+    if "ragUsage" in details:
+        rag_usage = _require_object(
+            details["ragUsage"], f"vectorDatabase.ragUsage in {source}"
+        )
+        operational_rag_usage: dict[str, Any] = {}
+        for field in ("recommendedStages", "retrievalPatterns"):
+            if field in rag_usage:
+                operational_rag_usage[field] = copy.deepcopy(
+                    _string_list(
+                        rag_usage[field],
+                        f"vectorDatabase.ragUsage.{field} in {source}",
+                    )
+                )
+        if operational_rag_usage:
+            operational["ragUsage"] = operational_rag_usage
+
+        for field in ("indexingConsiderations", "retrievalConsiderations"):
+            if field in rag_usage:
+                _extend_unique_strings(
+                    considerations,
+                    _string_list(
+                        rag_usage[field],
+                        f"vectorDatabase.ragUsage.{field} in {source}",
+                    ),
+                )
+
+    if "usageGuidance" in details:
+        _extend_unique_strings(
+            considerations,
+            _string_list(
+                details["usageGuidance"],
+                f"vectorDatabase.usageGuidance in {source}",
+            ),
+        )
+
+    if "limitations" in details:
+        limitations = _string_list(
+            details["limitations"], f"vectorDatabase.limitations in {source}"
+        )
+        _extend_unique_strings(
+            warnings,
+            (f"Vector database limitation: {item}" for item in limitations),
+        )
+
+    return operational, considerations, warnings
+
+
+def _entity_characteristics(
+    record: dict[str, Any], source: Path
+) -> tuple[dict[str, Any], list[Any], list[Any], list[str]]:
     operational: dict[str, Any] = {}
     evaluation: list[Any] = []
     considerations: list[Any] = []
+    warnings: list[str] = []
+
     for value in record.values():
         if not isinstance(value, dict):
             continue
         if "operationalCharacteristics" in value:
             operational = copy.deepcopy(
-                _require_object(value["operationalCharacteristics"], "operational characteristics")
+                _require_object(
+                    value["operationalCharacteristics"],
+                    f"operational characteristics in {source}",
+                )
             )
         if "evaluationGuidance" in value:
-            evaluation = copy.deepcopy(_require_list(value["evaluationGuidance"], "evaluation guidance"))
+            evaluation = copy.deepcopy(
+                _require_list(
+                    value["evaluationGuidance"],
+                    f"evaluation guidance in {source}",
+                )
+            )
             for index, item in enumerate(evaluation):
-                _require_string(item, f"evaluation guidance item {index}")
+                _require_string(
+                    item, f"evaluation guidance item {index} in {source}"
+                )
         if "implementationConsiderations" in value:
             considerations = copy.deepcopy(
-                _require_list(value["implementationConsiderations"], "implementation considerations")
+                _require_list(
+                    value["implementationConsiderations"],
+                    f"implementation considerations in {source}",
+                )
             )
             for index, item in enumerate(considerations):
-                _require_string(item, f"implementation consideration {index}")
-    return operational, evaluation, considerations
+                _require_string(
+                    item, f"implementation consideration {index} in {source}"
+                )
 
+    (
+        vector_operational,
+        vector_considerations,
+        vector_warnings,
+    ) = _vector_database_characteristics(record, source)
+
+    operational = {**vector_operational, **operational}
+    _extend_unique_strings(considerations, vector_considerations)
+    _extend_unique_strings(warnings, vector_warnings)
+
+    return operational, evaluation, considerations, warnings
 
 def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]:
     """Construct the single decision model consumed by both renderers."""
@@ -370,7 +498,9 @@ def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]
     references, claims, evidence = validate_embedded_knowledge(record, source)
     metadata = _require_object(record.get("metadata", {}), f"metadata in {source}")
     description = _require_object(record.get("description", {}), f"description in {source}")
-    operational, evaluation, considerations = _entity_characteristics(record)
+    operational, evaluation, considerations, characteristic_warnings = (
+        _entity_characteristics(record, source)
+    )
 
     resolved_references = [_resolve_reference(item) for item in references.values()]
     resolved_evidence = [_resolve_evidence(item) for item in evidence.values()]
@@ -399,6 +529,7 @@ def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]
     warnings = copy.deepcopy(_require_list(raw_warnings, f"warnings in {source}"))
     for index, warning in enumerate(warnings):
         _require_string(warning, f"warning {index} in {source}")
+    _extend_unique_strings(warnings, characteristic_warnings)
     name = identity["name"].get("display") or identity["name"].get("official")
     return {
         "entity": {
@@ -1371,6 +1502,86 @@ def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: st
     }
 
 
+def _fixture_vector_database_record() -> dict[str, Any]:
+    return {
+        "identity": {
+            "id": "VECTOR-DATABASE-TEST-1",
+            "slug": "fixture-vector-database",
+            "name": {
+                "official": "Fixture Vector Database",
+                "display": "Fixture Vector Database",
+            },
+            "entityType": "VectorDatabase",
+            "status": "Draft",
+        },
+        "metadata": {"reviewState": "Not Reviewed"},
+        "description": {
+            "summary": "Fixture VectorDatabase decision profile."
+        },
+        "warnings": ["Fixture warning."],
+        "vectorDatabase": {
+            "databaseType": "Relational Database With Vector Extension",
+            "deploymentModels": ["Self Hosted", "Managed Cloud"],
+            "supportedIndexTypes": ["HNSW", "IVF Flat"],
+            "distanceMetrics": ["Cosine Similarity", "Dot Product"],
+            "supportedModalities": ["Text", "Code"],
+            "metadataFiltering": {
+                "supported": True,
+                "filterTypes": ["Exact Match", "Range"],
+                "preFilterSupported": True,
+                "postFilterSupported": False,
+            },
+            "hybridSearch": {
+                "supported": True,
+                "methods": ["BM25 Plus Vector"],
+                "scoreNormalizationSupported": True,
+            },
+            "scalability": {
+                "horizontalScaling": "Variable",
+                "verticalScaling": "High",
+                "shardingSupported": False,
+                "replicationSupported": True,
+                "diskBackedIndexingSupported": False,
+            },
+            "consistency": {
+                "consistencyModel": "Strong",
+                "upsertsSupported": True,
+                "deletesSupported": True,
+                "streamingUpdatesSupported": False,
+                "transactionSupport": "Full ACID",
+            },
+            "integration": {
+                "apis": ["SQL"],
+                "sdkLanguages": ["Python", "Java"],
+            },
+            "operations": {
+                "accessControl": "High",
+                "encryption": "High",
+                "backupAndRestore": "High",
+                "observability": "Medium",
+                "multiTenancy": "Variable",
+            },
+            "ragUsage": {
+                "recommendedStages": ["Indexing", "Retrieval"],
+                "retrievalPatterns": [
+                    "Filtered Retrieval",
+                    "Hybrid Retrieval",
+                ],
+                "indexingConsiderations": [
+                    "Tune index parameters for the fixture workload."
+                ],
+                "retrievalConsiderations": [
+                    "Measure recall and latency for fixture queries."
+                ],
+            },
+            "limitations": ["Fixture vector database limitation."],
+            "usageGuidance": [
+                "Use the fixture only for decision-query self-tests."
+            ],
+        },
+    }
+
+
 def _fixture_relationship(
     relationship_id: str, source_id: str, target_id: str, predicate: str
 ) -> dict[str, Any]:
@@ -1532,8 +1743,12 @@ def run_self_test() -> None:
         data.mkdir()
         record = _fixture_record()
         second = _fixture_record("ENTITY-2", "second", "Second Example")
+        vector_database_record = _fixture_vector_database_record()
         (data / "example.json").write_text(json.dumps(record), encoding="utf-8")
         (data / "second.json").write_text(json.dumps(second), encoding="utf-8")
+        (data / "vector-database.json").write_text(
+            json.dumps(vector_database_record), encoding="utf-8"
+        )
         (data / "relationships.json").write_text(
             json.dumps({"relationshipSet": {"id": "SET-1"}}), encoding="utf-8"
         )
@@ -1541,16 +1756,23 @@ def run_self_test() -> None:
             "data": [
                 {"file": "data/example.json", "schema": "schema/example.json"},
                 {"file": "data/second.json", "schema": "schema/example.json"},
+                {
+                    "file": "data/vector-database.json",
+                    "schema": "schema/vector-database.schema.json",
+                },
                 {"file": "data/relationships.json", "schema": "schema/relationships.json"},
             ]
         }
         (data / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 
         entities = discover_entities(root)
-        assert len(entities) == 2
+        assert len(entities) == 3
         assert resolve_entity("ENTITY-1", entities)[1]["identity"]["id"] == "ENTITY-1"
         assert resolve_entity("example", entities)[1]["identity"]["id"] == "ENTITY-1"
         assert resolve_entity("eXaMpLe", entities)[1]["identity"]["id"] == "ENTITY-1"
+        assert resolve_entity("fixture-vector-database", entities)[1]["identity"][
+            "id"
+        ] == "VECTOR-DATABASE-TEST-1"
         source = data / "example.json"
         record["identity"]["name"]["official"] = "Example Official"
         assert resolve_entity("example official", [(source, record)])[1][
@@ -1614,6 +1836,81 @@ def run_self_test() -> None:
         assert json.loads(compact_json) == json.loads(full_json) == brief
         assert json.loads(render_output(brief, "json", compact_args.detail))["entity"]["slug"] == "example"
         assert json.loads(render_output(brief, "json", full_args.detail))["entity"]["slug"] == "example"
+
+        vector_source = data / "vector-database.json"
+        vector_brief = build_decision_brief(
+            vector_database_record, vector_source
+        )
+        assert vector_brief["entity"]["entityType"] == "VectorDatabase"
+        assert vector_brief["operationalCharacteristics"]["databaseType"] == (
+            "Relational Database With Vector Extension"
+        )
+        assert vector_brief["operationalCharacteristics"]["deploymentModels"] == [
+            "Self Hosted",
+            "Managed Cloud",
+        ]
+        assert vector_brief["operationalCharacteristics"]["ragUsage"] == {
+            "recommendedStages": ["Indexing", "Retrieval"],
+            "retrievalPatterns": [
+                "Filtered Retrieval",
+                "Hybrid Retrieval",
+            ],
+        }
+        assert vector_brief["implementationConsiderations"] == [
+            "Tune index parameters for the fixture workload.",
+            "Measure recall and latency for fixture queries.",
+            "Use the fixture only for decision-query self-tests.",
+        ]
+        assert vector_brief["warnings"] == [
+            "Fixture warning.",
+            "Vector database limitation: Fixture vector database limitation.",
+        ]
+        assert vector_brief["evaluationGuidance"] == []
+
+        vector_compact = render_text(vector_brief, "compact")
+        vector_full = render_text(vector_brief, "full")
+        for visible in (
+            "Fixture Vector Database",
+            "VectorDatabase",
+            "Database Type: Relational Database With Vector Extension",
+            "Deployment Models",
+            "Supported Index Types",
+            "Metadata Filtering",
+            "Hybrid Search",
+            "Tune index parameters for the fixture workload.",
+            "Measure recall and latency for fixture queries.",
+            "Use the fixture only for decision-query self-tests.",
+            "Vector database limitation: Fixture vector database limitation.",
+        ):
+            assert visible in vector_compact
+            assert visible in vector_full
+
+        assert json.loads(
+            render_output(vector_brief, "json", "compact")
+        ) == vector_brief
+        assert render_output(
+            vector_brief, "json", "compact"
+        ) == render_output(vector_brief, "json", "full")
+
+        malformed_vector_database = copy.deepcopy(vector_database_record)
+        malformed_vector_database["vectorDatabase"]["deploymentModels"] = (
+            "Self Hosted"
+        )
+        _expect_error(
+            malformed_vector_database,
+            "vectorDatabase.deploymentModels",
+            vector_source,
+        )
+
+        malformed_vector_database = copy.deepcopy(vector_database_record)
+        malformed_vector_database["vectorDatabase"]["limitations"] = (
+            "Malformed limitation"
+        )
+        _expect_error(
+            malformed_vector_database,
+            "vectorDatabase.limitations",
+            vector_source,
+        )
 
         broken = copy.deepcopy(record)
         broken["claims"][0]["evidenceIds"] = ["EVIDENCE-MISSING"]
