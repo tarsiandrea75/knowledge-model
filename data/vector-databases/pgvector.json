@@ -1,0 +1,498 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10001",
+    "slug": "pgvector",
+    "name": {
+      "official": "pgvector",
+      "display": "pgvector",
+      "short": "pgvector"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "vector extension for PostgreSQL"
+    ],
+    "keywords": [
+      "PostgreSQL",
+      "vector similarity search",
+      "HNSW",
+      "IVFFlat",
+      "hybrid retrieval",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "PostgreSQL Extensions",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-16T00:00:00Z",
+    "updatedAt": "2026-07-16T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official pgvector and PostgreSQL documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-16T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "pgvector is an open-source PostgreSQL extension for storing vectors and performing exact or approximate vector similarity search.",
+    "description": "pgvector adds vector data types, distance operators, exact nearest-neighbor search, and HNSW or IVFFlat approximate indexes to PostgreSQL. It can participate in SQL filtering, PostgreSQL full-text hybrid retrieval, transactions, replication, backup, and operational tooling provided by the PostgreSQL ecosystem. This record distinguishes extension-native capabilities from host-database and deployment-dependent behavior."
+  },
+  "vectorDatabase": {
+    "databaseType": "Relational Database With Vector Extension",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "IVF Flat"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Manhattan Distance",
+      "Hamming Distance",
+      "Jaccard Similarity"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Array Contains",
+        "Other"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Reciprocal Rank Fusion",
+        "Other"
+      ]
+    },
+    "scalability": {
+      "horizontalScaling": "Variable",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Strong",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "Full ACID"
+    },
+    "integration": {
+      "apis": [
+        "SQL"
+      ]
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval"
+      ],
+      "indexingConsiderations": [
+        "Use exact search when perfect recall is required; introduce HNSW or IVFFlat only after measuring the acceptable recall-speed tradeoff.",
+        "Create and tune a separate operator-class index for each distance function used by production queries.",
+        "Build approximate indexes after loading representative data, and monitor build memory, build time, and recall."
+      ],
+      "retrievalConsiderations": [
+        "Compare approximate results with exact search and tune hnsw.ef_search, ivfflat.probes, or iterative-scan limits.",
+        "Treat approximate filtering as planner- and configuration-dependent; consider scalar indexes, partial vector indexes, partitioning, or iterative scans.",
+        "Implement hybrid retrieval by combining pgvector results with PostgreSQL full-text search and an explicit fusion or reranking strategy."
+      ]
+    },
+    "limitations": [
+      "HNSW and IVFFlat trade exact recall for query speed and require workload-specific tuning.",
+      "HNSW generally uses more memory and builds more slowly, while IVFFlat requires representative data and list/probe tuning.",
+      "Approximate-index filtering is applied after the vector index scan by default and can return fewer rows without iterative scans or other filtering strategies.",
+      "Horizontal scaling, sharding, managed hosting, replication, security, and backup behavior depend on PostgreSQL and the selected deployment ecosystem rather than pgvector alone.",
+      "Hybrid search composition and score fusion are not a single built-in pgvector operation and require SQL or application logic."
+    ],
+    "usageGuidance": [
+      "Record the installed extension version and PostgreSQL version because supported features and limits evolve.",
+      "Use EXPLAIN with ANALYZE and BUFFERS to inspect query plans and verify that the intended scalar or vector index is used.",
+      "Monitor recall by comparing approximate searches with exact search on representative queries.",
+      "Use transaction-local search parameters when tuning a specific query without changing the session default."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-20001",
+      "title": "pgvector: Open-source vector similarity search for Postgres",
+      "authors": [
+        {
+          "name": "pgvector maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/pgvector/pgvector/blob/v0.8.5/README.md",
+      "repository": "https://github.com/pgvector/pgvector",
+      "version": "0.8.5",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-20002",
+      "title": "pgvector Changelog",
+      "authors": [
+        {
+          "name": "pgvector maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "publishedAt": "2026-07-08",
+      "canonicalUrl": "https://github.com/pgvector/pgvector/blob/v0.8.5/CHANGELOG.md",
+      "repository": "https://github.com/pgvector/pgvector",
+      "version": "0.8.5",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-20003",
+      "title": "PostgreSQL Documentation: Full Text Search",
+      "authors": [
+        {
+          "name": "PostgreSQL Global Development Group"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.postgresql.org/docs/18/textsearch.html",
+      "version": "18",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-20004",
+      "title": "PostgreSQL Documentation: Transaction Isolation",
+      "authors": [
+        {
+          "name": "PostgreSQL Global Development Group"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.postgresql.org/docs/18/transaction-iso.html",
+      "version": "18",
+      "accessedAt": "2026-07-16"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-20001",
+      "statement": "pgvector performs exact nearest-neighbor search by default and supports approximate nearest-neighbor search with HNSW and IVFFlat indexes.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10001",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Official pgvector documentation at version 0.8.5"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-20001"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20002"
+      ],
+      "rationale": "The official project README distinguishes exact search from the HNSW and IVFFlat approximate index types."
+    },
+    {
+      "id": "CLAIM-20002",
+      "statement": "pgvector documents Euclidean, inner-product, cosine, L1, Hamming, and Jaccard distance operations, with index support depending on the vector representation and index method.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10001",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Official pgvector documentation at version 0.8.5"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-20002"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20002"
+      ],
+      "rationale": "The official README lists operators and operator classes for dense, half-precision, sparse, and binary vector types."
+    },
+    {
+      "id": "CLAIM-20003",
+      "statement": "For approximate vector indexes, filtering is applied after the index scan by default; pgvector documents iterative scans, partial indexes, and partitioning as mitigation strategies.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10001",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "queryScope",
+          "value": "Approximate HNSW and IVFFlat retrieval with SQL predicates"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-20003"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001"
+      ],
+      "rationale": "The filtering section of the official README explicitly describes post-scan filtering and documented alternatives."
+    },
+    {
+      "id": "CLAIM-20004",
+      "statement": "pgvector can be combined with PostgreSQL full-text search for hybrid retrieval, with Reciprocal Rank Fusion or a cross-encoder used to combine or rerank result sets.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10001",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "implementationScope",
+          "value": "SQL and application-level hybrid retrieval composition"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-20004"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20003"
+      ],
+      "rationale": "The pgvector README recommends PostgreSQL full-text search and names Reciprocal Rank Fusion and cross-encoder combination."
+    },
+    {
+      "id": "CLAIM-20005",
+      "statement": "Because pgvector is a PostgreSQL extension, vector data operations participate in PostgreSQL transaction semantics; pgvector also documents transaction-local tuning for HNSW and IVFFlat search parameters.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10001",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "hostDependency",
+          "value": "Transaction guarantees are provided by PostgreSQL"
+        }
+      ],
+      "confidence": "Medium",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-20005"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20004"
+      ],
+      "rationale": "PostgreSQL documents transaction isolation while pgvector shows SET LOCAL search tuning inside explicit transactions."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-20001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The official pgvector README states that exact search is the default and lists HNSW and IVFFlat as approximate index types.",
+      "interpretation": "This directly supports modeling pgvector with Flat, HNSW, and IVF Flat retrieval/index approaches.",
+      "claimIds": [
+        "CLAIM-20001"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-20001",
+          "locator": "README sections: Indexing, HNSW, IVFFlat"
+        },
+        {
+          "referenceId": "REFERENCE-20002",
+          "locator": "Changelog section: 0.8.5 (2026-07-08)"
+        }
+      ],
+      "limitations": [
+        "Project documentation is authoritative for capabilities but is not an independent benchmark.",
+        "Approximate-index performance depends on data, hardware, parameters, and PostgreSQL configuration."
+      ]
+    },
+    {
+      "id": "EVIDENCE-20002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The official reference documents L2, inner-product, cosine, L1, Hamming, and Jaccard operations across supported vector types.",
+      "interpretation": "The RKM distance-metric profile can conservatively include the six corresponding schema values.",
+      "claimIds": [
+        "CLAIM-20002"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20002"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-20001",
+          "locator": "README sections: HNSW, IVFFlat, Binary Vectors, Sparse Vectors, Reference"
+        },
+        {
+          "referenceId": "REFERENCE-20002",
+          "locator": "Changelog sections: 0.7.0 through 0.8.5"
+        }
+      ],
+      "limitations": [
+        "Not every distance metric is indexable for every vector type or index method.",
+        "Supported dimensions and operator behavior are version-specific."
+      ]
+    },
+    {
+      "id": "EVIDENCE-20003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The README explains that approximate-index filters are applied after scanning and documents iterative scans, partial indexes, and partitioning.",
+      "interpretation": "pgvector supports filtered retrieval, but its filtering profile must retain planner- and index-dependent limitations.",
+      "claimIds": [
+        "CLAIM-20003"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-20001",
+          "locator": "README sections: Filtering, Iterative Index Scans"
+        }
+      ],
+      "limitations": [
+        "The PostgreSQL planner may choose a table scan, scalar index, or vector index.",
+        "Filtering with approximate indexes can return fewer rows without sufficient scan parameters."
+      ]
+    },
+    {
+      "id": "EVIDENCE-20004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The pgvector README recommends PostgreSQL full-text search for hybrid search and mentions RRF or a cross-encoder; PostgreSQL documents its full-text search subsystem.",
+      "interpretation": "Hybrid retrieval is supported through composition, not through a single pgvector-native end-to-end hybrid operator.",
+      "claimIds": [
+        "CLAIM-20004"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-20001",
+          "locator": "README section: Hybrid Search"
+        },
+        {
+          "referenceId": "REFERENCE-20003",
+          "locator": "PostgreSQL documentation: Chapter 12 Full Text Search"
+        }
+      ],
+      "limitations": [
+        "RRF, score fusion, or cross-encoder reranking must be designed in SQL or application logic.",
+        "The sources do not establish a universal best fusion method."
+      ]
+    },
+    {
+      "id": "EVIDENCE-20005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "Medium",
+      "status": "Draft",
+      "summary": "PostgreSQL documents transaction isolation levels and pgvector shows HNSW and IVFFlat search parameters set locally within a transaction.",
+      "interpretation": "The model can record Full ACID transaction support while clearly attributing those guarantees to the PostgreSQL host.",
+      "claimIds": [
+        "CLAIM-20005"
+      ],
+      "referenceIds": [
+        "REFERENCE-20001",
+        "REFERENCE-20004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-20001",
+          "locator": "README sections: HNSW Query Options, IVFFlat Query Options"
+        },
+        {
+          "referenceId": "REFERENCE-20004",
+          "locator": "PostgreSQL documentation: Transaction Isolation"
+        }
+      ],
+      "limitations": [
+        "Transaction guarantees come from PostgreSQL rather than a separate pgvector transaction layer.",
+        "Read-replica freshness and distributed consistency depend on deployment architecture."
+      ]
+    }
+  ]
+}
