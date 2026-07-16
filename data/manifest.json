@@ -53,6 +53,10 @@
       "schema": "schema/retriever.schema.json"
     },
     {
+      "file": "data/vector-databases/pgvector.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
       "file": "data/relationships/component-specialization-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },
