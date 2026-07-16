@@ -271,6 +271,18 @@
     }
   },
   {
+    "id": "SCHEMA-VECTOR_DATABASE",
+    "type": "Schema",
+    "label": "schema/vector-database.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/vector-database.schema.json",
+      "schemaPath": "schema/vector-database.schema.json",
+      "title": "RKM Vector Database Schema"
+    }
+  },
+  {
     "id": "TECHNIQUE-10001",
     "type": "Technique",
     "label": "Hybrid Retrieval",
@@ -429,6 +441,31 @@
       "status": "Draft",
       "summary": "Semantic Chunking splits source content around meaning-oriented boundaries so chunks can preserve topical coherence.",
       "techniqueFamily": "Chunking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10001",
+    "type": "VectorDatabase",
+    "label": "pgvector",
+    "sourceDataFile": "data/vector-databases/pgvector.json",
+    "properties": {
+      "keywords": [
+        "PostgreSQL",
+        "vector similarity search",
+        "HNSW",
+        "IVFFlat",
+        "hybrid retrieval",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "pgvector",
+      "status": "Draft",
+      "summary": "pgvector is an open-source PostgreSQL extension for storing vectors and performing exact or approximate vector similarity search.",
       "version": "1.0.0",
       "visibility": "Public"
     }
