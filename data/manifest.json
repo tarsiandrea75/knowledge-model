@@ -105,6 +105,10 @@
       "schema": "schema/vector-database.schema.json"
     },
     {
+      "file": "data/vector-databases/azure-ai-search.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
       "file": "data/relationships/component-specialization-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },
