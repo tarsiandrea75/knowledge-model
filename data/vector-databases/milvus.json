@@ -1,0 +1,594 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10004",
+    "slug": "milvus",
+    "name": {
+      "official": "Milvus",
+      "display": "Milvus",
+      "short": "Milvus"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Milvus Vector Database",
+      "Milvus DB"
+    ],
+    "keywords": [
+      "dedicated vector database",
+      "cloud-native",
+      "HNSW",
+      "IVF",
+      "DiskANN",
+      "BM25",
+      "hybrid retrieval",
+      "distributed vector search",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Dedicated Vector Databases",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-16T00:00:00Z",
+    "updatedAt": "2026-07-16T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Milvus repository, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-16T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Milvus is an open-source cloud-native vector database that combines distributed dense and sparse vector retrieval, scalar filtering, BM25 full-text retrieval, and configurable hybrid reranking.",
+    "description": "Milvus separates compute, storage, streaming, and coordination roles to support horizontally scalable vector retrieval. It provides exact, graph-based, inverted-file, quantized, GPU, sparse, and disk-oriented index families; standard and iterative metadata filtering; dense-sparse hybrid retrieval with weighted or reciprocal-rank reranking; configurable consistency levels; resource groups, replicas, and several multi-tenancy strategies. This record distinguishes documented capabilities from workload-, topology-, and deployment-dependent performance."
+  },
+  "vectorDatabase": {
+    "databaseType": "Dedicated Vector Database",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Disk ANN",
+      "Product Quantization",
+      "Scalar Quantization",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Hamming Distance"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Nested Fields",
+        "Array Contains"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "gRPC",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "Variable",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose FLAT, HNSW, IVF, quantized, GPU, sparse, or DiskANN indexes only after measuring recall, latency, build time, memory, storage, and top-k behavior on representative data.",
+        "Use DiskANN when most vector data must remain on SSD and available memory cannot hold an in-memory graph, while accounting for storage latency and IOPS.",
+        "Create scalar indexes for fields used by production filters and assess their ingestion, storage, and compaction costs.",
+        "Plan collection shards, replicas, resource groups, object storage, WAL infrastructure, and query-node capacity before large-scale ingestion."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate dense-only, BM25-only, sparse-only, and hybrid retrieval on the same relevance set before choosing a ranker and its weights.",
+        "Compare standard pre-filtering with iterative filtering when expressions are complex or highly selective.",
+        "Treat each vector field and sparse representation as a separate retrieval channel with explicit metrics, indexes, candidate limits, and evaluation criteria.",
+        "Select strong, bounded, session, or eventual consistency according to data-visibility requirements and acceptable search latency."
+      ]
+    },
+    "limitations": [
+      "Index families have workload-specific tradeoffs among recall, latency, build time, memory, storage, I/O, and operational cost.",
+      "DiskANN and memory-mapped configurations depend on SSD latency, throughput, page-cache behavior, and storage contention.",
+      "Complex scalar expressions can make standard pre-filtering expensive, while iterative filtering can perform additional vector-search work before collecting enough matches.",
+      "Dense-sparse fusion and reranker weights are relevance choices, not universally optimal defaults.",
+      "Bounded, session, and eventual consistency can expose data-visibility lags compared with strong consistency.",
+      "Distributed Milvus requires coordinated operation of metadata, WAL, object storage, compute nodes, compaction, replicas, and resource groups.",
+      "Multi-tenancy isolation and RBAC capabilities differ across database, collection, partition, and partition-key strategies.",
+      "Milvus does not provide general multi-record ACID transactions comparable to a relational database."
+    ],
+    "usageGuidance": [
+      "Record the Milvus server and SDK versions because index, query, filter, text-search, and operational behavior changes across releases.",
+      "Use a representative relevance and load test before changing index families, filter modes, rankers, quantization, mmap, or consistency settings.",
+      "Use resource groups and replicas to isolate query workloads, but coordinate them with external cluster scaling and capacity planning.",
+      "Choose the multi-tenancy level from the required isolation, schema flexibility, tenant count, RBAC scope, and cross-tenant query requirements.",
+      "Test backup and restoration procedures and monitor WAL health, object storage, indexing queues, compaction, shard distribution, query latency, recall, and replica availability."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-23001",
+      "title": "Milvus v2.6.20 Release",
+      "authors": [
+        {
+          "name": "Milvus maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "publishedAt": "2026-07-14",
+      "canonicalUrl": "https://github.com/milvus-io/milvus/releases/tag/v2.6.20",
+      "repository": "https://github.com/milvus-io/milvus",
+      "version": "2.6.20",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23002",
+      "title": "Milvus Architecture Overview",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/architecture_overview.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23003",
+      "title": "Milvus Documentation: Index Explained",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/index-explained.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23004",
+      "title": "Milvus Documentation: DISKANN",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/diskann.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23005",
+      "title": "Milvus Documentation: Filtered Search",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/filtered-search.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23006",
+      "title": "Milvus Documentation: Hybrid Search and BM25",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/hybrid_search_with_milvus.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23007",
+      "title": "Milvus Documentation: Consistency",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/consistency.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23008",
+      "title": "Milvus Documentation: Resource Groups",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/resource_group.md",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-23009",
+      "title": "Milvus Documentation: Multi-tenancy",
+      "authors": [
+        {
+          "name": "Milvus"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://milvus.io/docs/multi_tenancy.md",
+      "accessedAt": "2026-07-16"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-23001",
+      "statement": "Milvus supports exact, HNSW, IVF, quantized, sparse, GPU, and disk-oriented vector index families, including DiskANN for datasets that exceed available RAM.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10004",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Milvus 2.6.20 and official documentation accessed 2026-07-16"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-23001"
+      ],
+      "referenceIds": [
+        "REFERENCE-23001",
+        "REFERENCE-23003",
+        "REFERENCE-23004"
+      ],
+      "rationale": "The official index catalog lists FLAT, IVF, HNSW, quantized, GPU, sparse, and disk-based choices, while the DiskANN documentation describes a disk-resident Vamana graph with in-memory PQ data."
+    },
+    {
+      "id": "CLAIM-23002",
+      "statement": "Milvus supports metadata pre-filtering before ANN search and an iterative filtering mode for complex expressions that would make standard filtering expensive.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10004",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "configurationScope",
+          "value": "Filter efficiency depends on scalar indexes, expression complexity, selectivity, and vector index behavior"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-23002"
+      ],
+      "referenceIds": [
+        "REFERENCE-23005"
+      ],
+      "rationale": "The filtered-search documentation distinguishes standard metadata filtering before ANN from iterative vector retrieval followed by per-candidate filtering."
+    },
+    {
+      "id": "CLAIM-23003",
+      "statement": "Milvus stores dense and sparse vector fields in one collection, provides a built-in BM25 sparse pipeline, and combines retrieval channels with weighted or reciprocal-rank reranking.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10004",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "relevanceScope",
+          "value": "Fusion methods and weights require evaluation on a representative relevance set"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-23003"
+      ],
+      "referenceIds": [
+        "REFERENCE-23006"
+      ],
+      "rationale": "Official hybrid-search examples use dense and sparse fields with BM25, WeightedRanker, and reciprocal-rank fusion."
+    },
+    {
+      "id": "CLAIM-23004",
+      "statement": "Milvus uses a distributed storage-compute architecture with independently scalable worker roles, shared object storage, WAL durability, replicas, and query-node resource groups.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10004",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Distributed self-hosted deployments require external orchestration and coordinated operation of metadata, WAL, object storage, and worker nodes"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-23004"
+      ],
+      "referenceIds": [
+        "REFERENCE-23002",
+        "REFERENCE-23008"
+      ],
+      "rationale": "The architecture documentation describes disaggregated access, coordination, streaming, query, data, and storage layers; resource groups isolate QueryNodes and coordinate collection replicas."
+    },
+    {
+      "id": "CLAIM-23005",
+      "statement": "Milvus offers strong, bounded-staleness, session, and eventual consistency and supports multi-tenancy at database, collection, partition, and partition-key levels.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10004",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "isolationScope",
+          "value": "Isolation, tenant scale, schema flexibility, RBAC, and cross-tenant query behavior differ by multi-tenancy strategy"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-23005"
+      ],
+      "referenceIds": [
+        "REFERENCE-23007",
+        "REFERENCE-23009"
+      ],
+      "rationale": "The consistency documentation defines four selectable data-visibility levels, while the multi-tenancy guide compares four isolation levels and their operational tradeoffs."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-23001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Milvus sources enumerate multiple CPU, GPU, sparse, quantized, graph, inverted-file, exact, and disk-oriented indexes.",
+      "interpretation": "The RKM profile can represent Milvus as a broad index platform with exact, in-memory ANN, compressed, sparse, GPU, and DiskANN options.",
+      "claimIds": [
+        "CLAIM-23001"
+      ],
+      "referenceIds": [
+        "REFERENCE-23001",
+        "REFERENCE-23003",
+        "REFERENCE-23004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-23001",
+          "locator": "Release v2.6.20"
+        },
+        {
+          "referenceId": "REFERENCE-23003",
+          "locator": "Supported vector index table and index selection guidance"
+        },
+        {
+          "referenceId": "REFERENCE-23004",
+          "locator": "DiskANN overview, Vamana graph, product quantization, and disk search process"
+        }
+      ],
+      "limitations": [
+        "Project documentation establishes supported features but is not an independent performance benchmark.",
+        "Index results depend on vectors, dimensions, hardware, data size, filters, top-k, build parameters, and search parameters."
+      ]
+    },
+    {
+      "id": "EVIDENCE-23002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The filtered-search documentation describes standard filtering before ANN and iterative filtering during candidate collection.",
+      "interpretation": "Milvus supports pre-filtered retrieval and an alternative iterative path rather than relying only on post-filtering a fixed result set.",
+      "claimIds": [
+        "CLAIM-23002"
+      ],
+      "referenceIds": [
+        "REFERENCE-23005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-23005",
+          "locator": "Standard filtering and iterative filtering sections"
+        }
+      ],
+      "limitations": [
+        "Scalar indexes add storage, ingestion, and compaction cost.",
+        "Iterative filtering can examine additional candidates and may change latency predictability."
+      ]
+    },
+    {
+      "id": "EVIDENCE-23003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Milvus hybrid-search documentation combines dense and sparse fields, built-in BM25 retrieval, and weighted or RRF reranking.",
+      "interpretation": "The RKM profile can mark built-in sparse lexical retrieval, dense-sparse hybrid search, weighted fusion, and reciprocal-rank fusion.",
+      "claimIds": [
+        "CLAIM-23003"
+      ],
+      "referenceIds": [
+        "REFERENCE-23006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-23006",
+          "locator": "Dense, sparse, and hybrid retrieval example with WeightedRanker and reciprocal-rank fusion"
+        }
+      ],
+      "limitations": [
+        "No ranker or weighting scheme is universally best across relevance objectives.",
+        "Candidate limits and per-channel score distributions can materially affect fused rankings."
+      ]
+    },
+    {
+      "id": "EVIDENCE-23004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Milvus documents disaggregated compute and storage layers, WAL and object-storage persistence, worker specialization, replicas, and QueryNode resource groups.",
+      "interpretation": "The RKM profile can mark high horizontal scaling and workload isolation while retaining the operational complexity of a distributed system.",
+      "claimIds": [
+        "CLAIM-23004"
+      ],
+      "referenceIds": [
+        "REFERENCE-23002",
+        "REFERENCE-23008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-23002",
+          "locator": "Architecture layers, worker roles, object storage, WAL, and search data flow"
+        },
+        {
+          "referenceId": "REFERENCE-23008",
+          "locator": "Resource-group isolation, replicas, QueryNode transfer, and scaling guidance"
+        }
+      ],
+      "limitations": [
+        "Self-hosted deployments require external orchestration and capacity management.",
+        "Scaling, rebalancing, compaction, storage, and replica operations can interact under load."
+      ]
+    },
+    {
+      "id": "EVIDENCE-23005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Milvus documents four consistency levels and four multi-tenancy strategies with different isolation and scalability properties.",
+      "interpretation": "The RKM profile can mark configurable consistency and high multi-tenancy capability without treating all tenant models as equivalent.",
+      "claimIds": [
+        "CLAIM-23005"
+      ],
+      "referenceIds": [
+        "REFERENCE-23007",
+        "REFERENCE-23009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-23007",
+          "locator": "Strong, bounded staleness, session, eventual, and GuaranteeTs sections"
+        },
+        {
+          "referenceId": "REFERENCE-23009",
+          "locator": "Database, collection, partition, and partition-key multi-tenancy comparison"
+        }
+      ],
+      "limitations": [
+        "Weaker consistency levels trade immediate visibility for lower latency or higher availability.",
+        "Partition and partition-key tenant models provide different RBAC and physical-isolation guarantees than database or collection models."
+      ]
+    }
+  ]
+}
