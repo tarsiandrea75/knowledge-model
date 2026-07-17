@@ -1,0 +1,592 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10003",
+    "slug": "weaviate",
+    "name": {
+      "official": "Weaviate",
+      "display": "Weaviate",
+      "short": "Weaviate"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Weaviate Vector Database",
+      "Weaviate Database"
+    ],
+    "keywords": [
+      "dedicated vector database",
+      "HNSW",
+      "HFresh",
+      "BM25F",
+      "hybrid search",
+      "pre-filtering",
+      "multi-tenancy",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Dedicated Vector Databases",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-16T00:00:00Z",
+    "updatedAt": "2026-07-16T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Weaviate repository, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-16T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Weaviate is an open-source dedicated vector database that combines vector similarity search, structured pre-filtering, BM25F keyword retrieval, and configurable hybrid fusion.",
+    "description": "Weaviate stores objects and vectors and supports HNSW, flat, dynamic, and disk-oriented HFresh vector indexes. It combines vector retrieval with inverted-index filtering and BM25F keyword search, provides named and multi-vector retrieval, supports multi-tenancy, sharding, replication, tunable consistency, and several vector quantization methods, and can run self-hosted or through Weaviate Cloud. This record separates documented engine capabilities from workload-, configuration-, and deployment-dependent behavior."
+  },
+  "vectorDatabase": {
+    "databaseType": "Dedicated Vector Database",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Disk ANN",
+      "Product Quantization",
+      "Scalar Quantization",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Manhattan Distance",
+      "Hamming Distance"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Geo Spatial",
+        "Array Contains",
+        "Other"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "gRPC",
+        "GraphQL",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "Variable",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose HNSW for high query throughput, flat for small isolated indexes, dynamic for one-way flat-to-HNSW growth, or HFresh when reducing memory use is more important than peak query throughput.",
+        "Configure inverted and range indexes only for properties used by filtering, BM25F, sorting, or aggregation because each additional index consumes storage and ingestion resources.",
+        "Benchmark rotational, product, scalar, or binary quantization with the actual embeddings because compression changes recall, memory, storage, and rescoring cost.",
+        "Plan shard count, replication factor, tenant count, and replica movement for the expected cluster topology before large-scale ingestion."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate vector-only, BM25F-only, and hybrid retrieval on the same relevance set before selecting alpha and the fusion strategy.",
+        "Use indexed pre-filters and test selective filters with the chosen HNSW, flat, dynamic, or HFresh configuration.",
+        "Treat named and multi-vector spaces as separate retrieval representations with explicit target vectors, metrics, and evaluation criteria.",
+        "Select read and write consistency levels according to the required tradeoff among availability, latency, and replica convergence."
+      ]
+    },
+    "limitations": [
+      "HNSW, flat, dynamic, and HFresh indexes have different tradeoffs among import cost, memory, disk I/O, recall, latency, and query throughput.",
+      "The dynamic index requires asynchronous indexing and performs a one-way transition from flat to HNSW rather than switching back after the object count falls.",
+      "HFresh keeps most vector data on disk and targets memory efficiency rather than maximum HNSW-like query throughput; it also supports only cosine and squared-L2 distance.",
+      "Vector quantization is lossy and requires workload-specific rescoring and recall evaluation.",
+      "Read consistency controls retrieval of identified objects but does not merge search-result UUID lists from every replica.",
+      "Replication, shard movement, backup behavior, encryption, and operational automation depend on the chosen self-hosted or managed deployment.",
+      "Weaviate does not provide general multi-record ACID transactions comparable to a relational database."
+    ],
+    "usageGuidance": [
+      "Record the Weaviate server and client versions because index, replication, module, and query behavior evolves across releases.",
+      "Use a representative relevance and load test before changing index type, filter strategy, fusion, quantization, or consistency settings.",
+      "Use multi-tenancy when tenant isolation and per-tenant lifecycle management are required, while accounting for one shard per tenant.",
+      "Test backup and restoration procedures and replica-repair behavior instead of treating replication as a backup substitute.",
+      "Monitor memory, disk, indexing queues, shard distribution, query latency, recall, and replica consistency in production."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-22001",
+      "title": "Weaviate v1.38.5: LSM store performance improvements, batch vectorization deadlock fixes, and allocation-free reference cache improvements",
+      "authors": [
+        {
+          "name": "Weaviate maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "publishedAt": "2026-07-16",
+      "canonicalUrl": "https://github.com/weaviate/weaviate/releases/tag/v1.38.5",
+      "repository": "https://github.com/weaviate/weaviate",
+      "version": "1.38.5",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22002",
+      "title": "Weaviate: Open-source vector database repository",
+      "authors": [
+        {
+          "name": "Weaviate maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/weaviate/weaviate",
+      "repository": "https://github.com/weaviate/weaviate",
+      "version": "1.38.5",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22003",
+      "title": "Weaviate Documentation: Vector index",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/config-refs/indexing/vector-index",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22004",
+      "title": "Weaviate Documentation: Distance metrics",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/config-refs/distances",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22005",
+      "title": "Weaviate Documentation: Filtering",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/concepts/filtering",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22006",
+      "title": "Weaviate Documentation: Hybrid search",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/search/hybrid",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22007",
+      "title": "Weaviate Documentation: Consistency",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/concepts/replication-architecture/consistency",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22008",
+      "title": "Weaviate Documentation: Multi-tenancy operations",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/manage-collections/multi-tenancy",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-22009",
+      "title": "Weaviate Documentation: Vector quantization",
+      "authors": [
+        {
+          "name": "Weaviate"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.weaviate.io/weaviate/concepts/vector-quantization",
+      "accessedAt": "2026-07-16"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-22001",
+      "statement": "Weaviate supports HNSW, flat, dynamic, and HFresh vector indexes and documents cosine, dot-product, squared-L2, Hamming, and Manhattan distance options, subject to index-specific constraints.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10003",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Weaviate 1.38.5 and official documentation accessed 2026-07-16"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-22001"
+      ],
+      "referenceIds": [
+        "REFERENCE-22001",
+        "REFERENCE-22003",
+        "REFERENCE-22004"
+      ],
+      "rationale": "The official vector-index reference lists four index types, while the distance reference enumerates the supported metrics and notes that HFresh supports only cosine and squared L2."
+    },
+    {
+      "id": "CLAIM-22002",
+      "statement": "Weaviate performs structured pre-filtering by building an inverted-index allow-list before vector search and applying it during vector-index traversal.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10003",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "configurationScope",
+          "value": "Relevant properties must have appropriate inverted or range indexes"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-22002"
+      ],
+      "referenceIds": [
+        "REFERENCE-22005"
+      ],
+      "rationale": "The official filtering documentation explicitly describes pre-filtering through an inverted-index allow-list passed to the vector index."
+    },
+    {
+      "id": "CLAIM-22003",
+      "statement": "Weaviate hybrid search combines vector retrieval with BM25F keyword retrieval and supports configurable weighting plus relative-score or rank-based fusion.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10003",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Relative-score fusion is the documented default from Weaviate 1.24 onward"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-22003"
+      ],
+      "referenceIds": [
+        "REFERENCE-22006"
+      ],
+      "rationale": "The official hybrid-search documentation defines the parallel vector and BM25F legs, alpha weighting, relative-score fusion, and ranked fusion."
+    },
+    {
+      "id": "CLAIM-22004",
+      "statement": "Weaviate supports sharding and replicated multi-node collections; cluster metadata uses Raft, while data objects use leaderless replication with tunable read and write consistency.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10003",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Object-level read consistency does not merge query-result identifier lists from every replica"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-22004"
+      ],
+      "referenceIds": [
+        "REFERENCE-22007",
+        "REFERENCE-22008"
+      ],
+      "rationale": "The replication documentation distinguishes Raft-replicated cluster metadata from leaderless object replication and documents ONE, QUORUM, and ALL consistency levels; multi-tenancy stores each tenant on a separate shard."
+    },
+    {
+      "id": "CLAIM-22005",
+      "statement": "Weaviate supports rotational, product, scalar, and binary vector quantization, and its HFresh index keeps most vector data on disk while retaining a compressed centroid index in memory.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10003",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "performanceScope",
+          "value": "Compression and HFresh require workload-specific recall, latency, memory, and I/O evaluation"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-22005"
+      ],
+      "referenceIds": [
+        "REFERENCE-22003",
+        "REFERENCE-22009"
+      ],
+      "rationale": "The official compression documentation lists four quantization families, and the vector-index documentation describes the disk-oriented HFresh architecture and its mandatory rotational quantization."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-22001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Weaviate sources list HNSW, flat, dynamic, and HFresh indexes and enumerate five configurable distance metrics.",
+      "interpretation": "The RKM profile can model exact flat search, HNSW, a disk-oriented ANN option, and other dynamic index behavior while retaining index-specific metric constraints.",
+      "claimIds": [
+        "CLAIM-22001"
+      ],
+      "referenceIds": [
+        "REFERENCE-22001",
+        "REFERENCE-22003",
+        "REFERENCE-22004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-22003",
+          "locator": "Vector index sections: supported index types, HNSW, flat, dynamic, and HFresh"
+        },
+        {
+          "referenceId": "REFERENCE-22004",
+          "locator": "Available distance metrics and HFresh metric restrictions"
+        },
+        {
+          "referenceId": "REFERENCE-22001",
+          "locator": "Release v1.38.5"
+        }
+      ],
+      "limitations": [
+        "Project documentation establishes supported behavior but is not an independent benchmark.",
+        "Index performance depends on collection size, vector distribution, hardware, filters, compression, and tuning."
+      ]
+    },
+    {
+      "id": "EVIDENCE-22002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The Weaviate filtering documentation describes pre-filtering with an inverted-index allow-list supplied to vector search.",
+      "interpretation": "Weaviate supports filtered retrieval without relying on a post-filter-only candidate pipeline, provided the required scalar indexes exist.",
+      "claimIds": [
+        "CLAIM-22002"
+      ],
+      "referenceIds": [
+        "REFERENCE-22005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-22005",
+          "locator": "Filtering sections: pre-filtering, inverted-index allow-lists, ACORN strategy, and flat-search cutoff"
+        }
+      ],
+      "limitations": [
+        "Indexing additional properties consumes storage and ingestion resources.",
+        "Highly selective filters can trigger different search paths, so latency and recall still require workload testing."
+      ]
+    },
+    {
+      "id": "EVIDENCE-22003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The hybrid-search documentation combines vector and BM25F retrieval and documents alpha weighting, relative-score fusion, and ranked fusion.",
+      "interpretation": "The RKM profile can mark built-in BM25-plus-vector retrieval, weighted fusion, and score normalization.",
+      "claimIds": [
+        "CLAIM-22003"
+      ],
+      "referenceIds": [
+        "REFERENCE-22006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-22006",
+          "locator": "Hybrid search sections: vector and BM25F legs, alpha, Relative Score Fusion, and Ranked Fusion"
+        }
+      ],
+      "limitations": [
+        "No alpha or fusion method is universally optimal across datasets and relevance objectives.",
+        "Score normalization can make results sensitive to candidate set composition and query limits."
+      ]
+    },
+    {
+      "id": "EVIDENCE-22004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Weaviate documents Raft for cluster metadata, leaderless object replication, tunable ONE, QUORUM, and ALL consistency, and per-tenant shards.",
+      "interpretation": "The RKM profile can mark high horizontal scaling, sharding, replication, multi-tenancy, and configurable consistency while retaining query-consistency caveats.",
+      "claimIds": [
+        "CLAIM-22004"
+      ],
+      "referenceIds": [
+        "REFERENCE-22007",
+        "REFERENCE-22008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-22007",
+          "locator": "Consistency sections: Raft metadata, leaderless data objects, read/write consistency, and query caveat"
+        },
+        {
+          "referenceId": "REFERENCE-22008",
+          "locator": "Multi-tenancy sections: tenant isolation, separate shards, and tenant lifecycle states"
+        }
+      ],
+      "limitations": [
+        "Consistency levels change acknowledgment and object-retrieval behavior but do not make every search-result list globally merged across replicas.",
+        "Tenant and replica counts affect memory, shard management, and operational complexity."
+      ]
+    },
+    {
+      "id": "EVIDENCE-22005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Weaviate documents RQ, PQ, SQ, and BQ compression and describes HFresh as a disk-oriented index with compressed in-memory centroids.",
+      "interpretation": "The RKM profile can include product and scalar quantization, other compression families, and disk-backed ANN while preserving lossy compression and I/O tradeoffs.",
+      "claimIds": [
+        "CLAIM-22005"
+      ],
+      "referenceIds": [
+        "REFERENCE-22003",
+        "REFERENCE-22009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-22003",
+          "locator": "HFresh sections: centroid HNSW, disk posting lists, mandatory RQ, and tuning parameters"
+        },
+        {
+          "referenceId": "REFERENCE-22009",
+          "locator": "Vector quantization sections: RQ, PQ, SQ, BQ, rescoring, and index compatibility"
+        }
+      ],
+      "limitations": [
+        "Quantization is lossy, and rescoring or over-fetching can add latency and I/O.",
+        "HFresh prioritizes memory efficiency and predictable disk I/O rather than peak HNSW query throughput."
+      ]
+    }
+  ]
+}
