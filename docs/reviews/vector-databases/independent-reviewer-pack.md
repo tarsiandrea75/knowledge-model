@@ -7,12 +7,35 @@ The comparison output is descriptive and non-ranking. A matching value does
 not prove semantic equivalence, and a missing value means not recorded rather
 than unsupported.
 
-## Baseline
+## Baseline and provenance
 
 - Branch: `experiment/dataset-expansion`
-- Commit: `74ca2d05ff02e051fafab189e0fcbc07892d3596`
+- Comparison-data commit:
+  `74ca2d05ff02e051fafab189e0fcbc07892d3596`
+- Reviewer Pack introduction commit:
+  `2979527681323a0704396b69afcdeed2c43e61ad`
+- Provenance verification commit:
+  `866c41636e6ad91c82310874f9803e1263b3ce85`
 - Records remain `Draft` and `Not Reviewed`.
 - No record should be modified during the initial read-only review.
+
+The comparison output was generated from the three canonical records as they
+existed at the comparison-data commit. The Reviewer Pack was added by the next
+commit without modifying those records. The later adjudication commit also did
+not modify them.
+
+The record contents were verified as identical across all three commits using
+both Git blob identifiers and SHA-256 content hashes:
+
+| Record | Git blob | SHA-256 |
+|---|---|---|
+| `data/vector-databases/neo4j.json` | `24082b87e8ae4aafe17aa7abd6d00a101c25e828` | `8f59da948793cf956c78d1c5754608b4d38983b9d82b14d7640f17d12ccc85b7` |
+| `data/vector-databases/amazon-neptune-analytics.json` | `f058559f9183c449ebde7edfe93e5a0aa302d6f3` | `bea14fcf4c81e6058696c90907ba17aa6be8ee4a708820dd386143fdc4ecac4e` |
+| `data/vector-databases/memgraph.json` | `76798c56ce058f3536fe59f8c311cddb826d25b0` | `49b9581e922762968fb98ccbcea14f93556cc742ef6c3d6e265c21c8ff500670` |
+
+The distinction between the comparison-data commit and the Reviewer Pack
+introduction commit is therefore an artifact-provenance distinction, not a
+record-content difference.
 
 ## Required verdicts
 
