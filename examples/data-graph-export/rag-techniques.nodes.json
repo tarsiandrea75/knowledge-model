@@ -634,5 +634,34 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10008",
+    "type": "VectorDatabase",
+    "label": "OpenSearch",
+    "sourceDataFile": "data/vector-databases/opensearch.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "Lucene",
+        "Faiss",
+        "HNSW",
+        "IVF",
+        "k-NN",
+        "hybrid search",
+        "neural search",
+        "vector quantization",
+        "RAG retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "opensearch",
+      "status": "Draft",
+      "summary": "OpenSearch is an open-source distributed search and analytics engine with native exact, approximate, filtered, sparse, neural, and hybrid vector retrieval.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
