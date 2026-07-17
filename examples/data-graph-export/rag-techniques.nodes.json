@@ -776,5 +776,34 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10013",
+    "type": "VectorDatabase",
+    "label": "Vespa",
+    "sourceDataFile": "data/vector-databases/vespa.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "vector search",
+        "HNSW",
+        "tensor fields",
+        "BM25",
+        "hybrid retrieval",
+        "phased ranking",
+        "machine-learned ranking",
+        "content clusters",
+        "RAG serving"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "vespa",
+      "status": "Draft",
+      "summary": "Vespa is a distributed search, recommendation, and real-time serving engine with exact and HNSW vector retrieval, structured and lexical filtering, sparse-dense hybrid search, and programmable multiphase ranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
