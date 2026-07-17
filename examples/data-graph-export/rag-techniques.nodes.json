@@ -834,5 +834,35 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10015",
+    "type": "VectorDatabase",
+    "label": "Vertex AI Vector Search",
+    "sourceDataFile": "data/vector-databases/vertex-ai-vector-search.json",
+    "properties": {
+      "keywords": [
+        "managed vector search",
+        "ScaNN",
+        "tree-AH",
+        "asymmetric hashing",
+        "brute force KNN",
+        "sparse dense hybrid search",
+        "reciprocal rank fusion",
+        "crowding",
+        "Agent Retrieval",
+        "Google Cloud",
+        "RAG"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "vertex-ai-vector-search",
+      "status": "Draft",
+      "summary": "Vertex AI Vector Search is a managed Google Cloud retrieval service whose ScaNN-based indexes provide brute-force and tree-AH nearest-neighbor search, metadata filtering, sparse-dense hybrid retrieval, and crowding; its Agent Retrieval generation adds collection storage, auto-embeddings, full-text and vector fusion, and semantic reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
