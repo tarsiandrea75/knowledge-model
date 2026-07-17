@@ -691,5 +691,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10010",
+    "type": "VectorDatabase",
+    "label": "MongoDB",
+    "sourceDataFile": "data/vector-databases/mongodb.json",
+    "properties": {
+      "keywords": [
+        "document database",
+        "NoSQL database",
+        "vector search",
+        "HNSW",
+        "flat vector index",
+        "hybrid search",
+        "MongoDB Atlas",
+        "mongot",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "mongodb",
+      "status": "Draft",
+      "summary": "MongoDB is a distributed document database with native exact, approximate, filtered, lexical, hybrid, and reranked vector retrieval over application documents.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
