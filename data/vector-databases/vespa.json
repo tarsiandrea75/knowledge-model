@@ -1,0 +1,727 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10013",
+    "slug": "vespa",
+    "name": {
+      "official": "Vespa",
+      "display": "Vespa",
+      "short": "Vespa"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Vespa.ai",
+      "Vespa Search Engine",
+      "Vespa Serving Engine",
+      "Vespa Vector Search"
+    ],
+    "keywords": [
+      "distributed search engine",
+      "vector search",
+      "HNSW",
+      "tensor fields",
+      "BM25",
+      "hybrid retrieval",
+      "phased ranking",
+      "machine-learned ranking",
+      "content clusters",
+      "RAG serving"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Search Engines With Vector Support",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Vespa repository, release, vector-search, ranking, filtering, distributed-operations, consistency, API, and backup documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Vespa is a distributed search, recommendation, and real-time serving engine with exact and HNSW vector retrieval, structured and lexical filtering, sparse-dense hybrid search, and programmable multiphase ranking.",
+    "description": "Vespa combines a distributed document and tensor store with lexical indexes, structured attributes, exact and approximate nearest-neighbor retrieval, query-time filtering, embedding and inference components, and a declarative ranking framework. Dense or binary vectors are stored in tensor fields and queried through nearestNeighbor using exact scans or a modified HNSW index. Sparse retrievers such as weakAnd, wand, and BM25 can be combined with vector candidates and reranked through first-phase, second-phase, or global-phase expressions, including reciprocal-rank and normalized linear fusion. Content clusters partition documents into buckets, maintain configurable redundancy, rebalance automatically, and execute retrieval close to the data, while container clusters handle stateless query processing and global ranking. Vespa runs locally, self-managed, with a Kubernetes operator, or as Vespa Cloud. This record distinguishes its memory-resident tensor and HNSW working set from disk-first ANN systems, its eventual replica consistency and document-level atomicity from multi-document ACID transactions, and its general search-and-serving architecture from dedicated vector-only databases."
+  },
+  "vectorDatabase": {
+    "databaseType": "Search Engine With Vector Support",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Graph Based ANN",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Hamming Distance",
+      "Other"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": false
+    },
+    "consistency": {
+      "consistencyModel": "Eventual",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Document Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "Go",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "Variable",
+      "encryption": "Variable",
+      "backupAndRestore": "Variable",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose exact scanning or HNSW only after measuring recall, latency, memory, indexing throughput, update rate, and restart or rebuild behavior on representative vectors.",
+        "Match angular, prenormalized-angular, dot-product, Euclidean, Hamming, or geospatial distance behavior to the embedding model and vector representation.",
+        "Size tensor attributes and the HNSW graph as memory-resident structures while also planning durable document storage, attribute flushes, index files, transaction logs, and temporary headroom.",
+        "Model document schemas, tensor dimensions, cell precision, multiple-vector mapped dimensions, structured attributes, lexical indexes, and rank profiles as one versioned application package.",
+        "Plan content-node groups, redundancy, searchable copies, container capacity, bucket redistribution, and global-phase reranking resources before large-scale ingestion."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate exact vector, HNSW, lexical, sparse, filtered, and hybrid retrieval on the same relevance set before choosing candidate operators and rank phases.",
+        "Distinguish pre-filtering, post-filtering, and exact-search fallback because thresholds and selectivity change latency, candidate completeness, and top-k behavior.",
+        "Tune targetHits, totalTargetHits, hnsw.exploreAdditionalHits, approximate-threshold, post-filter-threshold, weakAnd or wand targets, and rank-phase limits under representative load.",
+        "Normalize or calibrate BM25, closeness, model scores, and business features explicitly before linear fusion; use rank-based fusion when score domains are not comparable.",
+        "Measure per-content-node retrieval, scatter-and-gather, second-phase, global-phase, summary fetch, embedding, and inference costs separately."
+      ]
+    },
+    "limitations": [
+      "Vespa is a broad search, recommendation, and serving platform whose schema, ranking, cluster, deployment, and operations surface is larger than that of a dedicated vector database.",
+      "Tensor attributes and HNSW graph structures are primarily memory-resident; large vector workloads require careful RAM sizing, cell-precision choices, graph tuning, and sharding.",
+      "HNSW provides approximate results, and recall, indexing throughput, memory, update cost, and query latency vary with graph settings and search expansion.",
+      "Filtering strategy is adaptive and threshold-driven; selective filters can trigger exact search, while post-filtering and special operators can return fewer candidates than requested.",
+      "Vespa uses eventual consistency across replicas and does not provide linearizable reads or general multi-document transactions.",
+      "Hybrid and multiphase ranking can consume substantial CPU, memory, and network resources, especially in global-phase ranking over distributed candidates.",
+      "Self-managed, Kubernetes-operator, and Vespa Cloud deployments differ in upgrades, autoscaling, encryption, tenancy, backups, observability, and support boundaries.",
+      "Vespa is Apache-2.0 open source, while some cloud or enterprise add-ons and managed-service capabilities use separate commercial terms."
+    ],
+    "usageGuidance": [
+      "Use Vespa when retrieval quality depends on combining structured filters, lexical matching, vectors, tensors, machine-learned models, and business ranking in one low-latency serving system.",
+      "Prefer a simpler vector store when the application only needs basic nearest-neighbor retrieval and does not benefit from distributed search, programmable ranking, or online inference.",
+      "Version the Vespa platform, application package, schemas, rank profiles, embedding models, tensor cell types, query profiles, and client libraries together for reproducibility.",
+      "Benchmark the complete RAG funnel, including feeding, indexing, filtering, candidate retrieval, phased ranking, summary fetch, updates, failover, and recovery.",
+      "Test document export, backup or snapshot, restore, node failure, redistribution, index rebuild, and application-package rollback before production adoption."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-32001",
+      "title": "Vespa 8.719.5 Release",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/vespa-engine/vespa/releases/tag/v8.719.5",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-07-07",
+      "version": "8.719.5",
+      "repository": "https://github.com/vespa-engine/vespa"
+    },
+    {
+      "id": "REFERENCE-32002",
+      "title": "Vespa Repository and Apache 2.0 License",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/vespa-engine/vespa",
+      "accessedAt": "2026-07-17",
+      "repository": "https://github.com/vespa-engine/vespa"
+    },
+    {
+      "id": "REFERENCE-32003",
+      "title": "Vespa Overview",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/learn/overview.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32004",
+      "title": "Vespa Nearest Neighbor Search",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/querying/nearest-neighbor-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32005",
+      "title": "Vespa Approximate Nearest Neighbor Search with HNSW",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/querying/approximate-nn-hnsw.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32006",
+      "title": "Vespa Schema Reference: Distance Metrics and HNSW",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/reference/schemas/schemas.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32007",
+      "title": "Vespa Nearest Neighbor Search Practical Guide",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/querying/nearest-neighbor-search-guide.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32008",
+      "title": "Vespa BM25 Rank Feature",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/ranking/bm25.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32009",
+      "title": "Vespa Phased Ranking",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/ranking/phased-ranking.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32010",
+      "title": "Vespa Hybrid Text Search Tutorial",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/learn/tutorials/hybrid-search.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32011",
+      "title": "Vespa Operations and Deployment Models",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/basics/operations.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32012",
+      "title": "Vespa Content Nodes, Redundancy, and Distribution",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/content/content-nodes.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32013",
+      "title": "Vespa Consistency Model",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/content/consistency",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32014",
+      "title": "Vespa APIs and Interfaces",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/reference/api/api.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-32015",
+      "title": "Vespa Data Management and Backup",
+      "authors": [
+        {
+          "name": "Vespa maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.vespa.ai/en/operations/data-management.html",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-32001",
+      "statement": "Vespa stores dense and binary vectors in tensor fields and supports exact nearest-neighbor retrieval plus approximate HNSW search over single-vector or multi-vector document fields using Euclidean, angular or cosine-equivalent, dot-product, prenormalized-angular, Hamming, and geospatial distance behavior.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10013",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Vespa 8.719.5 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-32001"
+      ],
+      "referenceIds": [
+        "REFERENCE-32001",
+        "REFERENCE-32002",
+        "REFERENCE-32004",
+        "REFERENCE-32005",
+        "REFERENCE-32006"
+      ],
+      "rationale": "The current release, repository, nearest-neighbor, HNSW, and schema references document Vespa tensor storage, exact and approximate retrieval, multi-vector indexing, HNSW controls, and supported distance metrics."
+    },
+    {
+      "id": "CLAIM-32002",
+      "statement": "Vespa combines nearest-neighbor retrieval with structured, lexical, and geospatial query constraints and can choose pre-filtering, post-filtering, or exact-search fallback behavior according to filter selectivity and rank-profile thresholds.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10013",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Execution behavior depends on query operators, rank annotations, filter selectivity, approximate-threshold, post-filter-threshold, and field indexing"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-32002"
+      ],
+      "referenceIds": [
+        "REFERENCE-32004",
+        "REFERENCE-32005",
+        "REFERENCE-32007"
+      ],
+      "rationale": "Vespa documentation describes combining nearestNeighbor with query filters and terms, default pre-filtering, configurable post-filtering, and exact-search fallback for sufficiently selective filters."
+    },
+    {
+      "id": "CLAIM-32003",
+      "statement": "Vespa supports native hybrid retrieval and multiphase ranking by combining BM25 or sparse retrievers with vector nearest-neighbor candidates and applying first-phase, second-phase, and global-phase ranking expressions including reciprocal-rank and normalized linear fusion patterns.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10013",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "rankingScope",
+          "value": "Retrieval unions, rank phases, normalization, candidate counts, and model execution must be designed and evaluated for the target latency and relevance budget"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-32003"
+      ],
+      "referenceIds": [
+        "REFERENCE-32007",
+        "REFERENCE-32008",
+        "REFERENCE-32009",
+        "REFERENCE-32010"
+      ],
+      "rationale": "The practical guide, BM25 reference, phased-ranking documentation, and hybrid tutorial show sparse and dense candidate retrieval followed by declarative multiphase ranking, RRF, normalization, and weighted score combinations."
+    },
+    {
+      "id": "CLAIM-32004",
+      "statement": "Vespa deploys as local or self-managed open-source software, through a Kubernetes operator, or as Vespa Cloud, and its distributed content clusters automatically partition documents, maintain configured redundancy, rebalance data, recover replicas, and scale query and storage capacity by adding nodes or groups.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10013",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Self-managed, Kubernetes-operator, and Vespa Cloud deployments expose different automation, security, backup, upgrade, and support boundaries"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-32004"
+      ],
+      "referenceIds": [
+        "REFERENCE-32002",
+        "REFERENCE-32003",
+        "REFERENCE-32011",
+        "REFERENCE-32012"
+      ],
+      "rationale": "The repository, overview, operations, and content-node documentation describe open-source and cloud deployment modes, content clusters, bucket distribution, redundancy, failover, automatic redistribution, and horizontal scaling."
+    },
+    {
+      "id": "CLAIM-32005",
+      "statement": "Vespa provides durable single-document put, update, remove, conditional-write, and read operations with configurable replication and eventually consistent replicas, but it does not provide multi-document transactions; Vespa Cloud adds managed backups while self-managed recovery requires explicit export, feed, and operational procedures.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10013",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Acknowledgement, replica availability, read path, search-index visibility, conditional writes, export, backup tier, and restore procedures determine effective durability and freshness"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-32005"
+      ],
+      "referenceIds": [
+        "REFERENCE-32012",
+        "REFERENCE-32013",
+        "REFERENCE-32014",
+        "REFERENCE-32015"
+      ],
+      "rationale": "The content, consistency, API, and data-management documentation distinguishes durable acknowledged writes and atomic single-document operations from eventual replica consistency and the absence of multi-document transactions, and documents cloud backup and export workflows."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-32001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Vespa sources document tensor vector fields, exact nearestNeighbor execution, modified HNSW indexing, single and multiple vectors per document, and Euclidean, angular, dot-product, prenormalized-angular, Hamming, and geospatial metrics.",
+      "interpretation": "The RKM profile can represent Vespa as a search and serving engine with exact and graph-based vector retrieval rather than as a dedicated vector-only database.",
+      "claimIds": [
+        "CLAIM-32001"
+      ],
+      "referenceIds": [
+        "REFERENCE-32001",
+        "REFERENCE-32002",
+        "REFERENCE-32004",
+        "REFERENCE-32005",
+        "REFERENCE-32006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-32001",
+          "locator": "Current 8.719.5 release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-32004",
+          "locator": "Exact nearestNeighbor retrieval, tensor fields, multi-vector documents, and ranking features"
+        },
+        {
+          "referenceId": "REFERENCE-32005",
+          "locator": "Modified HNSW implementation, multi-field indexes, filtering, and tuning controls"
+        },
+        {
+          "referenceId": "REFERENCE-32006",
+          "locator": "Distance-metric definitions for Euclidean, angular, dot-product, prenormalized-angular, Hamming, and geodegrees"
+        }
+      ],
+      "limitations": [
+        "Official product documentation is not an independent recall, latency, cost, or scalability benchmark.",
+        "HNSW graph and tensor attributes are primarily memory-resident, and metric, dimensions, cell precision, graph settings, updates, and hardware materially affect cost and recall."
+      ]
+    },
+    {
+      "id": "EVIDENCE-32002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Vespa documents nearest-neighbor queries combined with structured and lexical constraints, default pre-filtering, configurable post-filtering, and exact-search fallback for strict filters.",
+      "interpretation": "The RKM profile can mark both pre-filter and post-filter support while warning that filter execution strategy and top-k behavior are workload- and threshold-dependent.",
+      "claimIds": [
+        "CLAIM-32002"
+      ],
+      "referenceIds": [
+        "REFERENCE-32004",
+        "REFERENCE-32005",
+        "REFERENCE-32007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-32005",
+          "locator": "Pre-filter and post-filter strategies for constrained HNSW retrieval"
+        },
+        {
+          "referenceId": "REFERENCE-32007",
+          "locator": "Structured, lexical, and range constraints plus approximate-to-exact fallback for strict filters"
+        }
+      ],
+      "limitations": [
+        "Geo and predicate operators have special filtering behavior and may be evaluated after ANN candidate retrieval.",
+        "Selective filters, fallback thresholds, posting-list configuration, and distributed candidate counts can change latency and result completeness."
+      ]
+    },
+    {
+      "id": "EVIDENCE-32003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Vespa combines BM25, weakAnd or wand, and nearest-neighbor retrievers and supports first-phase, second-phase, and global-phase ranking with reciprocal-rank, normalized linear, tensor, and machine-learned ranking expressions.",
+      "interpretation": "The RKM profile can represent native sparse-dense hybrid retrieval, weighted score fusion, reciprocal-rank fusion, and multiphase reranking as first-class Vespa capabilities.",
+      "claimIds": [
+        "CLAIM-32003"
+      ],
+      "referenceIds": [
+        "REFERENCE-32007",
+        "REFERENCE-32008",
+        "REFERENCE-32009",
+        "REFERENCE-32010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-32008",
+          "locator": "BM25 lexical scoring feature"
+        },
+        {
+          "referenceId": "REFERENCE-32009",
+          "locator": "Candidate retrieval plus first-phase, second-phase, and global-phase ranking"
+        },
+        {
+          "referenceId": "REFERENCE-32010",
+          "locator": "BM25-vector hybrid retrieval, RRF, score normalization, and linear fusion examples"
+        }
+      ],
+      "limitations": [
+        "Global-phase ranking requires scatter-and-gather results and adds network, memory, and CPU cost.",
+        "Fusion formulas, candidate unions, rank-phase limits, embedding models, lexical analyzers, and relevance judgments require workload-specific evaluation."
+      ]
+    },
+    {
+      "id": "EVIDENCE-32004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Vespa official sources describe local, self-managed, Kubernetes-operated, and managed-cloud deployment paths plus automatically distributed and redundant content clusters that rebalance and recover data as topology changes.",
+      "interpretation": "The RKM profile can mark high horizontal scalability, sharding, and replication while separating open-source operational responsibilities from operator and cloud automation.",
+      "claimIds": [
+        "CLAIM-32004"
+      ],
+      "referenceIds": [
+        "REFERENCE-32002",
+        "REFERENCE-32003",
+        "REFERENCE-32011",
+        "REFERENCE-32012"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-32011",
+          "locator": "Self-managed, Kubernetes operator, and Vespa Cloud automation boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-32012",
+          "locator": "Bucket distribution, replicas, cluster state, write acknowledgements, and self-healing"
+        }
+      ],
+      "limitations": [
+        "Running Vespa at scale requires capacity planning across content nodes, container nodes, groups, redundancy, memory, disk, network, and ranking workloads.",
+        "Cloud, operator, and self-managed environments differ in upgrades, autoscaling, endpoint routing, encryption, backups, and support guarantees."
+      ]
+    },
+    {
+      "id": "EVIDENCE-32005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Vespa documents durable acknowledged writes, configurable redundancy, write-ahead logging, eventually consistent replicas, atomic single-document reads and conditional writes, no multi-document transactions, REST and Java document APIs, and cloud backup or document-export workflows.",
+      "interpretation": "The RKM profile can mark eventual consistency and document-level transactional semantics while distinguishing durable write acknowledgement from linearizable reads and cross-document ACID transactions.",
+      "claimIds": [
+        "CLAIM-32005"
+      ],
+      "referenceIds": [
+        "REFERENCE-32012",
+        "REFERENCE-32013",
+        "REFERENCE-32014",
+        "REFERENCE-32015"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-32013",
+          "locator": "Eventual consistency, durable replica writes, atomic single-document reads, test-and-set, and no multi-document transactions"
+        },
+        {
+          "referenceId": "REFERENCE-32014",
+          "locator": "REST Document API, Query API, Java Document API, health, metrics, and deployment interfaces"
+        },
+        {
+          "referenceId": "REFERENCE-32015",
+          "locator": "Vespa Cloud automated backup, restore, document export, feed, update, and removal workflows"
+        }
+      ],
+      "limitations": [
+        "Reads and searches are not guaranteed to be linearizable across replicas, and searches can transiently observe partial index updates while a write is in progress.",
+        "Self-managed backup and disaster recovery require explicitly designed export, feed, storage, topology, and restore procedures."
+      ]
+    }
+  ]
+}
