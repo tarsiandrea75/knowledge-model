@@ -578,5 +578,32 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10006",
+    "type": "VectorDatabase",
+    "label": "Chroma",
+    "sourceDataFile": "data/vector-databases/chroma.json",
+    "properties": {
+      "keywords": [
+        "embedded vector database",
+        "HNSW",
+        "SPANN",
+        "metadata filtering",
+        "full-text search",
+        "sparse vectors",
+        "hybrid retrieval",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "chroma",
+      "status": "Draft",
+      "summary": "Chroma is an open-source vector database and retrieval system that supports embedded local use, single-node serving, and distributed managed deployment.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
