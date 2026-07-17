@@ -522,5 +522,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10004",
+    "type": "VectorDatabase",
+    "label": "Milvus",
+    "sourceDataFile": "data/vector-databases/milvus.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "cloud-native",
+        "HNSW",
+        "IVF",
+        "DiskANN",
+        "BM25",
+        "hybrid retrieval",
+        "distributed vector search",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "milvus",
+      "status": "Draft",
+      "summary": "Milvus is an open-source cloud-native vector database that combines distributed dense and sparse vector retrieval, scalar filtering, BM25 full-text retrieval, and configurable hybrid reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
