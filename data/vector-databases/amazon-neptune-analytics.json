@@ -1,0 +1,806 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10016",
+    "slug": "amazon-neptune-analytics",
+    "name": {
+      "official": "Amazon Neptune Analytics",
+      "display": "Amazon Neptune Analytics",
+      "short": "Neptune Analytics"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "AWS Neptune Analytics",
+      "Neptune Analytics",
+      "Amazon Neptune Graph Analytics",
+      "Neptune Vector Search"
+    ],
+    "keywords": [
+      "managed graph analytics",
+      "property graph",
+      "openCypher",
+      "HNSW",
+      "vector similarity search",
+      "GraphRAG",
+      "knowledge graph",
+      "graph algorithms",
+      "AWS"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Graph Databases With Vector Support",
+      "category": "Graph And Vector Retrieval Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "LicenseRef-AWS-Service-Terms",
+    "language": "en",
+    "provenance": {
+      "source": "Official AWS Neptune Analytics product, vector-index, vector-algorithm, query, transaction, scaling, backup, security, networking, monitoring, and limits documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Amazon Neptune Analytics is a managed, memory-optimized property-graph analytics service that combines openCypher graph queries and algorithms with HNSW vector similarity search for GraphRAG, knowledge-graph, recommendation, and investigative retrieval workloads.",
+    "description": "Amazon Neptune Analytics is the analytics member of the Amazon Neptune family. It stores property-graph datasets in a memory-optimized managed graph, exposes openCypher query and administration APIs, and provides optimized pathfinding, centrality, community, similarity, and vector procedures. Its vector index is created with the graph, supports a single fixed embedding dimension, and uses HNSW for approximate nearest-neighbor top-k retrieval. Vector candidates can be filtered by labels or properties and combined with graph traversals and graph algorithms in the same openCypher workflow. Neptune Analytics complements the separately operated Neptune Database service: Database targets highly available transactional graph applications, while Analytics targets in-memory analytical processing, graph algorithms, and vector search. The vector subsystem has important consistency constraints because embedding mutations are durable and visible on write but are not atomic or isolated with the surrounding graph transaction. Operationally, AWS manages memory capacity, replicas, backups, snapshots, IAM, TLS, networking, monitoring, and query queues, while users remain responsible for embedding contracts, graph modeling, relevance evaluation, capacity sizing, cost control, failure repair, and recovery validation."
+  },
+  "vectorDatabase": {
+    "databaseType": "Graph Database With Vector Support",
+    "deploymentModels": [
+      "Managed Cloud"
+    ],
+    "supportedIndexTypes": [
+      "HNSW",
+      "Graph Based ANN",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Graph Plus Vector",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": false,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": false
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose the immutable vector dimension before graph creation and treat any embedding-model or dimension change as a graph migration decision.",
+        "Create embeddings only for labeled vertices or vertices with user properties, and preserve vertex identifiers, labels, properties, provenance, and embedding ownership as a versioned ingestion contract.",
+        "Use idempotent vector upserts and isolate embedding updates from other graph mutations because vector changes are non-atomic and unisolated.",
+        "Size m-NCUs for graph data, dictionaries, graph indexes, vector indexes, algorithms, query working sets, replicas, and expected growth together.",
+        "Retain authoritative source data or exports because vectors cannot currently be loaded directly from Neptune Database or a Neptune Database snapshot into an existing Analytics vector index."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate vector-only, graph-only, filtered vector, vector-plus-traversal, and vector-plus-graph-algorithm retrieval on the same relevance set.",
+        "Treat top-k HNSW squared-L2 scores and explicit cosine, dot-product, or Euclidean distance procedures as distinct scoring surfaces.",
+        "Tune top-k, vertex filters, graph expansion depth, path constraints, algorithm concurrency, and query queue pressure under representative load.",
+        "Use labels and properties to constrain candidate sets before graph expansion, then inspect whether post-filtering reduces result count or changes relevance.",
+        "Monitor vector count, graph-storage usage, CPU, queued requests, query latency, and algorithm concurrency as separate signals."
+      ]
+    },
+    "limitations": [
+      "Only one vector index can be created for a graph, only at graph creation time, and its dimension is fixed from 1 through 65,535.",
+      "HNSW top-k search is approximate and its quality and latency depend on data geometry, graph capacity, filters, candidate distribution, and workload concurrency.",
+      "Vector embedding inserts, updates, and deletes are non-atomic and unisolated and can remain visible even when the surrounding query fails.",
+      "Neptune Analytics supports openCypher for graph access and does not provide the Gremlin and SPARQL query surfaces of Neptune Database.",
+      "Neptune Analytics vector search is graph-plus-vector retrieval; this record does not claim built-in BM25, sparse-vector fusion, or general lexical search.",
+      "Neptune Analytics does not currently load vectors from Neptune Database or a Neptune Database snapshot, even when graph data is imported from those sources.",
+      "The memory-optimized service requires capacity planning; broad vertex enumeration, algorithm concurrency, and queued requests can exhaust memory or cause throttling and timeout behavior.",
+      "Public and private connectivity, replicas, quotas, capacity, availability, and pricing vary by region and graph configuration."
+    ],
+    "usageGuidance": [
+      "Use Neptune Analytics when retrieval requires semantic similarity together with explicit graph relationships, paths, graph algorithms, or investigative expansion.",
+      "Prefer Neptune Database when the primary requirement is highly available transactional graph serving rather than in-memory analytics and vector search.",
+      "Prefer a dedicated vector or search service when graph structure and graph algorithms do not materially improve retrieval quality or explainability.",
+      "Record the graph identifier, region, m-NCU capacity, replica count, vector dimension, embedding model, openCypher query, algorithm names, SDK version, and network mode for reproducibility.",
+      "Benchmark relevance, latency, queue depth, memory pressure, vector-update repair, snapshot restore, graph migration, and regional recovery before production adoption."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-35001",
+      "title": "What is Neptune Analytics?",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/what-is-neptune-analytics.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35002",
+      "title": "When to Use Neptune Analytics and When to Use Neptune Database",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/neptune-analytics-vs-neptune-database.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35003",
+      "title": "Working with Vector Similarity in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/vector-similarity.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35004",
+      "title": "Vector Indexing in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/vector-index.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35005",
+      "title": "Neptune Analytics Algorithms",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/algorithms.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35006",
+      "title": ".vectors.topK.byEmbedding Algorithm",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/vectors.topK.byEmbedding.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35007",
+      "title": ".vectors.distance.byEmbedding Algorithm",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/vectors.distance.byEmbedding.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35008",
+      "title": "Querying Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/query.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35009",
+      "title": "Query APIs in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/query-APIs.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35010",
+      "title": "Transaction Isolation Levels in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/query-isolation-level.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35011",
+      "title": "Concurrency and Query Queuing in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/query-concurrency-queuing.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35012",
+      "title": "Create an Empty Neptune Analytics Graph",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/gettingStarted-creating-a-graph.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35013",
+      "title": "Modifying a Neptune Analytics Graph",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/managing-modifying.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35014",
+      "title": "Graph Snapshots in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/graph-snapshots.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35015",
+      "title": "Managing Neptune Analytics Graphs",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/managing.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35016",
+      "title": "How Neptune Analytics Works with IAM",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/security_iam_service-with-iam.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35017",
+      "title": "Infrastructure Security in Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/infrastructure-security.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35018",
+      "title": "Monitoring Your Neptune Analytics Graphs",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/monitoring-cw.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35019",
+      "title": "Limits for Neptune Analytics",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/analytics-limits.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-35020",
+      "title": "Connecting to a Neptune Analytics Graph",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "canonicalUrl": "https://docs.aws.amazon.com/neptune-analytics/latest/userguide/gettingStarted-connecting.html",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-35001",
+      "subject": {
+        "id": "VECTOR-DATABASE-10016",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Amazon Neptune Analytics is a managed, memory-optimized property-graph analytics engine that supports openCypher, optimized graph algorithms, and HNSW vector similarity search inside graph-query workflows; it complements rather than replaces the OLTP-oriented Neptune Database service.",
+      "qualifiers": [
+        {
+          "name": "serviceScope",
+          "value": "Neptune Analytics documentation accessed 2026-07-17; Neptune Database is a separate operational surface"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "AWS documentation explicitly separates Neptune Analytics from Neptune Database and describes in-memory analytics, openCypher, graph algorithms, and vector search within graph traversals.",
+      "evidenceIds": [
+        "EVIDENCE-35001"
+      ],
+      "referenceIds": [
+        "REFERENCE-35001",
+        "REFERENCE-35002",
+        "REFERENCE-35003",
+        "REFERENCE-35005",
+        "REFERENCE-35008"
+      ]
+    },
+    {
+      "id": "CLAIM-35002",
+      "subject": {
+        "id": "VECTOR-DATABASE-10016",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "A Neptune Analytics graph can have one vector index created only when the graph is created, with a fixed dimension from 1 through 65,535; HNSW top-k search returns approximate nearest neighbors, while distance procedures support squared Euclidean, Euclidean, cosine similarity, cosine distance, and dot-product calculations.",
+      "qualifiers": [
+        {
+          "name": "indexScope",
+          "value": "Current Neptune Analytics vector-index and vector-algorithm documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "The vector-index guide defines creation-time, count, and dimension constraints, while the algorithm documentation identifies HNSW top-k behavior and supported distance calculations.",
+      "evidenceIds": [
+        "EVIDENCE-35002"
+      ],
+      "referenceIds": [
+        "REFERENCE-35004",
+        "REFERENCE-35005",
+        "REFERENCE-35006",
+        "REFERENCE-35007"
+      ]
+    },
+    {
+      "id": "CLAIM-35003",
+      "subject": {
+        "id": "VECTOR-DATABASE-10016",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Neptune Analytics can combine vector candidates with property-graph labels, properties, paths, and graph algorithms in openCypher, enabling graph-plus-vector retrieval for GraphRAG, knowledge-graph chatbots, recommendation, and investigative workloads without requiring a separate vector store for the same graph.",
+      "qualifiers": [
+        {
+          "name": "retrievalScope",
+          "value": "Graph-plus-vector composition through openCypher procedures; no built-in lexical BM25 fusion is asserted"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "AWS positions vector search as part of graph traversals and documents filtered top-k procedures plus graph algorithms that can be composed through openCypher CALL clauses.",
+      "evidenceIds": [
+        "EVIDENCE-35003"
+      ],
+      "referenceIds": [
+        "REFERENCE-35001",
+        "REFERENCE-35003",
+        "REFERENCE-35005",
+        "REFERENCE-35006",
+        "REFERENCE-35008"
+      ]
+    },
+    {
+      "id": "CLAIM-35004",
+      "subject": {
+        "id": "VECTOR-DATABASE-10016",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Neptune Analytics graph data uses snapshot-based transaction semantics, but vector-embedding inserts, updates, and deletes are non-atomic and unisolated: vector changes become durable and visible on write even when the surrounding query later fails.",
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Vector-index side effects differ from ordinary graph-property and edge updates"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "AWS explicitly documents vector-index transaction exceptions and recommends idempotent, isolated vector-update queries to reduce inconsistent partial effects.",
+      "evidenceIds": [
+        "EVIDENCE-35004"
+      ],
+      "referenceIds": [
+        "REFERENCE-35004",
+        "REFERENCE-35010"
+      ]
+    },
+    {
+      "id": "CLAIM-35005",
+      "subject": {
+        "id": "VECTOR-DATABASE-10016",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Neptune Analytics is operated as a managed regional AWS service with m-NCU memory scaling, optional replicas, continuous backups and named snapshots, public or private connectivity, IAM-signed TLS requests, CloudWatch metrics, CloudTrail auditing, and workload-dependent query queuing and service limits.",
+      "qualifiers": [
+        {
+          "name": "operationsScope",
+          "value": "Capacity, replica count, networking, quotas, availability, and cost depend on region and graph configuration"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "AWS administration, security, monitoring, and limits documentation describes the operational controls and their configuration-specific constraints.",
+      "evidenceIds": [
+        "EVIDENCE-35005"
+      ],
+      "referenceIds": [
+        "REFERENCE-35011",
+        "REFERENCE-35012",
+        "REFERENCE-35013",
+        "REFERENCE-35014",
+        "REFERENCE-35015",
+        "REFERENCE-35016",
+        "REFERENCE-35017",
+        "REFERENCE-35018",
+        "REFERENCE-35019",
+        "REFERENCE-35020"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-35001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "AWS describes Neptune Analytics as a memory-optimized graph analytics engine with low-latency openCypher queries, optimized graph algorithms, and vector search within graph traversals, while documenting Neptune Database as the separate transactional graph service.",
+      "interpretation": "RKM can classify Neptune Analytics as a managed graph database with vector support and should not merge its capabilities with Neptune Database.",
+      "claimIds": [
+        "CLAIM-35001"
+      ],
+      "referenceIds": [
+        "REFERENCE-35001",
+        "REFERENCE-35002",
+        "REFERENCE-35003",
+        "REFERENCE-35005",
+        "REFERENCE-35008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-35001",
+          "locator": "Memory-optimized graph analytics, low-latency graph queries, and vector search within graph traversals"
+        },
+        {
+          "referenceId": "REFERENCE-35002",
+          "locator": "Operational distinction between Neptune Analytics and Neptune Database"
+        },
+        {
+          "referenceId": "REFERENCE-35005",
+          "locator": "HNSW vector similarity and graph algorithms exposed as openCypher procedures"
+        }
+      ],
+      "limitations": [
+        "Official service documentation is not an independent performance, cost, availability, or retrieval-quality benchmark.",
+        "Neptune Database capabilities must not be attributed automatically to Neptune Analytics."
+      ]
+    },
+    {
+      "id": "EVIDENCE-35002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "AWS documents one creation-time vector index per graph, a fixed dimension from 1 through 65,535, HNSW approximate nearest-neighbor search, squared-L2 top-k scoring, and distance procedures supporting Euclidean, cosine, and dot-product calculations.",
+      "interpretation": "The RKM profile can represent HNSW and multiple distance calculations while preserving the stricter one-index and immutable-dimension constraints.",
+      "claimIds": [
+        "CLAIM-35002"
+      ],
+      "referenceIds": [
+        "REFERENCE-35004",
+        "REFERENCE-35005",
+        "REFERENCE-35006",
+        "REFERENCE-35007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-35004",
+          "locator": "One vector index per graph, creation-time only, fixed dimension 1 through 65,535"
+        },
+        {
+          "referenceId": "REFERENCE-35005",
+          "locator": "HNSW approximate nearest-neighbor vector similarity"
+        },
+        {
+          "referenceId": "REFERENCE-35006",
+          "locator": "Top-k nearest neighbors and squared Euclidean score"
+        },
+        {
+          "referenceId": "REFERENCE-35007",
+          "locator": "L2Squared, L2, CosineSimilarity, CosineDistance, and DotProduct metrics"
+        }
+      ],
+      "limitations": [
+        "Top-k HNSW search and pairwise distance procedures expose different scoring surfaces.",
+        "The fixed dimension and single vector index require graph recreation or migration when the embedding contract changes."
+      ]
+    },
+    {
+      "id": "EVIDENCE-35003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "AWS shows vector similarity procedures callable from openCypher, optional vertex filtering for embedding top-k search, and graph algorithms that can be composed with graph patterns and traversals for RAG and knowledge-graph applications.",
+      "interpretation": "Neptune Analytics supports graph-plus-vector retrieval, not a generic lexical-plus-vector hybrid-search engine.",
+      "claimIds": [
+        "CLAIM-35003"
+      ],
+      "referenceIds": [
+        "REFERENCE-35001",
+        "REFERENCE-35003",
+        "REFERENCE-35005",
+        "REFERENCE-35006",
+        "REFERENCE-35008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-35003",
+          "locator": "Vector search integrated with graph queries for domain-specific context and low-latency nearest-neighbor retrieval"
+        },
+        {
+          "referenceId": "REFERENCE-35005",
+          "locator": "Graph and vector algorithms integrated through openCypher CALL clauses"
+        },
+        {
+          "referenceId": "REFERENCE-35006",
+          "locator": "Top-k by embedding with optional vertex label or property filter"
+        }
+      ],
+      "limitations": [
+        "No built-in BM25 or sparse-dense fusion capability is asserted by this record.",
+        "Graph expansion depth, fan-out, candidate count, filters, and algorithm concurrency require workload-specific evaluation."
+      ]
+    },
+    {
+      "id": "EVIDENCE-35004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "AWS states that vector-embedding changes are non-atomic and unisolated, become durable and visible on write, and can remain after a surrounding query fails, while ordinary graph reads and mutations follow documented snapshot-based semantics.",
+      "interpretation": "The RKM profile must mark transaction support as limited for vector workloads even though non-vector graph operations have stronger guarantees.",
+      "claimIds": [
+        "CLAIM-35004"
+      ],
+      "referenceIds": [
+        "REFERENCE-35004",
+        "REFERENCE-35010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-35004",
+          "locator": "Vector index transaction support and idempotent-update recommendations"
+        },
+        {
+          "referenceId": "REFERENCE-35010",
+          "locator": "Snapshot isolation for graph queries and non-atomic, unisolated vector embedding changes"
+        }
+      ],
+      "limitations": [
+        "Idempotent retries reduce but do not eliminate the need to detect and repair partial vector updates.",
+        "Successful query-level graph mutations do not imply atomic consistency between graph properties and the vector index."
+      ]
+    },
+    {
+      "id": "EVIDENCE-35005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "AWS documentation covers m-NCU memory sizing, graph replicas, vertical resizing, continuous backups, snapshots, IAM permissions, TLS 1.2, public and private endpoints, CloudWatch and CloudTrail monitoring, FIFO query queues, and documented limits.",
+      "interpretation": "RKM can rate managed operations, access control, encryption, backup, and observability highly while keeping capacity, region, queueing, and quota caveats explicit.",
+      "claimIds": [
+        "CLAIM-35005"
+      ],
+      "referenceIds": [
+        "REFERENCE-35011",
+        "REFERENCE-35012",
+        "REFERENCE-35013",
+        "REFERENCE-35014",
+        "REFERENCE-35015",
+        "REFERENCE-35016",
+        "REFERENCE-35017",
+        "REFERENCE-35018",
+        "REFERENCE-35019",
+        "REFERENCE-35020"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-35011",
+          "locator": "FIFO queue, m-NCU-derived worker threads, and queue-depth constraints"
+        },
+        {
+          "referenceId": "REFERENCE-35012",
+          "locator": "m-NCU capacity, optional replicas, networking, and vector-search configuration"
+        },
+        {
+          "referenceId": "REFERENCE-35014",
+          "locator": "Named graph snapshots and restore into a new graph"
+        },
+        {
+          "referenceId": "REFERENCE-35016",
+          "locator": "IAM identity policies, actions, resources, conditions, and temporary credentials"
+        },
+        {
+          "referenceId": "REFERENCE-35017",
+          "locator": "TLS 1.2 or later and signed AWS requests"
+        },
+        {
+          "referenceId": "REFERENCE-35018",
+          "locator": "CloudWatch graph, CPU, queue, storage, and vector metrics"
+        }
+      ],
+      "limitations": [
+        "Replica, capacity, networking, quota, and region choices affect availability, latency, and cost.",
+        "Managed backups and snapshots do not replace application-level restore tests, source-data retention, or regional recovery planning."
+      ]
+    }
+  ]
+}
