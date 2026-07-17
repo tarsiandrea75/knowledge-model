@@ -469,5 +469,31 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10002",
+    "type": "VectorDatabase",
+    "label": "Qdrant",
+    "sourceDataFile": "data/vector-databases/qdrant.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "HNSW",
+        "payload filtering",
+        "sparse vectors",
+        "hybrid retrieval",
+        "distributed vector search",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "qdrant",
+      "status": "Draft",
+      "summary": "Qdrant is an open-source dedicated vector database and search engine for storing, filtering, and retrieving dense, sparse, named, and multi-vector representations.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
