@@ -864,5 +864,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10016",
+    "type": "VectorDatabase",
+    "label": "Amazon Neptune Analytics",
+    "sourceDataFile": "data/vector-databases/amazon-neptune-analytics.json",
+    "properties": {
+      "keywords": [
+        "managed graph analytics",
+        "property graph",
+        "openCypher",
+        "HNSW",
+        "vector similarity search",
+        "GraphRAG",
+        "knowledge graph",
+        "graph algorithms",
+        "AWS"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "amazon-neptune-analytics",
+      "status": "Draft",
+      "summary": "Amazon Neptune Analytics is a managed, memory-optimized property-graph analytics service that combines openCypher graph queries and algorithms with HNSW vector similarity search for GraphRAG, knowledge-graph, recommendation, and investigative retrieval workloads.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
