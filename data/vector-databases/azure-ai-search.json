@@ -1,0 +1,760 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10014",
+    "slug": "azure-ai-search",
+    "name": {
+      "official": "Azure AI Search",
+      "display": "Azure AI Search",
+      "short": "Azure AI Search"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Microsoft Azure AI Search",
+      "Azure Cognitive Search",
+      "Azure Search",
+      "Azure Vector Search"
+    ],
+    "keywords": [
+      "managed search service",
+      "vector search",
+      "HNSW",
+      "exhaustive KNN",
+      "hybrid search",
+      "reciprocal rank fusion",
+      "semantic ranker",
+      "integrated vectorization",
+      "Azure",
+      "RAG"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Managed Vector Search Services",
+      "category": "Cloud Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Microsoft Azure AI Search API-version, vector-search, filtering, hybrid-ranking, integrated-vectorization, capacity, reliability, indexing, networking, and encryption documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Azure AI Search is a fully managed cloud search service with exact and HNSW vector retrieval, OData filtering, BM25-vector hybrid search, reciprocal-rank fusion, semantic reranking, and integrated indexing and vectorization pipelines.",
+    "description": "Azure AI Search is a Microsoft Azure platform service for indexing and querying search documents through lexical, vector, hybrid, semantic, filtered, and agent-oriented retrieval APIs. Vector fields support exhaustive K-nearest-neighbor search and HNSW approximate nearest-neighbor search with cosine, dot-product, or Euclidean similarity. Built-in scalar and binary quantization can reduce memory and storage, with optional oversampling and rescoring against preserved full-precision vectors. Hybrid requests execute keyword and one or more vector queries in parallel and merge their ranked lists through reciprocal rank fusion; semantic ranker can then rerank text-rich candidates. OData filters target filterable nonvector fields and can be applied before or after vector traversal, with distinct recall and latency implications. Indexer and skillset pipelines can extract, chunk, enrich, and vectorize supported data sources by calling external embedding models, while query-time vectorizers can transform text or images into vectors. Capacity is provisioned through partitions and replicas, with managed replication, availability-zone placement where supported, Microsoft Entra ID, role-based access control, private endpoints, and encryption options. Azure AI Search is not intended to replace a primary system of record: indexing and replica propagation are asynchronous, document actions are reported independently, and the service does not provide native self-service backup and restore."
+  },
+  "vectorDatabase": {
+    "databaseType": "Managed Vector Search Service",
+    "deploymentModels": [
+      "Managed Cloud"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Graph Based ANN",
+      "Scalar Quantization",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Reciprocal Rank Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": false
+    },
+    "consistency": {
+      "consistencyModel": "Eventual",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Document Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "C#",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "Variable",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Parent Document Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose HNSW or exhaustive KNN only after measuring recall, latency, vector-index quota, indexing throughput, and cost on representative data.",
+        "Align cosine, dot-product, or Euclidean similarity with the embedding model and normalize vectors where the selected metric requires it.",
+        "Evaluate scalar or binary quantization, truncation dimensions, preserved originals, oversampling, and rescoring together rather than as isolated switches.",
+        "Model vector fields, searchable text, filterable metadata, semantic configurations, scoring profiles, analyzers, and security fields as one versioned index schema.",
+        "Distinguish preFilter, postFilter, and preview strictPostFilter because shard-level execution changes recall, latency, and top-k completeness.",
+        "Use exhaustive queries on sampled data to build ground truth for HNSW recall evaluation.",
+        "Tune HNSW construction and query parameters, vector weights, candidate k, text recall size, semantic reranking, and result thresholds under representative load.",
+        "Provision partitions for storage and indexing scale and replicas for query throughput and availability; test the combined search-unit configuration.",
+        "Treat integrated vectorization as a distributed pipeline that depends on data sources, indexers, skillsets, chunking logic, external embedding endpoints, identities, quotas, and retry behavior.",
+        "Version the data-plane API, management API, SDKs, index schema, vector profiles, compression settings, embedding models, and semantic configuration together.",
+        "Design index aliases or blue-green index deployment for structural schema changes that require rebuilds.",
+        "Keep an authoritative external data source and a tested reindex path because Azure AI Search is not a primary data store and has no native self-service backup and restore.",
+        "Use Microsoft Entra ID, least-privilege roles, private endpoints, managed identities, and customer-managed keys according to the workload threat model.",
+        "Measure indexing-to-query freshness and replica convergence separately from successful document-write acknowledgements."
+      ]
+    },
+    "limitations": [
+      "Azure AI Search is a managed Azure service; availability, quotas, features, API versions, and costs vary by region, pricing tier, service creation date, and preview status.",
+      "HNSW consumes vector-index quota and trades recall, latency, indexing time, and memory; exhaustive KNN provides exact retrieval but can be computationally expensive.",
+      "Scalar and binary quantization are lossy unless mitigated through oversampling and rescoring, and truncation is appropriate only for compatible embedding models.",
+      "Post-filter and strict-post-filter modes can return false negatives or fewer than k results for selective filters, especially across multiple shards.",
+      "Semantic ranker reranks an existing candidate set rather than searching the full corpus and adds regional, quota, latency, and billing considerations.",
+      "Integrated vectorization depends on external embedding models and supported indexer data sources; Azure AI Search does not host the embedding models itself.",
+      "Replica propagation and index updates are asynchronous, so queries can temporarily observe incomplete results and unreplicated writes can be at risk during a primary-zone failure.",
+      "The service exposes per-document indexing results rather than general multi-document or multi-index ACID transaction semantics.",
+      "Azure AI Search is not designed as a primary system of record and does not provide native self-service backup and restore; recovery normally rebuilds indexes from authoritative source data or custom exports.",
+      "Partitions and replicas improve capacity and resilience but increase cost, and SLA eligibility requires minimum replica counts."
+    ],
+    "usageGuidance": [
+      "Use Azure AI Search when a managed Azure-native service should combine lexical, vector, filtered, semantic, and agent-oriented retrieval behind one operational endpoint.",
+      "Prefer a dedicated vector database or self-hosted engine when portability, low-level index control, local execution, or non-Azure deployment is a primary requirement.",
+      "Benchmark pure lexical, pure vector, hybrid RRF, vector weighting, semantic reranking, compression, and filtering on the same relevance judgments.",
+      "Test ingestion, indexer retries, embedding throttling, query load, replica failover, zone behavior, index rebuild, alias cutover, and recovery before production adoption.",
+      "Record stable and preview API dependencies explicitly and avoid treating preview-only capabilities as generally available."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-33001",
+      "title": "Azure AI Search Data Plane REST API Versions",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/rest/api/searchservice/search-service-api-versions",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "2026-04-01",
+      "publishedAt": "2026-04-01"
+    },
+    {
+      "id": "REFERENCE-33002",
+      "title": "What's New in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/whats-new",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33003",
+      "title": "Vector Search Overview in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/vector-search-overview",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33004",
+      "title": "Vector Relevance and Ranking in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/vector-search-ranking",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33005",
+      "title": "Compress Vectors Using Scalar or Binary Quantization",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-quantization",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33006",
+      "title": "Vector Query Filters in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/vector-search-filters",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33007",
+      "title": "Hybrid Search Ranking with Reciprocal Rank Fusion",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33008",
+      "title": "Semantic Ranking Overview",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/semantic-search-overview",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33009",
+      "title": "Set Up Integrated Vectorization Using REST APIs",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/search-how-to-integrated-vectorization",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33010",
+      "title": "Generate Embeddings for Search Queries and Documents",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-generate-embeddings",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33011",
+      "title": "Service Limits for Azure AI Search Tiers and SKUs",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/search-limits-quotas-capacity",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33012",
+      "title": "Reliability in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/reliability/reliability-ai-search",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33013",
+      "title": "Search Index Overview in Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/search-what-is-an-index",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33014",
+      "title": "Documents - Index REST API 2026-04-01",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/rest/api/searchservice/documents/?view=rest-searchservice-2026-04-01",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "2026-04-01"
+    },
+    {
+      "id": "REFERENCE-33015",
+      "title": "Search Service REST APIs and Authentication",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/rest/api/searchservice/",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "2026-04-01"
+    },
+    {
+      "id": "REFERENCE-33016",
+      "title": "Create a Private Endpoint for Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/service-create-private-endpoint",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-33017",
+      "title": "Configure Customer-Managed Keys for Azure AI Search",
+      "authors": [
+        {
+          "name": "Microsoft"
+        }
+      ],
+      "canonicalUrl": "https://learn.microsoft.com/en-us/azure/search/search-security-manage-encryption-keys",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-33001",
+      "subject": {
+        "id": "VECTOR-DATABASE-10014",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Azure AI Search supports vector fields with exhaustive K-nearest-neighbor retrieval and HNSW approximate nearest-neighbor search using cosine, dot-product, or Euclidean similarity, plus scalar or binary quantization with optional oversampling, rescoring, and dimension truncation.",
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Azure AI Search stable data-plane API 2026-04-01 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Official vector-search, ranking, compression, API-version, and release documentation describes the currently stable vector schema and query capabilities.",
+      "evidenceIds": [
+        "EVIDENCE-33001"
+      ],
+      "referenceIds": [
+        "REFERENCE-33001",
+        "REFERENCE-33002",
+        "REFERENCE-33003",
+        "REFERENCE-33004",
+        "REFERENCE-33005"
+      ]
+    },
+    {
+      "id": "CLAIM-33002",
+      "subject": {
+        "id": "VECTOR-DATABASE-10014",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Azure AI Search applies OData filters over filterable nonvector fields and supports vector pre-filtering and post-filtering, while strict post-filtering remains preview and has the highest false-negative risk for selective filters or small k values.",
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Filter behavior depends on index creation date, vectorFilterMode, field attributes, shard count, selectivity, k, and stable versus preview API support"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "The official filtering documentation distinguishes preFilter, postFilter, and preview strictPostFilter execution and explains their shard-level recall and latency tradeoffs.",
+      "evidenceIds": [
+        "EVIDENCE-33002"
+      ],
+      "referenceIds": [
+        "REFERENCE-33003",
+        "REFERENCE-33006"
+      ]
+    },
+    {
+      "id": "CLAIM-33003",
+      "subject": {
+        "id": "VECTOR-DATABASE-10014",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Azure AI Search executes lexical and vector queries in parallel for hybrid search, merges ranked lists through Reciprocal Rank Fusion, supports vector weighting and multiple vector queries, and can apply semantic ranking to rerank text-rich hybrid or vector candidates.",
+      "qualifiers": [
+        {
+          "name": "rankingScope",
+          "value": "Candidate counts, vector weights, text recall size, semantic configuration, regional availability, quotas, and billing require workload-specific evaluation"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Hybrid-scoring and semantic-ranking documentation describes RRF, vector weighting, multiple query lists, separate reranker scores, and semantic reranking after initial retrieval.",
+      "evidenceIds": [
+        "EVIDENCE-33003"
+      ],
+      "referenceIds": [
+        "REFERENCE-33003",
+        "REFERENCE-33007",
+        "REFERENCE-33008"
+      ]
+    },
+    {
+      "id": "CLAIM-33004",
+      "subject": {
+        "id": "VECTOR-DATABASE-10014",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Azure AI Search can create indexing pipelines that extract, chunk, enrich, and vectorize supported source content by using indexers and skillsets, while query-time vectorizers call external embedding models; the search service itself does not host embedding models.",
+      "qualifiers": [
+        {
+          "name": "pipelineScope",
+          "value": "Integrated vectorization depends on supported data sources, indexers, skillsets, external model endpoints, managed identities, model quotas, and API-version compatibility"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Integrated-vectorization and embedding documentation separates search-managed orchestration from external model hosting and describes chunking, skillsets, vector fields, and query vectorizers.",
+      "evidenceIds": [
+        "EVIDENCE-33004"
+      ],
+      "referenceIds": [
+        "REFERENCE-33002",
+        "REFERENCE-33009",
+        "REFERENCE-33010"
+      ]
+    },
+    {
+      "id": "CLAIM-33005",
+      "subject": {
+        "id": "VECTOR-DATABASE-10014",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Azure AI Search is a managed service that scales through partitions and replicas, uses asynchronous replica propagation, provides document-level indexing results and Azure security controls, and is designed to be rebuilt from an authoritative data source rather than used as a primary database with native self-service backup and restore.",
+      "qualifiers": [
+        {
+          "name": "operationsScope",
+          "value": "Effective availability, durability, security, recovery, and cost depend on pricing tier, replica and partition counts, region, zone support, client retries, external source data, and tested rebuild procedures"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Capacity, reliability, index, document API, authentication, networking, and encryption documentation describes service units, replication, SLA thresholds, per-document results, primary-store boundaries, recovery patterns, and security controls.",
+      "evidenceIds": [
+        "EVIDENCE-33005"
+      ],
+      "referenceIds": [
+        "REFERENCE-33011",
+        "REFERENCE-33012",
+        "REFERENCE-33013",
+        "REFERENCE-33014",
+        "REFERENCE-33015",
+        "REFERENCE-33016",
+        "REFERENCE-33017"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-33001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Microsoft documentation describes exact exhaustive KNN and HNSW ANN vector retrieval, three similarity metrics, scalar and binary quantization, oversampling, rescoring, and optional dimension truncation.",
+      "interpretation": "The RKM profile can represent Azure AI Search as a managed vector search service with both exact and graph-based retrieval plus built-in compression controls.",
+      "claimIds": [
+        "CLAIM-33001"
+      ],
+      "referenceIds": [
+        "REFERENCE-33001",
+        "REFERENCE-33002",
+        "REFERENCE-33003",
+        "REFERENCE-33004",
+        "REFERENCE-33005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-33001",
+          "locator": "Stable data-plane API version 2026-04-01"
+        },
+        {
+          "referenceId": "REFERENCE-33004",
+          "locator": "Exhaustive KNN and HNSW algorithms, metrics, memory, recall, and query behavior"
+        },
+        {
+          "referenceId": "REFERENCE-33005",
+          "locator": "Scalar and binary quantization, oversampling, rescoring, and truncation dimensions"
+        }
+      ],
+      "limitations": [
+        "Official product documentation is not an independent recall, latency, cost, or scalability benchmark.",
+        "Compression, metric, dimensions, HNSW settings, vector quota, oversampling, and preserved-original configuration materially affect quality and cost."
+      ]
+    },
+    {
+      "id": "EVIDENCE-33002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Azure AI Search documents preFilter as the recommended default for newer indexes, postFilter as shard-local candidate filtering, and strictPostFilter as a preview mode that filters the unfiltered global top k.",
+      "interpretation": "The RKM profile can mark metadata filtering as supported while warning that execution placement changes recall, latency, and result completeness.",
+      "claimIds": [
+        "CLAIM-33002"
+      ],
+      "referenceIds": [
+        "REFERENCE-33003",
+        "REFERENCE-33006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-33006",
+          "locator": "preFilter, postFilter, and preview strictPostFilter semantics and tradeoffs"
+        },
+        {
+          "referenceId": "REFERENCE-33003",
+          "locator": "Vector search combined with filters over nonvector fields"
+        }
+      ],
+      "limitations": [
+        "Vector fields themselves are not filterable; filters target filterable nonvector fields in the same index.",
+        "Selective filters, small k values, and multiple shards can produce false negatives or fewer results in post-filter modes."
+      ]
+    },
+    {
+      "id": "EVIDENCE-33003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Azure AI Search hybrid-search documentation describes parallel lexical and vector retrieval, RRF list merging, vector weighting, multiple vector queries, and semantic reranking with a separate reranker score.",
+      "interpretation": "The RKM profile can represent BM25-plus-vector hybrid retrieval, RRF, multi-vector retrieval, and semantic reranking as first-class managed capabilities.",
+      "claimIds": [
+        "CLAIM-33003"
+      ],
+      "referenceIds": [
+        "REFERENCE-33003",
+        "REFERENCE-33007",
+        "REFERENCE-33008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-33007",
+          "locator": "RRF merging, vector weighting, subscores, candidate counts, and semantic reranking after fusion"
+        },
+        {
+          "referenceId": "REFERENCE-33008",
+          "locator": "Semantic ranker reranks an existing top candidate set and returns captions or answers from indexed text"
+        },
+        {
+          "referenceId": "REFERENCE-33003",
+          "locator": "Hybrid keyword and vector queries execute in parallel"
+        }
+      ],
+      "limitations": [
+        "Semantic ranker does not rerun retrieval over the entire corpus and generally reranks only the existing top candidate set.",
+        "RRF, vector weights, candidate k, lexical recall size, semantic configuration, quotas, latency, and billing require workload-specific evaluation."
+      ]
+    },
+    {
+      "id": "EVIDENCE-33004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Microsoft documentation describes indexer and skillset pipelines for extraction, chunking, enrichment, and vectorization plus query-time vectorizers that call external embedding models.",
+      "interpretation": "The RKM profile can distinguish managed ingestion orchestration from model hosting and record integrated vectorization as an indexing and query integration rather than an embedded model runtime.",
+      "claimIds": [
+        "CLAIM-33004"
+      ],
+      "referenceIds": [
+        "REFERENCE-33002",
+        "REFERENCE-33009",
+        "REFERENCE-33010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-33009",
+          "locator": "Skillsets, built-in chunking, embedding skills, vector fields, and indexer execution"
+        },
+        {
+          "referenceId": "REFERENCE-33010",
+          "locator": "Integrated or manual vectorization and the statement that Azure AI Search does not host embedding models"
+        },
+        {
+          "referenceId": "REFERENCE-33002",
+          "locator": "Current stable and preview feature availability"
+        }
+      ],
+      "limitations": [
+        "Integrated vectorization is limited to supported indexer sources, skills, models, regions, API versions, and service tiers.",
+        "External embedding quotas, latency, authentication, model changes, and failures become part of the indexing and query reliability envelope."
+      ]
+    },
+    {
+      "id": "EVIDENCE-33005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Azure AI Search documentation describes partition-and-replica capacity, asynchronous replica propagation, SLA replica thresholds, per-document write statuses, primary-store boundaries, rebuild-based recovery, RBAC, private endpoints, and customer-managed encryption keys.",
+      "interpretation": "The RKM profile can mark high managed scalability and security while recording eventual consistency, document-level write semantics, and variable backup and restore capabilities.",
+      "claimIds": [
+        "CLAIM-33005"
+      ],
+      "referenceIds": [
+        "REFERENCE-33011",
+        "REFERENCE-33012",
+        "REFERENCE-33013",
+        "REFERENCE-33014",
+        "REFERENCE-33015",
+        "REFERENCE-33016",
+        "REFERENCE-33017"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-33011",
+          "locator": "Partitions, replicas, search units, tier limits, and SLA replica thresholds"
+        },
+        {
+          "referenceId": "REFERENCE-33012",
+          "locator": "Asynchronous replication, zone behavior, primary-store guidance, and lack of native self-service backup and restore"
+        },
+        {
+          "referenceId": "REFERENCE-33014",
+          "locator": "Batch document actions with independent per-document indexing results"
+        },
+        {
+          "referenceId": "REFERENCE-33016",
+          "locator": "Private Link, private endpoints, and disabling public network access"
+        },
+        {
+          "referenceId": "REFERENCE-33017",
+          "locator": "Microsoft-managed encryption and customer-managed keys for search objects"
+        }
+      ],
+      "limitations": [
+        "Azure AI Search is a secondary search index, so authoritative source retention and a tested rebuild or export process remain the customer's responsibility.",
+        "Asynchronous replication can expose temporary staleness, and writes not yet replicated from a failed primary can be lost during a zone failure."
+      ]
+    }
+  ]
+}
