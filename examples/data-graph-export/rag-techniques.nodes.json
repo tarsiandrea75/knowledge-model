@@ -550,5 +550,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10005",
+    "type": "VectorDatabase",
+    "label": "Pinecone",
+    "sourceDataFile": "data/vector-databases/pinecone.json",
+    "properties": {
+      "keywords": [
+        "managed vector search",
+        "serverless vector database",
+        "dense vectors",
+        "sparse vectors",
+        "hybrid search",
+        "metadata filtering",
+        "namespaces",
+        "integrated inference",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "pinecone",
+      "status": "Draft",
+      "summary": "Pinecone is a managed serverless vector search service that provides dense, sparse, and hybrid retrieval, metadata filtering, namespaces, integrated inference, and optional dedicated read capacity.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
