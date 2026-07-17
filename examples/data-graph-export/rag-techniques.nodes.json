@@ -605,5 +605,34 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10007",
+    "type": "VectorDatabase",
+    "label": "Elasticsearch",
+    "sourceDataFile": "data/vector-databases/elasticsearch.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "Apache Lucene",
+        "dense vector",
+        "HNSW",
+        "DiskBBQ",
+        "BM25",
+        "hybrid retrieval",
+        "reciprocal rank fusion",
+        "metadata filtering",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "elasticsearch",
+      "status": "Draft",
+      "summary": "Elasticsearch is a distributed search and analytics engine with native dense-vector, filtered kNN, lexical, semantic, and hybrid retrieval capabilities.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
