@@ -719,5 +719,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10011",
+    "type": "VectorDatabase",
+    "label": "Neo4j",
+    "sourceDataFile": "data/vector-databases/neo4j.json",
+    "properties": {
+      "keywords": [
+        "graph database",
+        "property graph",
+        "vector search",
+        "HNSW",
+        "Cypher",
+        "GraphRAG",
+        "knowledge graph",
+        "hybrid retrieval",
+        "Neo4j Aura"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "neo4j",
+      "status": "Draft",
+      "summary": "Neo4j is a native property-graph database with Lucene-powered vector indexes for nodes and relationships, filtered ANN search, full-text and vector hybrid retrieval, and graph traversal through Cypher.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
