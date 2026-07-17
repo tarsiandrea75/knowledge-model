@@ -747,5 +747,34 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10012",
+    "type": "VectorDatabase",
+    "label": "LanceDB",
+    "sourceDataFile": "data/vector-databases/lancedb.json",
+    "properties": {
+      "keywords": [
+        "embedded vector database",
+        "Lance format",
+        "Apache Arrow",
+        "IVF",
+        "HNSW",
+        "IVF_PQ",
+        "hybrid search",
+        "object storage",
+        "multimodal data",
+        "RAG retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "lancedb",
+      "status": "Draft",
+      "summary": "LanceDB is an embedded, disk-first vector database built on the Lance columnar format, with exact and approximate vector search, filtering, full-text search, hybrid retrieval, and a remote Enterprise deployment model.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]

@@ -288,6 +288,18 @@
     }
   },
   {
+    "id": "EDGE-VECTOR-DATABASE-10012-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10012",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/lancedb.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
     "id": "RELATIONSHIP-10001",
     "predicate": "CAN_PRECEDE_IN_PIPELINE",
     "sourceId": "TECHNIQUE-10002",
