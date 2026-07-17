@@ -93,6 +93,10 @@
       "schema": "schema/vector-database.schema.json"
     },
     {
+      "file": "data/vector-databases/neo4j.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
       "file": "data/relationships/component-specialization-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },
