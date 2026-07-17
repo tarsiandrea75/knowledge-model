@@ -805,5 +805,34 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10014",
+    "type": "VectorDatabase",
+    "label": "Azure AI Search",
+    "sourceDataFile": "data/vector-databases/azure-ai-search.json",
+    "properties": {
+      "keywords": [
+        "managed search service",
+        "vector search",
+        "HNSW",
+        "exhaustive KNN",
+        "hybrid search",
+        "reciprocal rank fusion",
+        "semantic ranker",
+        "integrated vectorization",
+        "Azure",
+        "RAG"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "azure-ai-search",
+      "status": "Draft",
+      "summary": "Azure AI Search is a fully managed cloud search service with exact and HNSW vector retrieval, OData filtering, BM25-vector hybrid search, reciprocal-rank fusion, semantic reranking, and integrated indexing and vectorization pipelines.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
