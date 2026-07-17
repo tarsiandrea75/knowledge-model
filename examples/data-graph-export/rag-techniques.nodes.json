@@ -495,5 +495,32 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10003",
+    "type": "VectorDatabase",
+    "label": "Weaviate",
+    "sourceDataFile": "data/vector-databases/weaviate.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "HNSW",
+        "HFresh",
+        "BM25F",
+        "hybrid search",
+        "pre-filtering",
+        "multi-tenancy",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "weaviate",
+      "status": "Draft",
+      "summary": "Weaviate is an open-source dedicated vector database that combines vector similarity search, structured pre-filtering, BM25F keyword retrieval, and configurable hybrid fusion.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
