@@ -1,0 +1,842 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10017",
+    "slug": "memgraph",
+    "name": {
+      "official": "Memgraph",
+      "display": "Memgraph",
+      "short": "Memgraph"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Memgraph DB",
+      "Memgraph Community",
+      "Memgraph Enterprise",
+      "Memgraph Cloud",
+      "Memgraph Graph Database"
+    ],
+    "keywords": [
+      "graph database",
+      "property graph",
+      "Cypher",
+      "vector search",
+      "HNSW",
+      "USearch",
+      "text search",
+      "GraphRAG",
+      "MAGE",
+      "streaming graph",
+      "AI memory"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Graph Databases With Vector Support",
+      "category": "Graph And Vector Retrieval Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "LicenseRef-Memgraph-Edition-Dependent",
+    "language": "en",
+    "provenance": {
+      "source": "Official Memgraph release notes, vector-search, single-store architecture, text-search, GraphRAG, durability, transaction, storage, replication, backup, security, monitoring, streaming, algorithms, client, deployment, source-code, and licensing documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Memgraph is a Cypher-compatible property-graph database with native node and edge vector indexes, text search, streaming ingestion, graph algorithms, and GraphRAG tooling; its USearch-backed HNSW-style vector subsystem uses READ_UNCOMMITTED isolation and must be evaluated separately from ordinary graph transaction guarantees.",
+    "description": "Memgraph is a real-time property-graph database that exposes Cypher-compatible querying, multiple storage modes, streaming ingestion, full-text search, MAGE graph algorithms, replication, and deployment across local, self-hosted, Kubernetes, Enterprise, and cloud environments. Its native vector-search feature supports vector indexes on nodes and edges. Index definitions specify dimension, capacity, similarity metric, scalar representation, and label or edge-type scope, while vector_search procedures return approximate nearest neighbors for explicit composition with Cypher traversals, graph properties, text-search results, and algorithms. Memgraph documents a single-store vector design backed by USearch: the vector index owns the vector payload and the property store retains a reference rather than duplicating the same embedding. This architecture makes connected vector retrieval practical, but it also creates important operational boundaries. The query planner does not currently select vector indexes automatically, vector-index isolation is READ_UNCOMMITTED, and graph, text, vector, and algorithm scores require explicit application-level fusion or ranking. The main database can provide stronger transaction and durability behavior according to storage mode, WAL, snapshots, replication, and edition, yet those guarantees must not be projected automatically onto the vector subsystem. Memgraph is therefore most compelling when graph structure, streaming updates, connected context, or graph algorithms materially improve retrieval quality or explainability; a dedicated vector service may be simpler when graph relationships add no decision value."
+  },
+  "vectorDatabase": {
+    "databaseType": "Graph Database With Vector Support",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "HNSW",
+      "Graph Based ANN",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Other"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text"
+      ],
+      "preFilterSupported": false,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Graph Plus Vector",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "Medium",
+      "verticalScaling": "High",
+      "shardingSupported": false,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": false
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "Rust",
+        "C#",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "Variable",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Version the embedding model, vector dimension, metric, scalar kind, index capacity, label or edge-type scope, Memgraph version, edition, and storage mode as one ingestion contract.",
+        "Create separate node and edge vector indexes only where each search surface has an explicit retrieval use case and evaluation set.",
+        "Treat index labels, edge types, and wildcard scope as index-design choices rather than assuming arbitrary query-time metadata prefiltering.",
+        "Size graph data, vector indexes, text indexes, transaction working sets, MAGE algorithms, WAL, snapshots, and replicas together because they compete for memory, CPU, disk, and recovery time.",
+        "Keep authoritative source text and a reproducible embedding pipeline so indexes can be rebuilt after model, dimension, scalar, capacity, or schema changes."
+      ],
+      "retrievalConsiderations": [
+        "Invoke vector_search procedures explicitly because the query planner does not currently choose vector indexes automatically.",
+        "Evaluate node-vector, edge-vector, text-only, graph-only, vector-plus-traversal, text-plus-graph, and algorithm-augmented retrieval on the same relevance set.",
+        "Calibrate vector similarity, text relevance, traversal heuristics, and graph-algorithm scores explicitly instead of treating them as directly comparable.",
+        "Measure whether label or edge-type index scope and subsequent Cypher filtering reduce candidate completeness or return fewer than the requested top-k.",
+        "Test vector-index visibility, retries, and repair procedures independently because vector indexes use READ_UNCOMMITTED isolation.",
+        "Tune top-k, graph expansion depth, path constraints, text candidate windows, algorithm concurrency, and stream-update rate against relevance, latency, and memory budgets."
+      ]
+    },
+    "limitations": [
+      "Vector indexes use READ_UNCOMMITTED isolation, so their visibility and consistency boundaries are weaker than ordinary graph transaction guarantees.",
+      "The query planner does not currently utilize vector indexes automatically; applications must call the vector_search procedures explicitly.",
+      "Vector search is approximate and depends on embedding geometry, dimension, metric, scalar representation, index capacity, memory pressure, and workload concurrency.",
+      "Index label or edge-type scope and post-search Cypher composition are not equivalent to arbitrary in-index query-time metadata prefiltering.",
+      "Graph, vector, text, and algorithm scores are not automatically normalized or fused into a universal hybrid ranking.",
+      "On-disk transactional graph storage does not imply disk-backed vector indexing; vector memory must be sized separately.",
+      "Native sharding is not represented as supported by this record; horizontal scale relies primarily on deployment topology, replication, and workload partitioning.",
+      "High availability, advanced security, multi-tenancy, support, and managed operations vary by Community, Enterprise, and cloud offering.",
+      "Official Memgraph documentation does not replace independent recall, latency, durability, cost, or recovery benchmarking."
+    ],
+    "usageGuidance": [
+      "Use Memgraph when RAG or agent retrieval benefits materially from semantic similarity combined with explicit relationships, paths, streaming updates, graph algorithms, or connected memory.",
+      "Use native node and edge vector indexes when keeping embeddings close to the graph reduces integration complexity and enables direct Cypher expansion from retrieved candidates.",
+      "Prefer a dedicated vector or search service when graph relationships, graph algorithms, and connected explanations do not improve retrieval quality enough to justify graph operational complexity.",
+      "Prefer an RDF or SPARQL-oriented graph system when RDF semantics, standards-based ontology reasoning, or SPARQL compatibility are mandatory.",
+      "Record Memgraph version, edition, deployment, storage mode, vector-index definition, embedding model, query procedures, text-search configuration, and MAGE algorithms in every evaluation."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-36001",
+      "title": "Memgraph Release Notes: v3.12.0",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/release-notes",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-07-15",
+      "version": "3.12.0"
+    },
+    {
+      "id": "REFERENCE-36002",
+      "title": "Memgraph Source Code Repository",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://github.com/memgraph/memgraph",
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "3.12.0"
+    },
+    {
+      "id": "REFERENCE-36003",
+      "title": "Memgraph Graph Database Product Overview",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/memgraphdb",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36004",
+      "title": "Vector Search in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/querying/vector-search",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36005",
+      "title": "Text Search in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/querying/text-search",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36006",
+      "title": "GraphRAG with Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/ai-ecosystem/graph-rag",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36007",
+      "title": "Single-Store Vector Index Architecture in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/blog/single-store-vector-index",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-02-24"
+    },
+    {
+      "id": "REFERENCE-36008",
+      "title": "Data Durability in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/fundamentals/data-durability",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36009",
+      "title": "Transactions in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/fundamentals/transactions",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36010",
+      "title": "Storage Modes and Access in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/fundamentals/storage-access",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36011",
+      "title": "Replication in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/clustering/replication",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36012",
+      "title": "High Availability in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/clustering/high-availability",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36013",
+      "title": "Backup and Restore in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/database-management/backup-and-restore",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36014",
+      "title": "Authentication and Authorization in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/database-management/authentication-and-authorization",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36015",
+      "title": "Monitoring Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/database-management/monitoring",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36016",
+      "title": "Data Streams in Memgraph",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/data-streams",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36017",
+      "title": "Graph Algorithms in Memgraph MAGE",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/advanced-algorithms/run-algorithms",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36018",
+      "title": "Memgraph Java Client Guide",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/client-libraries/java",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36019",
+      "title": "Deploy Memgraph on Kubernetes",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/docs/getting-started/install-memgraph/kubernetes",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-36020",
+      "title": "Memgraph Legal and Licensing Information",
+      "authors": [
+        {
+          "name": "Memgraph"
+        }
+      ],
+      "canonicalUrl": "https://memgraph.com/legal",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-36001",
+      "subject": {
+        "id": "VECTOR-DATABASE-10017",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Memgraph is a Cypher-compatible property-graph database available for local, self-hosted, and managed-cloud deployment, with transactional and analytical storage modes, streaming ingestion, text search, graph algorithms, and native vector-search capabilities for connected-data and GraphRAG workloads.",
+      "qualifiers": [
+        {
+          "name": "productScope",
+          "value": "Memgraph v3.12 documentation and product surfaces accessed 2026-07-17; feature availability depends on edition, deployment, and storage mode"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Official Memgraph documentation describes the graph database, deployment options, storage modes, data streams, text search, MAGE algorithms, GraphRAG integration, and vector search as parts of the product ecosystem.",
+      "evidenceIds": [
+        "EVIDENCE-36001"
+      ],
+      "referenceIds": [
+        "REFERENCE-36001",
+        "REFERENCE-36002",
+        "REFERENCE-36003",
+        "REFERENCE-36005",
+        "REFERENCE-36006",
+        "REFERENCE-36010",
+        "REFERENCE-36016",
+        "REFERENCE-36017",
+        "REFERENCE-36019"
+      ]
+    },
+    {
+      "id": "CLAIM-36002",
+      "subject": {
+        "id": "VECTOR-DATABASE-10017",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Memgraph provides native approximate vector indexes for both nodes and edges using a USearch-backed single-store architecture with HNSW-style retrieval; indexes define dimension, capacity, metric, scalar kind, and label or edge-type scope, and searches are invoked through vector_search procedures rather than automatic query-planner index selection.",
+      "qualifiers": [
+        {
+          "name": "vectorScope",
+          "value": "Current node and edge vector-index documentation and single-store architecture article accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "The vector-search documentation defines node and edge index creation, index configuration, supported metrics and scalar kinds, search procedures, and the current query-planner limitation; the architecture article explains the USearch-backed single-store design.",
+      "evidenceIds": [
+        "EVIDENCE-36002"
+      ],
+      "referenceIds": [
+        "REFERENCE-36004",
+        "REFERENCE-36007"
+      ]
+    },
+    {
+      "id": "CLAIM-36003",
+      "subject": {
+        "id": "VECTOR-DATABASE-10017",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Memgraph can compose vector candidates with Cypher traversals, graph properties, text search, and MAGE algorithms, enabling graph-plus-vector and graph-plus-text retrieval patterns for GraphRAG, recommendation, fraud analysis, connected context, and agent memory.",
+      "qualifiers": [
+        {
+          "name": "retrievalScope",
+          "value": "Composition through explicit procedures and Cypher queries; no universal automatic score calibration or planner-driven vector-index selection is asserted"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Memgraph documents GraphRAG workflows, text-search procedures, vector-search procedures, Cypher graph expansion, and MAGE algorithms that can be explicitly combined by applications.",
+      "evidenceIds": [
+        "EVIDENCE-36003"
+      ],
+      "referenceIds": [
+        "REFERENCE-36004",
+        "REFERENCE-36005",
+        "REFERENCE-36006",
+        "REFERENCE-36017"
+      ]
+    },
+    {
+      "id": "CLAIM-36004",
+      "subject": {
+        "id": "VECTOR-DATABASE-10017",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Memgraph graph operations provide transaction and durability behavior according to the selected storage mode, WAL, and snapshot configuration, but vector indexes use READ_UNCOMMITTED isolation, so vector-index changes can be observed outside the stronger transactional guarantees of ordinary graph mutations.",
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Memgraph v3.12 transaction, durability, storage-mode, and vector-index documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "The transaction and durability documentation describes graph transaction handling, storage modes, WAL, and snapshots, while vector-search documentation explicitly identifies READ_UNCOMMITTED isolation for vector indexes.",
+      "evidenceIds": [
+        "EVIDENCE-36004"
+      ],
+      "referenceIds": [
+        "REFERENCE-36001",
+        "REFERENCE-36004",
+        "REFERENCE-36008",
+        "REFERENCE-36009",
+        "REFERENCE-36010"
+      ]
+    },
+    {
+      "id": "CLAIM-36005",
+      "subject": {
+        "id": "VECTOR-DATABASE-10017",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Memgraph supports operational patterns including synchronous or asynchronous replication, edition-dependent high availability and multi-tenancy, backup and restore, authentication and authorization, monitoring, streaming ingestion, client drivers, and Kubernetes deployment; licensing and advanced capabilities vary between Community, Enterprise, and cloud offerings.",
+      "qualifiers": [
+        {
+          "name": "operationsScope",
+          "value": "Operational and licensing capabilities depend on Memgraph edition, deployment topology, and version"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Official documentation covers replication, high availability, backups, security, monitoring, streams, client access, Kubernetes deployment, and legal or licensing terms.",
+      "evidenceIds": [
+        "EVIDENCE-36005"
+      ],
+      "referenceIds": [
+        "REFERENCE-36002",
+        "REFERENCE-36003",
+        "REFERENCE-36011",
+        "REFERENCE-36012",
+        "REFERENCE-36013",
+        "REFERENCE-36014",
+        "REFERENCE-36015",
+        "REFERENCE-36016",
+        "REFERENCE-36018",
+        "REFERENCE-36019",
+        "REFERENCE-36020"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-36001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Memgraph documentation presents a Cypher-compatible graph database with local, self-hosted, Kubernetes, and cloud deployment choices, multiple storage modes, data streams, text search, MAGE algorithms, GraphRAG tooling, and native vector search.",
+      "interpretation": "RKM can classify Memgraph as a graph database with vector support rather than as a standalone vector store or only an external GraphRAG integration.",
+      "claimIds": [
+        "CLAIM-36001"
+      ],
+      "referenceIds": [
+        "REFERENCE-36001",
+        "REFERENCE-36002",
+        "REFERENCE-36003",
+        "REFERENCE-36005",
+        "REFERENCE-36006",
+        "REFERENCE-36010",
+        "REFERENCE-36016",
+        "REFERENCE-36017",
+        "REFERENCE-36019"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-36001",
+          "locator": "v3.12.0 product release and current feature baseline"
+        },
+        {
+          "referenceId": "REFERENCE-36003",
+          "locator": "Graph database product and deployment overview"
+        },
+        {
+          "referenceId": "REFERENCE-36006",
+          "locator": "GraphRAG integration patterns"
+        },
+        {
+          "referenceId": "REFERENCE-36010",
+          "locator": "In-memory transactional, in-memory analytical, and on-disk transactional storage modes"
+        }
+      ],
+      "limitations": [
+        "Official product documentation is not an independent performance, retrieval-quality, availability, or cost benchmark.",
+        "Community, Enterprise, and managed-cloud deployments do not expose identical operational capabilities."
+      ]
+    },
+    {
+      "id": "EVIDENCE-36002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Memgraph documents native node and edge vector indexes with dimension, capacity, metric, scalar-kind, and label or edge-type configuration, vector_search search procedures, USearch-backed single-store storage, and a current limitation that the query planner does not automatically use vector indexes.",
+      "interpretation": "RKM should model native HNSW-style graph vector search while requiring explicit procedure invocation and distinguishing index scope from arbitrary query-time prefiltering.",
+      "claimIds": [
+        "CLAIM-36002"
+      ],
+      "referenceIds": [
+        "REFERENCE-36004",
+        "REFERENCE-36007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-36004",
+          "locator": "CREATE VECTOR INDEX and CREATE VECTOR EDGE INDEX configuration; search and search_edges procedures; supported metrics; planner limitation"
+        },
+        {
+          "referenceId": "REFERENCE-36007",
+          "locator": "USearch-backed single-store vector architecture and avoidance of duplicate vector-property storage"
+        }
+      ],
+      "limitations": [
+        "Approximate nearest-neighbor quality and latency depend on embedding distribution, dimension, metric, scalar kind, index capacity, memory pressure, and workload concurrency.",
+        "The query planner limitation means ordinary Cypher pattern matching does not transparently become a vector-index query."
+      ]
+    },
+    {
+      "id": "EVIDENCE-36003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Memgraph provides vector and text-search procedures, Cypher graph traversal, GraphRAG examples, and MAGE algorithms that applications can compose into connected retrieval pipelines.",
+      "interpretation": "RKM can mark Graph Plus Vector hybrid retrieval as supported, but should not claim automatic BM25-vector fusion, score normalization, or a universal built-in hybrid ranker.",
+      "claimIds": [
+        "CLAIM-36003"
+      ],
+      "referenceIds": [
+        "REFERENCE-36004",
+        "REFERENCE-36005",
+        "REFERENCE-36006",
+        "REFERENCE-36017"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-36004",
+          "locator": "Vector-search procedures returning node or edge candidates and similarity scores"
+        },
+        {
+          "referenceId": "REFERENCE-36005",
+          "locator": "Tantivy-backed text-search procedures"
+        },
+        {
+          "referenceId": "REFERENCE-36006",
+          "locator": "GraphRAG workflows using graph structure and semantic context"
+        },
+        {
+          "referenceId": "REFERENCE-36017",
+          "locator": "MAGE graph algorithms callable from Cypher workflows"
+        }
+      ],
+      "limitations": [
+        "Vector, text, traversal, and algorithm scores have different semantics and require application-level ranking or calibration.",
+        "Post-search graph filtering or expansion can reduce result count and change relevance relative to the original vector top-k."
+      ]
+    },
+    {
+      "id": "EVIDENCE-36004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Memgraph documents transaction behavior and storage-mode-dependent durability with WAL and snapshots, while its vector-index documentation explicitly states READ_UNCOMMITTED isolation for node and edge vector indexes.",
+      "interpretation": "RKM must rate vector-workload transaction support as limited even though ordinary graph operations can provide stronger transaction and durability guarantees.",
+      "claimIds": [
+        "CLAIM-36004"
+      ],
+      "referenceIds": [
+        "REFERENCE-36001",
+        "REFERENCE-36004",
+        "REFERENCE-36008",
+        "REFERENCE-36009",
+        "REFERENCE-36010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-36004",
+          "locator": "READ_UNCOMMITTED isolation for vector indexes"
+        },
+        {
+          "referenceId": "REFERENCE-36008",
+          "locator": "WAL, snapshots, recovery, and v3.12 WAL checksum protection"
+        },
+        {
+          "referenceId": "REFERENCE-36009",
+          "locator": "Transaction lifecycle and isolation behavior for graph operations"
+        },
+        {
+          "referenceId": "REFERENCE-36010",
+          "locator": "Storage-mode-specific durability and transaction trade-offs"
+        }
+      ],
+      "limitations": [
+        "Applications must test visibility and retry behavior when graph properties and vector indexes are updated together.",
+        "On-disk graph storage does not imply that the vector index itself is disk-backed or isolated by the same transaction boundary."
+      ]
+    },
+    {
+      "id": "EVIDENCE-36005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Memgraph documentation covers replication, high availability, backups, authentication and authorization, monitoring, data streams, Java and other Bolt-compatible clients, Kubernetes deployment, and edition-dependent legal and licensing terms.",
+      "interpretation": "RKM can represent broad operational support while marking access control, multi-tenancy, high availability, and licensing as edition- and deployment-dependent rather than universally available.",
+      "claimIds": [
+        "CLAIM-36005"
+      ],
+      "referenceIds": [
+        "REFERENCE-36002",
+        "REFERENCE-36003",
+        "REFERENCE-36011",
+        "REFERENCE-36012",
+        "REFERENCE-36013",
+        "REFERENCE-36014",
+        "REFERENCE-36015",
+        "REFERENCE-36016",
+        "REFERENCE-36018",
+        "REFERENCE-36019",
+        "REFERENCE-36020"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-36011",
+          "locator": "Synchronous and asynchronous replication topology and behavior"
+        },
+        {
+          "referenceId": "REFERENCE-36012",
+          "locator": "High-availability coordination and failover capabilities"
+        },
+        {
+          "referenceId": "REFERENCE-36013",
+          "locator": "Backup and restore procedures"
+        },
+        {
+          "referenceId": "REFERENCE-36014",
+          "locator": "Authentication, authorization, roles, and permissions"
+        },
+        {
+          "referenceId": "REFERENCE-36015",
+          "locator": "Monitoring and operational metrics"
+        },
+        {
+          "referenceId": "REFERENCE-36019",
+          "locator": "Kubernetes deployment guidance"
+        },
+        {
+          "referenceId": "REFERENCE-36020",
+          "locator": "Edition-dependent licensing and legal terms"
+        }
+      ],
+      "limitations": [
+        "High availability, advanced security, multi-tenancy, support, and managed operations may require Enterprise or cloud offerings.",
+        "Replication and backups do not replace application-level recovery tests, embedding regeneration plans, or cross-region continuity design."
+      ]
+    }
+  ]
+}
