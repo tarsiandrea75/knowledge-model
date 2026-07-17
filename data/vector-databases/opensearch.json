@@ -1,0 +1,651 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10008",
+    "slug": "opensearch",
+    "name": {
+      "official": "OpenSearch",
+      "display": "OpenSearch",
+      "short": "OpenSearch"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "OpenSearch Project",
+      "OpenSearch Vector Search",
+      "Amazon OpenSearch"
+    ],
+    "keywords": [
+      "distributed search engine",
+      "Lucene",
+      "Faiss",
+      "HNSW",
+      "IVF",
+      "k-NN",
+      "hybrid search",
+      "neural search",
+      "vector quantization",
+      "RAG retrieval"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Search Engines With Vector Support",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official OpenSearch, Amazon Web Services, repository, release, and documentation sources",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "OpenSearch is an open-source distributed search and analytics engine with native exact, approximate, filtered, sparse, neural, and hybrid vector retrieval.",
+    "description": "OpenSearch combines Lucene-based lexical search and analytics with configurable k-nearest-neighbor vector fields, Lucene and Faiss ANN engines, HNSW and IVF methods, vector quantization, efficient filtering, neural sparse retrieval, and search-pipeline-based hybrid fusion. It runs locally or in self-managed clusters and is available through Amazon OpenSearch Service and OpenSearch Serverless. This record distinguishes open-source engine capabilities from AWS-managed deployment guarantees and from algorithm-, version-, and workload-dependent performance behavior."
+  },
+  "vectorDatabase": {
+    "databaseType": "Search Engine With Vector Support",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Serverless",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "IVF",
+      "IVF Flat",
+      "Product Quantization",
+      "Scalar Quantization",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Manhattan Distance",
+      "Hamming Distance",
+      "Other"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Nested Fields",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Document Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose Lucene or Faiss, HNSW or IVF, vector dimensions, spaces, workload mode, and quantization only after measuring recall, latency, memory, disk, ingestion, and build cost.",
+        "Plan primary shards, replicas, node roles, allocation domains, recovery capacity, and shard size before large-scale ingestion.",
+        "Use explicit mappings and index templates for vector, text, sparse, and metadata fields rather than relying on accidental dynamic mappings.",
+        "Treat open-source, Amazon managed-domain, and serverless index settings as separate compatibility targets."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate BM25-only, dense-vector, neural-sparse, and hybrid retrieval on the same relevance set.",
+        "Place efficient filters inside supported k-NN queries when top-k filtered recall matters and distinguish them from post-filtering.",
+        "Tune k, candidate counts, HNSW or IVF parameters, normalization, fusion weights, rank constants, and reranking under representative load.",
+        "Profile shard-level execution and coordinating-node pipeline costs separately."
+      ]
+    },
+    "limitations": [
+      "OpenSearch is a broad search and analytics platform, so its schema, cluster, plugin, and operational surface is larger than that of a dedicated vector database.",
+      "ANN engines, algorithms, quantization, compression, and on-disk modes trade recall and indexing cost for memory, storage, and query efficiency.",
+      "Filter placement changes execution strategy and top-k guarantees; post-filtering can return fewer than the requested neighbors.",
+      "Hybrid search depends on search pipelines, candidate windows, normalization, fusion, model quality, and coordinating-node resources.",
+      "Shard count, replica placement, recovery, segment merges, caches, and hot spots can materially affect performance and resilience.",
+      "Amazon OpenSearch Service and Serverless expose deployment-specific quotas, pricing, supported APIs, plugins, regions, and operational behavior.",
+      "Search visibility is near-real-time and can lag acknowledged writes until refresh.",
+      "OpenSearch does not provide general relational-style multi-document ACID transactions."
+    ],
+    "usageGuidance": [
+      "Record OpenSearch, Lucene, plugin, client, and model versions because vector defaults, APIs, algorithms, and search-pipeline behavior change across releases.",
+      "Benchmark the exact engine, algorithm, compression, shard topology, filter selectivity, query mix, and hardware intended for production.",
+      "Use snapshots and restore drills for disaster recovery; replicas improve availability but do not replace backups.",
+      "Monitor cluster and shard health, refresh and merge pressure, vector-memory usage, native-library caches, disk watermarks, latency, recall, and hybrid relevance.",
+      "Review managed-service compatibility and security boundaries before moving between self-hosted, provisioned, and serverless deployments."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-27001",
+      "title": "OpenSearch 3.7.0 Release",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/opensearch-project/OpenSearch/releases/tag/3.7.0",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-06-09",
+      "version": "3.7.0",
+      "repository": "https://github.com/opensearch-project/OpenSearch"
+    },
+    {
+      "id": "REFERENCE-27002",
+      "title": "OpenSearch Documentation: Vector Search",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/vector-search/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27003",
+      "title": "OpenSearch Documentation: k-NN Vector Field",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/mappings/supported-field-types/knn-vector/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27004",
+      "title": "OpenSearch Documentation: Vector Quantization",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/vector-search/optimizing-storage/knn-vector-quantization/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27005",
+      "title": "OpenSearch Documentation: Efficient k-NN Filtering",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/vector-search/filter-search-knn/efficient-knn-filtering/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27006",
+      "title": "OpenSearch Documentation: Hybrid Search",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/vector-search/ai-search/hybrid-search/index/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27007",
+      "title": "OpenSearch Documentation: Normalization Processor",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/search-plugins/search-pipelines/normalization-processor/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27008",
+      "title": "OpenSearch Documentation: Score Ranker Processor",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/search-plugins/search-pipelines/score-ranker-processor/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27009",
+      "title": "OpenSearch Documentation: Introduction, Shards, and Replicas",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/getting-started/intro/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27010",
+      "title": "Amazon OpenSearch Serverless",
+      "authors": [
+        {
+          "name": "Amazon Web Services"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-27011",
+      "title": "OpenSearch Documentation: Document APIs and Distributed Writes",
+      "authors": [
+        {
+          "name": "OpenSearch maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.opensearch.org/latest/api-reference/document-apis/index/",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-27001",
+      "statement": "OpenSearch stores dense vectors in knn_vector fields and supports exact and approximate k-nearest-neighbor retrieval using Lucene, Faiss, and deprecated NMSLIB engines with HNSW, IVF, in-memory or on-disk modes, multiple distance spaces, and built-in vector quantization.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10008",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "OpenSearch 3.7.0 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-27001"
+      ],
+      "referenceIds": [
+        "REFERENCE-27001",
+        "REFERENCE-27002",
+        "REFERENCE-27003",
+        "REFERENCE-27004"
+      ],
+      "rationale": "The OpenSearch vector-search documentation describes exact and ANN techniques, engine and algorithm choices, vector workload modes, distance spaces, and scalar, product, byte, and binary quantization options."
+    },
+    {
+      "id": "CLAIM-27002",
+      "statement": "OpenSearch supports efficient filtered approximate k-NN search with Lucene HNSW and Faiss HNSW or IVF, while post-filter and scoring-script alternatives have different top-k, recall, and latency behavior.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10008",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Filter semantics depend on engine, algorithm, placement, selectivity, and exact-versus-approximate execution"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-27002"
+      ],
+      "referenceIds": [
+        "REFERENCE-27005"
+      ],
+      "rationale": "The filtering documentation distinguishes efficient candidate-stage filtering from Boolean or post_filter post-filtering and from exact scoring-script filtering."
+    },
+    {
+      "id": "CLAIM-27003",
+      "statement": "OpenSearch hybrid search combines keyword, neural, dense-vector, and sparse retrieval through search pipelines that support score normalization and weighted combination or rank-based Reciprocal Rank Fusion.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10008",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "relevanceScope",
+          "value": "Normalization, fusion, weights, rank constants, candidate sizes, models, and filters require workload-specific evaluation"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-27003"
+      ],
+      "referenceIds": [
+        "REFERENCE-27006",
+        "REFERENCE-27007",
+        "REFERENCE-27008"
+      ],
+      "rationale": "The hybrid-search and search-pipeline documentation describes score-based normalization and combination as well as weighted RRF over multiple query clauses."
+    },
+    {
+      "id": "CLAIM-27004",
+      "statement": "OpenSearch distributes indexes across primary and replica shards and can be deployed locally or self-hosted, while Amazon OpenSearch Service provides managed domains and an auto-scaling serverless option including vector-search collections.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10008",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Self-hosted OpenSearch and Amazon managed or serverless offerings expose different operational controls, limits, APIs, and responsibility boundaries"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-27004"
+      ],
+      "referenceIds": [
+        "REFERENCE-27009",
+        "REFERENCE-27010"
+      ],
+      "rationale": "OpenSearch documents primary and replica shard distribution, and AWS documents managed and serverless OpenSearch configurations with automatic capacity management."
+    },
+    {
+      "id": "CLAIM-27005",
+      "statement": "OpenSearch routes document writes to a primary shard and its active replicas, provides document-level versioning and optimistic concurrency control, and offers near-real-time search visibility rather than general multi-document ACID transactions.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10008",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Write acknowledgement, active replicas, refresh behavior, shard health, and concurrency parameters affect durability and visibility"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-27005"
+      ],
+      "referenceIds": [
+        "REFERENCE-27011"
+      ],
+      "rationale": "The document API documentation describes primary-replica write propagation, versioning, sequence numbers, primary terms, and the distinction between real-time document access and refresh-dependent search visibility."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-27001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official OpenSearch sources document knn_vector storage, exact and approximate search, Lucene and Faiss engines, HNSW and IVF methods, on-disk mode, multiple spaces, and several quantization approaches.",
+      "interpretation": "The RKM profile can represent OpenSearch as a search engine with broad vector-index configuration rather than as a dedicated vector database.",
+      "claimIds": [
+        "CLAIM-27001"
+      ],
+      "referenceIds": [
+        "REFERENCE-27001",
+        "REFERENCE-27002",
+        "REFERENCE-27003",
+        "REFERENCE-27004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-27001",
+          "locator": "OpenSearch 3.7.0 release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-27002",
+          "locator": "Vector-search overview and techniques"
+        },
+        {
+          "referenceId": "REFERENCE-27003",
+          "locator": "knn_vector modes, spaces, and method definitions"
+        },
+        {
+          "referenceId": "REFERENCE-27004",
+          "locator": "Built-in and external quantization options"
+        }
+      ],
+      "limitations": [
+        "Official documentation establishes supported functionality but is not an independent performance benchmark.",
+        "Engine, algorithm, compression, mode, dimension, hardware, filters, and query parameters materially affect recall and latency."
+      ]
+    },
+    {
+      "id": "EVIDENCE-27002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "OpenSearch documents efficient filtering during ANN search for Lucene HNSW and Faiss HNSW or IVF, alongside post-filter and exact scoring-script alternatives.",
+      "interpretation": "The RKM profile can mark metadata filtering as supported while warning that filter placement and selectivity alter top-k guarantees and execution strategy.",
+      "claimIds": [
+        "CLAIM-27002"
+      ],
+      "referenceIds": [
+        "REFERENCE-27005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-27005",
+          "locator": "Lucene and Faiss efficient filtering algorithms and comparison with post-filtering and scoring scripts"
+        }
+      ],
+      "limitations": [
+        "Highly selective filters can trigger exact-search fallbacks or additional graph traversal.",
+        "Post-filtering may return substantially fewer than k results even when enough matching documents exist globally."
+      ]
+    },
+    {
+      "id": "EVIDENCE-27003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "OpenSearch hybrid queries use search pipelines to normalize and combine keyword and semantic scores or to apply weighted RRF over ranked result lists.",
+      "interpretation": "The RKM profile can mark BM25-plus-vector, sparse-dense fusion, weighted score fusion, and RRF as supported hybrid patterns.",
+      "claimIds": [
+        "CLAIM-27003"
+      ],
+      "referenceIds": [
+        "REFERENCE-27006",
+        "REFERENCE-27007",
+        "REFERENCE-27008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-27006",
+          "locator": "Hybrid query setup and filtering"
+        },
+        {
+          "referenceId": "REFERENCE-27007",
+          "locator": "Normalization and score-combination techniques"
+        },
+        {
+          "referenceId": "REFERENCE-27008",
+          "locator": "Weighted Reciprocal Rank Fusion processor"
+        }
+      ],
+      "limitations": [
+        "Fusion quality depends on query sets, judgment lists, candidate counts, normalization, and model quality.",
+        "Search-pipeline and hybrid-query feature combinations have version-specific restrictions and coordinating-node costs."
+      ]
+    },
+    {
+      "id": "EVIDENCE-27004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "OpenSearch documents primary and replica shard distribution, while Amazon OpenSearch Serverless provides auto-scaling managed collections including vector-search workloads.",
+      "interpretation": "The RKM profile can mark high horizontal scalability and multiple deployment models while separating open-source engine behavior from AWS-managed service guarantees.",
+      "claimIds": [
+        "CLAIM-27004"
+      ],
+      "referenceIds": [
+        "REFERENCE-27009",
+        "REFERENCE-27010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-27009",
+          "locator": "Primary and replica shards and cluster scaling guidance"
+        },
+        {
+          "referenceId": "REFERENCE-27010",
+          "locator": "Serverless auto-scaling, availability, encryption, and capacity management"
+        }
+      ],
+      "limitations": [
+        "Shard count, allocation, recovery, and hot spots remain workload-sensitive in self-hosted clusters.",
+        "Managed and serverless limits, pricing, supported APIs, plugins, regions, and lifecycle behavior differ from self-hosted OpenSearch."
+      ]
+    },
+    {
+      "id": "EVIDENCE-27005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "OpenSearch document APIs describe primary-replica write propagation, version increments, optimistic concurrency fields, and refresh-dependent search visibility.",
+      "interpretation": "The RKM profile can mark document-level transaction semantics and configurable consistency without claiming relational multi-document ACID transactions.",
+      "claimIds": [
+        "CLAIM-27005"
+      ],
+      "referenceIds": [
+        "REFERENCE-27011"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-27011",
+          "locator": "Document write replication, versioning, optimistic concurrency, and refresh behavior"
+        }
+      ],
+      "limitations": [
+        "Acknowledged writes and real-time GET behavior do not imply immediate visibility in ordinary search results before refresh.",
+        "Bulk and update-by-query operations can partially succeed and do not provide atomic rollback across multiple documents."
+      ]
+    }
+  ]
+}
