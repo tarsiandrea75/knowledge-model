@@ -663,5 +663,33 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10009",
+    "type": "VectorDatabase",
+    "label": "Redis",
+    "sourceDataFile": "data/vector-databases/redis.json",
+    "properties": {
+      "keywords": [
+        "in-memory database",
+        "vector search",
+        "FLAT",
+        "HNSW",
+        "SVS-VAMANA",
+        "hybrid search",
+        "Redis Cluster",
+        "semantic cache",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "redis",
+      "status": "Draft",
+      "summary": "Redis is an in-memory data platform with native exact, approximate, filtered, full-text, and hybrid vector retrieval over hash and JSON documents.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
