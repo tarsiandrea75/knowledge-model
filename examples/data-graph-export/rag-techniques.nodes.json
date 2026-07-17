@@ -892,5 +892,35 @@
       "version": "1.0.0",
       "visibility": "Public"
     }
+  },
+  {
+    "id": "VECTOR-DATABASE-10017",
+    "type": "VectorDatabase",
+    "label": "Memgraph",
+    "sourceDataFile": "data/vector-databases/memgraph.json",
+    "properties": {
+      "keywords": [
+        "graph database",
+        "property graph",
+        "Cypher",
+        "vector search",
+        "HNSW",
+        "USearch",
+        "text search",
+        "GraphRAG",
+        "MAGE",
+        "streaming graph",
+        "AI memory"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "memgraph",
+      "status": "Draft",
+      "summary": "Memgraph is a Cypher-compatible property-graph database with native node and edge vector indexes, text search, streaming ingestion, graph algorithms, and GraphRAG tooling; its USearch-backed HNSW-style vector subsystem uses READ_UNCOMMITTED isolation and must be evaluated separately from ordinary graph transaction guarantees.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
   }
 ]
