@@ -77,6 +77,10 @@
       "schema": "schema/vector-database.schema.json"
     },
     {
+      "file": "data/vector-databases/elasticsearch.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
       "file": "data/relationships/component-specialization-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },
