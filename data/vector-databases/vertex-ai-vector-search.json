@@ -1,0 +1,848 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10015",
+    "slug": "vertex-ai-vector-search",
+    "name": {
+      "official": "Vertex AI Vector Search",
+      "display": "Vertex AI Vector Search",
+      "short": "Vertex Vector Search"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Google Cloud Vertex AI Vector Search",
+      "Vertex AI Matching Engine",
+      "Matching Engine",
+      "Vector Search 1.0",
+      "Vector Search 2.0",
+      "Agent Retrieval"
+    ],
+    "keywords": [
+      "managed vector search",
+      "ScaNN",
+      "tree-AH",
+      "asymmetric hashing",
+      "brute force KNN",
+      "sparse dense hybrid search",
+      "reciprocal rank fusion",
+      "crowding",
+      "Agent Retrieval",
+      "Google Cloud",
+      "RAG"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Managed Vector Search Services",
+      "category": "Cloud Vector Retrieval Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Google Cloud Vertex AI Vector Search and Agent Retrieval algorithm, filtering, hybrid-search, collection, embedding, reranking, update, deployment, monitoring, IAM, encryption, and quota documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Vertex AI Vector Search is a managed Google Cloud retrieval service whose ScaNN-based indexes provide brute-force and tree-AH nearest-neighbor search, metadata filtering, sparse-dense hybrid retrieval, and crowding; its Agent Retrieval generation adds collection storage, auto-embeddings, full-text and vector fusion, and semantic reranking.",
+    "description": "Vertex AI Vector Search is a Google Cloud managed retrieval family for semantic search, recommendation, multimodal retrieval, and RAG. The established index-and-endpoint service, formerly called Matching Engine, uses Google ScaNN technology and exposes exact brute-force search plus tree-AH approximate nearest-neighbor search, where a shallow partitioning tree narrows the search space and asymmetric hashing accelerates candidate scoring before exact reordering. It supports dense and sparse vectors, hybrid queries, token and numeric restrictions, crowding-based result diversification, streaming or batch updates, storage-optimized deployments, public endpoints, private networking, autoscaled replicas, IAM, and monitoring. In 2026 Google made Vector Search 2.0 generally available and subsequently renamed that collection-based generation Agent Retrieval. Agent Retrieval stores JSON Data Objects and vector fields in Collections, can generate embeddings automatically, supports KNN and ANN indexes, combines vector and full-text retrieval with reciprocal-rank fusion, and can apply server-side semantic reranking. These two resource models have different APIs, tuning surfaces, durability semantics, quotas, and migration considerations; capabilities from Agent Retrieval must not be assumed to exist in classic Vector Search indexes. Both are managed regional services whose quality, latency, freshness, availability, and cost depend on index type, candidate expansion, filters, shards or indexes, replicas, regions, update mode, and embedding or ranking models."
+  },
+  "vectorDatabase": {
+    "databaseType": "Managed Vector Search Service",
+    "deploymentModels": [
+      "Managed Cloud"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "Tree Based ANN",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": false
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Eventual",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Document Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "Variable",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose classic brute-force, tree-AH, storage-optimized, or Agent Retrieval KNN and ANN paths only after measuring recall, latency, update rate, storage, deployment time, and cost on representative data.",
+        "Align dot-product, cosine-equivalent normalization, or Euclidean distance with the embedding model and keep vector dimensions and normalization rules immutable for reproducibility.",
+        "Use brute-force queries or an independently computed sample as ground truth before tuning tree-AH leaf size, searched-leaf fraction, approximate candidate count, and exact reordering.",
+        "Model dense vectors, sparse vectors, token restrictions, numeric restrictions, crowding tags, payload fields, and embedding metadata as a versioned ingestion contract.",
+        "Evaluate dense-only, sparse-only, hybrid, filtered, and crowding-aware retrieval on the same relevance set rather than treating one configuration as universally superior.",
+        "Tune reciprocal-rank weighting, candidate counts, searched-leaf fraction, top-k, filters, and semantic reranking depth against target relevance and latency budgets.",
+        "Distinguish classic Vector Search indexes and endpoints from Agent Retrieval Collections, Data Objects, autogenerated embeddings, and collection indexes because their APIs and operations differ.",
+        "For Agent Retrieval, define strict data and vector schemas, embedding ownership, field-level search behavior, index coverage, and ETag-based concurrency rules before ingestion.",
+        "For classic streaming indexes, measure nearly-real-time propagation separately from successful upsert or delete acknowledgements; for batch indexes, plan delta publication and rebuild windows.",
+        "Provision shards, machine type, replicas, autoscaling bounds, and storage tier together, and use at least the replica count required by the applicable SLA.",
+        "Choose public endpoints, Private Service Connect, Private Google Access, VPC Service Controls, IAM roles, service accounts, and CMEK according to the threat model.",
+        "Monitor current shards, current replicas, request latency, errors, update jobs, quota consumption, embedding calls, and reranking calls as separate operational signals.",
+        "Version the Google Cloud APIs, client libraries, index configuration, Collection schema, embedding models, sparse encoders, ranker, and networking configuration together.",
+        "Keep an export or authoritative source and test index or Collection recovery, migration, and regional redeployment procedures before production adoption."
+      ]
+    },
+    "limitations": [
+      "Vertex AI Vector Search is a managed Google Cloud service; regions, quotas, API surfaces, pricing, machine choices, networking, and feature availability vary between classic Vector Search and Agent Retrieval.",
+      "Tree-AH and ANN retrieval trade recall for latency and cost; leaf partitioning, asymmetric hashing, candidate counts, searched-leaf fraction, exact reordering, and dataset geometry materially affect results.",
+      "Brute-force search provides an exact baseline but can be too expensive for large online workloads.",
+      "Classic hybrid search uses dense and sparse embeddings rather than a universal built-in BM25 corpus, while Agent Retrieval adds full-text retrieval and semantic reranking through a different resource model.",
+      "Token and numeric restrictions are not equivalent to arbitrary relational predicates, and selective filters can alter candidate availability and latency.",
+      "Crowding improves diversity by limiting repeated tags but can exclude otherwise high-scoring nearest neighbors.",
+      "Classic stream updates are applied to deployed indexes nearly in real time rather than within a general multi-record ACID transaction; batch updates and rebuilds have longer publication windows.",
+      "Agent Retrieval ETags provide optimistic concurrency control per Data Object but do not create general multi-object transactions.",
+      "High availability and SLA coverage depend on adequate replica provisioning, regional capacity, client retries, and supported endpoint configuration.",
+      "Agent Retrieval auto-embedding and semantic reranking introduce external model behavior, quotas, latency, cost, and version dependencies into the retrieval path."
+    ],
+    "usageGuidance": [
+      "Use Vertex AI Vector Search when a managed Google Cloud service should provide high-scale semantic, recommendation, multimodal, filtered, or sparse-dense retrieval.",
+      "Choose Agent Retrieval when collection-native payload storage, auto-embeddings, full-text and vector fusion, and server-side semantic reranking justify adopting its newer API and schema model.",
+      "Prefer another service when local or self-hosted deployment, cross-cloud portability, low-level index implementation control, or general relational transactions are mandatory.",
+      "Benchmark classic tree-AH, brute-force ground truth, storage-optimized deployment, and Agent Retrieval KNN or ANN independently rather than assuming equivalent behavior.",
+      "Record the exact product generation and API surface in every evaluation because the names Vector Search, Vector Search 2.0, and Agent Retrieval refer to related but operationally distinct resource models."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-34001",
+      "title": "Vertex AI Release Notes: Vector Search 2.0 General Availability",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/release-notes",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "2026-03-05",
+      "publishedAt": "2026-03-05"
+    },
+    {
+      "id": "REFERENCE-34002",
+      "title": "Vertex AI Vector Search Overview",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/overview",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34003",
+      "title": "Vertex AI Vector Search Index Configuration Parameters",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/configuring-indexes",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34004",
+      "title": "Vertex AI REST Resource: projects.locations.indexes",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.indexes",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "v1"
+    },
+    {
+      "id": "REFERENCE-34005",
+      "title": "Query a Public Vertex AI Vector Search Index",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/query-index-public-endpoint",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34006",
+      "title": "Filter Vector Matches in Vertex AI Vector Search",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/filtering",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34007",
+      "title": "Vertex AI Vector Search Input Data Format and Structure",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/format-structure",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34008",
+      "title": "Update and Rebuild a Vertex AI Vector Search Index",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/update-rebuild-index",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34009",
+      "title": "Storage-Optimized Vertex AI Vector Search",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/storage-optimized-vector-search",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34010",
+      "title": "Set Up Vertex AI Vector Search with Private Service Connect",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/private-service-connect",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34011",
+      "title": "Monitor a Deployed Vertex AI Vector Search Index",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/vertex-ai/docs/vector-search/monitor",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34012",
+      "title": "Vector Search IAM Roles and Permissions",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/iam/docs/roles-permissions/vectorsearch",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34013",
+      "title": "Agent Retrieval, Formerly Vector Search 2.0, Overview",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/overview",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17",
+      "version": "GA",
+      "publishedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-34014",
+      "title": "Agent Retrieval Collections",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/collections/collections",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34015",
+      "title": "Autogenerating Embeddings for Agent Retrieval",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/embeddings/autogenerating-embeddings",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34016",
+      "title": "Searching for Data Objects in Agent Retrieval",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/query-search/search",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34017",
+      "title": "Reranking Agent Retrieval Search Results with VertexRanker",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/query-search/reranking",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34018",
+      "title": "Use ETags for Agent Retrieval Data Object Concurrency Control",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/data-objects/using-etags-for-concurrency-control",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34019",
+      "title": "Customer-Managed Encryption Keys in Agent Retrieval",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/cmek",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-34020",
+      "title": "Agent Retrieval Quotas",
+      "authors": [
+        {
+          "name": "Google Cloud"
+        }
+      ],
+      "canonicalUrl": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/quotas",
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-34001",
+      "subject": {
+        "id": "VECTOR-DATABASE-10015",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Classic Vertex AI Vector Search uses Google ScaNN technology and supports exact brute-force retrieval plus tree-AH approximate nearest-neighbor search with asymmetric hashing, exact candidate reordering, and dot-product, cosine, or Euclidean distance behavior.",
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Classic Vertex AI Vector Search v1 documentation and Agent Retrieval GA documentation accessed 2026-07-17; the two product generations are versioned and operated separately"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Google Cloud overview, configuration, RPC, query, and storage documentation defines ScaNN, brute-force and tree-AH algorithms, candidate expansion and exact reordering, supported metrics, sharding, and storage-optimized serving.",
+      "evidenceIds": [
+        "EVIDENCE-34001"
+      ],
+      "referenceIds": [
+        "REFERENCE-34002",
+        "REFERENCE-34003",
+        "REFERENCE-34004",
+        "REFERENCE-34005",
+        "REFERENCE-34009"
+      ]
+    },
+    {
+      "id": "CLAIM-34002",
+      "subject": {
+        "id": "VECTOR-DATABASE-10015",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Vertex AI Vector Search supports dense, sparse, and hybrid queries, categorical and numeric restrictions, and crowding limits that diversify returned neighbors by capping results from the same crowding tag.",
+      "qualifiers": [
+        {
+          "name": "retrievalScope",
+          "value": "Classic hybrid queries combine user-supplied dense and sparse embeddings; filter syntax, supported operators, crowding behavior, and tuning parameters depend on the selected API and index configuration"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Official query, filtering, and input-format documentation describes sparse and dense embeddings, weighted RRF hybrid queries, token and numeric restricts, allow and deny semantics, and per-crowding neighbor limits.",
+      "evidenceIds": [
+        "EVIDENCE-34002"
+      ],
+      "referenceIds": [
+        "REFERENCE-34005",
+        "REFERENCE-34006",
+        "REFERENCE-34007"
+      ]
+    },
+    {
+      "id": "CLAIM-34003",
+      "subject": {
+        "id": "VECTOR-DATABASE-10015",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Google made Vector Search 2.0 generally available in March 2026 and now documents it as Agent Retrieval, a collection-based storage and retrieval system with JSON Data Objects, autogenerated or bring-your-own embeddings, full-text and vector search, reciprocal-rank fusion, and optional semantic reranking.",
+      "qualifiers": [
+        {
+          "name": "generationScope",
+          "value": "Agent Retrieval is the renamed collection-based generation formerly called Vector Search 2.0 and should not be conflated with classic index-and-endpoint Vector Search capabilities"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Release notes and current Agent Retrieval documentation describe GA status, the naming transition, Collections and Data Objects, embedding generation, KNN or ANN indexes, parallel search and RRF, and VertexRanker reranking.",
+      "evidenceIds": [
+        "EVIDENCE-34003"
+      ],
+      "referenceIds": [
+        "REFERENCE-34001",
+        "REFERENCE-34013",
+        "REFERENCE-34014",
+        "REFERENCE-34015",
+        "REFERENCE-34016",
+        "REFERENCE-34017"
+      ]
+    },
+    {
+      "id": "CLAIM-34004",
+      "subject": {
+        "id": "VECTOR-DATABASE-10015",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Vertex AI Vector Search is a managed regional service that scales classic deployed indexes through shards, replicas, machine resources, autoscaling, and storage-optimized tiers, and supports public or private connectivity, IAM, monitoring, VPC controls, and customer-managed encryption options.",
+      "qualifiers": [
+        {
+          "name": "operationsScope",
+          "value": "Availability, SLA eligibility, security controls, regions, quotas, and costs depend on the product generation, endpoint type, replica count, machine or pricing model, and regional support"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Deployment, PSC, monitoring, IAM, storage-optimized, Agent Retrieval overview, CMEK, and quota documentation describes managed scaling, private networking, replica requirements, observability, access control, encryption, and service limits.",
+      "evidenceIds": [
+        "EVIDENCE-34004"
+      ],
+      "referenceIds": [
+        "REFERENCE-34009",
+        "REFERENCE-34010",
+        "REFERENCE-34011",
+        "REFERENCE-34012",
+        "REFERENCE-34013",
+        "REFERENCE-34019",
+        "REFERENCE-34020"
+      ]
+    },
+    {
+      "id": "CLAIM-34005",
+      "subject": {
+        "id": "VECTOR-DATABASE-10015",
+        "type": "Entity"
+      },
+      "claimType": "Factual",
+      "statement": "Classic Vertex AI Vector Search exposes batch and streaming index update workflows with nearly-real-time propagation for streaming indexes, while Agent Retrieval stores Data Objects as a queryable source of truth and offers per-object optimistic concurrency control through ETags; neither model should be treated as a general multi-object ACID transaction system.",
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Freshness and conflict behavior depend on batch versus stream update mode, deployed-index propagation, Collection operations, ETag use, import jobs, export strategy, and client retry logic"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "rationale": "Index resource and update documentation describes batch and stream update modes, while Agent Retrieval Collection and ETag documentation describes stored Data Objects, version tags, conditional writes, imports, exports, and per-record conflict handling.",
+      "evidenceIds": [
+        "EVIDENCE-34005"
+      ],
+      "referenceIds": [
+        "REFERENCE-34004",
+        "REFERENCE-34008",
+        "REFERENCE-34013",
+        "REFERENCE-34014",
+        "REFERENCE-34018"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-34001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Google Cloud documentation identifies ScaNN as the underlying technology and defines classic brute-force and tree-AH search, asymmetric hashing, exact reordering, supported distance measures, shard configuration, and query-time recall controls.",
+      "interpretation": "The RKM profile can represent Vertex AI Vector Search as a managed service with an exact baseline and a tree-partitioned, quantized ANN path rather than HNSW.",
+      "claimIds": [
+        "CLAIM-34001"
+      ],
+      "referenceIds": [
+        "REFERENCE-34002",
+        "REFERENCE-34003",
+        "REFERENCE-34004",
+        "REFERENCE-34005",
+        "REFERENCE-34009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-34002",
+          "locator": "ScaNN-based managed vector search overview and retrieval concepts"
+        },
+        {
+          "referenceId": "REFERENCE-34003",
+          "locator": "TreeAhConfig, BruteForceConfig, metrics, normalization, leaf size, and searched-leaf fraction"
+        },
+        {
+          "referenceId": "REFERENCE-34004",
+          "locator": "Tree-AH as shallow tree plus asymmetric hashing and stream or batch index update methods"
+        },
+        {
+          "referenceId": "REFERENCE-34005",
+          "locator": "Approximate candidate count, exact reordering, neighbor count, searched-leaf fraction, recall, latency, and cost"
+        },
+        {
+          "referenceId": "REFERENCE-34009",
+          "locator": "Storage-optimized deployment tier and dynamically selected serving resources"
+        }
+      ],
+      "limitations": [
+        "Official product documentation is not an independent recall, latency, availability, or cost benchmark.",
+        "Dataset geometry, normalization, metric, tree partitioning, asymmetric hashing, candidate count, searched-leaf fraction, exact reordering, shard size, and hardware materially affect outcomes."
+      ]
+    },
+    {
+      "id": "EVIDENCE-34002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Classic Vector Search query and ingestion documentation describes dense and sparse embeddings, hybrid RRF weighting, token and numeric restrictions, allow and deny rules, and crowding-tag result limits.",
+      "interpretation": "The RKM profile can record sparse-dense hybrid retrieval, metadata filtering, and result diversification as native capabilities while keeping their syntax and semantics distinct from full relational filtering.",
+      "claimIds": [
+        "CLAIM-34002"
+      ],
+      "referenceIds": [
+        "REFERENCE-34005",
+        "REFERENCE-34006",
+        "REFERENCE-34007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-34005",
+          "locator": "Dense, sparse, and hybrid query examples plus filtering and per-crowding result limits"
+        },
+        {
+          "referenceId": "REFERENCE-34006",
+          "locator": "Categorical and numeric restricted search semantics"
+        },
+        {
+          "referenceId": "REFERENCE-34007",
+          "locator": "Sparse embeddings, token namespaces, numeric restricts, crowding tags, and input formats"
+        }
+      ],
+      "limitations": [
+        "Classic hybrid retrieval depends on externally generated sparse and dense embeddings and is not automatically equivalent to BM25 plus dense retrieval.",
+        "Selective restrictions and crowding limits can alter candidate completeness, ranking, and latency."
+      ]
+    },
+    {
+      "id": "EVIDENCE-34003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Google Cloud release notes and Agent Retrieval documentation state that Vector Search 2.0 became GA, was renamed Agent Retrieval, and provides collection storage, Data Objects, auto-embeddings, KNN or ANN indexes, full-text and vector fusion, RRF, and semantic reranking.",
+      "interpretation": "The RKM profile can capture the product family evolution while explicitly separating collection-native Agent Retrieval features from classic Vector Search index endpoints.",
+      "claimIds": [
+        "CLAIM-34003"
+      ],
+      "referenceIds": [
+        "REFERENCE-34001",
+        "REFERENCE-34013",
+        "REFERENCE-34014",
+        "REFERENCE-34015",
+        "REFERENCE-34016",
+        "REFERENCE-34017"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-34001",
+          "locator": "March 5, 2026 GA announcement for Vector Search 2.0"
+        },
+        {
+          "referenceId": "REFERENCE-34013",
+          "locator": "Agent Retrieval naming, collection-based storage and retrieval, auto-tuning, KNN or ANN, and supported regions"
+        },
+        {
+          "referenceId": "REFERENCE-34014",
+          "locator": "Collection data schema, vector schema, dense and sparse vector fields, and Data Object source-of-truth semantics"
+        },
+        {
+          "referenceId": "REFERENCE-34015",
+          "locator": "Vertex embedding configuration and automatic population of vector fields"
+        },
+        {
+          "referenceId": "REFERENCE-34016",
+          "locator": "Vector, full-text, combined search, filters, and RRF-based result combination"
+        },
+        {
+          "referenceId": "REFERENCE-34017",
+          "locator": "VertexRanker semantic reranking after RRF fusion"
+        }
+      ],
+      "limitations": [
+        "Agent Retrieval and classic Vector Search have different resources, clients, quotas, migration paths, and tuning surfaces.",
+        "Auto-embedding and semantic reranking add model-specific quality, latency, quota, cost, and version dependencies."
+      ]
+    },
+    {
+      "id": "EVIDENCE-34004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Google Cloud documentation describes shards, replicas, autoscaling, storage-optimized serving, current-shard and replica metrics, Private Service Connect, IAM roles, VPC controls, CMEK, and quotas across the managed retrieval surfaces.",
+      "interpretation": "The RKM profile can mark scalability, access control, encryption, and observability as high while recording generation-specific provisioning, regional, and SLA constraints.",
+      "claimIds": [
+        "CLAIM-34004"
+      ],
+      "referenceIds": [
+        "REFERENCE-34009",
+        "REFERENCE-34010",
+        "REFERENCE-34011",
+        "REFERENCE-34012",
+        "REFERENCE-34013",
+        "REFERENCE-34019",
+        "REFERENCE-34020"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-34010",
+          "locator": "Private Service Connect endpoint setup, deployment, autoscaling, and minimum replicas for SLA coverage"
+        },
+        {
+          "referenceId": "REFERENCE-34011",
+          "locator": "Current shard and current replica monitoring metrics"
+        },
+        {
+          "referenceId": "REFERENCE-34012",
+          "locator": "Vector Search Admin, Viewer, Collection Writer, Data Object Writer, and Index Writer roles"
+        },
+        {
+          "referenceId": "REFERENCE-34013",
+          "locator": "Agent Retrieval managed storage, auto-tuning, pricing models, and supported regions"
+        },
+        {
+          "referenceId": "REFERENCE-34019",
+          "locator": "Customer-managed encryption key configuration and constraints"
+        },
+        {
+          "referenceId": "REFERENCE-34020",
+          "locator": "Resource and request quotas for Agent Retrieval"
+        }
+      ],
+      "limitations": [
+        "SLA, networking, encryption, roles, regions, and quotas are not identical across classic Vector Search and Agent Retrieval.",
+        "Managed scaling reduces infrastructure work but does not remove capacity planning, cost controls, retry design, or regional recovery requirements."
+      ]
+    },
+    {
+      "id": "EVIDENCE-34005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Classic Index APIs define batch and stream update modes with nearly-real-time propagation for deployed stream indexes, while Agent Retrieval defines Collections as a Data Object source of truth and ETags as per-object optimistic concurrency control for real-time and bulk writes.",
+      "interpretation": "The RKM profile can model eventual index freshness and document-level mutation semantics without claiming general multi-object ACID transactions.",
+      "claimIds": [
+        "CLAIM-34005"
+      ],
+      "referenceIds": [
+        "REFERENCE-34004",
+        "REFERENCE-34008",
+        "REFERENCE-34013",
+        "REFERENCE-34014",
+        "REFERENCE-34018"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-34004",
+          "locator": "BATCH_UPDATE and STREAM_UPDATE index modes and nearly-real-time propagation to deployed indexes"
+        },
+        {
+          "referenceId": "REFERENCE-34008",
+          "locator": "Full overwrite, partial batch update, partial streaming update, and metadata update workflows"
+        },
+        {
+          "referenceId": "REFERENCE-34014",
+          "locator": "Collections as queryable source of truth for Data Objects"
+        },
+        {
+          "referenceId": "REFERENCE-34018",
+          "locator": "ETag read-modify-write checks, HTTP 409 conflicts, per-record imports, and exported ETags"
+        }
+      ],
+      "limitations": [
+        "Successful mutation acknowledgement does not imply general multi-record transactional visibility across all retrieval resources.",
+        "ETags prevent lost updates only when clients supply and correctly handle them; omitted ETags permit overwrites."
+      ]
+    }
+  ]
+}
