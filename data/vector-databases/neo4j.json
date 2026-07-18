@@ -34,14 +34,14 @@
     "status": "Draft",
     "visibility": "Public",
     "language": "en",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "metadata": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "schemaVersion": "1.0.0",
     "repositoryVersion": "1.0.0",
     "status": "Draft",
-    "reviewState": "Not Reviewed",
+    "reviewState": "Changes Requested",
     "createdAt": "2026-07-17T00:00:00Z",
     "updatedAt": "2026-07-18T00:00:00Z",
     "createdBy": [
@@ -493,15 +493,6 @@
       "Cosine Similarity",
       "Euclidean Distance"
     ],
-    "supportedModalities": [
-      "Text",
-      "Code",
-      "Image",
-      "Audio",
-      "Video",
-      "Table",
-      "Multimodal"
-    ],
     "metadataFiltering": {
       "supported": true,
       "filterTypes": [
@@ -516,16 +507,10 @@
       "supported": true,
       "methods": [
         "BM25 Plus Vector",
-        "Weighted Score Fusion",
-        "Graph Plus Vector",
-        "Other"
-      ],
-      "scoreNormalizationSupported": false
+        "Weighted Score Fusion"
+      ]
     },
     "scalability": {
-      "horizontalScaling": "High",
-      "verticalScaling": "High",
-      "shardingSupported": true,
       "replicationSupported": true,
       "diskBackedIndexingSupported": true
     },
@@ -534,7 +519,7 @@
       "upsertsSupported": true,
       "deletesSupported": true,
       "streamingUpdatesSupported": true,
-      "transactionSupport": "Full ACID"
+      "transactionSupport": "Limited"
     },
     "integration": {
       "apis": [
@@ -942,7 +927,7 @@
     },
     {
       "id": "CLAIM-30005",
-      "statement": "Neo4j provides ACID transactions and backup or snapshot workflows, but vector-index changes are not visible within the same transaction; Community Edition uses GPLv3 while Enterprise and Aura are governed by commercial or service-specific terms.",
+      "statement": "Neo4j provides ACID database transactions, but vector-index updates are not visible to vector queries within the same transaction; backup, snapshot, and licensing behavior varies across Community, Enterprise, Infinigraph, and Aura.",
       "claimType": "Factual",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
@@ -969,7 +954,7 @@
         "REFERENCE-30016",
         "REFERENCE-30017"
       ],
-      "rationale": "Neo4j transaction, vector-index, backup, edition, software-agreement, and Aura terms documentation separates database atomicity from vector-index visibility and distinguishes Community, Enterprise, and managed-service licensing scopes."
+      "rationale": "Official Neo4j transaction, vector-index, backup, edition, software-agreement, and Aura documentation requires the RKM record to separate database transaction guarantees from vector-index visibility and to scope recovery and licensing behavior by edition or managed offering."
     }
   ],
   "evidence": [
@@ -1135,7 +1120,7 @@
       "confidence": "High",
       "status": "Draft",
       "summary": "Neo4j documentation describes ACID transactions, full and differential backup or restore workflows, Aura snapshots, same-transaction vector-index invisibility, and distinct Community versus commercial licensing models.",
-      "interpretation": "The RKM profile can mark full ACID transaction support and strong recovery tooling while explicitly separating them from vector-index visibility and edition-specific operations.",
+      "interpretation": "The RKM profile should distinguish ACID graph transactions from limited same-transaction vector-index visibility, while scoping recovery and licensing capabilities to the editions or managed services that provide them.",
       "claimIds": [
         "CLAIM-30005"
       ],
