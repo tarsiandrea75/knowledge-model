@@ -34,16 +34,16 @@
     "status": "Draft",
     "visibility": "Public",
     "language": "en",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "schemaVersion": "1.0.0",
     "repositoryVersion": "1.0.0",
     "status": "Draft",
     "reviewState": "Not Reviewed",
     "createdAt": "2026-07-17T00:00:00Z",
-    "updatedAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-18T00:00:00Z",
     "createdBy": [
       {
         "type": "Automation",
@@ -435,6 +435,60 @@
         ]
       }
     ],
+    "productLicensing": [
+      {
+        "scope": {
+          "editions": [
+            "Community Edition"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "licenseModel": "Open Source License",
+        "spdxExpression": "GPL-3.0-only",
+        "licenseName": "GNU General Public License v3.0",
+        "referenceIds": [
+          "REFERENCE-30013"
+        ],
+        "notes": "Applies only to Neo4j Community Edition; Enterprise editions and Aura use different terms."
+      },
+      {
+        "scope": {
+          "editions": [
+            "Enterprise Edition",
+            "Enterprise Edition with Infinigraph"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "licenseModel": "Commercial License",
+        "licenseName": "Neo4j Software Agreement",
+        "termsDescription": "Self-managed commercial software use is governed by the applicable agreement, offering addenda, order forms, subscription term, and usage limits.",
+        "referenceIds": [
+          "REFERENCE-30015"
+        ],
+        "notes": "Infinigraph is a specialized Enterprise Edition offering requiring a separate subscription."
+      },
+      {
+        "scope": {
+          "offerings": [
+            "Neo4j Aura"
+          ],
+          "deploymentModels": [
+            "Managed Cloud"
+          ]
+        },
+        "licenseModel": "Managed Service Terms",
+        "licenseName": "Neo4j Cloud Agreement and Aura Self-Serve Terms of Service",
+        "termsDescription": "Aura access and use are governed by the applicable cloud or self-service agreement, offering terms, order forms, and referenced policies.",
+        "referenceIds": [
+          "REFERENCE-30016",
+          "REFERENCE-30017"
+        ]
+      }
+    ],
     "distanceMetrics": [
       "Cosine Similarity",
       "Euclidean Distance"
@@ -734,6 +788,48 @@
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/authentication-authorization/manage-privileges/",
       "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-30015",
+      "title": "Neo4j Software Agreement",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "updatedAt": "2026-06-17",
+      "accessedAt": "2026-07-18",
+      "canonicalUrl": "https://neo4j.com/legal-terms/software-agreement/"
+    },
+    {
+      "id": "REFERENCE-30016",
+      "title": "Neo4j Cloud Agreement",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "updatedAt": "2026-06-17",
+      "accessedAt": "2026-07-18",
+      "canonicalUrl": "https://neo4j.com/legal-terms/cloud-agreement/"
+    },
+    {
+      "id": "REFERENCE-30017",
+      "title": "Aura Self-Serve Terms of Service",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "updatedAt": "2026-03-18",
+      "accessedAt": "2026-07-18",
+      "canonicalUrl": "https://neo4j.com/legal-terms/aura-selfserve-terms/"
     }
   ],
   "claims": [
@@ -868,9 +964,12 @@
         "REFERENCE-30010",
         "REFERENCE-30011",
         "REFERENCE-30012",
-        "REFERENCE-30013"
+        "REFERENCE-30013",
+        "REFERENCE-30015",
+        "REFERENCE-30016",
+        "REFERENCE-30017"
       ],
-      "rationale": "Neo4j transaction, vector-index, backup, Aura snapshot, and edition documentation separates database atomicity from vector-index visibility and documents edition-specific recovery and licensing boundaries."
+      "rationale": "Neo4j transaction, vector-index, backup, edition, software-agreement, and Aura terms documentation separates database atomicity from vector-index visibility and distinguishes Community, Enterprise, and managed-service licensing scopes."
     }
   ],
   "evidence": [
@@ -1045,7 +1144,10 @@
         "REFERENCE-30010",
         "REFERENCE-30011",
         "REFERENCE-30012",
-        "REFERENCE-30013"
+        "REFERENCE-30013",
+        "REFERENCE-30015",
+        "REFERENCE-30016",
+        "REFERENCE-30017"
       ],
       "sourceFragments": [
         {
