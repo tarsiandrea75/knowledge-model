@@ -572,40 +572,48 @@ When origin affects comparison or adoption, claims and evidence should preserve:
 These qualifiers may initially remain in claims and evidence until the schema
 provides a dedicated capability-origin structure.
 
-## Current Schema Limitation
+## Structured Capability Contract
 
-The current vector-database schema has no canonical `capabilityOrigin`
-structure.
+The vector-database schema provides the optional
+`vectorDatabase.capabilities` collection for material product, service,
+package, integration, query-language and application-orchestrated
+capabilities.
 
-Until that structure exists:
+Each structured capability can preserve:
 
-* origin must be stated explicitly in claims, evidence, limitations or usage
-  guidance
-* deployment models must not be used as a substitute for origin
-* vendor ownership must not be used as proof of product-core implementation
-* service capabilities must not be generalized to self-hosted deployments
-* host-platform capabilities must not be attributed solely to an extension
-* query-language composition must not be described as automatic native fusion
-* application-side orchestration must not be described as built-in behavior
+* the bounded behavior being described
+* the implementation boundary
+* the capability origin
+* versions, editions, plans and deployment availability
+* maturity or lifecycle status
+* constraints and exclusions
+* supporting claims, evidence and references
 
-A future schema migration should introduce structures equivalent to:
-
-~~~text
-capabilities
-capabilityOrigin
-availabilityScope
-implementationBoundary
-maturityStatus
-~~~
+The structured capability contract supplements transitional aggregate fields
+such as `supportedModalities`, `hybridSearch`, `scalability` and
+`consistency`. It does not automatically make those legacy fields precise.
 
 Existing records must not be migrated through blanket defaults. Each material
 capability must be re-established from product-specific evidence.
 
-A first-party package must not be reported as DBMS-core behavior solely because
-it is published by the same vendor.
+During migration:
 
-A workflow that can be assembled by user code must not be reported as a native
-automatic capability.
+* absence of structured capabilities must not be interpreted as proof that the
+  product lacks the behavior
+* a first-party package must not be reported as DBMS-core behavior solely
+  because it is published by the same vendor
+* a managed-service capability must not be generalized to self-hosted
+  deployments
+* a host-platform capability must not be attributed solely to an extension
+* query-language composition must not be described as an automatic built-in
+  workflow
+* application-side orchestration must not be described as native product
+  behavior
+* edition, plan, version and deployment boundaries must remain explicit
+
+Capability origin and support strength remain independent dimensions. A
+product-core capability may be preview or constrained, while an external or
+application-side capability may be mature and strongly documented.
 
 ## Score Normalization
 
@@ -662,6 +670,70 @@ evidence.
 Filtering, fusion and graph augmentation should remain structured whenever
 they affect tenant isolation, access control, freshness, source selection,
 candidate completeness, ranking, explainability or retrieval reproducibility.
+
+---
+
+# Product Licensing
+
+Product licensing must be modeled separately from the license of the RKM
+artifact.
+
+`metadata.license` declares the SPDX license applying to the canonical RKM
+record or document. It must not be reused to describe the software license,
+commercial agreement or service terms of the vector database being modeled.
+
+`vectorDatabase.productLicensing` describes edition-, offering-, plan-,
+version- or deployment-scoped licensing profiles for the product or managed
+service.
+
+Each product-licensing profile requires:
+
+* an explicit `scope`
+* a `licenseModel`
+* one or more supporting `referenceIds`
+* at least one of `spdxExpression`, `licenseName` or `termsDescription`
+
+The scope may identify:
+
+* product versions
+* software editions
+* managed-service offerings
+* plans or license tiers
+* deployment models
+* additional exclusions or boundaries
+
+Separate profiles should be used when materially different terms apply to
+different editions or offerings. For example, an open-source Community
+Edition, a commercially licensed Enterprise Edition and a hosted managed
+service should not be collapsed into one aggregate license value.
+
+Use `spdxExpression` only when the applicable software license can be
+represented accurately with SPDX syntax. Commercial agreements, evaluation
+terms, provider contracts and managed-service terms must not be converted into
+invented SPDX identifiers.
+
+`licenseName` should preserve the documented name of a license, agreement or
+service-terms document when one exists.
+
+`termsDescription` should summarize material access or usage conditions that
+cannot be represented by SPDX alone. It must remain concise and supported by
+the referenced sources.
+
+Boolean fields such as `commercialUseAllowed`, `redistributionAllowed` and
+`sourceCodeAvailable` should be omitted when the answer depends on additional
+conditions or has not been directly verified.
+
+Product licensing must not be inferred solely from:
+
+* source-code availability
+* vendor ownership
+* deployment model
+* the existence of a free plan
+* the license of a client library or driver
+* the license of the RKM record
+
+Claims and evidence should preserve additional qualifications when licensing
+varies by version, edition, plan, region, contract or component.
 
 ---
 
