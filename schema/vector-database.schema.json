@@ -145,6 +145,24 @@
           },
           "uniqueItems": true
         },
+        "capabilities": {
+          "type": "array",
+          "description": "Structured material capabilities exposed, implemented or enabled by the vector database, including their behavioral boundary, implementation origin, availability scope, maturity, constraints and supporting knowledge.",
+          "minItems": 1,
+          "items": {
+            "$ref": "definitions/capability.schema.json"
+          },
+          "uniqueItems": true
+        },
+        "productLicensing": {
+          "type": "array",
+          "description": "Edition-, offering-, plan-, or deployment-scoped licensing and service-term profiles for the vector database product. This field describes the product or service and is distinct from metadata.license, which applies to the RKM artifact.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/productLicensingProfile"
+          },
+          "uniqueItems": true
+        },
         "distanceMetrics": {
           "type": "array",
           "description": "Similarity or distance metrics supported for vector search.",
@@ -473,6 +491,171 @@
         "Variable",
         "Unknown"
       ]
+    },
+    "productLicensingProfile": {
+      "type": "object",
+      "description": "A licensing or service-terms profile scoped to a specific product edition, managed offering, plan, version, or deployment model.",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "licenseModel",
+        "referenceIds"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/productLicensingScope"
+        },
+        "licenseModel": {
+          "type": "string",
+          "description": "Primary legal or commercial model governing the scoped product edition or service.",
+          "enum": [
+            "Open Source License",
+            "Commercial License",
+            "Managed Service Terms",
+            "Evaluation License",
+            "Source Available License",
+            "Proprietary License",
+            "Mixed or Edition Dependent",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "spdxExpression": {
+          "type": "string",
+          "description": "Verified SPDX identifier or SPDX license expression when the applicable software license can be represented exactly.",
+          "minLength": 1
+        },
+        "licenseName": {
+          "type": "string",
+          "description": "Official or commonly documented license, agreement, or service-terms name.",
+          "minLength": 1
+        },
+        "termsDescription": {
+          "type": "string",
+          "description": "Concise description of material licensing, access, or service-use terms that cannot be represented by SPDX alone.",
+          "minLength": 1
+        },
+        "commercialUseAllowed": {
+          "type": "boolean",
+          "description": "Whether commercial use is documented as allowed within the specified scope. Omit when the answer depends on additional conditions or has not been directly verified."
+        },
+        "redistributionAllowed": {
+          "type": "boolean",
+          "description": "Whether redistribution is documented as allowed within the specified scope. Omit when conditional or unverified."
+        },
+        "sourceCodeAvailable": {
+          "type": "boolean",
+          "description": "Whether source code for the scoped product or edition is documented as available."
+        },
+        "referenceIds": {
+          "type": "array",
+          "description": "Official or otherwise authoritative references supporting this scoped licensing profile.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^REFERENCE-[0-9]{4,}$"
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional qualifications, exclusions, or interpretation boundaries.",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "spdxExpression"
+              ]
+            },
+            {
+              "required": [
+                "licenseName"
+              ]
+            },
+            {
+              "required": [
+                "termsDescription"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "productLicensingScope": {
+      "type": "object",
+      "description": "Product versions, editions, offerings, plans, and deployment models to which a licensing profile applies.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "versions": {
+          "type": "array",
+          "description": "Product or service versions governed by the profile.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "editions": {
+          "type": "array",
+          "description": "Named software editions governed by the profile.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "offerings": {
+          "type": "array",
+          "description": "Named hosted services, distributions, or product offerings governed by the profile.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "plansOrTiers": {
+          "type": "array",
+          "description": "Managed-service plans, license tiers, or pricing tiers governed by the profile.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "deploymentModels": {
+          "type": "array",
+          "description": "Deployment models within which the profile applies.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Self Hosted",
+              "Managed Cloud",
+              "Serverless",
+              "Embedded",
+              "Local",
+              "Hybrid",
+              "Edge",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional scope boundaries or exclusions.",
+          "minLength": 1
+        }
+      }
     }
   }
 }

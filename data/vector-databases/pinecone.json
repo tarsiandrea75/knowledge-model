@@ -1,0 +1,620 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10005",
+    "slug": "pinecone",
+    "name": {
+      "official": "Pinecone Database",
+      "display": "Pinecone",
+      "short": "Pinecone"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Pinecone Vector Database",
+      "Pinecone Vector Search"
+    ],
+    "keywords": [
+      "managed vector search",
+      "serverless vector database",
+      "dense vectors",
+      "sparse vectors",
+      "hybrid search",
+      "metadata filtering",
+      "namespaces",
+      "integrated inference",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Managed Vector Search Services",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-16T00:00:00Z",
+    "updatedAt": "2026-07-16T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Proprietary",
+    "language": "en",
+    "provenance": {
+      "source": "Official Pinecone API reference, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-16T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Pinecone is a managed serverless vector search service that provides dense, sparse, and hybrid retrieval, metadata filtering, namespaces, integrated inference, and optional dedicated read capacity.",
+    "description": "Pinecone Database is a proprietary managed vector search platform. It offers serverless indexes with on-demand read capacity and optional Dedicated Read Nodes for isolated, provisioned read hardware. It supports dense and sparse vectors, vector-API hybrid retrieval, metadata filtering, namespace-based partitioning, hosted embedding and reranking models, eventual-consistency freshness tracking, backups and restore for supported serverless index types, and a local development emulator. This record distinguishes stable API 2026-04 capabilities from preview features and records service-specific limits, cost, consistency, and portability considerations."
+  },
+  "vectorDatabase": {
+    "databaseType": "Managed Vector Search Service",
+    "deploymentModels": [
+      "Managed Cloud",
+      "Serverless",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Array Contains"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "Variable",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Eventual",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "None"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "gRPC",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose on-demand read capacity for variable workloads and Dedicated Read Nodes for sustained high query rates that require predictable latency and isolated read hardware.",
+        "Select dense, sparse, or hybrid indexing according to the retrieval signal and keep the configured dimension and metric aligned with the embedding model.",
+        "Use the dot-product metric for a single vector-API index that combines dense and sparse vectors.",
+        "Model each tenant with a namespace when namespace-level isolation, lower query cost, and independent data lifecycle are required.",
+        "Treat Pinecone Local as a development and automated-testing emulator rather than a self-hosted production deployment."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate dense-only, sparse-only, and hybrid retrieval on the same relevance set before choosing query-time weights or client-side fusion.",
+        "Normalize or otherwise weight dense and sparse query values explicitly because the vector-API hybrid path does not automatically place their scores on the same scale.",
+        "Use hosted or external reranking only after retrieving a sufficiently broad candidate set and measuring the latency-quality tradeoff.",
+        "Use metadata filters to reduce the candidate scope, while keeping metadata flat and within supported value and size limits.",
+        "Account for eventual consistency after upsert, update, or delete operations and use log sequence numbers or retries when read-after-write visibility matters."
+      ]
+    },
+    "limitations": [
+      "Pinecone is a proprietary managed service and does not provide a self-hosted production deployment or direct control over the underlying ANN implementation.",
+      "Pinecone is eventually consistent, so writes may not be immediately visible to query, list, or fetch operations.",
+      "Single-index dense-sparse querying requires the dot-product metric and explicit query-time weighting or normalization; separate-index fusion adds application-side coordination.",
+      "Metadata must be a flat JSON object; nested objects and null values are not supported, and metadata size and filter-expression limits apply.",
+      "On-demand reads use shared capacity and can fetch cold data from object storage, while cost and latency depend on namespace size, result shape, and read-unit consumption.",
+      "Dedicated Read Nodes require manual shard and replica capacity planning, currently support one namespace per index, and block writes when configured shard capacity is exceeded.",
+      "Serverless backups remain in the same project, cloud, and region, may omit the newest writes, and do not support every document-schema or full-text-search index type.",
+      "Preview and alpha features can use different API versions and availability guarantees from stable Database API 2026-04 capabilities.",
+      "Pinecone does not expose general multi-record ACID transactions comparable to a relational database."
+    ],
+    "usageGuidance": [
+      "Pin the X-Pinecone-Api-Version header and the matching SDK version instead of relying on the oldest supported default API version.",
+      "Use one namespace per tenant when tenant isolation is the primary access pattern, and include namespace size in read-cost and latency estimates.",
+      "Choose on-demand or dedicated read capacity from measured query volume, latency objectives, namespace layout, storage size, and cost predictability.",
+      "Build a representative relevance set before selecting dense, sparse, hybrid, metadata-filter, and reranking strategies.",
+      "Monitor read and write units, namespace sizes, data freshness, latency, result size, rate limits, and dedicated shard fullness.",
+      "Create and test backups where supported, and document unsupported index-schema cases and same-region restore constraints.",
+      "Use Pinecone Local for repeatable development tests, while validating production behavior against the managed service."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-24001",
+      "title": "Pinecone Database API 2026-04: Create an index",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/reference/api/2026-04/control-plane/create_index",
+      "version": "2026-04",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24002",
+      "title": "Pinecone Documentation: Dedicated Read Nodes",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "publishedAt": "2026-04-15",
+      "canonicalUrl": "https://docs.pinecone.io/guides/index-data/dedicated-read-nodes",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24003",
+      "title": "Pinecone Documentation: Hybrid search",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/search/hybrid-search",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24004",
+      "title": "Pinecone Documentation: Rerank results",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/search/rerank-results",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24005",
+      "title": "Pinecone Documentation: Filter by metadata",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/search/filter-by-metadata",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24006",
+      "title": "Pinecone Documentation: Manage namespaces",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/manage-data/manage-namespaces",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24007",
+      "title": "Pinecone Documentation: Check data freshness",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/index-data/check-data-freshness",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24008",
+      "title": "Pinecone Documentation: Backups overview",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/guides/manage-data/backups-overview",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24009",
+      "title": "Pinecone Release Notes: 2026 releases",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.pinecone.io/release-notes/2026",
+      "version": "2026",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-24010",
+      "title": "Pinecone: The Missing WHERE Clause in Vector Search",
+      "authors": [
+        {
+          "name": "Pinecone"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.pinecone.io/learn/vector-search-filtering/",
+      "accessedAt": "2026-07-16"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-24001",
+      "statement": "Pinecone provides managed serverless indexes with on-demand shared read capacity or Dedicated Read Nodes that use isolated provisioned read hardware, configurable shards, and replicas.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10005",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Pinecone Database API 2026-04 and official documentation accessed 2026-07-16"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-24001"
+      ],
+      "referenceIds": [
+        "REFERENCE-24001",
+        "REFERENCE-24002",
+        "REFERENCE-24009"
+      ],
+      "rationale": "The stable API exposes serverless index creation, while the Dedicated Read Nodes documentation distinguishes shared on-demand reads from isolated provisioned executors and documents manual shard and replica configuration."
+    },
+    {
+      "id": "CLAIM-24002",
+      "statement": "Pinecone supports dense, sparse, and hybrid retrieval, hosted embedding and reranking models, and both single-index weighted dense-sparse querying and separate-index client-side fusion patterns.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10005",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "hybridScope",
+          "value": "Single vector-API dense-sparse indexes require dot product and explicit query-time weighting or normalization"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-24002"
+      ],
+      "referenceIds": [
+        "REFERENCE-24001",
+        "REFERENCE-24003",
+        "REFERENCE-24004"
+      ],
+      "rationale": "The official hybrid guide documents single-index and separate-index patterns, and the inference documentation supports integrated or standalone hosted embedding and reranking."
+    },
+    {
+      "id": "CLAIM-24003",
+      "statement": "Pinecone supports metadata-filtered search and namespace-based partitioning for multi-tenant isolation, with exact, range, boolean, existence, list-membership, and logical filter operators over flat metadata.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10005",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "metadataScope",
+          "value": "Metadata is flat JSON; nested objects and null values are not supported"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-24003"
+      ],
+      "referenceIds": [
+        "REFERENCE-24005",
+        "REFERENCE-24006",
+        "REFERENCE-24010"
+      ],
+      "rationale": "The filter guide enumerates comparison, membership, existence, and logical operators, namespace documentation provides explicit namespace lifecycle operations, and Pinecone describes its integrated single-stage filter as providing pre-filtering accuracy."
+    },
+    {
+      "id": "CLAIM-24004",
+      "statement": "Pinecone is eventually consistent, and serverless write and query responses expose namespace-scoped log sequence numbers that can be compared to verify whether a query reflects a particular write.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10005",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "LSN freshness verification applies to serverless indexes through the Database API"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-24004"
+      ],
+      "referenceIds": [
+        "REFERENCE-24007"
+      ],
+      "rationale": "The data-freshness guide explicitly states eventual consistency and documents monotonically increasing namespace-scoped LSNs for write visibility checks."
+    },
+    {
+      "id": "CLAIM-24005",
+      "statement": "Pinecone supports backups and restore for supported serverless index types, but backups remain in the same project, cloud, and region, can omit very recent writes, and do not cover every document-schema index type.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10005",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "availabilityScope",
+          "value": "Backup availability depends on plan and index schema; scheduled backups use an unstable API"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-24005"
+      ],
+      "referenceIds": [
+        "REFERENCE-24008",
+        "REFERENCE-24009"
+      ],
+      "rationale": "The backup documentation describes static serverless snapshots, restore behavior, plan and schema restrictions, same-region constraints, freshness lag, and scheduled-backup API maturity."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-24001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Pinecone sources document managed serverless indexes, on-demand shared reads, and Dedicated Read Nodes with isolated hardware, shards, and replicas.",
+      "interpretation": "The RKM profile can model Pinecone as a managed serverless service with two read-capacity modes rather than as a self-hosted database with user-selected ANN index families.",
+      "claimIds": [
+        "CLAIM-24001"
+      ],
+      "referenceIds": [
+        "REFERENCE-24001",
+        "REFERENCE-24002",
+        "REFERENCE-24009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-24001",
+          "locator": "Create-index request: serverless deployment and read-capacity configuration"
+        },
+        {
+          "referenceId": "REFERENCE-24002",
+          "locator": "Overview and on-demand versus dedicated comparison; shards, replicas, local SSDs, and object storage"
+        },
+        {
+          "referenceId": "REFERENCE-24009",
+          "locator": "2026-04-15: Dedicated Read Nodes general availability"
+        }
+      ],
+      "limitations": [
+        "The underlying ANN implementation and service internals are not user-configurable or fully disclosed.",
+        "Dedicated capacity behavior, limits, and availability vary by plan, region, node type, shard count, and replica count."
+      ]
+    },
+    {
+      "id": "EVIDENCE-24002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Pinecone documentation covers dense and sparse indexes, single- and separate-index hybrid patterns, explicit weighting, hosted embeddings, and hosted reranking.",
+      "interpretation": "The RKM profile can mark built-in dense and sparse retrieval, hybrid retrieval, weighted fusion, client-side RRF patterns, integrated inference, and a reranking stage.",
+      "claimIds": [
+        "CLAIM-24002"
+      ],
+      "referenceIds": [
+        "REFERENCE-24001",
+        "REFERENCE-24003",
+        "REFERENCE-24004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-24001",
+          "locator": "Dense and sparse serverless index creation and integrated embedding options"
+        },
+        {
+          "referenceId": "REFERENCE-24003",
+          "locator": "Hybrid approaches, dot-product requirement, alpha weighting, normalization guidance, and separate-index fusion"
+        },
+        {
+          "referenceId": "REFERENCE-24004",
+          "locator": "Integrated and standalone hosted reranking workflows"
+        }
+      ],
+      "limitations": [
+        "Single-index vector-API hybrid scores require explicit weighting or normalization, and sparse-only integrated embedding uses a separate sparse index.",
+        "No hybrid weighting or reranking model is universally optimal across datasets and relevance objectives."
+      ]
+    },
+    {
+      "id": "EVIDENCE-24003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Pinecone documents metadata filter expressions and namespace creation, listing, description, deletion, renaming, and record movement.",
+      "interpretation": "The RKM profile can mark filtered retrieval and high multi-tenancy support, while recording flat-metadata and namespace-layout constraints.",
+      "claimIds": [
+        "CLAIM-24003"
+      ],
+      "referenceIds": [
+        "REFERENCE-24005",
+        "REFERENCE-24006",
+        "REFERENCE-24010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-24005",
+          "locator": "Metadata filter operator table and filtered query examples"
+        },
+        {
+          "referenceId": "REFERENCE-24006",
+          "locator": "Namespace lifecycle operations and optional metadata-index schema"
+        },
+        {
+          "referenceId": "REFERENCE-24010",
+          "locator": "Single-stage filtering architecture and pre-filtering accuracy discussion"
+        }
+      ],
+      "limitations": [
+        "Metadata values support a constrained set of scalar and string-list types; nested objects and nulls are not supported.",
+        "Namespace quotas, request-rate limits, and dedicated-read-node namespace restrictions depend on plan and deployment mode."
+      ]
+    },
+    {
+      "id": "EVIDENCE-24004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The data-freshness guide states that Pinecone is eventually consistent and explains namespace-scoped write and query LSN comparison.",
+      "interpretation": "The RKM profile can represent eventual consistency and recommend explicit freshness checks or retries for read-after-write-sensitive RAG pipelines.",
+      "claimIds": [
+        "CLAIM-24004"
+      ],
+      "referenceIds": [
+        "REFERENCE-24007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-24007",
+          "locator": "Eventual consistency statement, write LSN, query LSN, and comparison procedure"
+        }
+      ],
+      "limitations": [
+        "An LSN confirms that a write is reflected in a query view but does not prove the record remains present or unchanged after later writes.",
+        "Freshness checks add application logic and do not create general transactional read-after-write semantics."
+      ]
+    },
+    {
+      "id": "EVIDENCE-24005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Pinecone documents static serverless backups, restore to a new index, plan and schema restrictions, same-region constraints, and backup freshness lag.",
+      "interpretation": "The RKM profile can mark strong managed backup support while preserving eligibility, portability, recovery-time, and recent-write limitations.",
+      "claimIds": [
+        "CLAIM-24005"
+      ],
+      "referenceIds": [
+        "REFERENCE-24008",
+        "REFERENCE-24009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-24008",
+          "locator": "Backup overview, restore behavior, quotas, same-project/cloud/region constraints, freshness, and schema limitations"
+        },
+        {
+          "referenceId": "REFERENCE-24009",
+          "locator": "2026-03-26: backups and restore general availability for serverless indexes"
+        }
+      ],
+      "limitations": [
+        "Backups are unavailable on some plans and unsupported for specified document-schema and full-text-search index types.",
+        "Backups can omit vectors written less than approximately fifteen minutes before snapshot creation and cannot be restored across project, cloud, or region boundaries."
+      ]
+    }
+  ]
+}

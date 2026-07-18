@@ -156,6 +156,210 @@
     }
   },
   {
+    "id": "EDGE-VECTOR-DATABASE-10001-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10001",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/pgvector.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10002-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10002",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/qdrant.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10003-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10003",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/weaviate.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10004-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10004",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/milvus.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10005-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10005",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/pinecone.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10006-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10006",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/chroma.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10007-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10007",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/elasticsearch.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10008-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10008",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/opensearch.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10009-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10009",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/redis.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10010-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10010",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/mongodb.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10011-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10011",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/neo4j.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10012-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10012",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/lancedb.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10013-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10013",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/vespa.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10014-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10014",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/azure-ai-search.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10015-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10015",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/vertex-ai-vector-search.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10016-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10016",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/amazon-neptune-analytics.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
+    "id": "EDGE-VECTOR-DATABASE-10017-VALIDATED_BY_SCHEMA-SCHEMA-VECTOR_DATABASE",
+    "predicate": "VALIDATED_BY_SCHEMA",
+    "sourceId": "VECTOR-DATABASE-10017",
+    "targetId": "SCHEMA-VECTOR_DATABASE",
+    "sourceDataFile": "data/vector-databases/memgraph.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "edgeKind": "Export Provenance",
+      "schema": "schema/vector-database.schema.json"
+    }
+  },
+  {
     "id": "RELATIONSHIP-10001",
     "predicate": "CAN_PRECEDE_IN_PIPELINE",
     "sourceId": "TECHNIQUE-10002",

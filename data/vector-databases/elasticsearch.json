@@ -1,0 +1,626 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10007",
+    "slug": "elasticsearch",
+    "name": {
+      "official": "Elasticsearch",
+      "display": "Elasticsearch",
+      "short": "Elasticsearch"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Elastic Search Engine",
+      "Elastic Vector Database"
+    ],
+    "keywords": [
+      "distributed search engine",
+      "Apache Lucene",
+      "dense vector",
+      "HNSW",
+      "DiskBBQ",
+      "BM25",
+      "hybrid retrieval",
+      "reciprocal rank fusion",
+      "metadata filtering",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Search Engines With Vector Support",
+      "category": "Search and Vector Retrieval Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Elastic release notes and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Elasticsearch is a distributed search and analytics engine with native dense-vector, filtered kNN, lexical, semantic, and hybrid retrieval capabilities.",
+    "description": "Elasticsearch stores JSON documents in distributed Lucene shards and combines mature lexical search, structured and geo filtering, dense-vector exact and approximate retrieval, quantized and disk-backed vector indexes, and hybrid fusion such as Reciprocal Rank Fusion. It can be self-managed or consumed through managed and serverless Elastic Cloud offerings. This record distinguishes vector-search support from dedicated vector-only databases and keeps version-, license-, deployment-, filter-, index-, and relevance-dependent behavior explicit."
+  },
+  "vectorDatabase": {
+    "databaseType": "Search Engine With Vector Support",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Serverless",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Scalar Quantization",
+      "Disk ANN",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Hamming Distance",
+      "Other"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Nested Fields",
+        "Array Contains"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Document Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "C#",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Select vector element type, dimensions, similarity, HNSW or disk-backed index options, and quantization only after measuring recall, latency, indexing cost, memory, and disk behavior.",
+        "Plan primary shard count, shard size, replica count, node roles, allocation awareness, and recovery capacity before large-scale ingestion.",
+        "Use index templates and explicit mappings to avoid accidental vector dimensions, analyzers, dynamic mappings, or field types.",
+        "Treat lexical analyzers, semantic models, vector indexes, and metadata fields as separate retrieval representations with explicit lifecycle and compatibility rules."
+      ],
+      "retrievalConsiderations": [
+        "Place filters inside the kNN query when top-k filtered recall is required and distinguish them from post-filters.",
+        "Evaluate BM25-only, vector-only, semantic-only, and hybrid retrieval on the same relevance set before choosing RRF, linear fusion, boosts, or reranking.",
+        "Tune k, num_candidates, rank_window_size, rank_constant, filters, and candidate sizes under representative load.",
+        "Use profile, explain, slow logs, and retrieval metrics to separate query-planning, shard, model, and ranking costs."
+      ]
+    },
+    "limitations": [
+      "Elasticsearch is a general search and analytics platform, so its operational and schema surface is broader than that of a dedicated vector database.",
+      "Approximate vector indexes and quantization trade exact recall for indexing speed, memory, disk, and query efficiency.",
+      "Pre-filter and post-filter placement changes top-k guarantees and can substantially affect latency and recall.",
+      "Shard count is an architectural decision: oversharding, undersharding, relocation, recovery, and hot shards can impair performance and resilience.",
+      "Search visibility is near-real-time and can lag acknowledged writes until refresh behavior makes new segments searchable.",
+      "RRF and other hybrid strategies depend on candidate windows, feature support, licensing, models, analyzers, and workload-specific relevance evaluation.",
+      "Elasticsearch does not provide general relational-style multi-document ACID transactions.",
+      "The default distribution and some capabilities are governed by Elastic licensing and deployment-specific subscription terms rather than by a single permissive product license."
+    ],
+    "usageGuidance": [
+      "Record Elasticsearch, Lucene, client, and model versions because index defaults, vector formats, retrievers, APIs, and ranking behavior evolve across releases.",
+      "Benchmark the actual shard topology, vector dimensions, filters, query mix, candidate sizes, and hardware rather than relying on generic ANN results.",
+      "Use snapshots and restore drills as part of disaster recovery; replicas protect availability but do not replace backups.",
+      "Monitor shard health, refresh and merge pressure, indexing and search latency, cache behavior, disk watermarks, vector recall, and hybrid relevance in production.",
+      "Review feature availability and license requirements before depending on managed inference, advanced ranking, security, or serverless-specific behavior."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-26001",
+      "title": "Elasticsearch 9.4.2 Release Notes",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/release-notes/elasticsearch#elasticsearch-9.4.2-release-notes",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-05-28",
+      "version": "9.4.2",
+      "repository": "https://github.com/elastic/elasticsearch"
+    },
+    {
+      "id": "REFERENCE-26002",
+      "title": "Elasticsearch Reference Overview",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/reference/elasticsearch",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26003",
+      "title": "Elasticsearch Reference: Dense Vector Field Type",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/dense-vector",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26004",
+      "title": "Elasticsearch Reference: kNN Query",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-knn-query",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26005",
+      "title": "Elasticsearch Reference: Reciprocal Rank Fusion",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26006",
+      "title": "Elastic: Hybrid Search with Elasticsearch",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/elasticsearch/hybrid-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26007",
+      "title": "Elastic Docs: Clusters, Nodes, and Shards",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/deploy-manage/distributed-architecture/clusters-nodes-shards",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26008",
+      "title": "Elastic Docs: Shard Allocation, Relocation, and Recovery",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/deploy-manage/distributed-architecture/shard-allocation-relocation-recovery",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26009",
+      "title": "Elastic Docs: Reading and Writing Documents",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/deploy-manage/distributed-architecture/reading-and-writing-documents",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-26010",
+      "title": "Elastic Docs: Snapshot and Restore",
+      "authors": [
+        {
+          "name": "Elastic"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-26001",
+      "statement": "Elasticsearch stores dense vectors and supports exact vector scoring plus approximate k-nearest-neighbor retrieval with HNSW-based and disk-backed quantized index options across cosine, dot-product, Euclidean, maximum-inner-product, and bit-vector Hamming similarity behavior.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10007",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Elasticsearch 9.4.2 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-26001"
+      ],
+      "referenceIds": [
+        "REFERENCE-26001",
+        "REFERENCE-26002",
+        "REFERENCE-26003"
+      ],
+      "rationale": "The Elasticsearch reference identifies the product as a vector database and documents dense_vector storage, exact script_score retrieval, approximate kNN indexes, quantization, DiskBBQ, and supported vector similarities."
+    },
+    {
+      "id": "CLAIM-26002",
+      "statement": "Elasticsearch supports metadata-aware approximate kNN retrieval with an explicit pre-filter applied during candidate collection, while filters outside the kNN filter parameter can act as post-filters and return fewer than the requested neighbors.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10007",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Filter placement in the query DSL determines pre-filter versus post-filter behavior"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-26002"
+      ],
+      "referenceIds": [
+        "REFERENCE-26004"
+      ],
+      "rationale": "The kNN query documentation directly distinguishes pre-filtering inside the kNN query from post-filtering elsewhere in the query tree and describes their different top-k guarantees."
+    },
+    {
+      "id": "CLAIM-26003",
+      "statement": "Elasticsearch combines lexical BM25 retrieval, dense-vector or semantic retrieval, filtering, and reranking through hybrid queries including Reciprocal Rank Fusion over multiple retrievers.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10007",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "relevanceScope",
+          "value": "Fusion strategy, candidate windows, boosts, models, and filters require workload-specific relevance evaluation"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-26003"
+      ],
+      "referenceIds": [
+        "REFERENCE-26005",
+        "REFERENCE-26006"
+      ],
+      "rationale": "Elastic documents hybrid lexical-vector search and the RRF retriever, including independent child retrievers, rank windows, rank constants, and final coordinating-node fusion."
+    },
+    {
+      "id": "CLAIM-26004",
+      "statement": "Elasticsearch distributes indices into primary and replica shards across nodes, automatically balances shard copies, promotes replicas after primary failure, and supports self-managed, managed, and serverless deployment models.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10007",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Shard topology is user-managed in self-hosted deployments and increasingly automated in managed and serverless offerings"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-26004"
+      ],
+      "referenceIds": [
+        "REFERENCE-26007",
+        "REFERENCE-26008"
+      ],
+      "rationale": "The distributed-architecture documentation describes indices as Lucene shards, primary and replica roles, allocation, balancing, failover, and deployment-dependent operational responsibility."
+    },
+    {
+      "id": "CLAIM-26005",
+      "statement": "Elasticsearch uses primary-backup replication for document writes, provides document-level atomic operations rather than general multi-document ACID transactions, and supports off-cluster snapshots with lifecycle-managed backup and restore workflows.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10007",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "durabilityScope",
+          "value": "Acknowledgement, refresh visibility, replica health, snapshot repository configuration, and version compatibility affect durability and recovery behavior"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-26005"
+      ],
+      "referenceIds": [
+        "REFERENCE-26009",
+        "REFERENCE-26010"
+      ],
+      "rationale": "Elastic documents primary-stage validation and replication to in-sync replicas as well as snapshot repositories, automated snapshot lifecycle management, and restore constraints."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-26001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Elastic sources describe Elasticsearch as a distributed search engine and vector database and document dense_vector exact and approximate search, HNSW, quantization, DiskBBQ, and vector similarity choices.",
+      "interpretation": "The RKM profile can classify Elasticsearch as a search engine with vector support rather than as a dedicated vector-only database.",
+      "claimIds": [
+        "CLAIM-26001"
+      ],
+      "referenceIds": [
+        "REFERENCE-26001",
+        "REFERENCE-26002",
+        "REFERENCE-26003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-26001",
+          "locator": "Elasticsearch 9.4.2 release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-26002",
+          "locator": "Product overview and vector-database description"
+        },
+        {
+          "referenceId": "REFERENCE-26003",
+          "locator": "Dense vector indexing, similarity, HNSW, quantization, and DiskBBQ sections"
+        }
+      ],
+      "limitations": [
+        "Official documentation establishes supported behavior but is not an independent performance benchmark.",
+        "Index defaults and available quantization options vary by vector element type and Elasticsearch version."
+      ]
+    },
+    {
+      "id": "EVIDENCE-26002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The kNN query reference documents filter-aware approximate search and explicitly distinguishes candidate-stage pre-filters from query-tree post-filters.",
+      "interpretation": "The RKM profile can mark pre-filter support while warning that filter placement changes result-count and latency behavior.",
+      "claimIds": [
+        "CLAIM-26002"
+      ],
+      "referenceIds": [
+        "REFERENCE-26004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-26004",
+          "locator": "filter parameter and pre-filters versus post-filters sections"
+        }
+      ],
+      "limitations": [
+        "Highly selective filters can increase graph traversal or trigger alternate search behavior, so workload testing remains necessary.",
+        "Post-filtering can return fewer than k documents even when enough matching documents exist in the index."
+      ]
+    },
+    {
+      "id": "EVIDENCE-26003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Elastic documents BM25 lexical retrieval, dense or semantic retrieval, native filters, and RRF-based combination of multiple retriever result sets.",
+      "interpretation": "The RKM profile can mark built-in hybrid retrieval and RRF without treating any rank constant, candidate window, model, or weighting choice as universally optimal.",
+      "claimIds": [
+        "CLAIM-26003"
+      ],
+      "referenceIds": [
+        "REFERENCE-26005",
+        "REFERENCE-26006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-26005",
+          "locator": "RRF retriever algorithm, child retrievers, and supported feature sections"
+        },
+        {
+          "referenceId": "REFERENCE-26006",
+          "locator": "Hybrid lexical, vector, filters, and reranking overview"
+        }
+      ],
+      "limitations": [
+        "RRF can truncate child results to the rank window and does not support every search feature in every combination.",
+        "Hybrid relevance depends on analyzers, embeddings, candidate sizes, fusion, boosts, filters, and evaluation data."
+      ]
+    },
+    {
+      "id": "EVIDENCE-26004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Elastic documents primary and replica shards, automatic shard allocation and balancing, failover promotion, and different levels of infrastructure responsibility across deployment models.",
+      "interpretation": "The RKM profile can mark high horizontal scalability and replication support while retaining shard-sizing and operational complexity as explicit tradeoffs.",
+      "claimIds": [
+        "CLAIM-26004"
+      ],
+      "referenceIds": [
+        "REFERENCE-26007",
+        "REFERENCE-26008"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-26007",
+          "locator": "Clusters, nodes, primary shards, replicas, and serverless automation"
+        },
+        {
+          "referenceId": "REFERENCE-26008",
+          "locator": "Shard allocation, relocation, recovery, and primary promotion"
+        }
+      ],
+      "limitations": [
+        "Primary-shard count is fixed at index creation even though replica count can be changed later.",
+        "Oversharding, undersharding, relocation, recovery, and hot spots can materially affect cost and performance."
+      ]
+    },
+    {
+      "id": "EVIDENCE-26005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Elastic documents primary-backup write replication to in-sync copies and snapshot repositories for backup, migration, and disaster recovery.",
+      "interpretation": "The RKM profile can mark configurable consistency, document-level atomicity, replication, and strong backup capabilities without claiming relational multi-document transactions.",
+      "claimIds": [
+        "CLAIM-26005"
+      ],
+      "referenceIds": [
+        "REFERENCE-26009",
+        "REFERENCE-26010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-26009",
+          "locator": "Primary, replica, in-sync copy, acknowledgement, and failure-handling model"
+        },
+        {
+          "referenceId": "REFERENCE-26010",
+          "locator": "Snapshot repositories, lifecycle management, backup, and restore workflows"
+        }
+      ],
+      "limitations": [
+        "Search visibility is near-real-time and depends on refresh behavior rather than only on write acknowledgement.",
+        "Snapshot restore depends on repository availability, version compatibility, cluster state, index state, and sufficient capacity."
+      ]
+    }
+  ]
+}

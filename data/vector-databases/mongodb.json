@@ -1,0 +1,730 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10010",
+    "slug": "mongodb",
+    "name": {
+      "official": "MongoDB",
+      "display": "MongoDB",
+      "short": "MongoDB"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "MongoDB Atlas Vector Search",
+      "MongoDB Vector Search",
+      "MongoDB Search",
+      "MongoDB Document Database"
+    ],
+    "keywords": [
+      "document database",
+      "NoSQL database",
+      "vector search",
+      "HNSW",
+      "flat vector index",
+      "hybrid search",
+      "MongoDB Atlas",
+      "mongot",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "NoSQL Databases With Vector Support",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official MongoDB release notes, database manual, MongoDB Search and Vector Search documentation, and licensing documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "MongoDB is a distributed document database with native exact, approximate, filtered, lexical, hybrid, and reranked vector retrieval over application documents.",
+    "description": "MongoDB combines BSON document storage, replica sets, sharding, aggregation pipelines, transactions, and managed Atlas operations with MongoDB Search and MongoDB Vector Search. Vector indexes are maintained by the Lucene-based mongot process and support HNSW or flat indexing, exact and approximate nearest-neighbor search, quantization, metadata and lexical pre-filtering, and hybrid fusion with lexical or multiple vector pipelines. MongoDB Search and Vector Search can be consumed through Atlas and are also available through supported self-managed Community or Enterprise deployment paths, while atlas-local is intended only for development and testing. This record separates database-server guarantees from search-index freshness, Atlas-hosted features, preview capabilities, and deployment-specific limits."
+  },
+  "vectorDatabase": {
+    "databaseType": "NoSQL Database With Vector Support",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Graph Based ANN",
+      "Scalar Quantization",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Nested Fields",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Full ACID"
+    },
+    "integration": {
+      "apis": [
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "Rust",
+        "C#",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "High",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Parent Document Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose HNSW or flat indexing, vector dimensions, BSON vector representation, similarity, and quantization only after measuring recall, latency, storage, build time, and update behavior on representative data.",
+        "Separate operational sizing for mongod data, mongot index storage, search nodes, change-stream synchronization, replicas, and shard topology.",
+        "Use explicit Search and Vector Search index definitions for vector, filter, token, and stored-source fields rather than relying on broad dynamic mappings.",
+        "Record which capabilities are Atlas-hosted, self-managed, generally available, preview, or tied to a particular MongoDB server or mongot version."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate exact, approximate, lexical, vector-only, multi-vector, and hybrid retrieval on the same relevance set.",
+        "Tune numCandidates, limit, filter selectivity, HNSW construction options, fusion weights, reranking depth, and source retrieval under representative load.",
+        "Treat selective metadata filters, lexical pre-filters, arrays of embeddings, and embedded-document retrieval as distinct query plans with different recall and latency behavior.",
+        "Measure search-index freshness separately from transactional commit latency because mongot synchronizes index changes asynchronously from mongod."
+      ]
+    },
+    "limitations": [
+      "MongoDB Search and MongoDB Vector Search indexes are maintained by the separate mongot process and can lag committed database writes while change-stream synchronization and index refresh complete.",
+      "Atlas-hosted, self-managed Community, self-managed Enterprise, and atlas-local deployments expose different support boundaries, topology requirements, feature availability, and operational responsibilities.",
+      "Flat indexing, arrays of embeddings, stored source, advanced lexical pre-filtering, HNSW construction controls, automated embedding, score fusion, and native reranking have version-specific or preview availability.",
+      "HNSW, flat search, exact search, quantization, candidate counts, filters, and shard topology trade recall, latency, CPU, memory, storage, and indexing cost differently.",
+      "Hybrid fusion sub-pipelines can run serially, have stage and pagination restrictions, and require workload-specific weights, score normalization, candidate windows, and relevance evaluation.",
+      "Database transactions provide ACID guarantees for MongoDB data but do not make external Search or Vector Search index updates transactionally visible at commit time.",
+      "Atlas snapshot restore can restore Search index definitions without restoring mongot index data, requiring index resynchronization after restore.",
+      "MongoDB Community Server is licensed under SSPL v1.0 for current releases; commercial licensing and Atlas service terms are separate considerations."
+    ],
+    "usageGuidance": [
+      "Use MongoDB when application documents, operational queries, transactions, and vector retrieval benefit from a shared document model and aggregation pipeline.",
+      "Use dedicated Search Nodes or appropriately sized self-managed mongot instances when search workloads should scale independently from database nodes.",
+      "Benchmark the complete RAG lifecycle including document updates, index synchronization, filters, hybrid fusion, reranking, sharding, failover, backup, and restore.",
+      "Pin and record MongoDB server, mongot, driver, index-definition, embedding-model, and managed-service versions because behavior and feature availability evolve independently.",
+      "Use read concern, write concern, causal sessions, and transaction options according to the application consistency requirement rather than assuming one global consistency level."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-29001",
+      "title": "MongoDB 8.2.11 Release Notes",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/manual/release-notes/8.2/#8.2.11---june-11-2026",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-06-11",
+      "version": "8.2.11"
+    },
+    {
+      "id": "REFERENCE-29002",
+      "title": "MongoDB Vector Search: How to Index Vector Fields",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/search/index/field-types/vector-type/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29003",
+      "title": "MongoDB Vector Search: $vectorSearch Aggregation Stage",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29004",
+      "title": "MongoDB Search: vectorSearch Operator and Pre-Filtering",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/search/query/operators-collectors/vectorSearch/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29005",
+      "title": "MongoDB Search and MongoDB Vector Search Changelog",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/atlas/search-changelog/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29006",
+      "title": "MongoDB Vector Search: Hybrid Search Overview",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search-overview/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29007",
+      "title": "MongoDB Vector Search: Combine Multiple Vector Search Queries",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/vector-search/hybrid-search/vector-search-with-rankfusion/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29008",
+      "title": "MongoDB Search and MongoDB Vector Search on Self-Managed Deployments",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/search/self-managed/current/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29009",
+      "title": "MongoDB Search Deployment Options",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/search/deployment/deployment-options/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29010",
+      "title": "MongoDB Replica Set Read and Write Semantics",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/manual/applications/replication/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29011",
+      "title": "MongoDB Read Concern and Write Concern",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/manual/reference/read-concern/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29012",
+      "title": "MongoDB Transactions",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/manual/core/transactions/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29013",
+      "title": "MongoDB Atlas Snapshot Restore",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/docs/atlas/backup/cloud-backup/restore-from-snapshot/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-29014",
+      "title": "MongoDB Community Edition Licensing",
+      "authors": [
+        {
+          "name": "MongoDB, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://www.mongodb.com/legal/licensing/community-edition",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-29001",
+      "statement": "MongoDB stores vectors alongside BSON application documents and supports exact and approximate nearest-neighbor retrieval using flat or HNSW indexes, optional scalar or binary quantization, and cosine, dot-product, or Euclidean similarity.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10010",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "MongoDB 8.2.11 database server and MongoDB Search or Vector Search documentation accessed 2026-07-17; Atlas-hosted and self-managed mongot features are versioned separately"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-29001"
+      ],
+      "referenceIds": [
+        "REFERENCE-29001",
+        "REFERENCE-29002",
+        "REFERENCE-29003",
+        "REFERENCE-29005"
+      ],
+      "rationale": "The official release notes establish the database-server checkpoint, while the vector-field, query, and changelog documentation enumerate index structures, quantization, metrics, exact and approximate execution, and recent preview capabilities."
+    },
+    {
+      "id": "CLAIM-29002",
+      "statement": "MongoDB Vector Search supports metadata-aware pre-filtering over indexed scalar and array fields, and newer MongoDB Search vectorSearch syntax adds analyzed lexical and geospatial pre-filters before semantic similarity retrieval.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10010",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Basic MQL pre-filter support and advanced MongoDB Search lexical pre-filter support depend on deployment type, index definition, supported operators, and feature maturity"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-29002"
+      ],
+      "referenceIds": [
+        "REFERENCE-29003",
+        "REFERENCE-29004",
+        "REFERENCE-29005"
+      ],
+      "rationale": "MongoDB documents pre-filter expressions for Boolean, date, ObjectId, numeric, string, UUID, and array values and separately records preview lexical pre-filter support using MongoDB Search operators."
+    },
+    {
+      "id": "CLAIM-29003",
+      "statement": "MongoDB combines lexical, vector, geospatial, and multiple vector-search pipelines through aggregation stages including Reciprocal Rank Fusion, score-based fusion on supported versions, and native reranking in eligible Atlas deployments.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10010",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "availabilityScope",
+          "value": "Rank fusion, score fusion, reranking, stored source, and multi-vector features have distinct MongoDB server, mongot, Atlas service, general-availability, and preview requirements"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-29003"
+      ],
+      "referenceIds": [
+        "REFERENCE-29005",
+        "REFERENCE-29006",
+        "REFERENCE-29007"
+      ],
+      "rationale": "The hybrid-search documentation describes rank- and score-based pipeline fusion, multiple vector queries, weights, restrictions, and reranking, while the changelog records the dated Atlas feature introductions."
+    },
+    {
+      "id": "CLAIM-29004",
+      "statement": "MongoDB Search and MongoDB Vector Search use a separate Lucene-based mongot process that synchronizes from mongod through change streams, can run in Atlas or supported self-managed Community and Enterprise topologies, and can scale across replica sets, sharded clusters, and dedicated search-node resources.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10010",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Atlas, self-managed Community, self-managed Enterprise, and atlas-local expose different production support, topology, high-availability, scaling, and operational responsibility boundaries"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-29004"
+      ],
+      "referenceIds": [
+        "REFERENCE-29008",
+        "REFERENCE-29009",
+        "REFERENCE-29010"
+      ],
+      "rationale": "Official deployment documentation describes mongot architecture, dedicated index storage, self-managed installation paths, Atlas Search Nodes, replica-set and sharded-cluster support, and the non-production role of atlas-local."
+    },
+    {
+      "id": "CLAIM-29005",
+      "statement": "MongoDB provides configurable read and write concerns, replication, causal consistency, and ACID transactions across multiple documents, collections, databases, and shards, while Atlas supports snapshot-based recovery; these database guarantees do not make mongot search-index updates transactionally visible at commit time.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10010",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Database durability and visibility depend on read concern, write concern, session, transaction, replica, shard, backup, and restore configuration, while Search and Vector Search index freshness depends on asynchronous mongot synchronization"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-29005"
+      ],
+      "referenceIds": [
+        "REFERENCE-29008",
+        "REFERENCE-29010",
+        "REFERENCE-29011",
+        "REFERENCE-29012",
+        "REFERENCE-29013",
+        "REFERENCE-29014"
+      ],
+      "rationale": "MongoDB documents configurable replica-set semantics and multi-document transactions, Atlas snapshot restore behavior, and mongot change-stream synchronization; licensing documentation establishes the separate SSPL and commercial-license considerations."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-29001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "MongoDB official sources document vector fields in BSON documents, default HNSW and optional flat indexing, ANN and ENN execution, scalar and binary quantization, and cosine, dot-product, and Euclidean similarity.",
+      "interpretation": "The RKM profile can classify MongoDB as a NoSQL database with vector support and represent both exact and approximate retrieval without treating Atlas-hosted preview capabilities as universal guarantees.",
+      "claimIds": [
+        "CLAIM-29001"
+      ],
+      "referenceIds": [
+        "REFERENCE-29001",
+        "REFERENCE-29002",
+        "REFERENCE-29003",
+        "REFERENCE-29005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-29001",
+          "locator": "MongoDB 8.2.11 supported database-server release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-29002",
+          "locator": "Vector field syntax, HNSW and flat indexing, quantization, dimensions, and similarity"
+        },
+        {
+          "referenceId": "REFERENCE-29003",
+          "locator": "ANN and ENN query semantics, numCandidates, limit, score, and vector-search stage"
+        },
+        {
+          "referenceId": "REFERENCE-29005",
+          "locator": "2026 flat-index, arrays-of-embeddings, stored-source, and HNSW-option changelog entries"
+        }
+      ],
+      "limitations": [
+        "Official product documentation is not an independent recall, latency, cost, or scalability benchmark.",
+        "Flat indexes, arrays of embeddings, and HNSW construction controls have deployment- and maturity-specific availability."
+      ]
+    },
+    {
+      "id": "EVIDENCE-29002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "MongoDB documents metadata pre-filters for scalar values and arrays and records newer Search vectorSearch support for analyzed text, fuzzy, phrase, wildcard, and location filtering before vector similarity evaluation.",
+      "interpretation": "The RKM profile can mark pre-filter support while warning that operator coverage, index types, selectivity, arrays, encryption, and preview syntax materially affect query planning and completeness.",
+      "claimIds": [
+        "CLAIM-29002"
+      ],
+      "referenceIds": [
+        "REFERENCE-29003",
+        "REFERENCE-29004",
+        "REFERENCE-29005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-29003",
+          "locator": "$vectorSearch filter field and supported scalar or array value types"
+        },
+        {
+          "referenceId": "REFERENCE-29004",
+          "locator": "MongoDB Vector Search pre-filter operators and index requirements"
+        },
+        {
+          "referenceId": "REFERENCE-29005",
+          "locator": "Lexical pre-filter and embedded-array feature changelog entries"
+        }
+      ],
+      "limitations": [
+        "Highly selective pre-filters can change the relative performance of ANN and ENN retrieval.",
+        "Advanced analyzed lexical pre-filter support is not equivalent to universal full-text filtering in every deployment or server version."
+      ]
+    },
+    {
+      "id": "EVIDENCE-29003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "MongoDB hybrid-search documentation describes $rankFusion reciprocal-rank fusion, $scoreFusion score normalization and weighting on supported versions, multiple vector-search sub-pipelines, and reranking after fusion.",
+      "interpretation": "The RKM profile can represent hybrid and multi-vector retrieval while preserving explicit version and service boundaries instead of treating all fusion and reranking stages as baseline features.",
+      "claimIds": [
+        "CLAIM-29003"
+      ],
+      "referenceIds": [
+        "REFERENCE-29005",
+        "REFERENCE-29006",
+        "REFERENCE-29007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-29005",
+          "locator": "2026 Atlas Search and Vector Search feature-release chronology"
+        },
+        {
+          "referenceId": "REFERENCE-29006",
+          "locator": "Hybrid-search algorithms, normalization, weights, reranking, and limitations"
+        },
+        {
+          "referenceId": "REFERENCE-29007",
+          "locator": "Multiple $vectorSearch pipelines combined with reciprocal-rank fusion"
+        }
+      ],
+      "limitations": [
+        "Fusion sub-pipelines may execute serially and have stage, pagination, and cross-collection restrictions.",
+        "Weights, candidate limits, score normalization, and reranking depth require target-workload relevance and latency evaluation."
+      ]
+    },
+    {
+      "id": "EVIDENCE-29004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "MongoDB documents mongot as a separate Lucene-based process that streams changes from mongod, maintains dedicated search-index storage, and supports Atlas-managed plus defined self-managed Community and Enterprise deployment paths.",
+      "interpretation": "The RKM profile can distinguish MongoDB database topology from Search and Vector Search topology and mark atlas-local as a development target rather than a production deployment.",
+      "claimIds": [
+        "CLAIM-29004"
+      ],
+      "referenceIds": [
+        "REFERENCE-29008",
+        "REFERENCE-29009",
+        "REFERENCE-29010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-29008",
+          "locator": "mongot architecture, self-managed installation paths, and replica-set or sharded deployment"
+        },
+        {
+          "referenceId": "REFERENCE-29009",
+          "locator": "Atlas local, co-located, and dedicated Search Node deployment options"
+        },
+        {
+          "referenceId": "REFERENCE-29010",
+          "locator": "Replica-set and sharded-cluster read and write semantics"
+        }
+      ],
+      "limitations": [
+        "Atlas, Community, and Enterprise deployment paths differ in supported topology, automation, monitoring, and commercial support.",
+        "Search-node scaling and database-node scaling are related but independently capacity-planned."
+      ]
+    },
+    {
+      "id": "EVIDENCE-29005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "MongoDB official documentation describes configurable read and write concerns, replica-set semantics, causal sessions, multi-document and cross-shard ACID transactions, Atlas snapshot restore, mongot asynchronous synchronization, and current Community Server licensing.",
+      "interpretation": "The RKM profile can mark full database transaction support and configurable consistency while warning that Search and Vector Search visibility is asynchronous and backup restore may rebuild search indexes from definitions.",
+      "claimIds": [
+        "CLAIM-29005"
+      ],
+      "referenceIds": [
+        "REFERENCE-29008",
+        "REFERENCE-29010",
+        "REFERENCE-29011",
+        "REFERENCE-29012",
+        "REFERENCE-29013",
+        "REFERENCE-29014"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-29008",
+          "locator": "Change-stream-driven mongot synchronization and dedicated search-index storage"
+        },
+        {
+          "referenceId": "REFERENCE-29010",
+          "locator": "Replica-set and sharded-cluster write acknowledgement and read routing"
+        },
+        {
+          "referenceId": "REFERENCE-29011",
+          "locator": "Read concern levels and consistency or availability tradeoffs"
+        },
+        {
+          "referenceId": "REFERENCE-29012",
+          "locator": "Transactions across operations, collections, databases, documents, and shards"
+        },
+        {
+          "referenceId": "REFERENCE-29013",
+          "locator": "Atlas snapshot restore and Search index resynchronization behavior"
+        },
+        {
+          "referenceId": "REFERENCE-29014",
+          "locator": "SSPL v1.0 and commercial licensing for current MongoDB Community Server"
+        }
+      ],
+      "limitations": [
+        "ACID transaction commit does not make mongot indexes synchronously visible in the same atomic boundary.",
+        "Atlas restores Search index definitions but not Search index data, which can delay availability while indexes resynchronize."
+      ]
+    }
+  ]
+}

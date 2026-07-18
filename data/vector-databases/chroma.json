@@ -1,0 +1,620 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10006",
+    "slug": "chroma",
+    "name": {
+      "official": "Chroma",
+      "display": "Chroma",
+      "short": "Chroma"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "ChromaDB",
+      "Chroma Vector Database"
+    ],
+    "keywords": [
+      "embedded vector database",
+      "HNSW",
+      "SPANN",
+      "metadata filtering",
+      "full-text search",
+      "sparse vectors",
+      "hybrid retrieval",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Dedicated Vector Databases",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Chroma repository, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Chroma is an open-source vector database and retrieval system that supports embedded local use, single-node serving, and distributed managed deployment.",
+    "description": "Chroma stores embeddings, documents, and metadata and exposes vector similarity, metadata filtering, full-text and regex retrieval, and deployment-dependent sparse and hybrid search. Single-node Chroma uses HNSW, while Distributed Chroma and Chroma Cloud use SPANN over a multi-service architecture backed by a write-ahead log, object storage, local caches, and a SQL system catalog. This record distinguishes generally available collection APIs from Chroma Cloud Search API capabilities and from features that are not yet identical across local and distributed storage systems."
+  },
+  "vectorDatabase": {
+    "databaseType": "Dedicated Vector Database",
+    "deploymentModels": [
+      "Local",
+      "Self Hosted",
+      "Managed Cloud"
+    ],
+    "supportedIndexTypes": [
+      "HNSW",
+      "Disk ANN",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Array Contains"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "Rust"
+      ]
+    },
+    "operations": {
+      "accessControl": "Variable",
+      "encryption": "Variable",
+      "backupAndRestore": "Variable",
+      "observability": "High",
+      "multiTenancy": "High"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Use local embedded mode for prototyping, single-node mode for moderate workloads, and distributed or Cloud mode when horizontal scaling and managed operations are required.",
+        "Tune HNSW only after measuring recall, latency, memory, build time, and ingestion behavior on representative embeddings.",
+        "Treat SPANN as a distinct distributed index whose configuration and storage behavior differ from single-node HNSW.",
+        "Disable unused full-text, regex, or metadata indexes where the deployment and schema support doing so, because every index increases write and storage cost."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate vector-only, lexical-only, sparse-only, and hybrid retrieval on a shared relevance set.",
+        "Keep local query APIs and Cloud Search API feature availability separate in application architecture.",
+        "Test selective metadata and document filters with realistic candidate counts and collection sizes.",
+        "Tune RRF weights and candidate limits rather than treating documented examples as universal defaults."
+      ]
+    },
+    "limitations": [
+      "Single-node and distributed Chroma use different storage and indexing subsystems and do not yet have complete feature and behavior parity.",
+      "The composable Search API, sparse-vector schema, and documented RRF workflow are currently Chroma Cloud capabilities.",
+      "Single-node HNSW and distributed SPANN have different tuning, storage, scaling, latency, and recall tradeoffs.",
+      "Full-text containment search is case-sensitive, and regex or text predicates can increase indexing and query cost.",
+      "Metadata types and arrays have structural constraints, and cloud deployments impose request and collection quotas.",
+      "Local embedded deployments do not automatically provide the authentication, isolation, redundancy, scaling, or operational guarantees of Chroma Cloud.",
+      "Chroma does not expose general cross-collection or relational-style ACID transactions."
+    ],
+    "usageGuidance": [
+      "Record the server and client versions because local, distributed, Search API, schema, and embedding-function behavior changes across releases.",
+      "Benchmark the intended deployment mode rather than extrapolating results between embedded HNSW and distributed SPANN.",
+      "Use tenant, database, and collection boundaries according to isolation, quota, lifecycle, and access patterns.",
+      "Monitor WAL ingestion, compaction, index freshness, cache behavior, object-storage reads, latency, and recall.",
+      "Maintain separate compatibility tests for local Chroma and Chroma Cloud whenever an application supports both."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-25001",
+      "title": "Chroma 1.5.9 Release",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/chroma-core/chroma/releases/tag/1.5.9",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-05-05",
+      "version": "1.5.9",
+      "repository": "https://github.com/chroma-core/chroma"
+    },
+    {
+      "id": "REFERENCE-25002",
+      "title": "Chroma Documentation: Architecture Overview",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/docs/overview/architecture",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25003",
+      "title": "Chroma Documentation: Configure Collections",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/docs/collections/configure",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25004",
+      "title": "Chroma Documentation: Metadata Filtering",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/docs/querying-collections/metadata-filtering",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25005",
+      "title": "Chroma Documentation: Full Text Search",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/docs/querying-collections/full-text-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25006",
+      "title": "Chroma Documentation: Sparse Vector Search Setup",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/cloud/schema/sparse-vector-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25007",
+      "title": "Chroma Documentation: Hybrid Search with RRF",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/cloud/search-api/hybrid-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25008",
+      "title": "Chroma Documentation: Distributed Architecture",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/references/architecture/distributed",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25009",
+      "title": "Chroma Documentation: Chroma Cloud",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/cloud/getting-started",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-25010",
+      "title": "Chroma Documentation: Open Source",
+      "authors": [
+        {
+          "name": "Chroma maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.trychroma.com/docs/overview/oss",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-25001",
+      "statement": "Chroma supports embedded local, single-node, and distributed deployment modes; single-node collections use HNSW while Distributed Chroma and Chroma Cloud use SPANN, with squared-L2, cosine, and inner-product distance options.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10006",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Chroma 1.5.9 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-25001"
+      ],
+      "referenceIds": [
+        "REFERENCE-25001",
+        "REFERENCE-25002",
+        "REFERENCE-25003"
+      ],
+      "rationale": "The architecture and collection-configuration documentation distinguish the three deployment modes and their HNSW or SPANN index implementations, metrics, and tuning scope."
+    },
+    {
+      "id": "CLAIM-25002",
+      "statement": "Chroma supports metadata-filtered vector retrieval together with document full-text and regular-expression filtering.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10006",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Metadata and document filters depend on indexed fields, supported operators, and deployment-specific limits"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-25002"
+      ],
+      "referenceIds": [
+        "REFERENCE-25004",
+        "REFERENCE-25005"
+      ],
+      "rationale": "The query documentation exposes metadata filters through where and document-content filters through where_document, including logical, containment, and regex operators."
+    },
+    {
+      "id": "CLAIM-25003",
+      "statement": "Chroma supports dense and sparse vector retrieval and can combine retrieval channels through weighted Reciprocal Rank Fusion in the Chroma Cloud Search API.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10006",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "availabilityScope",
+          "value": "The composable Search API and sparse-vector hybrid workflow are documented for Chroma Cloud; equivalent single-node support is not yet fully available"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-25003"
+      ],
+      "referenceIds": [
+        "REFERENCE-25006",
+        "REFERENCE-25007",
+        "REFERENCE-25010"
+      ],
+      "rationale": "The sparse-vector and hybrid-search documentation shows dense and sparse KNN channels combined with configurable RRF weights, while the open-source roadmap documents temporary differences between distributed and local Chroma."
+    },
+    {
+      "id": "CLAIM-25004",
+      "statement": "Distributed Chroma separates gateway, write-ahead log, query execution, compaction, system catalog, and object storage, and the log provides durability, replay, and atomicity across multi-record writes.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10006",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Distributed Chroma and Chroma Cloud; operational topology and service management differ from embedded and single-node modes"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-25004"
+      ],
+      "referenceIds": [
+        "REFERENCE-25008",
+        "REFERENCE-25009"
+      ],
+      "rationale": "The distributed architecture documentation describes each service, the WAL acknowledgement path, object storage, SQL catalog, local SSD caches, and independently scalable runtime components."
+    },
+    {
+      "id": "CLAIM-25005",
+      "statement": "Chroma organizes collections within databases and tenants, uses tenant-level isolation in its data model, and offers the distributed engine as a managed serverless Chroma Cloud service.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10006",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "isolationScope",
+          "value": "Tenant, quota, access-control, and billing behavior is most fully exposed in Chroma Cloud; local deployments require their own surrounding operational controls"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-25005"
+      ],
+      "referenceIds": [
+        "REFERENCE-25002",
+        "REFERENCE-25009",
+        "REFERENCE-25010"
+      ],
+      "rationale": "The architecture documentation defines tenant, database, and collection boundaries, while the Cloud and open-source pages describe the managed distributed service and current feature-parity boundaries."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-25001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Chroma sources document local, single-node, and distributed modes, HNSW for single-node, SPANN for distributed deployments, and L2, cosine, and inner-product spaces.",
+      "interpretation": "The RKM profile can represent Chroma as a dedicated vector database spanning embedded, server, and distributed deployment styles rather than treating Chroma as local-only.",
+      "claimIds": [
+        "CLAIM-25001"
+      ],
+      "referenceIds": [
+        "REFERENCE-25001",
+        "REFERENCE-25002",
+        "REFERENCE-25003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-25001",
+          "locator": "Release 1.5.9 package and repository checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-25002",
+          "locator": "Deployment Modes and Chroma Data Model sections"
+        },
+        {
+          "referenceId": "REFERENCE-25003",
+          "locator": "HNSW and SPANN Index Configuration sections"
+        }
+      ],
+      "limitations": [
+        "Official documentation establishes supported behavior but is not an independent performance benchmark.",
+        "HNSW and SPANN have different storage, tuning, latency, recall, and deployment characteristics."
+      ]
+    },
+    {
+      "id": "EVIDENCE-25002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Chroma documents metadata predicates, array containment, logical operators, document substring search, and regex filtering alongside vector queries.",
+      "interpretation": "The RKM profile can mark filtered retrieval and full-text constraints while preserving the distinction between metadata filtering and ranked lexical retrieval.",
+      "claimIds": [
+        "CLAIM-25002"
+      ],
+      "referenceIds": [
+        "REFERENCE-25004",
+        "REFERENCE-25005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-25004",
+          "locator": "where filter operators, logical composition, and arrays"
+        },
+        {
+          "referenceId": "REFERENCE-25005",
+          "locator": "where_document full-text and regex operators"
+        }
+      ],
+      "limitations": [
+        "Full-text containment is case-sensitive according to the documentation.",
+        "Metadata arrays must be homogeneous and nested arrays are not supported."
+      ]
+    },
+    {
+      "id": "EVIDENCE-25003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Chroma Cloud documents sparse-vector indexes and weighted RRF over dense and sparse KNN rankings.",
+      "interpretation": "The RKM profile can mark built-in sparse-dense fusion and RRF, but must scope the composable Search API to Chroma Cloud.",
+      "claimIds": [
+        "CLAIM-25003"
+      ],
+      "referenceIds": [
+        "REFERENCE-25006",
+        "REFERENCE-25007",
+        "REFERENCE-25010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-25006",
+          "locator": "Sparse Vector Search and Hybrid Search sections"
+        },
+        {
+          "referenceId": "REFERENCE-25007",
+          "locator": "RRF ranking expression, weights, and smoothing parameter"
+        },
+        {
+          "referenceId": "REFERENCE-25010",
+          "locator": "Roadmap discussion of distributed and local feature parity"
+        }
+      ],
+      "limitations": [
+        "Search API capabilities documented for Chroma Cloud may not exist in the same form in single-node Chroma.",
+        "RRF weights and candidate limits require relevance evaluation for the target workload."
+      ]
+    },
+    {
+      "id": "EVIDENCE-25004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The distributed architecture documents a WAL, independent query and compaction services, SQL catalog metadata, object storage, and SSD caches.",
+      "interpretation": "The RKM profile can mark high horizontal scalability, disk-backed indexing, durable writes, and limited transactional semantics without claiming general relational ACID behavior.",
+      "claimIds": [
+        "CLAIM-25004"
+      ],
+      "referenceIds": [
+        "REFERENCE-25008",
+        "REFERENCE-25009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-25008",
+          "locator": "Gateway, Log, Query Executor, Compactor, and System Database sections"
+        },
+        {
+          "referenceId": "REFERENCE-25009",
+          "locator": "Managed distributed and serverless Chroma Cloud overview"
+        }
+      ],
+      "limitations": [
+        "Atomic multi-record writes do not imply general multi-operation or cross-collection ACID transactions.",
+        "Object-storage and cache behavior introduces workload-specific cold-start, I/O, and compaction tradeoffs."
+      ]
+    },
+    {
+      "id": "EVIDENCE-25005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Chroma defines tenants, databases, and collections and documents Chroma Cloud as the managed serverless deployment of the open-source distributed engine.",
+      "interpretation": "The RKM profile can mark multi-tenancy and managed cloud availability while warning that local installations must provide their own surrounding security and operational setup.",
+      "claimIds": [
+        "CLAIM-25005"
+      ],
+      "referenceIds": [
+        "REFERENCE-25002",
+        "REFERENCE-25009",
+        "REFERENCE-25010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-25002",
+          "locator": "Tenants, Databases, and Collections sections"
+        },
+        {
+          "referenceId": "REFERENCE-25009",
+          "locator": "Chroma Cloud deployment and regional operation"
+        },
+        {
+          "referenceId": "REFERENCE-25010",
+          "locator": "Open-source deployment modes and feature-parity roadmap"
+        }
+      ],
+      "limitations": [
+        "Local and distributed Chroma currently use different storage subsystems and may not have full feature parity.",
+        "Managed-cloud quotas, billing, regions, and operational guarantees do not automatically apply to self-hosted modes."
+      ]
+    }
+  ]
+}

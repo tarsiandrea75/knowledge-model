@@ -1,0 +1,655 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10009",
+    "slug": "redis",
+    "name": {
+      "official": "Redis",
+      "display": "Redis",
+      "short": "Redis"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Redis Open Source",
+      "Redis Vector Database",
+      "Redis Search",
+      "Redis Query Engine"
+    ],
+    "keywords": [
+      "in-memory database",
+      "vector search",
+      "FLAT",
+      "HNSW",
+      "SVS-VAMANA",
+      "hybrid search",
+      "Redis Cluster",
+      "semantic cache",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "In Memory Vector Stores",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Redis repository, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Redis is an in-memory data platform with native exact, approximate, filtered, full-text, and hybrid vector retrieval over hash and JSON documents.",
+    "description": "Redis combines its low-latency in-memory data structures with secondary indexing, full-text search, geospatial and metadata filtering, and vector retrieval. Redis 8 supports FLAT, HNSW, and SVS-VAMANA vector indexes, KNN and range queries, and FT.HYBRID fusion of text and vector results. Redis can run locally or self-hosted, scale through Redis Cluster and asynchronous replication, or be consumed as Redis Cloud. This record separates in-memory query performance from persistence durability, replication consistency, cluster behavior, managed-service guarantees, and workload-specific vector recall."
+  },
+  "vectorDatabase": {
+    "databaseType": "In Memory Vector Store",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Graph Based ANN",
+      "Scalar Quantization",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": false
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": false
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "Rust",
+        "C#",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "High",
+      "encryption": "Variable",
+      "backupAndRestore": "High",
+      "observability": "High",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Semantic Cache",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Select FLAT, HNSW, or SVS-VAMANA only after measuring recall, latency, memory, construction time, compression, and hardware behavior on representative vectors.",
+        "Size memory for primary data, secondary indexes, replication buffers, persistence copy-on-write overhead, client buffers, and operational headroom.",
+        "Use explicit HASH or JSON schemas, vector dimensions, element types, distance metrics, key prefixes, and indexed metadata fields.",
+        "Plan Redis Cluster hash slots, shard count, replica count, hot-key distribution, persistence, and failover capacity before large-scale ingestion."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate text-only, vector-only, and FT.HYBRID retrieval on the same relevance set before choosing RRF or linear fusion.",
+        "Tune EF_RUNTIME, KNN candidate counts, SHARD_K_RATIO, filter policy, batch size, fusion windows, rank constants, and weights under representative load.",
+        "Distinguish vector pre-filters from post-combination filters because they change candidate eligibility, result counts, and latency.",
+        "Account for key expiration, eviction policy, replication lag, failover, and persistence when Redis is used as the authoritative RAG memory store."
+      ]
+    },
+    "limitations": [
+      "Vector indexes and primary data consume memory, so dataset size, index overhead, fragmentation, replicas, and persistence forks must be capacity-planned together.",
+      "SVS-VAMANA compression behavior and proprietary Intel optimizations depend on hardware, build options, platform, and selected Redis license.",
+      "Redis replication is asynchronous by default, and acknowledged writes can still be lost during failover depending on persistence and topology.",
+      "Redis Cluster supports atomic multi-key operations only when the participating keys are colocated in the same hash slot.",
+      "MULTI/EXEC serializes queued commands but does not roll back successful commands when another queued command fails during execution.",
+      "RDB, AOF, and combined persistence trade restart time, write amplification, latency, storage, and possible data loss differently.",
+      "FT.HYBRID fusion and filtered vector retrieval require workload-specific relevance, latency, memory, and cluster evaluation.",
+      "Redis 8 uses a tri-license choice of RSALv2, SSPLv1, or AGPLv3, and optional proprietary vector optimizations can impose additional compatibility constraints."
+    ],
+    "usageGuidance": [
+      "Record the Redis server, client, query-engine, and index versions because vector types, algorithms, defaults, commands, and cluster behavior evolve across releases.",
+      "Use Redis primarily when low-latency mutable retrieval, caching, session memory, or real-time data structures justify the in-memory cost model.",
+      "Benchmark the complete RAG workload including ingestion, expiration, filters, hybrid fusion, replication, persistence, failover, and recovery.",
+      "Use ACLs, TLS, network isolation, key-prefix conventions, and deployment-specific tenant controls rather than exposing Redis directly to untrusted clients.",
+      "Test RDB and AOF recovery, replica promotion, cluster resharding, memory pressure, and eviction behavior before production adoption."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-28001",
+      "title": "Redis 8.8.0 Release",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/redis/redis/releases/tag/8.8.0",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-05-25",
+      "version": "8.8.0",
+      "repository": "https://github.com/redis/redis"
+    },
+    {
+      "id": "REFERENCE-28002",
+      "title": "Redis Repository and Licensing Overview",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/redis/redis",
+      "accessedAt": "2026-07-17",
+      "repository": "https://github.com/redis/redis"
+    },
+    {
+      "id": "REFERENCE-28003",
+      "title": "Redis Search Overview",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/develop/ai/search-and-query/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28004",
+      "title": "Redis Documentation: Vector Search Concepts",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/develop/ai/search-and-query/vectors/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28005",
+      "title": "Redis Documentation: Combined Queries",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/develop/ai/search-and-query/query/combined/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28006",
+      "title": "Redis Command Reference: FT.HYBRID",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/commands/ft.hybrid/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28007",
+      "title": "Redis Documentation: Scale with Redis Cluster",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28008",
+      "title": "Redis Documentation: Replication",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/operate/oss_and_stack/management/replication/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28009",
+      "title": "Redis Documentation: Persistence",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28010",
+      "title": "Redis Documentation: Transactions",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/develop/using-commands/transactions/",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-28011",
+      "title": "Redis Cloud Documentation",
+      "authors": [
+        {
+          "name": "Redis maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://redis.io/docs/latest/operate/rc/",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-28001",
+      "statement": "Redis stores vectors and metadata in hashes or JSON documents and supports exact FLAT search, approximate HNSW search, and SVS-VAMANA graph search with optional compression across cosine, inner-product, and Euclidean distance metrics.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10009",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Redis 8.8.0 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-28001"
+      ],
+      "referenceIds": [
+        "REFERENCE-28001",
+        "REFERENCE-28002",
+        "REFERENCE-28003",
+        "REFERENCE-28004"
+      ],
+      "rationale": "The Redis repository, release, Search overview, and vector documentation describe Redis as a vector-capable in-memory data platform and enumerate its storage models, vector index families, compression options, and metrics."
+    },
+    {
+      "id": "CLAIM-28002",
+      "statement": "Redis supports metadata-aware vector retrieval using exact-match, numeric-range, full-text, geospatial, and logical pre-filters, with runtime heuristics or explicit ADHOC_BF and BATCHES policies for filtered KNN execution.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10009",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Filter behavior depends on query dialect, index type, selectivity, cluster topology, and the selected hybrid policy"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-28002"
+      ],
+      "referenceIds": [
+        "REFERENCE-28004",
+        "REFERENCE-28005"
+      ],
+      "rationale": "The vector and combined-query documentation describes structured filters before KNN search and documents the execution policies used to balance brute-force filtering against batched ANN traversal."
+    },
+    {
+      "id": "CLAIM-28003",
+      "statement": "Redis FT.HYBRID combines BM25-style text search and vector similarity in one query and supports Reciprocal Rank Fusion or weighted linear fusion, vector pre-filtering, post-combination filtering, and cluster candidate controls.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10009",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "availabilityScope",
+          "value": "FT.HYBRID is available from Redis Open Source 8.4 and Redis 8.8 adds shard-candidate and profiling improvements"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-28003"
+      ],
+      "referenceIds": [
+        "REFERENCE-28001",
+        "REFERENCE-28006"
+      ],
+      "rationale": "The Redis 8.8 release and FT.HYBRID command reference document unified text-vector retrieval, RRF and linear fusion, filter placement, candidate windows, shard controls, and profiling support."
+    },
+    {
+      "id": "CLAIM-28004",
+      "statement": "Redis Cluster horizontally shards keys across nodes, Redis replication uses asynchronous leader-follower propagation with optional WAIT acknowledgements, and Redis Cloud provides a managed service with scaling, failover, backup, and recovery capabilities.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10009",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Self-hosted Redis Open Source, Redis Cluster, and Redis Cloud expose different operational guarantees and responsibility boundaries"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-28004"
+      ],
+      "referenceIds": [
+        "REFERENCE-28007",
+        "REFERENCE-28008",
+        "REFERENCE-28011"
+      ],
+      "rationale": "Official deployment documentation describes automatic key sharding, replica promotion and migration, asynchronous replication semantics, and the managed Redis Cloud operating model."
+    },
+    {
+      "id": "CLAIM-28005",
+      "statement": "Redis provides configurable RDB snapshots, append-only-file logging, or combined persistence and supports serialized MULTI/EXEC transactions with WATCH-based optimistic locking, but transaction errors are not rolled back and durability depends on persistence and replication configuration.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10009",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "durabilityScope",
+          "value": "RDB intervals, AOF fsync policy, failover, replication lag, and transaction error handling determine effective durability and atomicity"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-28005"
+      ],
+      "referenceIds": [
+        "REFERENCE-28009",
+        "REFERENCE-28010"
+      ],
+      "rationale": "Redis persistence and transaction documentation distinguishes snapshots from command logging and documents transaction serialization, optimistic locking, partial command errors, and the absence of relational rollback semantics."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-28001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Redis official sources list HASH and JSON vector storage, FLAT, HNSW, and SVS-VAMANA indexes, L2, inner-product, and cosine metrics, and multiple numeric vector encodings and compression modes.",
+      "interpretation": "The RKM profile can classify Redis as an in-memory vector store with exact, graph-based ANN, and compressed vector-search options rather than as a dedicated disk-first vector database.",
+      "claimIds": [
+        "CLAIM-28001"
+      ],
+      "referenceIds": [
+        "REFERENCE-28001",
+        "REFERENCE-28002",
+        "REFERENCE-28003",
+        "REFERENCE-28004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-28001",
+          "locator": "Redis 8.8.0 GA release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-28002",
+          "locator": "Repository description, licensing, and vector-query engine overview"
+        },
+        {
+          "referenceId": "REFERENCE-28003",
+          "locator": "Redis Search capabilities and use cases"
+        },
+        {
+          "referenceId": "REFERENCE-28004",
+          "locator": "Vector index algorithms, storage types, metrics, and compression"
+        }
+      ],
+      "limitations": [
+        "Official project documentation is not an independent performance benchmark.",
+        "FLAT, HNSW, and SVS-VAMANA have different recall, latency, memory, training, hardware, and build-time tradeoffs."
+      ]
+    },
+    {
+      "id": "EVIDENCE-28002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Redis documents exact, range, text, geospatial, and logical filters before vector search and dynamically chooses between batched ANN traversal and ad-hoc brute-force evaluation.",
+      "interpretation": "The RKM profile can mark pre-filtered vector retrieval while warning that filter selectivity and execution policy materially influence latency and candidate completeness.",
+      "claimIds": [
+        "CLAIM-28002"
+      ],
+      "referenceIds": [
+        "REFERENCE-28004",
+        "REFERENCE-28005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-28004",
+          "locator": "Filtered vector search, HYBRID_POLICY, BATCHES, and ADHOC_BF"
+        },
+        {
+          "referenceId": "REFERENCE-28005",
+          "locator": "Combined-query operators and KNN pre-filter syntax"
+        }
+      ],
+      "limitations": [
+        "Highly selective or complex filters can change the chosen execution strategy and latency profile.",
+        "Cluster candidate ratios and uneven shard distributions can return fewer than the requested top-k results."
+      ]
+    },
+    {
+      "id": "EVIDENCE-28003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "FT.HYBRID exposes text search, vector KNN or range retrieval, BM25 scoring, RRF or linear fusion, filter placement, shard candidate controls, and query profiling.",
+      "interpretation": "The RKM profile can represent native lexical-vector hybrid retrieval and configurable fusion without claiming that one fusion method or weight setting is universally optimal.",
+      "claimIds": [
+        "CLAIM-28003"
+      ],
+      "referenceIds": [
+        "REFERENCE-28001",
+        "REFERENCE-28006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-28001",
+          "locator": "Redis 8.8 FT.HYBRID shard-candidate and profiling enhancements"
+        },
+        {
+          "referenceId": "REFERENCE-28006",
+          "locator": "FT.HYBRID syntax, fusion, filtering, defaults, and complexity"
+        }
+      ],
+      "limitations": [
+        "RRF windows, rank constants, linear weights, KNN candidates, and filters require relevance and latency evaluation.",
+        "Linear fusion combines heterogeneous score domains and should be validated against the target data and scorer configuration."
+      ]
+    },
+    {
+      "id": "EVIDENCE-28004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Redis Cluster automatically shards data, replicas can be promoted after failures, replication is asynchronous by default, and Redis Cloud provides managed scaling and recovery features.",
+      "interpretation": "The RKM profile can mark high horizontal scalability and replication while using configurable consistency rather than claiming globally strong consistency under failover.",
+      "claimIds": [
+        "CLAIM-28004"
+      ],
+      "referenceIds": [
+        "REFERENCE-28007",
+        "REFERENCE-28008",
+        "REFERENCE-28011"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-28007",
+          "locator": "Redis Cluster sharding, failover, and replica migration"
+        },
+        {
+          "referenceId": "REFERENCE-28008",
+          "locator": "Asynchronous replication, WAIT, and failover limitations"
+        },
+        {
+          "referenceId": "REFERENCE-28011",
+          "locator": "Managed service, scalability, failover, backups, and recovery"
+        }
+      ],
+      "limitations": [
+        "WAIT reduces risk but does not turn Redis replication into a strongly consistent CP system.",
+        "Cluster slot layout, replica count, failover timing, hot keys, and managed-service limits affect resilience and performance."
+      ]
+    },
+    {
+      "id": "EVIDENCE-28005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Redis supports RDB, AOF, combined persistence, and no-persistence modes, while MULTI/EXEC serializes queued commands and WATCH provides optimistic concurrency control.",
+      "interpretation": "The RKM profile can mark limited transactional support and configurable durability while distinguishing command serialization from rollback-capable relational transactions.",
+      "claimIds": [
+        "CLAIM-28005"
+      ],
+      "referenceIds": [
+        "REFERENCE-28009",
+        "REFERENCE-28010"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-28009",
+          "locator": "RDB, AOF, combined persistence, fsync, backup, and recovery tradeoffs"
+        },
+        {
+          "referenceId": "REFERENCE-28010",
+          "locator": "MULTI, EXEC, DISCARD, WATCH, serialization, and error semantics"
+        }
+      ],
+      "limitations": [
+        "RDB can lose writes since the last snapshot and AOF durability depends on fsync policy and file integrity.",
+        "Commands that fail after EXEC do not roll back other successfully executed commands."
+      ]
+    }
+  ]
+}

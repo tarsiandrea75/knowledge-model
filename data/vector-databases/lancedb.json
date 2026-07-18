@@ -1,0 +1,737 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10012",
+    "slug": "lancedb",
+    "name": {
+      "official": "LanceDB",
+      "display": "LanceDB",
+      "short": "LanceDB"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "LanceDB OSS",
+      "LanceDB Enterprise",
+      "Lance vector database",
+      "LanceDB multimodal lakehouse"
+    ],
+    "keywords": [
+      "embedded vector database",
+      "Lance format",
+      "Apache Arrow",
+      "IVF",
+      "HNSW",
+      "IVF_PQ",
+      "hybrid search",
+      "object storage",
+      "multimodal data",
+      "RAG retrieval"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Embedded Vector Stores",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-17T00:00:00Z",
+    "updatedAt": "2026-07-17T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official LanceDB repository, release, indexing, search, storage, consistency, versioning, SDK, and Enterprise documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-17T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "LanceDB is an embedded, disk-first vector database built on the Lance columnar format, with exact and approximate vector search, filtering, full-text search, hybrid retrieval, and a remote Enterprise deployment model.",
+    "description": "LanceDB combines an in-process open-source database model with Arrow-native columnar storage, Lance table versioning, local or object-store persistence, vector and scalar indexes, BM25 full-text search, hybrid retrieval, and reranking. The stable Python SDK 0.34.0 supports local and remote tables while the TypeScript and Rust SDKs follow separate release lines. LanceDB provides exhaustive scans plus IVF, IVF-PQ, IVF-RQ, and IVF-HNSW index families, scalar and product quantization, binary-vector Hamming search, pre-filtering and post-filtering, and multi-vector workflows. LanceDB Enterprise separates query serving, background indexing, compaction, control, and object storage. This record distinguishes embedded OSS behavior from remote Enterprise guarantees, table-level versioned writes from general multi-table transactions, and storage-backed scalability from database-managed replication."
+  },
+  "vectorDatabase": {
+    "databaseType": "Embedded Vector Store",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "IVF",
+      "IVF Flat",
+      "IVF PQ",
+      "Product Quantization",
+      "Scalar Quantization",
+      "Disk ANN",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Hamming Distance"
+    ],
+    "supportedModalities": [
+      "Text",
+      "Code",
+      "Image",
+      "Audio",
+      "Video",
+      "Table",
+      "Multimodal"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Array Contains"
+      ],
+      "preFilterSupported": true,
+      "postFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "BM25 Plus Vector",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": false,
+      "replicationSupported": false,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "streamingUpdatesSupported": true,
+      "transactionSupport": "Collection Level"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "Rust",
+        "Ruby",
+        "Other"
+      ]
+    },
+    "operations": {
+      "accessControl": "Variable",
+      "encryption": "Variable",
+      "backupAndRestore": "Variable",
+      "observability": "Variable",
+      "multiTenancy": "Variable"
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Choose exhaustive search, IVF, IVF-PQ, IVF-RQ, or IVF-HNSW only after measuring recall, latency, index-build time, storage, and update behavior on representative vectors.",
+        "Select L2, cosine, dot-product, or Hamming distance according to vector type, normalization, index support, and evaluation data.",
+        "Plan table fragments, versions, scalar indexes, vector indexes, full-text indexes, compaction, cleanup, and object-store request costs together.",
+        "Use explicit Arrow schemas, stable identifiers, vector dimensions, nullable-field rules, embedding versions, and storage-format compatibility settings.",
+        "Separate OSS manual indexing and optimization from Enterprise background indexing, compaction, and remote-table behavior."
+      ],
+      "retrievalConsiderations": [
+        "Evaluate exhaustive, ANN, full-text, multi-vector, and hybrid retrieval on the same relevance set before choosing an index and reranker.",
+        "Distinguish default pre-filtering from post-filtering because post-filtering can return fewer than the requested limit.",
+        "Tune partition probes, HNSW exploration, refinement, candidate counts, filter selectivity, fusion weights, and reranking depth under representative load.",
+        "Use exhaustive bypass queries on samples as recall ground truth for indexed retrieval rather than assuming index defaults are sufficient.",
+        "Measure read freshness separately from write completion when multiple processes or remote clients access the same table."
+      ]
+    },
+    "limitations": [
+      "LanceDB OSS is an embedded library rather than a database server and does not provide built-in cluster membership, database-managed replication, or server-side high availability.",
+      "Vector indexing and optimization are manual in OSS, and newly added or updated rows can require index maintenance or mixed indexed and unindexed execution.",
+      "Quantized IVF and IVF-HNSW indexes trade recall for storage, build time, and latency, while supported metrics vary by index type and vector representation.",
+      "Post-filtering can return fewer than the requested limit because filtering occurs after candidate ranking.",
+      "The default OSS read-consistency setting does not automatically refresh table state from other writers; stronger freshness increases storage checks and latency.",
+      "Table operations are versioned and atomic at the table-commit boundary, but LanceDB does not expose general relational-style multi-table ACID transactions.",
+      "Object storage, network file systems, block storage, and local disks have materially different latency, availability, backup, and concurrent-writer characteristics.",
+      "Enterprise scaling, access control, encryption, background maintenance, and service guarantees are deployment-specific and are not identical to OSS behavior."
+    ],
+    "usageGuidance": [
+      "Use LanceDB when an application needs an embedded, Arrow-native, disk-first vector store with local development and a path to object storage or remote Enterprise tables.",
+      "Prefer a server-oriented vector database when built-in cluster replication, server-managed tenancy, and operational isolation are mandatory from the beginning.",
+      "Record Python, TypeScript, Rust, Lance format, index, storage-backend, and embedding-model versions because those release lines and capabilities evolve separately.",
+      "Benchmark the full RAG lifecycle including ingestion, version refresh, filtering, hybrid fusion, reranking, compaction, cleanup, object-store access, and recovery.",
+      "Design backup and disaster recovery around the selected storage backend, retained table versions, object-store durability, and tested restore procedures."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-31001",
+      "title": "Python LanceDB 0.34.0 Release",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/lancedb/lancedb/releases/tag/python-v0.34.0",
+      "accessedAt": "2026-07-17",
+      "publishedAt": "2026-07-02",
+      "version": "0.34.0",
+      "repository": "https://github.com/lancedb/lancedb"
+    },
+    {
+      "id": "REFERENCE-31002",
+      "title": "LanceDB Repository and Apache 2.0 License",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/lancedb/lancedb",
+      "accessedAt": "2026-07-17",
+      "repository": "https://github.com/lancedb/lancedb"
+    },
+    {
+      "id": "REFERENCE-31003",
+      "title": "LanceDB Quickstart and Deployment Options",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/quickstart",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31004",
+      "title": "LanceDB Vector Indexes",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/indexing/vector-index",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31005",
+      "title": "LanceDB Vector Search",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/search/vector-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31006",
+      "title": "LanceDB Metadata Filtering",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/search/filtering",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31007",
+      "title": "LanceDB Indexing Overview",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/indexing",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31008",
+      "title": "LanceDB Hybrid Search",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/search/hybrid-search",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31009",
+      "title": "LanceDB Hybrid Search Evaluation and Score Fusion",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/reranking/eval",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31010",
+      "title": "LanceDB Storage Architecture",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/storage",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31011",
+      "title": "LanceDB Enterprise Architecture",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/enterprise/architecture",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31012",
+      "title": "LanceDB Read Consistency",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/tables/consistency",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31013",
+      "title": "LanceDB Versioning and Reproducibility",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/tables/versioning",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31014",
+      "title": "LanceDB Updating and Modifying Table Data",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/tables/update",
+      "accessedAt": "2026-07-17"
+    },
+    {
+      "id": "REFERENCE-31015",
+      "title": "LanceDB SDKs and REST API Reference",
+      "authors": [
+        {
+          "name": "LanceDB maintainers"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://docs.lancedb.com/api-reference",
+      "accessedAt": "2026-07-17"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-31001",
+      "statement": "LanceDB stores vectors and multimodal columns in Lance tables and supports exhaustive search plus IVF, IVF-PQ, IVF-RQ, and IVF-HNSW index families with L2, cosine, dot-product, and binary-vector Hamming distance options.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10012",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Python LanceDB 0.34.0 and official documentation accessed 2026-07-17"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-31001"
+      ],
+      "referenceIds": [
+        "REFERENCE-31001",
+        "REFERENCE-31002",
+        "REFERENCE-31004",
+        "REFERENCE-31005"
+      ],
+      "rationale": "The release, repository, vector-index, and search documentation identify the stable Python release line and enumerate storage, exhaustive search, ANN indexes, quantization choices, and distance metrics."
+    },
+    {
+      "id": "CLAIM-31002",
+      "statement": "LanceDB supports metadata-aware vector retrieval with SQL-style scalar predicates, scalar indexes, default pre-filtering, and optional post-filtering that can return fewer than the requested result limit.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10012",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "filterScope",
+          "value": "Filter behavior depends on index coverage, predicate support, selectivity, pre-filter versus post-filter placement, and selected vector index"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-31002"
+      ],
+      "referenceIds": [
+        "REFERENCE-31005",
+        "REFERENCE-31006",
+        "REFERENCE-31007"
+      ],
+      "rationale": "The vector-search, filtering, and indexing guides distinguish pre-filtering from post-filtering and document scalar-index support and result-count consequences."
+    },
+    {
+      "id": "CLAIM-31003",
+      "statement": "LanceDB combines BM25 full-text and vector retrieval through hybrid search with default Reciprocal Rank Fusion, optional weighted linear score fusion, score or rank normalization, and model-based or custom rerankers.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10012",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "retrievalScope",
+          "value": "Fusion, normalization, candidate pools, reranker availability, and provider integrations vary by SDK and require workload-specific evaluation"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-31003"
+      ],
+      "referenceIds": [
+        "REFERENCE-31008",
+        "REFERENCE-31009"
+      ],
+      "rationale": "The hybrid-search and evaluation documentation describes BM25 plus vector retrieval, default RRF, linear combination, normalization choices, and pluggable rerankers."
+    },
+    {
+      "id": "CLAIM-31004",
+      "statement": "LanceDB OSS runs embedded in Python, TypeScript, or Rust processes over local, file, block, or object storage, while LanceDB Enterprise separates query serving, background indexing, compaction, control, and durable object storage for remote tables.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10012",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "OSS and Enterprise expose different control planes, maintenance responsibilities, scaling paths, security controls, and service guarantees"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-31004"
+      ],
+      "referenceIds": [
+        "REFERENCE-31002",
+        "REFERENCE-31003",
+        "REFERENCE-31010",
+        "REFERENCE-31011",
+        "REFERENCE-31015"
+      ],
+      "rationale": "The quickstart, repository, storage, Enterprise architecture, and API references distinguish in-process OSS connections from remote Enterprise tables and their operational models."
+    },
+    {
+      "id": "CLAIM-31005",
+      "statement": "LanceDB uses versioned table commits, supports update, delete, and merge-insert operations, and offers configurable cross-process read freshness, but does not expose general multi-table relational transactions or database-managed replication in OSS.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10012",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "consistencyScope",
+          "value": "Effective durability and freshness depend on storage backend, concurrent-writer support, read-consistency interval, version retention, compaction, and backup design"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-31005"
+      ],
+      "referenceIds": [
+        "REFERENCE-31010",
+        "REFERENCE-31012",
+        "REFERENCE-31013",
+        "REFERENCE-31014"
+      ],
+      "rationale": "The storage, consistency, versioning, and mutation documentation describes versioned table writes, refresh intervals, update and merge behavior, and storage-dependent concurrent writers."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-31001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "LanceDB official sources describe an embedded multimodal database on the Lance format with exhaustive vector scans, IVF and IVF-HNSW families, multiple quantizers, and four distance families including Hamming for binary vectors.",
+      "interpretation": "The RKM profile can classify LanceDB as an embedded vector store with exact, partition-based ANN, graph-assisted ANN, and compressed disk-backed retrieval options rather than as an in-memory service.",
+      "claimIds": [
+        "CLAIM-31001"
+      ],
+      "referenceIds": [
+        "REFERENCE-31001",
+        "REFERENCE-31002",
+        "REFERENCE-31004",
+        "REFERENCE-31005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-31001",
+          "locator": "Stable Python 0.34.0 release checkpoint"
+        },
+        {
+          "referenceId": "REFERENCE-31004",
+          "locator": "IVF, IVF-HNSW, PQ, SQ, RQ, tuning, and binary index rules"
+        },
+        {
+          "referenceId": "REFERENCE-31005",
+          "locator": "Exact and indexed search metrics and query controls"
+        }
+      ],
+      "limitations": [
+        "Official documentation is not an independent performance benchmark.",
+        "Index families, quantization, vector type, dimension, probes, refinement, filters, and hardware materially affect recall and latency."
+      ]
+    },
+    {
+      "id": "EVIDENCE-31002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "LanceDB applies SQL-style metadata predicates before vector search by default, supports scalar indexes for filter acceleration, and can move the predicate after ranking when post-filter behavior is requested.",
+      "interpretation": "The RKM profile can mark both pre-filtering and post-filtering while warning that post-filtering weakens the top-k result-count contract.",
+      "claimIds": [
+        "CLAIM-31002"
+      ],
+      "referenceIds": [
+        "REFERENCE-31005",
+        "REFERENCE-31006",
+        "REFERENCE-31007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-31005",
+          "locator": "Vector query pre-filter and post-filter examples"
+        },
+        {
+          "referenceId": "REFERENCE-31006",
+          "locator": "Filtering semantics and result-count warning"
+        },
+        {
+          "referenceId": "REFERENCE-31007",
+          "locator": "Scalar indexes combined with vector and full-text search"
+        }
+      ],
+      "limitations": [
+        "Predicate support and pushdown depend on field types, scalar indexes, SDKs, and query plans.",
+        "Post-filtering may return fewer than the requested limit or no rows."
+      ]
+    },
+    {
+      "id": "EVIDENCE-31003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "LanceDB hybrid search runs vector and BM25 full-text retrieval, merges results with RRF by default, and supports linear score fusion, normalization, provider rerankers, and custom reranker implementations.",
+      "interpretation": "The RKM profile can represent native hybrid retrieval, RRF, weighted score fusion, and reranking without claiming one strategy is universally optimal.",
+      "claimIds": [
+        "CLAIM-31003"
+      ],
+      "referenceIds": [
+        "REFERENCE-31008",
+        "REFERENCE-31009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-31008",
+          "locator": "Hybrid query construction, default RRF, filters, and reranking"
+        },
+        {
+          "referenceId": "REFERENCE-31009",
+          "locator": "Linear combination, score or rank normalization, and evaluation guidance"
+        }
+      ],
+      "limitations": [
+        "Provider-specific rerankers and feature parity differ across Python, TypeScript, and Rust.",
+        "Fusion and reranking quality depend on candidate sets, normalization, weights, models, judgments, and latency budgets."
+      ]
+    },
+    {
+      "id": "EVIDENCE-31004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "LanceDB OSS runs in process and can persist to local or cloud storage, while Enterprise uses remote tables with separated query nodes, background workers, control plane, and durable object storage.",
+      "interpretation": "The RKM profile can distinguish embedded deployment from a remote distributed service and can mark high storage-backed scale without claiming native OSS sharding or replication.",
+      "claimIds": [
+        "CLAIM-31004"
+      ],
+      "referenceIds": [
+        "REFERENCE-31002",
+        "REFERENCE-31003",
+        "REFERENCE-31010",
+        "REFERENCE-31011",
+        "REFERENCE-31015"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-31003",
+          "locator": "Embedded local and remote connection patterns"
+        },
+        {
+          "referenceId": "REFERENCE-31010",
+          "locator": "Local, block, file, and object-storage tradeoffs"
+        },
+        {
+          "referenceId": "REFERENCE-31011",
+          "locator": "Enterprise compute-storage separation and background processing"
+        },
+        {
+          "referenceId": "REFERENCE-31015",
+          "locator": "Official SDK and REST surfaces"
+        }
+      ],
+      "limitations": [
+        "Storage backends have different latency, concurrency, availability, encryption, and backup semantics.",
+        "Enterprise operational guarantees and commercial features are not identical to OSS behavior."
+      ]
+    },
+    {
+      "id": "EVIDENCE-31005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Lance tables create versioned snapshots for mutations, expose configurable read refresh across writers, and support updates, deletes, and merge-insert operations, while compaction and cleanup govern retained fragments and storage use.",
+      "interpretation": "The RKM profile can mark configurable consistency, table-level transactional support, updates, deletes, and version restoration while excluding general multi-table ACID guarantees.",
+      "claimIds": [
+        "CLAIM-31005"
+      ],
+      "referenceIds": [
+        "REFERENCE-31010",
+        "REFERENCE-31012",
+        "REFERENCE-31013",
+        "REFERENCE-31014"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-31012",
+          "locator": "Cross-process read consistency intervals and manual refresh"
+        },
+        {
+          "referenceId": "REFERENCE-31013",
+          "locator": "Version history, checkout, restore, and tags"
+        },
+        {
+          "referenceId": "REFERENCE-31014",
+          "locator": "Update, delete, merge-insert, soft-delete, and optimize behavior"
+        },
+        {
+          "referenceId": "REFERENCE-31010",
+          "locator": "Atomic object-store writes and storage-dependent durability"
+        }
+      ],
+      "limitations": [
+        "The default OSS refresh behavior may not automatically observe other writers.",
+        "Version retention, compaction, cleanup, and storage backup policies must be designed together."
+      ]
+    }
+  ]
+}

@@ -53,6 +53,74 @@
       "schema": "schema/retriever.schema.json"
     },
     {
+      "file": "data/vector-databases/pgvector.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/qdrant.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/weaviate.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/milvus.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/pinecone.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/chroma.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/elasticsearch.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/opensearch.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/redis.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/mongodb.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/neo4j.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/lancedb.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/vespa.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/azure-ai-search.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/vertex-ai-vector-search.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/amazon-neptune-analytics.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
+      "file": "data/vector-databases/memgraph.json",
+      "schema": "schema/vector-database.schema.json"
+    },
+    {
       "file": "data/relationships/component-specialization-relationships.json",
       "schema": "schema/relationship-set.schema.json"
     },

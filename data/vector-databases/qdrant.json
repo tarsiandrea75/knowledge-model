@@ -1,0 +1,601 @@
+{
+  "identity": {
+    "id": "VECTOR-DATABASE-10002",
+    "slug": "qdrant",
+    "name": {
+      "official": "Qdrant",
+      "display": "Qdrant",
+      "short": "Qdrant"
+    },
+    "entityType": "VectorDatabase",
+    "aliases": [
+      "Qdrant Vector Database",
+      "Qdrant Vector Search Engine"
+    ],
+    "keywords": [
+      "dedicated vector database",
+      "HNSW",
+      "payload filtering",
+      "sparse vectors",
+      "hybrid retrieval",
+      "distributed vector search",
+      "RAG storage"
+    ],
+    "taxonomy": {
+      "family": "Vector Databases",
+      "subFamily": "Dedicated Vector Databases",
+      "category": "Vector Search Infrastructure",
+      "domain": "Retrieval-Augmented Generation"
+    },
+    "status": "Draft",
+    "visibility": "Public",
+    "language": "en",
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "schemaVersion": "1.0.0",
+    "repositoryVersion": "1.0.0",
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "createdAt": "2026-07-16T00:00:00Z",
+    "updatedAt": "2026-07-16T00:00:00Z",
+    "createdBy": [
+      {
+        "type": "Automation",
+        "name": "ChatGPT",
+        "role": "Evidence synthesis and seed data drafting"
+      }
+    ],
+    "license": "Apache-2.0",
+    "language": "en",
+    "provenance": {
+      "source": "Official Qdrant repository, release notes, and documentation",
+      "generator": "ChatGPT",
+      "generatorVersion": "GPT-5.6 Thinking",
+      "generatedAt": "2026-07-16T00:00:00Z",
+      "sourceFiles": [
+        "schema/vector-database.schema.json",
+        "schema/definitions/identity.schema.json",
+        "schema/definitions/metadata.schema.json",
+        "schema/definitions/description.schema.json",
+        "schema/definitions/claim.schema.json",
+        "schema/definitions/evidence.schema.json",
+        "schema/definitions/reference.schema.json"
+      ]
+    }
+  },
+  "description": {
+    "summary": "Qdrant is an open-source dedicated vector database and search engine for storing, filtering, and retrieving dense, sparse, named, and multi-vector representations.",
+    "description": "Qdrant provides exact and HNSW-based vector search, structured payload filtering, dense-sparse hybrid retrieval, multi-stage queries, disk-backed storage options, quantization, and distributed sharding and replication. It is available for self-hosted deployments and as Qdrant Cloud. This record separates documented engine capabilities from configuration-, workload-, and deployment-dependent guarantees."
+  },
+  "vectorDatabase": {
+    "databaseType": "Dedicated Vector Database",
+    "deploymentModels": [
+      "Self Hosted",
+      "Managed Cloud",
+      "Local"
+    ],
+    "supportedIndexTypes": [
+      "Flat",
+      "HNSW",
+      "Scalar Quantization",
+      "Product Quantization",
+      "Hybrid Sparse Dense",
+      "Other"
+    ],
+    "distanceMetrics": [
+      "Cosine Similarity",
+      "Dot Product",
+      "Euclidean Distance",
+      "Manhattan Distance"
+    ],
+    "metadataFiltering": {
+      "supported": true,
+      "filterTypes": [
+        "Exact Match",
+        "Range",
+        "Boolean",
+        "Full Text",
+        "Geo Spatial",
+        "Nested Fields",
+        "Array Contains"
+      ],
+      "preFilterSupported": true
+    },
+    "hybridSearch": {
+      "supported": true,
+      "methods": [
+        "Sparse Dense Fusion",
+        "Reciprocal Rank Fusion",
+        "Weighted Score Fusion",
+        "Other"
+      ],
+      "scoreNormalizationSupported": true
+    },
+    "scalability": {
+      "horizontalScaling": "High",
+      "verticalScaling": "High",
+      "shardingSupported": true,
+      "replicationSupported": true,
+      "diskBackedIndexingSupported": true
+    },
+    "consistency": {
+      "consistencyModel": "Configurable",
+      "upsertsSupported": true,
+      "deletesSupported": true,
+      "transactionSupport": "Limited"
+    },
+    "integration": {
+      "apis": [
+        "REST",
+        "gRPC",
+        "Native SDK"
+      ],
+      "sdkLanguages": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "Go",
+        "Rust",
+        "C#"
+      ]
+    },
+    "ragUsage": {
+      "recommendedStages": [
+        "Indexing",
+        "Retrieval",
+        "Reranking",
+        "Monitoring"
+      ],
+      "retrievalPatterns": [
+        "Top K Similarity Search",
+        "Filtered Retrieval",
+        "Hybrid Retrieval",
+        "Multi Vector Retrieval",
+        "Long Term Memory"
+      ],
+      "indexingConsiderations": [
+        "Create payload indexes for fields used by production filters, preferably before ingesting data, so filtered HNSW construction can account for those fields.",
+        "Choose exact search, HNSW parameters, on-disk storage, and quantization only after measuring recall, latency, memory, and ingestion behavior on representative data.",
+        "Size shards and replicas for the expected cluster topology; self-hosted clusters require explicit planning for shard placement, movement, and rebalancing.",
+        "Treat named dense, sparse, and multi-vector spaces as separate retrieval representations with explicit dimensions, metrics, and lifecycle management."
+      ],
+      "retrievalConsiderations": [
+        "Use payload filters together with appropriate payload indexes and test strict or combined filters against the chosen HNSW search configuration.",
+        "Tune dense-sparse fusion with a relevance evaluation set; RRF, weighted RRF, and distribution-based score fusion make different ranking assumptions.",
+        "Place fusion at the top-level query when a distributed collection requires results to be fused globally across shards.",
+        "Set read consistency, write consistency, and ordering options according to the required tradeoff among latency, availability, and concurrent-update consistency."
+      ]
+    },
+    "limitations": [
+      "HNSW, on-disk indexing, and quantization introduce workload-specific tradeoffs among recall, latency, memory, storage, and indexing cost.",
+      "Strict or compound filters can reduce HNSW graph connectivity; payload-index design and search-method tuning remain necessary.",
+      "A self-hosted distributed deployment does not automatically rebalance existing shards when nodes are added or removed.",
+      "High availability requires replication and an appropriate number of voting nodes; a two-node cluster cannot retain a Raft majority when one node is unavailable.",
+      "Concurrent updates can diverge across replicas under default settings unless stronger read consistency, write consistency, or update ordering is selected.",
+      "Qdrant does not provide general multi-record ACID transactions comparable to a relational database; update durability and ordering guarantees are scoped to its point, WAL, shard, and cluster mechanisms."
+    ],
+    "usageGuidance": [
+      "Record the Qdrant server and client versions because API behavior, storage migrations, and supported query features change across releases.",
+      "Build a representative relevance evaluation set before choosing HNSW, quantization, fusion, or multistage-query parameters.",
+      "Create snapshots and test restoration procedures even when replication is enabled.",
+      "Use payload indexes selectively for fields that participate in filters, faceting, ordering, or tenant partitioning.",
+      "Upgrade self-hosted clusters through supported intermediate versions when release notes document storage-format or migration constraints."
+    ]
+  },
+  "references": [
+    {
+      "id": "REFERENCE-21001",
+      "title": "Qdrant v1.18.2 Release",
+      "authors": [
+        {
+          "name": "Qdrant maintainers"
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "publishedAt": "2026-06-04",
+      "canonicalUrl": "https://github.com/qdrant/qdrant/releases/tag/v1.18.2",
+      "repository": "https://github.com/qdrant/qdrant",
+      "version": "1.18.2",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21002",
+      "title": "Qdrant Documentation: Overview",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/overview/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21003",
+      "title": "Qdrant Documentation: Vectors",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/manage-data/vectors/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21004",
+      "title": "Qdrant Documentation: Indexing",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/manage-data/indexing/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21005",
+      "title": "Qdrant Documentation: Filtering",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/search/filtering/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21006",
+      "title": "Qdrant Documentation: Hybrid and Multi-Stage Queries",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/search/hybrid-queries/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21007",
+      "title": "Qdrant Documentation: Distributed Deployment",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/scaling/distributed_deployment/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21008",
+      "title": "Qdrant Documentation: Storage",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/manage-data/storage/",
+      "accessedAt": "2026-07-16"
+    },
+    {
+      "id": "REFERENCE-21009",
+      "title": "Qdrant Documentation: Quantization",
+      "authors": [
+        {
+          "name": "Qdrant"
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://qdrant.tech/documentation/quantization/",
+      "accessedAt": "2026-07-16"
+    }
+  ],
+  "claims": [
+    {
+      "id": "CLAIM-21001",
+      "statement": "Qdrant supports dense, sparse, named, and multi-vector representations and provides exact dense-vector search or approximate dense-vector search through HNSW.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10002",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Qdrant 1.18.2 and official documentation accessed 2026-07-16"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-21001"
+      ],
+      "referenceIds": [
+        "REFERENCE-21001",
+        "REFERENCE-21002",
+        "REFERENCE-21003",
+        "REFERENCE-21004"
+      ],
+      "rationale": "Official Qdrant documentation describes the supported vector representations and distinguishes exact search from HNSW-based approximate dense-vector retrieval."
+    },
+    {
+      "id": "CLAIM-21002",
+      "statement": "Qdrant supports structured payload filtering and can augment HNSW construction with payload-index-aware edges to improve filtered vector search.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10002",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "configurationScope",
+          "value": "Payload indexes must be created for fields that should participate efficiently in filtered search"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-21002"
+      ],
+      "referenceIds": [
+        "REFERENCE-21004",
+        "REFERENCE-21005"
+      ],
+      "rationale": "The filtering and indexing documentation describes boolean, range, text, geo, nested, and related payload conditions, and explains payload-index-aware filtered HNSW behavior."
+    },
+    {
+      "id": "CLAIM-21003",
+      "statement": "Qdrant's Query API supports dense-sparse hybrid and multi-stage retrieval with Reciprocal Rank Fusion, weighted RRF, and distribution-based score fusion.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10002",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Hybrid Query API capabilities documented through Qdrant 1.18.2"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-21003"
+      ],
+      "referenceIds": [
+        "REFERENCE-21003",
+        "REFERENCE-21006"
+      ],
+      "rationale": "The official hybrid-query documentation provides dense and sparse prefetch examples and documents RRF, weighted RRF, DBSF, nested prefetches, and multistage queries."
+    },
+    {
+      "id": "CLAIM-21004",
+      "statement": "Qdrant supports distributed collections with sharding and replication, while read consistency, write consistency, and update ordering can be configured to change the balance among availability, throughput, and consistency.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10002",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "deploymentScope",
+          "value": "Distributed mode; operational automation differs between self-hosted Qdrant and Qdrant Cloud"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-21004"
+      ],
+      "referenceIds": [
+        "REFERENCE-21007"
+      ],
+      "rationale": "The distributed-deployment documentation describes Raft topology consensus, shards, replicas, read consistency, write consistency factors, ordering, and deployment-specific shard operations."
+    },
+    {
+      "id": "CLAIM-21005",
+      "statement": "Qdrant supports in-memory or memory-mapped vector storage, on-disk HNSW, and multiple quantization methods that trade memory and storage usage against recall and search behavior.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10002",
+        "type": "Entity"
+      },
+      "qualifiers": [
+        {
+          "name": "versionScope",
+          "value": "Qdrant 1.18.2, including TurboQuant introduced in the 1.18 release line"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-21005"
+      ],
+      "referenceIds": [
+        "REFERENCE-21001",
+        "REFERENCE-21008",
+        "REFERENCE-21009"
+      ],
+      "rationale": "Official storage and quantization documentation describes RAM, memmap, on-disk HNSW, scalar, binary, product, and TurboQuant configurations and their tradeoffs."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVIDENCE-21001",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Official Qdrant sources document dense, sparse, named, and multi-vector representations together with exact and HNSW dense-vector search.",
+      "interpretation": "The RKM profile can model Qdrant as a dedicated database supporting Flat, HNSW, and hybrid sparse-dense retrieval.",
+      "claimIds": [
+        "CLAIM-21001"
+      ],
+      "referenceIds": [
+        "REFERENCE-21001",
+        "REFERENCE-21002",
+        "REFERENCE-21003",
+        "REFERENCE-21004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-21002",
+          "locator": "Overview sections: retrieval workflow, architecture, and client-server interfaces"
+        },
+        {
+          "referenceId": "REFERENCE-21003",
+          "locator": "Vectors sections: Dense Vectors, Sparse Vectors, Named Vectors, and MultiVectors"
+        },
+        {
+          "referenceId": "REFERENCE-21004",
+          "locator": "Indexing sections: vector index and HNSW configuration"
+        },
+        {
+          "referenceId": "REFERENCE-21001",
+          "locator": "Release v1.18.2"
+        }
+      ],
+      "limitations": [
+        "Project documentation establishes supported capabilities but is not an independent performance benchmark.",
+        "Recall and latency depend on vector distribution, hardware, collection size, filters, and search parameters."
+      ]
+    },
+    {
+      "id": "EVIDENCE-21002",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Qdrant documents structured payload filters and recommends creating payload indexes before ingestion so filtered HNSW can use payload-aware graph edges.",
+      "interpretation": "Qdrant supports pre-filtered retrieval, but efficient and well-connected filtered search depends on payload-index and HNSW design.",
+      "claimIds": [
+        "CLAIM-21002"
+      ],
+      "referenceIds": [
+        "REFERENCE-21004",
+        "REFERENCE-21005"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-21004",
+          "locator": "Indexing section: HNSW with payload indexes and filtered-search graph edges"
+        },
+        {
+          "referenceId": "REFERENCE-21005",
+          "locator": "Filtering sections: clauses, match, range, full text, geo, nested, and payload-index guidance"
+        }
+      ],
+      "limitations": [
+        "Strict combinations of filters can still fragment the effective HNSW search space and require tuning.",
+        "Creating payload indexes consumes memory and indexing resources, so indexing every payload field is not advised."
+      ]
+    },
+    {
+      "id": "EVIDENCE-21003",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "The Qdrant Query API documentation combines dense and sparse prefetches and documents RRF, weighted RRF, DBSF, nested prefetches, and multistage rescoring.",
+      "interpretation": "The RKM hybrid-search profile can include sparse-dense fusion, reciprocal-rank fusion, weighted fusion, and score normalization.",
+      "claimIds": [
+        "CLAIM-21003"
+      ],
+      "referenceIds": [
+        "REFERENCE-21003",
+        "REFERENCE-21006"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-21003",
+          "locator": "Vectors sections: Sparse Vectors and Named Vectors"
+        },
+        {
+          "referenceId": "REFERENCE-21006",
+          "locator": "Hybrid Queries sections: Query API, Hybrid Search, RRF, DBSF, and Multi-Stage Queries"
+        }
+      ],
+      "limitations": [
+        "No fusion strategy is universally best; quality must be measured on a representative relevance set.",
+        "In distributed collections, query nesting and the placement of fusion affect whether ranking is shard-local or global."
+      ]
+    },
+    {
+      "id": "EVIDENCE-21004",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Qdrant's distributed-deployment documentation describes sharding, replicas, Raft topology consensus, configurable read consistency, write consistency factors, and update ordering.",
+      "interpretation": "Qdrant has high horizontal-scaling capability, but resilience and consistency depend on node count, replica placement, and selected request and collection settings.",
+      "claimIds": [
+        "CLAIM-21004"
+      ],
+      "referenceIds": [
+        "REFERENCE-21007"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-21007",
+          "locator": "Distributed Deployment sections: Sharding, Replication, Node Failure Recovery, and Consistency Guarantees"
+        }
+      ],
+      "limitations": [
+        "Collection topology operations require a Raft majority; a two-node cluster loses that majority if either node is unavailable.",
+        "Self-hosted shard rebalancing and some replica operations require manual administration."
+      ]
+    },
+    {
+      "id": "EVIDENCE-21005",
+      "role": "Supports",
+      "strength": "Strong",
+      "confidence": "High",
+      "status": "Draft",
+      "summary": "Qdrant documents in-memory and memmap storage, on-disk HNSW, and scalar, binary, product, and TurboQuant compression methods.",
+      "interpretation": "The RKM profile can mark disk-backed indexing and multiple quantization approaches while retaining explicit recall-memory-latency tradeoffs.",
+      "claimIds": [
+        "CLAIM-21005"
+      ],
+      "referenceIds": [
+        "REFERENCE-21001",
+        "REFERENCE-21008",
+        "REFERENCE-21009"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-21008",
+          "locator": "Storage sections: In-memory storage, Memmap storage, on-disk HNSW, payload storage, and WAL versioning"
+        },
+        {
+          "referenceId": "REFERENCE-21009",
+          "locator": "Quantization sections: Scalar, Binary, Product, and TurboQuant"
+        },
+        {
+          "referenceId": "REFERENCE-21001",
+          "locator": "Release v1.18.2 and the 1.18 release-line context"
+        }
+      ],
+      "limitations": [
+        "Compression and on-disk configurations must be benchmarked with the actual embedding model and storage hardware.",
+        "Quantization can reduce recall, and rescoring or oversampling can increase latency or I/O."
+      ]
+    }
+  ]
+}

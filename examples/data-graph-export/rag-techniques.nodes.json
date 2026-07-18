@@ -271,6 +271,18 @@
     }
   },
   {
+    "id": "SCHEMA-VECTOR_DATABASE",
+    "type": "Schema",
+    "label": "schema/vector-database.schema.json",
+    "sourceDataFile": "data/manifest.json",
+    "properties": {
+      "declaredInManifest": "data/manifest.json",
+      "schemaId": "https://rkm.org/schema/vector-database.schema.json",
+      "schemaPath": "schema/vector-database.schema.json",
+      "title": "RKM Vector Database Schema"
+    }
+  },
+  {
     "id": "TECHNIQUE-10001",
     "type": "Technique",
     "label": "Hybrid Retrieval",
@@ -429,6 +441,484 @@
       "status": "Draft",
       "summary": "Semantic Chunking splits source content around meaning-oriented boundaries so chunks can preserve topical coherence.",
       "techniqueFamily": "Chunking",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10001",
+    "type": "VectorDatabase",
+    "label": "pgvector",
+    "sourceDataFile": "data/vector-databases/pgvector.json",
+    "properties": {
+      "keywords": [
+        "PostgreSQL",
+        "vector similarity search",
+        "HNSW",
+        "IVFFlat",
+        "hybrid retrieval",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "pgvector",
+      "status": "Draft",
+      "summary": "pgvector is an open-source PostgreSQL extension for storing vectors and performing exact or approximate vector similarity search.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10002",
+    "type": "VectorDatabase",
+    "label": "Qdrant",
+    "sourceDataFile": "data/vector-databases/qdrant.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "HNSW",
+        "payload filtering",
+        "sparse vectors",
+        "hybrid retrieval",
+        "distributed vector search",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "qdrant",
+      "status": "Draft",
+      "summary": "Qdrant is an open-source dedicated vector database and search engine for storing, filtering, and retrieving dense, sparse, named, and multi-vector representations.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10003",
+    "type": "VectorDatabase",
+    "label": "Weaviate",
+    "sourceDataFile": "data/vector-databases/weaviate.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "HNSW",
+        "HFresh",
+        "BM25F",
+        "hybrid search",
+        "pre-filtering",
+        "multi-tenancy",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "weaviate",
+      "status": "Draft",
+      "summary": "Weaviate is an open-source dedicated vector database that combines vector similarity search, structured pre-filtering, BM25F keyword retrieval, and configurable hybrid fusion.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10004",
+    "type": "VectorDatabase",
+    "label": "Milvus",
+    "sourceDataFile": "data/vector-databases/milvus.json",
+    "properties": {
+      "keywords": [
+        "dedicated vector database",
+        "cloud-native",
+        "HNSW",
+        "IVF",
+        "DiskANN",
+        "BM25",
+        "hybrid retrieval",
+        "distributed vector search",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "milvus",
+      "status": "Draft",
+      "summary": "Milvus is an open-source cloud-native vector database that combines distributed dense and sparse vector retrieval, scalar filtering, BM25 full-text retrieval, and configurable hybrid reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10005",
+    "type": "VectorDatabase",
+    "label": "Pinecone",
+    "sourceDataFile": "data/vector-databases/pinecone.json",
+    "properties": {
+      "keywords": [
+        "managed vector search",
+        "serverless vector database",
+        "dense vectors",
+        "sparse vectors",
+        "hybrid search",
+        "metadata filtering",
+        "namespaces",
+        "integrated inference",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "pinecone",
+      "status": "Draft",
+      "summary": "Pinecone is a managed serverless vector search service that provides dense, sparse, and hybrid retrieval, metadata filtering, namespaces, integrated inference, and optional dedicated read capacity.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10006",
+    "type": "VectorDatabase",
+    "label": "Chroma",
+    "sourceDataFile": "data/vector-databases/chroma.json",
+    "properties": {
+      "keywords": [
+        "embedded vector database",
+        "HNSW",
+        "SPANN",
+        "metadata filtering",
+        "full-text search",
+        "sparse vectors",
+        "hybrid retrieval",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "chroma",
+      "status": "Draft",
+      "summary": "Chroma is an open-source vector database and retrieval system that supports embedded local use, single-node serving, and distributed managed deployment.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10007",
+    "type": "VectorDatabase",
+    "label": "Elasticsearch",
+    "sourceDataFile": "data/vector-databases/elasticsearch.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "Apache Lucene",
+        "dense vector",
+        "HNSW",
+        "DiskBBQ",
+        "BM25",
+        "hybrid retrieval",
+        "reciprocal rank fusion",
+        "metadata filtering",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "elasticsearch",
+      "status": "Draft",
+      "summary": "Elasticsearch is a distributed search and analytics engine with native dense-vector, filtered kNN, lexical, semantic, and hybrid retrieval capabilities.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10008",
+    "type": "VectorDatabase",
+    "label": "OpenSearch",
+    "sourceDataFile": "data/vector-databases/opensearch.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "Lucene",
+        "Faiss",
+        "HNSW",
+        "IVF",
+        "k-NN",
+        "hybrid search",
+        "neural search",
+        "vector quantization",
+        "RAG retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "opensearch",
+      "status": "Draft",
+      "summary": "OpenSearch is an open-source distributed search and analytics engine with native exact, approximate, filtered, sparse, neural, and hybrid vector retrieval.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10009",
+    "type": "VectorDatabase",
+    "label": "Redis",
+    "sourceDataFile": "data/vector-databases/redis.json",
+    "properties": {
+      "keywords": [
+        "in-memory database",
+        "vector search",
+        "FLAT",
+        "HNSW",
+        "SVS-VAMANA",
+        "hybrid search",
+        "Redis Cluster",
+        "semantic cache",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "redis",
+      "status": "Draft",
+      "summary": "Redis is an in-memory data platform with native exact, approximate, filtered, full-text, and hybrid vector retrieval over hash and JSON documents.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10010",
+    "type": "VectorDatabase",
+    "label": "MongoDB",
+    "sourceDataFile": "data/vector-databases/mongodb.json",
+    "properties": {
+      "keywords": [
+        "document database",
+        "NoSQL database",
+        "vector search",
+        "HNSW",
+        "flat vector index",
+        "hybrid search",
+        "MongoDB Atlas",
+        "mongot",
+        "RAG storage"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "mongodb",
+      "status": "Draft",
+      "summary": "MongoDB is a distributed document database with native exact, approximate, filtered, lexical, hybrid, and reranked vector retrieval over application documents.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10011",
+    "type": "VectorDatabase",
+    "label": "Neo4j",
+    "sourceDataFile": "data/vector-databases/neo4j.json",
+    "properties": {
+      "keywords": [
+        "graph database",
+        "property graph",
+        "vector search",
+        "HNSW",
+        "Cypher",
+        "GraphRAG",
+        "knowledge graph",
+        "hybrid retrieval",
+        "Neo4j Aura"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Approved",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "neo4j",
+      "status": "Draft",
+      "summary": "Neo4j is a native property-graph database with Lucene HNSW vector indexes, Cypher filtering and graph traversal, and separately scoped lexical-vector fusion through Cypher or neo4j-graphrag.",
+      "version": "1.5.1",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10012",
+    "type": "VectorDatabase",
+    "label": "LanceDB",
+    "sourceDataFile": "data/vector-databases/lancedb.json",
+    "properties": {
+      "keywords": [
+        "embedded vector database",
+        "Lance format",
+        "Apache Arrow",
+        "IVF",
+        "HNSW",
+        "IVF_PQ",
+        "hybrid search",
+        "object storage",
+        "multimodal data",
+        "RAG retrieval"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "lancedb",
+      "status": "Draft",
+      "summary": "LanceDB is an embedded, disk-first vector database built on the Lance columnar format, with exact and approximate vector search, filtering, full-text search, hybrid retrieval, and a remote Enterprise deployment model.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10013",
+    "type": "VectorDatabase",
+    "label": "Vespa",
+    "sourceDataFile": "data/vector-databases/vespa.json",
+    "properties": {
+      "keywords": [
+        "distributed search engine",
+        "vector search",
+        "HNSW",
+        "tensor fields",
+        "BM25",
+        "hybrid retrieval",
+        "phased ranking",
+        "machine-learned ranking",
+        "content clusters",
+        "RAG serving"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "vespa",
+      "status": "Draft",
+      "summary": "Vespa is a distributed search, recommendation, and real-time serving engine with exact and HNSW vector retrieval, structured and lexical filtering, sparse-dense hybrid search, and programmable multiphase ranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10014",
+    "type": "VectorDatabase",
+    "label": "Azure AI Search",
+    "sourceDataFile": "data/vector-databases/azure-ai-search.json",
+    "properties": {
+      "keywords": [
+        "managed search service",
+        "vector search",
+        "HNSW",
+        "exhaustive KNN",
+        "hybrid search",
+        "reciprocal rank fusion",
+        "semantic ranker",
+        "integrated vectorization",
+        "Azure",
+        "RAG"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "azure-ai-search",
+      "status": "Draft",
+      "summary": "Azure AI Search is a fully managed cloud search service with exact and HNSW vector retrieval, OData filtering, BM25-vector hybrid search, reciprocal-rank fusion, semantic reranking, and integrated indexing and vectorization pipelines.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10015",
+    "type": "VectorDatabase",
+    "label": "Vertex AI Vector Search",
+    "sourceDataFile": "data/vector-databases/vertex-ai-vector-search.json",
+    "properties": {
+      "keywords": [
+        "managed vector search",
+        "ScaNN",
+        "tree-AH",
+        "asymmetric hashing",
+        "brute force KNN",
+        "sparse dense hybrid search",
+        "reciprocal rank fusion",
+        "crowding",
+        "Agent Retrieval",
+        "Google Cloud",
+        "RAG"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "vertex-ai-vector-search",
+      "status": "Draft",
+      "summary": "Vertex AI Vector Search is a managed Google Cloud retrieval service whose ScaNN-based indexes provide brute-force and tree-AH nearest-neighbor search, metadata filtering, sparse-dense hybrid retrieval, and crowding; its Agent Retrieval generation adds collection storage, auto-embeddings, full-text and vector fusion, and semantic reranking.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10016",
+    "type": "VectorDatabase",
+    "label": "Amazon Neptune Analytics",
+    "sourceDataFile": "data/vector-databases/amazon-neptune-analytics.json",
+    "properties": {
+      "keywords": [
+        "managed graph analytics",
+        "property graph",
+        "openCypher",
+        "HNSW",
+        "vector similarity search",
+        "GraphRAG",
+        "knowledge graph",
+        "graph algorithms",
+        "AWS"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "amazon-neptune-analytics",
+      "status": "Draft",
+      "summary": "Amazon Neptune Analytics is a managed, memory-optimized property-graph analytics service that combines openCypher graph queries and algorithms with HNSW vector similarity search for GraphRAG, knowledge-graph, recommendation, and investigative retrieval workloads.",
+      "version": "1.0.0",
+      "visibility": "Public"
+    }
+  },
+  {
+    "id": "VECTOR-DATABASE-10017",
+    "type": "VectorDatabase",
+    "label": "Memgraph",
+    "sourceDataFile": "data/vector-databases/memgraph.json",
+    "properties": {
+      "keywords": [
+        "graph database",
+        "property graph",
+        "Cypher",
+        "vector search",
+        "HNSW",
+        "USearch",
+        "text search",
+        "GraphRAG",
+        "MAGE",
+        "streaming graph",
+        "AI memory"
+      ],
+      "language": "en",
+      "metadataStatus": "Draft",
+      "reviewState": "Not Reviewed",
+      "schema": "schema/vector-database.schema.json",
+      "slug": "memgraph",
+      "status": "Draft",
+      "summary": "Memgraph is a Cypher-compatible property-graph database with native node and edge vector indexes, text search, streaming ingestion, graph algorithms, and GraphRAG tooling; its USearch-backed HNSW-style vector subsystem uses READ_UNCOMMITTED isolation and must be evaluated separately from ordinary graph transaction guarantees.",
       "version": "1.0.0",
       "visibility": "Public"
     }

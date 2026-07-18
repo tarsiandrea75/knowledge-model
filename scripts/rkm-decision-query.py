@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render source-linked entity and pipeline decision views from canonical RKM data."""
+"""Render source-linked entity, comparison, and pipeline decision views from canonical RKM data."""
 
 from __future__ import annotations
 
@@ -340,29 +340,157 @@ def _resolve_evidence(item: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def _entity_characteristics(record: dict[str, Any]) -> tuple[dict[str, Any], list[Any], list[Any]]:
+def _extend_unique_strings(target: list[str], values: Iterable[str]) -> None:
+    for value in values:
+        if value not in target:
+            target.append(value)
+
+
+def _vector_database_characteristics(
+    record: dict[str, Any], source: Path
+) -> tuple[dict[str, Any], list[str], list[str]]:
+    if "vectorDatabase" not in record:
+        return {}, [], []
+
+    details = _require_object(record["vectorDatabase"], f"vectorDatabase in {source}")
+    operational: dict[str, Any] = {}
+    considerations: list[str] = []
+    warnings: list[str] = []
+
+    operational["databaseType"] = _require_string(
+        details.get("databaseType"), f"vectorDatabase.databaseType in {source}"
+    )
+    operational["deploymentModels"] = copy.deepcopy(
+        _string_list(
+            details.get("deploymentModels"),
+            f"vectorDatabase.deploymentModels in {source}",
+        )
+    )
+    operational["supportedIndexTypes"] = copy.deepcopy(
+        _string_list(
+            details.get("supportedIndexTypes"),
+            f"vectorDatabase.supportedIndexTypes in {source}",
+        )
+    )
+
+    for field in ("distanceMetrics", "supportedModalities"):
+        if field in details:
+            operational[field] = copy.deepcopy(
+                _string_list(details[field], f"vectorDatabase.{field} in {source}")
+            )
+
+    for field in (
+        "metadataFiltering",
+        "hybridSearch",
+        "scalability",
+        "consistency",
+        "integration",
+        "operations",
+    ):
+        if field in details:
+            operational[field] = copy.deepcopy(
+                _require_object(details[field], f"vectorDatabase.{field} in {source}")
+            )
+
+    if "ragUsage" in details:
+        rag_usage = _require_object(
+            details["ragUsage"], f"vectorDatabase.ragUsage in {source}"
+        )
+        operational_rag_usage: dict[str, Any] = {}
+        for field in ("recommendedStages", "retrievalPatterns"):
+            if field in rag_usage:
+                operational_rag_usage[field] = copy.deepcopy(
+                    _string_list(
+                        rag_usage[field],
+                        f"vectorDatabase.ragUsage.{field} in {source}",
+                    )
+                )
+        if operational_rag_usage:
+            operational["ragUsage"] = operational_rag_usage
+
+        for field in ("indexingConsiderations", "retrievalConsiderations"):
+            if field in rag_usage:
+                _extend_unique_strings(
+                    considerations,
+                    _string_list(
+                        rag_usage[field],
+                        f"vectorDatabase.ragUsage.{field} in {source}",
+                    ),
+                )
+
+    if "usageGuidance" in details:
+        _extend_unique_strings(
+            considerations,
+            _string_list(
+                details["usageGuidance"],
+                f"vectorDatabase.usageGuidance in {source}",
+            ),
+        )
+
+    if "limitations" in details:
+        limitations = _string_list(
+            details["limitations"], f"vectorDatabase.limitations in {source}"
+        )
+        _extend_unique_strings(
+            warnings,
+            (f"Vector database limitation: {item}" for item in limitations),
+        )
+
+    return operational, considerations, warnings
+
+
+def _entity_characteristics(
+    record: dict[str, Any], source: Path
+) -> tuple[dict[str, Any], list[Any], list[Any], list[str]]:
     operational: dict[str, Any] = {}
     evaluation: list[Any] = []
     considerations: list[Any] = []
+    warnings: list[str] = []
+
     for value in record.values():
         if not isinstance(value, dict):
             continue
         if "operationalCharacteristics" in value:
             operational = copy.deepcopy(
-                _require_object(value["operationalCharacteristics"], "operational characteristics")
+                _require_object(
+                    value["operationalCharacteristics"],
+                    f"operational characteristics in {source}",
+                )
             )
         if "evaluationGuidance" in value:
-            evaluation = copy.deepcopy(_require_list(value["evaluationGuidance"], "evaluation guidance"))
+            evaluation = copy.deepcopy(
+                _require_list(
+                    value["evaluationGuidance"],
+                    f"evaluation guidance in {source}",
+                )
+            )
             for index, item in enumerate(evaluation):
-                _require_string(item, f"evaluation guidance item {index}")
+                _require_string(
+                    item, f"evaluation guidance item {index} in {source}"
+                )
         if "implementationConsiderations" in value:
             considerations = copy.deepcopy(
-                _require_list(value["implementationConsiderations"], "implementation considerations")
+                _require_list(
+                    value["implementationConsiderations"],
+                    f"implementation considerations in {source}",
+                )
             )
             for index, item in enumerate(considerations):
-                _require_string(item, f"implementation consideration {index}")
-    return operational, evaluation, considerations
+                _require_string(
+                    item, f"implementation consideration {index} in {source}"
+                )
 
+    (
+        vector_operational,
+        vector_considerations,
+        vector_warnings,
+    ) = _vector_database_characteristics(record, source)
+
+    operational = {**vector_operational, **operational}
+    _extend_unique_strings(considerations, vector_considerations)
+    _extend_unique_strings(warnings, vector_warnings)
+
+    return operational, evaluation, considerations, warnings
 
 def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]:
     """Construct the single decision model consumed by both renderers."""
@@ -370,7 +498,9 @@ def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]
     references, claims, evidence = validate_embedded_knowledge(record, source)
     metadata = _require_object(record.get("metadata", {}), f"metadata in {source}")
     description = _require_object(record.get("description", {}), f"description in {source}")
-    operational, evaluation, considerations = _entity_characteristics(record)
+    operational, evaluation, considerations, characteristic_warnings = (
+        _entity_characteristics(record, source)
+    )
 
     resolved_references = [_resolve_reference(item) for item in references.values()]
     resolved_evidence = [_resolve_evidence(item) for item in evidence.values()]
@@ -399,6 +529,7 @@ def build_decision_brief(record: dict[str, Any], source: Path) -> dict[str, Any]
     warnings = copy.deepcopy(_require_list(raw_warnings, f"warnings in {source}"))
     for index, warning in enumerate(warnings):
         _require_string(warning, f"warning {index} in {source}")
+    _extend_unique_strings(warnings, characteristic_warnings)
     name = identity["name"].get("display") or identity["name"].get("official")
     return {
         "entity": {
@@ -1298,6 +1429,219 @@ def render_pipeline_output(model: dict[str, Any], output_format: str, detail: st
     raise ValueError(f"Unsupported text detail mode: {detail}")
 
 
+
+def _comparison_value_key(value: Any) -> str:
+    """Return an order-insensitive canonical key for display-only comparison."""
+    if isinstance(value, dict):
+        normalized = {
+            str(key): json.loads(_comparison_value_key(item))
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+        }
+        return json.dumps(normalized, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    if isinstance(value, list):
+        normalized_items = sorted(_comparison_value_key(item) for item in value)
+        return json.dumps(normalized_items, ensure_ascii=False, separators=(",", ":"))
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _flatten_comparison_fields(
+    value: Any, prefix: tuple = ()
+) -> list[tuple[tuple, Any]]:
+    if isinstance(value, dict):
+        flattened: list[tuple[tuple, Any]] = []
+        for key, item in value.items():
+            flattened.extend(_flatten_comparison_fields(item, (*prefix, str(key))))
+        return flattened
+    return [(prefix, copy.deepcopy(value))]
+
+
+def _comparison_profile(brief: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "lifecycle": {
+            "status": brief["entity"].get("status"),
+            "reviewState": brief["entity"].get("reviewState"),
+        },
+        "operationalCharacteristics": copy.deepcopy(
+            brief.get("operationalCharacteristics", {})
+        ),
+        "evidenceCoverage": {
+            "claimCount": len(brief.get("claims", [])),
+            "evidenceCount": len(brief.get("evidence", [])),
+            "referenceCount": len(brief.get("references", [])),
+            "warningCount": len(brief.get("warnings", [])),
+            "residualLimitationCount": len(brief.get("residualLimitations", [])),
+        },
+    }
+
+
+def build_compare_model(
+    requested_entities: Sequence[tuple[Path, dict[str, Any]]]
+) -> dict[str, Any]:
+    """Build a non-ranking comparison model from complete canonical entity briefs."""
+    if not 2 <= len(requested_entities) <= 8:
+        raise DecisionQueryError("A comparison requires between two and eight resolved entities.")
+
+    briefs = [build_decision_brief(record, source) for source, record in requested_entities]
+    entity_ids = [brief["entity"]["id"] for brief in briefs]
+    if len(set(entity_ids)) != len(entity_ids):
+        raise DecisionQueryError("A comparison cannot contain the same entity more than once.")
+
+    entity_types = {brief["entity"].get("entityType") for brief in briefs}
+    if len(entity_types) != 1:
+        rendered_types = ", ".join(sorted(_display_value(item) for item in entity_types))
+        raise DecisionQueryError(
+            "A comparison requires entities with the same canonical entityType; "
+            f"found: {rendered_types}."
+        )
+    entity_type = next(iter(entity_types))
+
+    profiles = [_comparison_profile(brief) for brief in briefs]
+    ordered_paths: list[tuple] = []
+    values_by_entity: list[dict[tuple, Any]] = []
+    for profile in profiles:
+        flattened = dict(_flatten_comparison_fields(profile))
+        values_by_entity.append(flattened)
+        for path in flattened:
+            if path not in ordered_paths:
+                ordered_paths.append(path)
+
+    rows: list[dict[str, Any]] = []
+    missing_fields = False
+    for path in ordered_paths:
+        values = [item.get(path) for item in values_by_entity]
+        if all(value is None for value in values):
+            continue
+        present_keys = [_comparison_value_key(value) for value in values if value is not None]
+        if any(value is None for value in values):
+            status = "Incomplete"
+            missing_fields = True
+        elif len(set(present_keys)) == 1:
+            status = "Same"
+        else:
+            status = "Different"
+        rows.append(
+            {
+                "path": ".".join(path),
+                "label": " / ".join(_label(part) for part in path),
+                "status": status,
+                "values": [
+                    {
+                        "entityId": brief["entity"]["id"],
+                        "entityName": brief["entity"]["name"],
+                        "value": copy.deepcopy(value),
+                    }
+                    for brief, value in zip(briefs, values)
+                ],
+            }
+        )
+
+    warnings = [
+        "This comparison is a deterministic projection of canonical RKM data; it does not rank entities or select a winner.",
+        "Matching field labels or values do not prove semantic equivalence across products, editions, versions, deployment models, or APIs.",
+        "Evidence-object counts measure recorded coverage, not source quality, factual correctness, or product superiority.",
+        "Differences and missing values require source-level review before an architectural decision.",
+    ]
+    if any(
+        brief["entity"].get("status") == "Draft"
+        or brief["entity"].get("reviewState") == "Not Reviewed"
+        for brief in briefs
+    ):
+        warnings.append(
+            "At least one compared entity is Draft or Not Reviewed; all conclusions require independent review."
+        )
+    if missing_fields:
+        warnings.append(
+            "At least one comparison field is incomplete; absence means not recorded, not unsupported."
+        )
+
+    return {
+        "comparison": {
+            "entityType": entity_type,
+            "requestedOrder": entity_ids,
+            "entities": briefs,
+            "rows": rows,
+            "warnings": warnings,
+        }
+    }
+
+
+def render_compare_compact_text(model: dict[str, Any]) -> str:
+    """Render a bounded field-by-field comparison without recommendations."""
+    comparison = model["comparison"]
+    briefs = comparison["entities"]
+    names = [brief["entity"]["name"] for brief in briefs]
+    title = f"RKM Entity Comparison: {' | '.join(str(name) for name in names)}"
+    lines = [
+        title,
+        "=" * len(title),
+        "",
+        "Comparison scope",
+        f"- Entity type: {_display_value(comparison.get('entityType'))}",
+        f"- Requested order: {', '.join(comparison['requestedOrder'])}",
+        "- Mode: descriptive, non-ranking, evidence-traceable comparison",
+        "",
+        "Compared entities and lifecycle",
+    ]
+    for brief in briefs:
+        entity = brief["entity"]
+        lines.append(
+            f"- {entity['id']} | {entity['name']} | "
+            f"Status: {_display_value(entity.get('status'))} | "
+            f"Review state: {_display_value(entity.get('reviewState'))}"
+        )
+
+    lines.extend(("", "Comparison matrix"))
+    for row in comparison["rows"]:
+        lines.append(f"[{row['status']}] {row['label']}")
+        for item in row["values"]:
+            lines.append(
+                f"  - {item['entityName']} ({item['entityId']}): "
+                f"{_display_value(item['value'])}"
+            )
+
+    lines.extend(("", "Interpretation cautions"))
+    lines.extend(f"- {warning}" for warning in comparison["warnings"])
+
+    lines.extend(("", "Inspect complete evidence"))
+    for brief in briefs:
+        entity = brief["entity"]
+        lines.append(
+            f"- {entity['name']}: "
+            f"python3 scripts/rkm-decision-query.py --entity {entity['slug']} --detail full"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def render_compare_full_text(model: dict[str, Any]) -> str:
+    """Append each complete canonical entity brief to the compact comparison."""
+    comparison = model["comparison"]
+    lines = [
+        render_compare_compact_text(model).rstrip("\n"),
+        "",
+        "Complete compared entity decision briefs",
+    ]
+    for brief in comparison["entities"]:
+        lines.extend(
+            (
+                "",
+                f"Entity: {brief['entity']['name']}",
+                render_full_text(brief).rstrip("\n"),
+            )
+        )
+    return "\n".join(lines) + "\n"
+
+
+def render_compare_output(model: dict[str, Any], output_format: str, detail: str) -> str:
+    """Render complete comparison JSON independently of text detail."""
+    if output_format == "json":
+        return render_json(model)
+    if detail == "compact":
+        return render_compare_compact_text(model)
+    if detail == "full":
+        return render_compare_full_text(model)
+    raise ValueError(f"Unsupported text detail mode: {detail}")
+
+
 def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: str = "Example") -> dict[str, Any]:
     return {
         "identity": {
@@ -1367,6 +1711,86 @@ def _fixture_record(entity_id: str = "ENTITY-1", slug: str = "example", name: st
         "technique": {
             "operationalCharacteristics": {"latencyImpact": "Variable"},
             "evaluationGuidance": ["Evaluate the fixture."],
+        },
+    }
+
+
+def _fixture_vector_database_record() -> dict[str, Any]:
+    return {
+        "identity": {
+            "id": "VECTOR-DATABASE-TEST-1",
+            "slug": "fixture-vector-database",
+            "name": {
+                "official": "Fixture Vector Database",
+                "display": "Fixture Vector Database",
+            },
+            "entityType": "VectorDatabase",
+            "status": "Draft",
+        },
+        "metadata": {"reviewState": "Not Reviewed"},
+        "description": {
+            "summary": "Fixture VectorDatabase decision profile."
+        },
+        "warnings": ["Fixture warning."],
+        "vectorDatabase": {
+            "databaseType": "Relational Database With Vector Extension",
+            "deploymentModels": ["Self Hosted", "Managed Cloud"],
+            "supportedIndexTypes": ["HNSW", "IVF Flat"],
+            "distanceMetrics": ["Cosine Similarity", "Dot Product"],
+            "supportedModalities": ["Text", "Code"],
+            "metadataFiltering": {
+                "supported": True,
+                "filterTypes": ["Exact Match", "Range"],
+                "preFilterSupported": True,
+                "postFilterSupported": False,
+            },
+            "hybridSearch": {
+                "supported": True,
+                "methods": ["BM25 Plus Vector"],
+                "scoreNormalizationSupported": True,
+            },
+            "scalability": {
+                "horizontalScaling": "Variable",
+                "verticalScaling": "High",
+                "shardingSupported": False,
+                "replicationSupported": True,
+                "diskBackedIndexingSupported": False,
+            },
+            "consistency": {
+                "consistencyModel": "Strong",
+                "upsertsSupported": True,
+                "deletesSupported": True,
+                "streamingUpdatesSupported": False,
+                "transactionSupport": "Full ACID",
+            },
+            "integration": {
+                "apis": ["SQL"],
+                "sdkLanguages": ["Python", "Java"],
+            },
+            "operations": {
+                "accessControl": "High",
+                "encryption": "High",
+                "backupAndRestore": "High",
+                "observability": "Medium",
+                "multiTenancy": "Variable",
+            },
+            "ragUsage": {
+                "recommendedStages": ["Indexing", "Retrieval"],
+                "retrievalPatterns": [
+                    "Filtered Retrieval",
+                    "Hybrid Retrieval",
+                ],
+                "indexingConsiderations": [
+                    "Tune index parameters for the fixture workload."
+                ],
+                "retrievalConsiderations": [
+                    "Measure recall and latency for fixture queries."
+                ],
+            },
+            "limitations": ["Fixture vector database limitation."],
+            "usageGuidance": [
+                "Use the fixture only for decision-query self-tests."
+            ],
         },
     }
 
@@ -1532,8 +1956,12 @@ def run_self_test() -> None:
         data.mkdir()
         record = _fixture_record()
         second = _fixture_record("ENTITY-2", "second", "Second Example")
+        vector_database_record = _fixture_vector_database_record()
         (data / "example.json").write_text(json.dumps(record), encoding="utf-8")
         (data / "second.json").write_text(json.dumps(second), encoding="utf-8")
+        (data / "vector-database.json").write_text(
+            json.dumps(vector_database_record), encoding="utf-8"
+        )
         (data / "relationships.json").write_text(
             json.dumps({"relationshipSet": {"id": "SET-1"}}), encoding="utf-8"
         )
@@ -1541,16 +1969,23 @@ def run_self_test() -> None:
             "data": [
                 {"file": "data/example.json", "schema": "schema/example.json"},
                 {"file": "data/second.json", "schema": "schema/example.json"},
+                {
+                    "file": "data/vector-database.json",
+                    "schema": "schema/vector-database.schema.json",
+                },
                 {"file": "data/relationships.json", "schema": "schema/relationships.json"},
             ]
         }
         (data / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 
         entities = discover_entities(root)
-        assert len(entities) == 2
+        assert len(entities) == 3
         assert resolve_entity("ENTITY-1", entities)[1]["identity"]["id"] == "ENTITY-1"
         assert resolve_entity("example", entities)[1]["identity"]["id"] == "ENTITY-1"
         assert resolve_entity("eXaMpLe", entities)[1]["identity"]["id"] == "ENTITY-1"
+        assert resolve_entity("fixture-vector-database", entities)[1]["identity"][
+            "id"
+        ] == "VECTOR-DATABASE-TEST-1"
         source = data / "example.json"
         record["identity"]["name"]["official"] = "Example Official"
         assert resolve_entity("example official", [(source, record)])[1][
@@ -1615,6 +2050,160 @@ def run_self_test() -> None:
         assert json.loads(render_output(brief, "json", compact_args.detail))["entity"]["slug"] == "example"
         assert json.loads(render_output(brief, "json", full_args.detail))["entity"]["slug"] == "example"
 
+        vector_source = data / "vector-database.json"
+        vector_brief = build_decision_brief(
+            vector_database_record, vector_source
+        )
+        assert vector_brief["entity"]["entityType"] == "VectorDatabase"
+        assert vector_brief["operationalCharacteristics"]["databaseType"] == (
+            "Relational Database With Vector Extension"
+        )
+        assert vector_brief["operationalCharacteristics"]["deploymentModels"] == [
+            "Self Hosted",
+            "Managed Cloud",
+        ]
+        assert vector_brief["operationalCharacteristics"]["ragUsage"] == {
+            "recommendedStages": ["Indexing", "Retrieval"],
+            "retrievalPatterns": [
+                "Filtered Retrieval",
+                "Hybrid Retrieval",
+            ],
+        }
+        assert vector_brief["implementationConsiderations"] == [
+            "Tune index parameters for the fixture workload.",
+            "Measure recall and latency for fixture queries.",
+            "Use the fixture only for decision-query self-tests.",
+        ]
+        assert vector_brief["warnings"] == [
+            "Fixture warning.",
+            "Vector database limitation: Fixture vector database limitation.",
+        ]
+        assert vector_brief["evaluationGuidance"] == []
+
+        vector_compact = render_text(vector_brief, "compact")
+        vector_full = render_text(vector_brief, "full")
+        for visible in (
+            "Fixture Vector Database",
+            "VectorDatabase",
+            "Database Type: Relational Database With Vector Extension",
+            "Deployment Models",
+            "Supported Index Types",
+            "Metadata Filtering",
+            "Hybrid Search",
+            "Tune index parameters for the fixture workload.",
+            "Measure recall and latency for fixture queries.",
+            "Use the fixture only for decision-query self-tests.",
+            "Vector database limitation: Fixture vector database limitation.",
+        ):
+            assert visible in vector_compact
+            assert visible in vector_full
+
+        assert json.loads(
+            render_output(vector_brief, "json", "compact")
+        ) == vector_brief
+        assert render_output(
+            vector_brief, "json", "compact"
+        ) == render_output(vector_brief, "json", "full")
+
+        second_vector_database = copy.deepcopy(vector_database_record)
+        second_vector_database["identity"]["id"] = "VECTOR-DATABASE-TEST-2"
+        second_vector_database["identity"]["slug"] = "second-fixture-vector-database"
+        second_vector_database["identity"]["name"] = {
+            "official": "Second Fixture Vector Database",
+            "display": "Second Fixture Vector Database",
+        }
+        second_vector_database["vectorDatabase"]["databaseType"] = (
+            "Managed Vector Search Service"
+        )
+        second_vector_database["vectorDatabase"]["deploymentModels"] = [
+            "Managed Cloud"
+        ]
+        second_vector_source = data / "second-vector-database.json"
+        comparison = build_compare_model(
+            [
+                (vector_source, vector_database_record),
+                (second_vector_source, second_vector_database),
+            ]
+        )
+        assert comparison["comparison"]["entityType"] == "VectorDatabase"
+        assert comparison["comparison"]["requestedOrder"] == [
+            "VECTOR-DATABASE-TEST-1",
+            "VECTOR-DATABASE-TEST-2",
+        ]
+        rows_by_path = {
+            row["path"]: row for row in comparison["comparison"]["rows"]
+        }
+        assert rows_by_path[
+            "operationalCharacteristics.databaseType"
+        ]["status"] == "Different"
+        assert rows_by_path[
+            "operationalCharacteristics.metadataFiltering.supported"
+        ]["status"] == "Same"
+        compare_compact = render_compare_output(comparison, "text", "compact")
+        compare_full = render_compare_output(comparison, "text", "full")
+        assert "RKM Entity Comparison" in compare_compact
+        assert "[Different] Operational Characteristics / Database Type" in compare_compact
+        assert "[Same] Operational Characteristics / Metadata Filtering / Supported" in (
+            compare_compact
+        )
+        assert "does not rank entities or select a winner" in compare_compact
+        assert "Complete compared entity decision briefs" in compare_full
+        compare_compact_json = render_compare_output(comparison, "json", "compact")
+        compare_full_json = render_compare_output(comparison, "json", "full")
+        assert compare_compact_json == compare_full_json
+        assert json.loads(compare_compact_json) == comparison
+
+        try:
+            build_compare_model([(vector_source, vector_database_record)])
+        except DecisionQueryError as exc:
+            assert "between two and eight" in str(exc)
+        else:
+            raise AssertionError("Single-entity comparison unexpectedly succeeded")
+
+        try:
+            build_compare_model(
+                [
+                    (vector_source, vector_database_record),
+                    (vector_source, vector_database_record),
+                ]
+            )
+        except DecisionQueryError as exc:
+            assert "same entity more than once" in str(exc)
+        else:
+            raise AssertionError("Duplicate comparison entity unexpectedly succeeded")
+
+        try:
+            build_compare_model(
+                [
+                    (source, record),
+                    (vector_source, vector_database_record),
+                ]
+            )
+        except DecisionQueryError as exc:
+            assert "same canonical entityType" in str(exc)
+        else:
+            raise AssertionError("Mixed-type comparison unexpectedly succeeded")
+
+        malformed_vector_database = copy.deepcopy(vector_database_record)
+        malformed_vector_database["vectorDatabase"]["deploymentModels"] = (
+            "Self Hosted"
+        )
+        _expect_error(
+            malformed_vector_database,
+            "vectorDatabase.deploymentModels",
+            vector_source,
+        )
+
+        malformed_vector_database = copy.deepcopy(vector_database_record)
+        malformed_vector_database["vectorDatabase"]["limitations"] = (
+            "Malformed limitation"
+        )
+        _expect_error(
+            malformed_vector_database,
+            "vectorDatabase.limitations",
+            vector_source,
+        )
+
         broken = copy.deepcopy(record)
         broken["claims"][0]["evidenceIds"] = ["EVIDENCE-MISSING"]
         _expect_error(broken, "unresolved Evidence ID", source)
@@ -1665,8 +2254,15 @@ def run_self_test() -> None:
             raise AssertionError("Ambiguous entity lookup unexpectedly succeeded")
 
     _expect_argument_error(["--entity", "example", "--pipeline", "example", "second"])
+    _expect_argument_error(["--entity", "example", "--compare", "example", "second"])
+    _expect_argument_error(["--pipeline", "example", "second", "--compare", "example", "second"])
     _expect_argument_error(["--pipeline", "example"])
     _expect_argument_error(["--pipeline", "example", "second", "third"])
+    _expect_argument_error(["--compare", "example"], validate_mode=True)
+    _expect_argument_error(
+        ["--compare", "a", "b", "c", "d", "e", "f", "g", "h", "i"],
+        validate_mode=True,
+    )
     _expect_argument_error([], validate_mode=True)
 
     with tempfile.TemporaryDirectory() as directory:
@@ -1860,6 +2456,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         metavar=("ENTITY_A", "ENTITY_B"),
         help="Two exact entity lookups in the intended pipeline stage order.",
     )
+    modes.add_argument(
+        "--compare",
+        nargs="+",
+        metavar="ENTITY",
+        help="Two to eight exact entity lookups with the same canonical entity type.",
+    )
     parser.add_argument(
         "--format",
         choices=("text", "json"),
@@ -1883,8 +2485,12 @@ def _parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
 def _validate_mode_arguments(
     parser: argparse.ArgumentParser, args: argparse.Namespace
 ) -> None:
-    if not args.self_test and not args.entity and not args.pipeline:
-        parser.error("exactly one of --entity or --pipeline is required unless --self-test is used")
+    if not args.self_test and not args.entity and not args.pipeline and not args.compare:
+        parser.error(
+            "exactly one of --entity, --pipeline, or --compare is required unless --self-test is used"
+        )
+    if args.compare and not 2 <= len(args.compare) <= 8:
+        parser.error("--compare requires between two and eight entity lookups")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -1902,10 +2508,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             source, record = resolve_entity(args.entity, entities)
             brief = build_decision_brief(record, source)
             output = render_output(brief, args.format, args.detail)
-        else:
+        elif args.pipeline:
             requested = [resolve_entity(query, entities) for query in args.pipeline]
             model = build_pipeline_model(requested, entities)
             output = render_pipeline_output(model, args.format, args.detail)
+        else:
+            requested = [resolve_entity(query, entities) for query in args.compare]
+            model = build_compare_model(requested)
+            output = render_compare_output(model, args.format, args.detail)
         sys.stdout.write(output)
         return 0
     except DecisionQueryError as exc:
