@@ -60,6 +60,15 @@
       },
       "uniqueItems": true
     },
+    "capabilityOrigin": {
+      "$ref": "#/$defs/capabilityOrigin"
+    },
+    "availabilityScope": {
+      "$ref": "#/$defs/availabilityScope"
+    },
+    "maturityStatus": {
+      "$ref": "#/$defs/maturityStatus"
+    },
     "qualityAttributes": {
       "type": "array",
       "description": "Quality attributes relevant to selecting, evaluating or governing this capability.",
@@ -262,6 +271,18 @@
         }
       }
     },
+    "maturityStatus": {
+      "type": "string",
+      "description": "Release, lifecycle or availability maturity of the capability within its stated implementation and availability scope.",
+      "enum": [
+        "Generally Available",
+        "Preview",
+        "Experimental",
+        "Deprecated",
+        "Limited",
+        "Unknown"
+      ]
+    },
     "capabilityProvider": {
       "type": "object",
       "description": "Entity role associated with making the capability available or using it.",
@@ -288,15 +309,132 @@
           "$ref": "#/$defs/entityReference"
         },
         "availability": {
+          "$ref": "#/$defs/maturityStatus"
+        }
+      }
+    },
+    "capabilityOrigin": {
+      "type": "object",
+      "description": "Implementation origin and product boundary that make the capability available. This is distinct from the behavioral boundary of the capability.",
+      "additionalProperties": false,
+      "required": [
+        "originType",
+        "implementationBoundary"
+      ],
+      "properties": {
+        "originType": {
           "type": "string",
+          "description": "Canonical category describing where the capability is implemented.",
           "enum": [
-            "Generally Available",
-            "Preview",
-            "Experimental",
-            "Deprecated",
-            "Limited",
-            "Unknown"
+            "Product Core",
+            "Edition-Specific Product Feature",
+            "Managed-Service Capability",
+            "Host-Platform Capability",
+            "First-Party Optional Package",
+            "Third-Party Extension or Integration",
+            "Embedded External Component",
+            "Query-Language Composition",
+            "Application-Side Orchestration",
+            "Unknown or Unverified Origin"
           ]
+        },
+        "implementationBoundary": {
+          "type": "string",
+          "description": "Product, service, host platform, package, query-language or application boundary that actually implements the capability.",
+          "minLength": 1
+        },
+        "implementationName": {
+          "type": "string",
+          "description": "Name of the implementing engine, service, edition, package, plugin, subsystem or application component when it is not represented through an entity reference.",
+          "minLength": 1
+        },
+        "implementationEntity": {
+          "$ref": "#/$defs/entityReference"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional explanation needed to interpret the implementation origin correctly.",
+          "minLength": 1
+        }
+      }
+    },
+    "availabilityScope": {
+      "type": "object",
+      "description": "Versions, editions, plans, deployments and other boundaries within which the capability is documented as available.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Product, service, package or API versions where the capability is available.",
+          "minItems": 1
+        },
+        "editions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Named editions or commercial distributions where the capability is available.",
+          "minItems": 1
+        },
+        "plansOrTiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Managed-service plans, license tiers or pricing tiers where the capability is available.",
+          "minItems": 1
+        },
+        "deploymentModels": {
+          "type": "array",
+          "description": "Deployment models where the capability is available.",
+          "items": {
+            "$ref": "#/$defs/deploymentModel"
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "apiOrResourceGenerations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "API families, resource generations or service generations that expose the capability.",
+          "minItems": 1
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Geographic or cloud regions where the capability is available when availability is region-dependent.",
+          "minItems": 1
+        },
+        "installationRequired": {
+          "type": "boolean",
+          "description": "Whether a package, plugin, module or other separately installed component is required."
+        },
+        "configurationRequired": {
+          "type": "boolean",
+          "description": "Whether explicit configuration or enablement is required before the capability is available."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional availability boundaries, exclusions or lifecycle details.",
+          "minLength": 1
         }
       }
     },
