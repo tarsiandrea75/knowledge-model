@@ -86,6 +86,355 @@
       "Scalar Quantization",
       "Other"
     ],
+    "capabilities": [
+      {
+        "capabilityId": "vector-similarity-retrieval",
+        "name": "Vector Similarity Retrieval",
+        "capabilityType": "Retrieval Capability",
+        "statement": "Retrieves node or relationship candidates through HNSW vector indexes.",
+        "boundary": {
+          "behavior": "Indexes and retrieves vector-bearing Neo4j properties."
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Neo4j database engine and Lucene-backed vector-index subsystem"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true,
+          "notes": "Binary quantization is preview and advanced controls are version-specific."
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Approximate search must be benchmarked for recall and result completeness."
+          }
+        ]
+      },
+      {
+        "capabilityId": "filtered-vector-retrieval",
+        "name": "Filtered Vector Retrieval",
+        "capabilityType": "Retrieval Capability",
+        "statement": "Applies in-index predicates or outer Cypher post-filtering.",
+        "boundary": {
+          "behavior": "Constrains vector candidates through SEARCH WHERE or outer WHERE."
+        },
+        "scope": {
+          "ragStages": [
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Cypher 25 SEARCH clause and Neo4j vector-index execution"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.01 or later"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Filter placement changes completeness, supported predicates and cost."
+          }
+        ]
+      },
+      {
+        "capabilityId": "full-text-vector-fusion",
+        "name": "Full-Text and Vector Fusion",
+        "capabilityType": "Ranking Capability",
+        "statement": "Combines full-text and vector candidates through weighted linear ranking.",
+        "boundary": {
+          "behavior": "Executes lexical-vector fusion through Neo4j GraphRAG for Python."
+        },
+        "scope": {
+          "ragStages": [
+            "Retrieval",
+            "Reranking"
+          ],
+          "runtimeEnvironments": [
+            "Application Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "First-Party Optional Package",
+          "implementationBoundary": "Separately installed Neo4j GraphRAG for Python package"
+        },
+        "availabilityScope": {
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "installationRequired": true,
+          "configurationRequired": true
+        },
+        "maturityStatus": "Unknown",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Quality depends on analyzers, embeddings, candidate pools and weights."
+          }
+        ]
+      },
+      {
+        "capabilityId": "vector-cypher-context-expansion",
+        "name": "Vector-Cypher Context Expansion",
+        "capabilityType": "Retrieval Capability",
+        "statement": "Expands vector-retrieved entities through explicit Cypher traversal.",
+        "boundary": {
+          "behavior": "Composes vector retrieval and graph traversal in a user-authored query."
+        },
+        "scope": {
+          "ragStages": [
+            "Retrieval",
+            "Context Assembly"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Query-Language Composition",
+          "implementationBoundary": "Cypher vector-index retrieval plus graph traversal"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Traversal depth, fan-out and context assembly remain workload-defined."
+          }
+        ]
+      },
+      {
+        "capabilityId": "enterprise-cluster-replication",
+        "name": "Enterprise Cluster Replication and Read Scaling",
+        "capabilityType": "Operational Capability",
+        "statement": "Provides replicated primaries and read-scaling secondaries.",
+        "boundary": {
+          "behavior": "Provides Enterprise cluster replication and causal-consistency support."
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Enterprise clustering"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Enterprise"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Standard clustering must not be equated with automatic sharding."
+          }
+        ]
+      },
+      {
+        "capabilityId": "acid-transaction-processing",
+        "name": "ACID Transaction Processing",
+        "capabilityType": "Operational Capability",
+        "statement": "Provides ACID transactions for graph data and vector-bearing properties.",
+        "boundary": {
+          "behavior": "Commits transactional data while vector-index visibility follows separate timing."
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Neo4j transaction engine"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Vector-index changes are not searchable inside the creating transaction."
+          }
+        ]
+      },
+      {
+        "capabilityId": "enterprise-backup-restore",
+        "name": "Enterprise Backup and Restore",
+        "capabilityType": "Operational Capability",
+        "statement": "Provides full and differential backup and restore workflows.",
+        "boundary": {
+          "behavior": "Creates and restores self-hosted Enterprise database backups."
+        },
+        "scope": {
+          "ragStages": [
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Enterprise backup and restore tooling"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Enterprise"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Recovery depends on backup cadence and tested restore procedures."
+          }
+        ]
+      },
+      {
+        "capabilityId": "aura-snapshot-recovery",
+        "name": "Aura Snapshot and Recovery",
+        "capabilityType": "Operational Capability",
+        "statement": "Provides provider-managed Aura backup, export and restore workflows.",
+        "boundary": {
+          "behavior": "Manages snapshots and recovery inside the Neo4j Aura service boundary."
+        },
+        "scope": {
+          "ragStages": [
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Managed-Service Capability",
+          "implementationBoundary": "Neo4j Aura managed service"
+        },
+        "availabilityScope": {
+          "deploymentModels": [
+            "Managed Service"
+          ],
+          "notes": "Retention and automation depend on the selected Aura service and tier."
+        },
+        "maturityStatus": "Unknown",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "The capability depends on provider lifecycle, tier and region."
+          }
+        ]
+      }
+    ],
     "distanceMetrics": [
       "Cosine Similarity",
       "Euclidean Distance"
