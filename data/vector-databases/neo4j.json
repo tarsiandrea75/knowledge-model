@@ -34,10 +34,10 @@
     "status": "Draft",
     "visibility": "Public",
     "language": "en",
-    "version": "1.2.0"
+    "version": "1.3.0"
   },
   "metadata": {
-    "version": "1.2.0",
+    "version": "1.3.0",
     "schemaVersion": "1.0.0",
     "repositoryVersion": "1.0.0",
     "status": "Draft",
@@ -826,12 +826,6 @@
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "qualifiers": [
-        {
-          "name": "versionScope",
-          "value": "Neo4j 2026.06.0 and official documentation accessed 2026-07-17"
-        }
-      ],
       "confidence": "High",
       "status": "Draft",
       "evidenceIds": [
@@ -852,12 +846,6 @@
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "qualifiers": [
-        {
-          "name": "filterScope",
-          "value": "SEARCH-clause filtering requires Neo4j 2026.01 or later, supported predicates, and filterable properties declared in the vector index"
-        }
-      ],
       "confidence": "High",
       "status": "Draft",
       "evidenceIds": [
@@ -872,18 +860,12 @@
     },
     {
       "id": "CLAIM-30003",
-      "statement": "Neo4j can combine vector search, full-text retrieval, and graph traversal through Cypher and first-party GraphRAG retrievers, including vector-plus-Cypher context expansion and weighted linear full-text-vector ranking.",
-      "claimType": "Factual",
+      "statement": "Neo4j DBMS exposes vector indexes and full-text indexes that can be queried through Cypher, but combining their ranked outputs is not one automatic DBMS-core retrieval operation.",
+      "claimType": "Implementation Specific",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "qualifiers": [
-        {
-          "name": "retrievalScope",
-          "value": "Fusion weights, candidate pools, graph expansion, and index versions require workload-specific relevance and latency evaluation"
-        }
-      ],
       "confidence": "High",
       "status": "Draft",
       "evidenceIds": [
@@ -895,22 +877,16 @@
         "REFERENCE-30006",
         "REFERENCE-30007"
       ],
-      "rationale": "Neo4j vector-index and GraphRAG documentation describes HybridRetriever, HybridCypherRetriever, VectorCypherRetriever, and graph traversal appended to semantic or lexical retrieval."
+      "rationale": "Vector and full-text retrieval primitives are product capabilities, while their fusion boundary must be represented separately from the underlying indexes."
     },
     {
       "id": "CLAIM-30004",
-      "statement": "Neo4j is deployable locally, self-hosted, and as managed Aura; Enterprise clustering uses replicated primaries and read-scaling secondaries with majority-based write availability and causal-consistency support, while automatic sharding and advanced operations are edition-specific.",
-      "claimType": "Factual",
+      "statement": "Neo4j Enterprise clustering uses replicated primaries and read-scaling secondaries, with topology and availability varying by edition and deployment.",
+      "claimType": "Implementation Specific",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "qualifiers": [
-        {
-          "name": "deploymentScope",
-          "value": "Community, Enterprise, Aura, and Infinigraph expose different scalability, security, backup, multi-database, and support boundaries"
-        }
-      ],
       "confidence": "High",
       "status": "Draft",
       "evidenceIds": [
@@ -923,38 +899,130 @@
         "REFERENCE-30013",
         "REFERENCE-30014"
       ],
-      "rationale": "Neo4j official architecture and edition documentation distinguishes single-instance Community operation, Enterprise clusters, Aura management, replicated primaries and secondaries, causal consistency, and edition-specific capabilities."
+      "rationale": "Cluster replication and read scaling are edition-scoped operational capabilities and must not be generalized to every Neo4j deployment."
     },
     {
       "id": "CLAIM-30005",
-      "statement": "Neo4j provides ACID database transactions, but vector-index updates are not visible to vector queries within the same transaction; backup, snapshot, and licensing behavior varies across Community, Enterprise, Infinigraph, and Aura.",
+      "statement": "Neo4j provides ACID database transactions, but vector-index updates are not visible to vector queries within the same transaction.",
       "claimType": "Factual",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "qualifiers": [
-        {
-          "name": "durabilityScope",
-          "value": "Effective durability and recovery depend on edition, topology, transaction routing, backup cadence, snapshot tier, restore procedure, and index rebuild behavior"
-        }
-      ],
       "confidence": "High",
       "status": "Draft",
       "evidenceIds": [
         "EVIDENCE-30005"
       ],
       "referenceIds": [
+        "REFERENCE-30002"
+      ],
+      "rationale": "Database transaction atomicity and vector-index query visibility are distinct guarantees and must be represented separately."
+    },
+    {
+      "id": "CLAIM-30006",
+      "statement": "The first-party neo4j-graphrag package can combine vector and full-text retrieval through configurable fusion or orchestration; this capability is package-scoped rather than DBMS-core.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30003"
+      ],
+      "referenceIds": [
         "REFERENCE-30002",
+        "REFERENCE-30005",
+        "REFERENCE-30006",
+        "REFERENCE-30007"
+      ],
+      "rationale": "Vendor ownership does not make an independently installed and versioned first-party package part of the database engine."
+    },
+    {
+      "id": "CLAIM-30007",
+      "statement": "Cypher can compose vector-search candidates with graph pattern matching and traversal to expand, constrain, connect, or contextualize retrieved entities.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30003"
+      ],
+      "referenceIds": [
+        "REFERENCE-30002",
+        "REFERENCE-30005",
+        "REFERENCE-30006",
+        "REFERENCE-30007"
+      ],
+      "rationale": "This behavior is Vector-Graph Composition implemented through query-language composition, not canonical dense-sparse hybrid retrieval."
+    },
+    {
+      "id": "CLAIM-30008",
+      "statement": "Automatic data sharding is not a universal Neo4j capability; it is edition- or offering-specific and must be verified for the target deployment, including Infinigraph where applicable.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30004"
+      ],
+      "referenceIds": [
+        "REFERENCE-30001",
+        "REFERENCE-30008",
+        "REFERENCE-30009",
+        "REFERENCE-30013",
+        "REFERENCE-30014"
+      ],
+      "rationale": "Standard cluster replication must not be conflated with automatic data partitioning or sharding."
+    },
+    {
+      "id": "CLAIM-30009",
+      "statement": "Online backup and restore are scoped to eligible self-managed editions, while Aura provides managed snapshot and restore workflows with service- and plan-specific behavior.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30006"
+      ],
+      "referenceIds": [
         "REFERENCE-30010",
         "REFERENCE-30011",
-        "REFERENCE-30012",
+        "REFERENCE-30012"
+      ],
+      "rationale": "Recovery behavior differs materially between self-managed Enterprise deployments and the Aura managed service."
+    },
+    {
+      "id": "CLAIM-30010",
+      "statement": "Neo4j Community Edition is licensed under GPL-3.0-only, self-managed Enterprise editions use commercial software terms, and Aura is governed by cloud or self-service terms.",
+      "claimType": "Factual",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30007"
+      ],
+      "referenceIds": [
         "REFERENCE-30013",
         "REFERENCE-30015",
         "REFERENCE-30016",
         "REFERENCE-30017"
       ],
-      "rationale": "Official Neo4j transaction, vector-index, backup, edition, software-agreement, and Aura documentation requires the RKM record to separate database transaction guarantees from vector-index visibility and to scope recovery and licensing behavior by edition or managed offering."
+      "rationale": "Product licensing must be scoped separately from the Apache-2.0 license applying to the canonical RKM artifact."
     }
   ],
   "evidence": [
@@ -962,8 +1030,6 @@
       "id": "EVIDENCE-30001",
       "role": "Supports",
       "strength": "Strong",
-      "confidence": "High",
-      "status": "Draft",
       "summary": "Neo4j official manuals document the current server version, Lucene HNSW vector indexes for nodes and relationships, VECTOR or numeric-list properties, cosine and Euclidean similarity, scalar and binary quantization, dimensions, and HNSW settings.",
       "interpretation": "The RKM profile can classify Neo4j as a graph database with native graph-based ANN and quantization rather than as a dedicated vector database.",
       "claimIds": [
@@ -974,20 +1040,8 @@
         "REFERENCE-30002",
         "REFERENCE-30004"
       ],
-      "sourceFragments": [
-        {
-          "referenceId": "REFERENCE-30001",
-          "locator": "Current server version 2026.06.0"
-        },
-        {
-          "referenceId": "REFERENCE-30002",
-          "locator": "Vector-index schema, HNSW provider, similarity, dimensions, quantization, and advanced settings"
-        },
-        {
-          "referenceId": "REFERENCE-30004",
-          "locator": "Native VECTOR values and coordinate types"
-        }
-      ],
+      "confidence": "High",
+      "status": "Draft",
       "limitations": [
         "Official product documentation is not an independent recall, latency, cost, or scalability benchmark.",
         "Binary quantization and search-expansion controls have version-specific maturity and defaults."
@@ -997,8 +1051,6 @@
       "id": "EVIDENCE-30002",
       "role": "Supports",
       "strength": "Strong",
-      "confidence": "High",
-      "status": "Draft",
       "summary": "Neo4j documents SEARCH-clause vector filtering over declared properties and contrasts it with outer WHERE post-filtering, including result-completeness and supported-predicate differences.",
       "interpretation": "The RKM profile can mark both pre-filter and post-filter support while warning that placement changes semantics and completeness.",
       "claimIds": [
@@ -1009,20 +1061,8 @@
         "REFERENCE-30003",
         "REFERENCE-30007"
       ],
-      "sourceFragments": [
-        {
-          "referenceId": "REFERENCE-30002",
-          "locator": "Multi-label or multi-type vector indexes with additional filterable properties"
-        },
-        {
-          "referenceId": "REFERENCE-30003",
-          "locator": "SEARCH WHERE in-index filtering versus outer WHERE post-filtering"
-        },
-        {
-          "referenceId": "REFERENCE-30007",
-          "locator": "GraphRAG support boundary for SEARCH-clause filtering"
-        }
-      ],
+      "confidence": "High",
+      "status": "Draft",
       "limitations": [
         "Supported predicates and filterable property types are narrower than unrestricted Cypher WHERE semantics.",
         "Highly selective filters and security restrictions can reduce results or change cost."
@@ -1032,12 +1072,12 @@
       "id": "EVIDENCE-30003",
       "role": "Supports",
       "strength": "Strong",
-      "confidence": "High",
-      "status": "Draft",
-      "summary": "Neo4j first-party GraphRAG documentation provides vector, hybrid, hybrid-Cypher, and vector-Cypher retrievers that combine semantic retrieval, full-text search, weighted linear ranking, and graph traversal.",
-      "interpretation": "The RKM profile can represent BM25-plus-vector, weighted score fusion, and graph-plus-vector retrieval without claiming a universal best fusion strategy.",
+      "summary": "Neo4j documentation describes vector and full-text indexes, Cypher composition with graph traversal, and first-party GraphRAG retrieval workflows.",
+      "interpretation": "The same source family supports three distinct claims: DBMS retrieval primitives, package-scoped vector and lexical fusion, and query-language Vector-Graph Composition.",
       "claimIds": [
-        "CLAIM-30003"
+        "CLAIM-30003",
+        "CLAIM-30006",
+        "CLAIM-30007"
       ],
       "referenceIds": [
         "REFERENCE-30002",
@@ -1045,39 +1085,21 @@
         "REFERENCE-30006",
         "REFERENCE-30007"
       ],
-      "sourceFragments": [
-        {
-          "referenceId": "REFERENCE-30002",
-          "locator": "Vector search combined with full-text or other ranked sources"
-        },
-        {
-          "referenceId": "REFERENCE-30005",
-          "locator": "HybridRetriever and VectorCypherRetriever usage patterns"
-        },
-        {
-          "referenceId": "REFERENCE-30006",
-          "locator": "Linear ranker alpha and full-text-vector retrieval implementation"
-        },
-        {
-          "referenceId": "REFERENCE-30007",
-          "locator": "First-party GraphRAG package and supported Neo4j versions"
-        }
-      ],
+      "confidence": "High",
+      "status": "Draft",
       "limitations": [
-        "Hybrid retrieval quality depends on the embedding model, full-text analyzer, candidate pool, fusion weights, graph fan-out, and relevance judgments.",
-        "Vector and full-text scores are heterogeneous and should not be compared without an explicit ranking design."
+        "Fusion behavior depends on the selected first-party package, retriever, configuration, and application workflow."
       ]
     },
     {
       "id": "EVIDENCE-30004",
       "role": "Supports",
       "strength": "Strong",
-      "confidence": "High",
-      "status": "Draft",
-      "summary": "Neo4j official architecture documents local and self-managed deployments, Aura, Enterprise clusters with primaries and secondaries, majority-based write availability, causal consistency, and edition-specific operational features.",
-      "interpretation": "The RKM profile can mark high replication and horizontal-scaling capability while qualifying sharding, security, and multi-tenancy by edition.",
+      "summary": "Neo4j architecture and edition documentation distinguishes replicated cluster topology, read scaling, and edition- or offering-specific sharding.",
+      "interpretation": "Replication and sharding are separate operational properties, and neither should be generalized beyond its documented edition or deployment scope.",
       "claimIds": [
-        "CLAIM-30004"
+        "CLAIM-30004",
+        "CLAIM-30008"
       ],
       "referenceIds": [
         "REFERENCE-30001",
@@ -1086,79 +1108,69 @@
         "REFERENCE-30013",
         "REFERENCE-30014"
       ],
-      "sourceFragments": [
-        {
-          "referenceId": "REFERENCE-30001",
-          "locator": "Current operations scope and managed Aura reference"
-        },
-        {
-          "referenceId": "REFERENCE-30008",
-          "locator": "Native graph database, ACID, cluster, and failover overview"
-        },
-        {
-          "referenceId": "REFERENCE-30009",
-          "locator": "Primary and secondary topology, majority availability, and causal consistency"
-        },
-        {
-          "referenceId": "REFERENCE-30013",
-          "locator": "Edition feature boundaries and GPLv3 Community licensing"
-        },
-        {
-          "referenceId": "REFERENCE-30014",
-          "locator": "Enterprise and Aura role-based access control"
-        }
-      ],
+      "confidence": "High",
+      "status": "Draft",
       "limitations": [
-        "Standard clustering and Infinigraph sharding are different architectures and should not be treated as interchangeable.",
-        "Community, Enterprise, and Aura limits, automation, security, and service guarantees differ."
+        "Exact topology and partitioning behavior must be verified for the selected edition, service, and version."
       ]
     },
     {
       "id": "EVIDENCE-30005",
       "role": "Supports",
       "strength": "Strong",
-      "confidence": "High",
-      "status": "Draft",
-      "summary": "Neo4j documentation describes ACID transactions, full and differential backup or restore workflows, Aura snapshots, same-transaction vector-index invisibility, and distinct Community versus commercial licensing models.",
-      "interpretation": "The RKM profile should distinguish ACID graph transactions from limited same-transaction vector-index visibility, while scoping recovery and licensing capabilities to the editions or managed services that provide them.",
+      "summary": "Neo4j transaction and vector-index documentation states that database transactions are ACID while same-transaction vector-index updates are not visible to vector queries.",
+      "interpretation": "The evidence supports a limited vector transaction profile without weakening Neo4j graph transaction guarantees.",
       "claimIds": [
         "CLAIM-30005"
       ],
       "referenceIds": [
-        "REFERENCE-30002",
+        "REFERENCE-30002"
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Post-commit vector-index visibility and indexing latency remain separate operational concerns."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30006",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j operations and Aura documentation describes separate backup, restore, snapshot, retention, and recovery workflows for self-managed and hosted deployments.",
+      "interpretation": "Recovery capability must be attributed to the edition or managed service that provides the documented workflow.",
+      "claimIds": [
+        "CLAIM-30009"
+      ],
+      "referenceIds": [
         "REFERENCE-30010",
         "REFERENCE-30011",
-        "REFERENCE-30012",
+        "REFERENCE-30012"
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Retention, cadence, availability, and restore behavior can vary by edition, Aura plan, and service configuration."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30007",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j edition documentation, the Software Agreement, the Cloud Agreement, and Aura self-service terms establish distinct licensing scopes for Community, Enterprise, and Aura.",
+      "interpretation": "The sources support separate productLicensing profiles and do not justify changing metadata.license for the RKM artifact.",
+      "claimIds": [
+        "CLAIM-30010"
+      ],
+      "referenceIds": [
         "REFERENCE-30013",
         "REFERENCE-30015",
         "REFERENCE-30016",
         "REFERENCE-30017"
       ],
-      "sourceFragments": [
-        {
-          "referenceId": "REFERENCE-30002",
-          "locator": "Vector-index same-transaction visibility limitation"
-        },
-        {
-          "referenceId": "REFERENCE-30010",
-          "locator": "ACID transaction semantics and explicit transaction routing"
-        },
-        {
-          "referenceId": "REFERENCE-30011",
-          "locator": "Community and Enterprise backup and restore capabilities"
-        },
-        {
-          "referenceId": "REFERENCE-30012",
-          "locator": "Aura snapshot cadence, storage, and restore workflows"
-        },
-        {
-          "referenceId": "REFERENCE-30013",
-          "locator": "Community GPLv3 and Enterprise feature boundaries"
-        }
-      ],
+      "confidence": "High",
+      "status": "Draft",
       "limitations": [
-        "ACID commit does not make same-transaction vector-index changes queryable through the index.",
-        "Online backup, clustering, advanced security, and snapshot behavior vary by edition or Aura tier."
+        "Applicable commercial rights and obligations depend on the executed agreement, order form, offering, and service terms."
       ]
     }
   ]
