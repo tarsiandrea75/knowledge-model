@@ -95,6 +95,124 @@ These entities may be connected through canonical relationships when the relatio
 
 ---
 
+# Modality Semantics
+
+Vector databases store and retrieve vector representations. The modality of the
+artifact from which a vector was produced must not be confused with a native
+capability of the database.
+
+A vector generated from text, code, an image, audio, video, a table or another
+artifact remains a numeric representation when it is stored in a vector
+database. The database does not thereby acquire the ability to parse,
+understand, transform or embed the original artifact.
+
+RKM must distinguish three modality-related concepts.
+
+## Embedding Source Modalities
+
+Embedding source modalities identify the kinds of artifacts that may be
+represented by vectors stored or searched through the database.
+
+Examples include:
+
+* text
+* code
+* image
+* audio
+* video
+* table
+* graph-derived data
+
+This characteristic normally belongs to the embedding model, ingestion
+pipeline, retriever or documented workload rather than to the vector database
+itself.
+
+A vector database record may mention an embedding source modality only when
+the statement is scoped as workload compatibility or embedding provenance. It
+must not be presented as native media processing by the database.
+
+## Native Payload Modalities
+
+Native payload modalities identify artifact or field types that the product
+stores, indexes or queries as first-class data in addition to numeric vectors.
+
+Examples may include:
+
+* text fields with native lexical indexing
+* JSON documents
+* relational columns
+* graph nodes and relationships
+* binary or media columns
+* collection-native data objects
+
+Native payload support requires direct product evidence. Generic metadata
+storage, opaque binary storage or the ability to attach an external URI does
+not by itself prove native modality-specific retrieval or processing.
+
+## Native Embedding Generation
+
+Native embedding generation identifies whether the product or managed service
+accepts source artifacts and generates embeddings through an integrated,
+documented capability.
+
+This knowledge must preserve:
+
+* supported source modalities
+* embedding model or provider
+* capability origin
+* product generation or API
+* edition, plan and region
+* configuration requirements
+* preview or generally available status
+* model-version, latency, quota and cost dependencies
+
+An embedding model invoked by application code is external pipeline behavior.
+A separately installed first-party package is not DBMS-core behavior. A managed
+service feature must be scoped to the service generation and plan that provide
+it.
+
+## Current `supportedModalities` Field
+
+The current `vectorDatabase.supportedModalities` field is transitional.
+
+Until the schema is migrated, it must be interpreted only as:
+
+> Embedding source modalities commonly represented by vectors in documented
+> workloads using the database.
+
+It must not be interpreted as proof that the database:
+
+* accepts raw artifacts of those modalities
+* parses or chunks those artifacts
+* generates embeddings for them
+* provides modality-specific indexing
+* understands their semantic content
+* offers equivalent native support across all listed modalities
+
+The field is therefore unsuitable by itself for ranking or capability
+comparison.
+
+`Multimodal` is not an atomic source modality. It describes a model, record or
+workflow that combines multiple modalities. A future schema should represent
+the contributing modalities explicitly rather than mixing `Multimodal` into
+the same enumeration as text, image or audio.
+
+A future schema migration should replace or supersede
+`supportedModalities` with separate structures equivalent to:
+
+~~~text
+embeddingSourceModalities
+nativePayloadModalities
+nativeEmbeddingGeneration
+~~~
+
+The migration must be performed separately from this semantic decision.
+Existing records must not be rewritten mechanically. Each future value must be
+re-established from product-specific evidence and capability-origin
+qualifiers.
+
+---
+
 # Index Support
 
 Index support describes the retrieval structures or search approaches available in the database.
@@ -227,7 +345,9 @@ The schema requires:
 
 The `identity.entityType` value must be `VectorDatabase`.
 
-The specialized `vectorDatabase` object captures domain-specific structure such as database type, deployment models, supported index types, distance metrics, supported modalities, metadata filtering, hybrid search, scalability, consistency, integration, operations, RAG usage, limitations and usage guidance.
+The specialized `vectorDatabase` object captures domain-specific structure such as database type, deployment models, supported index types, distance metrics, transitional modality information, metadata filtering, hybrid search, scalability, consistency, integration, operations, RAG usage, limitations and usage guidance.
+
+Until the modality schema migration is completed, `supportedModalities` must be interpreted according to the transitional semantics defined in this document and must not be treated as native modality processing.
 
 Shared concepts such as relationships, claims, evidence, references and external links remain outside the specialized object so they can be reused consistently across RKM entities and graph exports.
 
