@@ -34,14 +34,14 @@
     "status": "Draft",
     "visibility": "Public",
     "language": "en",
-    "version": "1.5.0"
+    "version": "1.5.1"
   },
   "metadata": {
-    "version": "1.5.0",
+    "version": "1.5.1",
     "schemaVersion": "1.0.0",
     "repositoryVersion": "1.0.0",
     "status": "Draft",
-    "reviewState": "Changes Requested",
+    "reviewState": "Approved",
     "createdAt": "2026-07-17T00:00:00Z",
     "updatedAt": "2026-07-18T00:00:00Z",
     "createdBy": [
