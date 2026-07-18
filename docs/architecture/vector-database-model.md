@@ -253,24 +253,183 @@ Compatibility should be modeled through structured fields and canonical relation
 
 ---
 
-# Filtering and Hybrid Search
+# Filtering, Hybrid Retrieval and Graph Augmentation
+
+Filtering, hybrid retrieval and graph augmentation are distinct retrieval
+concepts. They must not be collapsed into one product-level boolean.
+
+## Filtering
 
 Filtering defines which stored objects are eligible for retrieval.
 
-Hybrid search combines vector retrieval with other retrieval signals such as sparse lexical search, full-text search, metadata constraints, graph constraints or rule-based filters.
+A filter constrains a candidate population through metadata, document fields,
+labels, tenant identifiers, access-control predicates, dates, regions or other
+structured conditions.
 
-Filtering and hybrid search knowledge should be structured when it affects:
+Filtering does not become hybrid retrieval merely because it is used together
+with vector search. A filter normally changes candidate eligibility rather
+than contributing an independent ranked retrieval signal.
 
-* tenant isolation
-* access control
-* document freshness
-* source selection
-* jurisdiction or region constraints
-* metadata predicates
-* sparse-dense score fusion
-* retrieval reproducibility
+RKM should distinguish:
 
-Filtering behavior should not be collapsed into general feature prose when it explains why one RAG workflow returns different context from another.
+* pre-filtering applied before or during candidate selection
+* post-filtering applied after candidate selection
+* static index scope established when an index is created
+* dynamic query-time filtering
+* database-side filtering
+* application-side filtering
+* over-fetch behavior required to preserve the requested result count
+
+## Hybrid Retrieval
+
+Hybrid Retrieval combines two or more independently meaningful retrieval
+channels whose candidates, ranks or scores are merged, fused or reranked.
+
+In the canonical RKM usage, the primary hybrid pattern combines:
+
+* dense vector or semantic retrieval
+* sparse, lexical, keyword or full-text retrieval
+
+Examples include:
+
+* dense-vector plus sparse-vector retrieval
+* vector similarity plus BM25 or BM25F retrieval
+* lexical and vector candidate lists merged through Reciprocal Rank Fusion
+* score-bearing retrieval channels combined through weighted linear fusion
+* multiple independently executed retrievers followed by a documented fusion
+  or reranking stage
+
+A capability must not be classified as Hybrid Retrieval merely because a
+single query also contains:
+
+* metadata filters
+* graph predicates
+* access-control conditions
+* rule-based eligibility constraints
+* traversal after candidate retrieval
+* application logic that does not combine independent retrieval channels
+
+Hybrid support must preserve:
+
+* retrieval channels
+* candidate-generation stage
+* fusion or reranking method
+* score or rank semantics
+* capability origin
+* execution boundary
+* version, edition, plan and configuration
+* whether the operation is automatic, configurable or application-defined
+
+## Vector-Graph Composition
+
+Vector-Graph Composition starts with vector candidates, graph candidates or
+both and uses graph structure to expand, constrain, connect, explain or
+contextualize retrieved entities.
+
+Examples include:
+
+* vector retrieval followed by neighborhood expansion
+* vector candidates constrained by graph labels or relationships
+* path traversal from semantically matched entities
+* graph algorithms applied before or after vector retrieval
+* connected-context assembly for GraphRAG
+* graph-derived reranking or heuristic scoring
+
+Vector-Graph Composition is valuable retrieval behavior, but it is not
+synonymous with canonical dense-sparse Hybrid Retrieval.
+
+A product may support Vector-Graph Composition without providing:
+
+* BM25 or lexical retrieval
+* sparse-vector retrieval
+* ranked-list fusion
+* score normalization
+* a built-in hybrid ranker
+
+RKM should eventually represent this capability through a separate structure
+equivalent to:
+
+~~~text
+graphAugmentedRetrieval
+vectorGraphComposition
+~~~
+
+## Capability Origin
+
+Every hybrid or graph-augmented capability must identify where it is
+implemented.
+
+Valid capability origins include:
+
+* DBMS or service core
+* edition-specific product feature
+* managed-service generation or plan
+* first-party but separately installed library
+* embedded external search component
+* query-language composition
+* application-side orchestration
+
+A first-party package must not be reported as DBMS-core behavior solely because
+it is published by the same vendor.
+
+A workflow that can be assembled by user code must not be reported as a native
+automatic fusion capability.
+
+## Score Normalization
+
+Score normalization is meaningful only when multiple score-bearing retrieval
+channels are combined.
+
+RKM must distinguish:
+
+* no score combination
+* rank-based fusion that does not require raw-score normalization
+* built-in score normalization
+* configurable score normalization
+* first-party library normalization
+* explicit query-expression normalization
+* application-side normalization
+* unknown or undocumented behavior
+
+`scoreNormalizationSupported` must not be interpreted as proof that all hybrid
+methods use normalization. Reciprocal Rank Fusion, weighted score fusion and
+graph traversal have different score requirements.
+
+## Current `hybridSearch` Field
+
+The current `vectorDatabase.hybridSearch` field is transitional.
+
+Until the schema is migrated:
+
+* `supported: true` should mean that a documented multi-channel retrieval
+  workflow exists, not that every method is DBMS-core
+* each method must be interpreted together with claims, evidence and capability
+  origin
+* `Graph Plus Vector` must be treated as a legacy classification for
+  Vector-Graph Composition, not as canonical dense-sparse Hybrid Retrieval
+* metadata filtering must not be treated as a hybrid method
+* `scoreNormalizationSupported` must be scoped to a concrete fusion method and
+  implementation boundary
+
+The current field is unsuitable by itself for capability ranking.
+
+A future schema migration should separate structures equivalent to:
+
+~~~text
+hybridRetrieval
+graphAugmentedRetrieval
+capabilityOrigin
+fusionMethods
+scoreHandling
+~~~
+
+Existing records must not be rewritten mechanically. Hybrid, graph-augmented
+and score-handling values must be re-established from product-specific
+evidence.
+
+Filtering, fusion and graph augmentation should remain structured whenever
+they affect tenant isolation, access control, freshness, source selection,
+candidate completeness, ranking, explainability or retrieval reproducibility.
 
 ---
 
