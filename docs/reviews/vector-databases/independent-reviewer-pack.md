@@ -1,5 +1,13 @@
 # RKM Vector Database Independent Reviewer Pack
 
+## Historical snapshot and current-state notice
+
+> **Historical scope.** This Reviewer Pack is a historical, commit-bound comparison snapshot bound to baseline commit `74ca2d05ff02e051fafab189e0fcbc07892d3596`. Its `Not Reviewed` and other lifecycle statements describe that historical baseline, including the Neo4j Git blob `24082b87e8ae4aafe17aa7abd6d00a101c25e828` with SHA-256 `8f59da948793cf956c78d1c5754608b4d38983b9d82b14d7640f17d12ccc85b7`; they must not be interpreted as Neo4j's current state. The historical pack remains authoritative for its pinned comparison and is not erroneous merely because later commits changed the canonical record.
+>
+> **Current Neo4j state.** Neo4j is currently version `1.5.1` with review state `Approved`. The canonical JSON record, [data/vector-databases/neo4j.json](../../../data/vector-databases/neo4j.json), is the sole authority for current lifecycle state. That current record is bound to SHA-256 `6ea8eb9ac34d995c3759a71ce7cf43e7c8ee6445947720bbb71354b3bb473e55`, Git blob `c98ac1e352e216b712ccd2f3cdd84d9f9b986d82`, and approval commit `a617864fff7f56b25f3a37ab259d727275648de4`.
+>
+> **Acceptance provenance and scope.** [docs/reviews/vector-databases/neo4j-1.5.1-independent-acceptance.md](neo4j-1.5.1-independent-acceptance.md) records the durable independent acceptance and approval chain. Neo4j's current approval implies no current approval for the other sixteen `VectorDatabase` records.
+
 ## Purpose
 
 Review canonical VectorDatabase records independently from their creation.
