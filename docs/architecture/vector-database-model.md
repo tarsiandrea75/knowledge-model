@@ -356,24 +356,256 @@ vectorGraphComposition
 
 ## Capability Origin
 
-Every hybrid or graph-augmented capability must identify where it is
-implemented.
+Every material vector-database capability must identify where it is
+implemented and under which product boundary it is available.
 
-Valid capability origins include:
+Capability origin applies not only to hybrid or graph-augmented retrieval but
+also to:
 
-* DBMS or service core
-* edition-specific product feature
-* managed-service generation or plan
-* first-party but separately installed library
-* embedded external search component
-* query-language composition
-* application-side orchestration
+* vector data types
+* index families
+* distance metrics
+* filtering
+* lexical or sparse retrieval
+* fusion and reranking
+* embedding generation
+* graph traversal
+* transactions and consistency
+* replication and scaling
+* backup and recovery
+* security and access control
+* observability
+* multi-tenancy
+* deployment automation
+
+RKM must distinguish the following capability origins.
+
+### Product Core
+
+The capability is implemented by the database engine or managed service being
+described and is available through its documented primary interface.
+
+Examples include:
+
+* a DBMS-native vector data type
+* a built-in vector index
+* a service-native filtering API
+* a core query-language operator
+* a built-in replication mechanism
+
+Product-core classification still requires version and deployment qualifiers.
+A feature in one major release must not be projected onto earlier releases.
+
+### Edition-Specific Product Feature
+
+The capability is implemented by the product but is available only in a named
+edition, license tier or commercial distribution.
+
+Examples include:
+
+* Enterprise-only clustering
+* edition-specific native vector storage
+* commercial backup tooling
+* advanced security or monitoring
+* edition-specific sharding
+
+The record must identify the edition boundary instead of assigning the
+capability to every deployment of the product.
+
+### Managed-Service Capability
+
+The capability is supplied by a hosted service rather than by every
+self-managed deployment of the underlying engine.
+
+The record should preserve:
+
+* service name
+* resource generation or API family
+* plan or pricing tier
+* region
+* preview or generally available status
+* provider-managed dependencies
+* quotas and lifecycle constraints
+
+A managed backup, autoscaling or security feature must not be projected onto
+the open-source or self-hosted engine.
+
+### Host-Platform Capability
+
+The capability is inherited from a host database, runtime or platform on which
+the represented vector extension or subsystem depends.
+
+Examples include:
+
+* PostgreSQL transactions used by pgvector
+* host-database replication
+* host-database backup and recovery
+* Kubernetes scheduling
+* cloud identity and network controls
+
+The capability belongs to the host boundary and must not be presented as an
+independent implementation by the vector extension.
+
+### First-Party Optional Package
+
+The capability is delivered by the same vendor or project through a separately
+installed library, package, SDK, plugin, module or toolkit.
+
+Examples include:
+
+* a GraphRAG retriever package
+* an optional search plugin
+* a vendor-maintained integration library
+* a separately installed algorithm module
+
+First-party ownership does not make an optional package part of the DBMS core.
+The package name, version, installation requirement and supported product
+versions should be retained.
+
+### Third-Party Extension or Integration
+
+The capability depends on software maintained outside the represented product
+boundary.
+
+Examples include:
+
+* third-party plugins
+* community adapters
+* external rerankers
+* external embedding services
+* separately operated lexical-search systems
+* external orchestration frameworks
+
+The record must not imply that the primary product provides operational
+support, lifecycle management or compatibility guarantees for the external
+component unless evidence explicitly says so.
+
+### Embedded External Component
+
+The product ships with or invokes another search, indexing or model component
+inside its supported distribution.
+
+Examples include:
+
+* an embedded search engine
+* an ANN library used by the vector subsystem
+* a bundled model runtime
+* an internal indexing service
+
+RKM should preserve both the product-facing capability and the implementation
+dependency when that dependency affects licensing, compatibility, performance,
+failure behavior or upgrade risk.
+
+### Query-Language Composition
+
+The capability can be expressed through the product query language by
+combining lower-level primitives, but it is not a single automatic product
+operation.
+
+Examples include:
+
+* SQL combining full-text and vector candidates
+* Cypher combining vector retrieval and graph traversal
+* user-authored score expressions
+* query-defined normalization
+* explicit candidate unions
+
+Query-language composability is stronger than purely external orchestration,
+but it must not be reported as a built-in automatic ranker, fusion pipeline or
+workflow.
+
+### Application-Side Orchestration
+
+The capability exists only because application code coordinates multiple
+queries, components or systems.
+
+Examples include:
+
+* application-side reciprocal-rank fusion
+* client-side score normalization
+* over-fetch and post-filter loops
+* cross-database retrieval
+* external graph expansion
+* workflow-managed retries or failover
+
+The product may enable the workflow, but the application owns its correctness,
+latency, availability, security and reproducibility.
+
+### Unknown or Unverified Origin
+
+Use an unknown or unverified classification when available evidence proves
+that a capability exists but does not establish its implementation boundary.
+
+Unknown origin must not be silently interpreted as product core.
+
+## Origin Is Independent From Support Strength
+
+Capability origin and support strength are separate dimensions.
+
+For example:
+
+* an application-side workflow may be well documented and strongly supported
+* a product-core feature may be preview, constrained or poorly documented
+* a first-party package may be production-ready but independently versioned
+* a managed-service feature may be generally available in only some regions
+
+RKM must therefore avoid deriving confidence, maturity or quality directly
+from origin.
+
+## Required Origin Qualifiers
+
+When origin affects comparison or adoption, claims and evidence should preserve:
+
+* origin category
+* product or component name
+* version
+* edition
+* plan or tier
+* deployment model
+* API or resource generation
+* region
+* installation requirement
+* configuration requirement
+* release status
+* supporting reference
+
+These qualifiers may initially remain in claims and evidence until the schema
+provides a dedicated capability-origin structure.
+
+## Current Schema Limitation
+
+The current vector-database schema has no canonical `capabilityOrigin`
+structure.
+
+Until that structure exists:
+
+* origin must be stated explicitly in claims, evidence, limitations or usage
+  guidance
+* deployment models must not be used as a substitute for origin
+* vendor ownership must not be used as proof of product-core implementation
+* service capabilities must not be generalized to self-hosted deployments
+* host-platform capabilities must not be attributed solely to an extension
+* query-language composition must not be described as automatic native fusion
+* application-side orchestration must not be described as built-in behavior
+
+A future schema migration should introduce structures equivalent to:
+
+~~~text
+capabilities
+capabilityOrigin
+availabilityScope
+implementationBoundary
+maturityStatus
+~~~
+
+Existing records must not be migrated through blanket defaults. Each material
+capability must be re-established from product-specific evidence.
 
 A first-party package must not be reported as DBMS-core behavior solely because
 it is published by the same vendor.
 
 A workflow that can be assembled by user code must not be reported as a native
-automatic fusion capability.
+automatic capability.
 
 ## Score Normalization
 
