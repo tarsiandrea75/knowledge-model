@@ -34,10 +34,10 @@
     "status": "Draft",
     "visibility": "Public",
     "language": "en",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "metadata": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "schemaVersion": "1.0.0",
     "repositoryVersion": "1.0.0",
     "status": "Draft",
@@ -70,8 +70,8 @@
     }
   },
   "description": {
-    "summary": "Neo4j is a native property-graph database with Lucene-powered vector indexes for nodes and relationships, filtered ANN search, full-text and vector hybrid retrieval, and graph traversal through Cypher.",
-    "description": "Neo4j combines native graph storage and traversal, Cypher querying, ACID transactions, vector indexes, full-text indexes, managed Aura deployments, and enterprise clustering. Neo4j 2026.06 supports HNSW-based approximate vector search over node or relationship properties, native VECTOR values in eligible editions, cosine or Euclidean similarity, scalar quantization, preview binary quantization, filterable vector indexes, and the Cypher SEARCH clause. First-party GraphRAG retrievers can combine vector search, full-text retrieval, and graph traversal so semantically matched entities can be expanded through their relationships. This record separates database transaction guarantees from vector-index visibility, Community from Enterprise and Aura capabilities, standard cluster replication from edition-specific sharding, and generic graph-plus-vector potential from workload-specific retrieval quality."
+    "summary": "Neo4j is a native property-graph database with Lucene HNSW vector indexes, Cypher filtering and graph traversal, and separately scoped lexical-vector fusion through Cypher or neo4j-graphrag.",
+    "description": "Neo4j combines native graph storage and traversal, Cypher querying, ACID transactions, vector and full-text indexes, self-managed Community and Enterprise editions, the Infinigraph offering, and managed Aura services. Neo4j 2026.06 supports approximate vector search over node or relationship properties with cosine or Euclidean similarity, generally available scalar quantization, preview binary quantization, and preview vector.default_search_expansion_factor. Community stores indexed embeddings as supported numeric lists; native VECTOR property storage requires Enterprise block format or Aura. Lexical-vector hybrid retrieval has two distinct first-party origins in this record: ranked-list composition written directly in Cypher using weighted reciprocal-rank fusion, and configurable fusion in the separately installed neo4j-graphrag 1.17.0 package. Vector-Graph Composition remains a separate Cypher traversal pattern. Operational capabilities are scoped to Community, Enterprise, Infinigraph, Aura plans, and deployment boundaries instead of being summarized by product-wide ratings."
   },
   "vectorDatabase": {
     "databaseType": "Graph Database With Vector Support",
@@ -123,13 +123,62 @@
             "Managed Service"
           ],
           "configurationRequired": true,
-          "notes": "Binary quantization is preview and advanced controls are version-specific."
+          "notes": "The vector-index capability is generally available. Binary quantization and vector.default_search_expansion_factor are separately scoped Preview features in Neo4j 2026.06. Native VECTOR property storage requires Enterprise block format or Aura; Community can index supported numeric-list properties."
         },
         "maturityStatus": "Generally Available",
         "constraints": [
           {
             "constraintType": "Other",
             "description": "Approximate search must be benchmarked for recall and result completeness."
+          }
+        ]
+      },
+      {
+        "capabilityId": "vector-search-expansion-control",
+        "name": "Vector Search Expansion Control",
+        "capabilityType": "Retrieval Capability",
+        "statement": "Configures the vector.default_search_expansion_factor used to query more neighbors than are returned.",
+        "boundary": {
+          "behavior": "Scales the vector-index neighbor search while retaining the requested result count.",
+          "excludedResponsibilities": [
+            "Changing the maturity of the generally available vector-index capability",
+            "Guaranteeing workload-independent recall improvement"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Neo4j 2026.06 vector-2026.06 index provider",
+          "implementationName": "vector.default_search_expansion_factor"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Preview",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Values above 1.0 can increase accuracy at the cost of query time, and defaults depend on the quantization type."
           }
         ]
       },
@@ -181,7 +230,7 @@
         "capabilityId": "full-text-vector-fusion",
         "name": "Full-Text and Vector Fusion",
         "capabilityType": "Ranking Capability",
-        "statement": "Combines full-text and vector candidates through weighted linear ranking.",
+        "statement": "Combines full-text and vector candidates through configurable fusion in neo4j-graphrag 1.17.0.",
         "boundary": {
           "behavior": "Executes lexical-vector fusion through Neo4j GraphRAG for Python."
         },
@@ -201,9 +250,13 @@
         },
         "capabilityOrigin": {
           "originType": "First-Party Optional Package",
-          "implementationBoundary": "Separately installed Neo4j GraphRAG for Python package"
+          "implementationBoundary": "Separately installed neo4j-graphrag Python package",
+          "implementationName": "neo4j-graphrag 1.17.0"
         },
         "availabilityScope": {
+          "versions": [
+            "neo4j-graphrag 1.17.0"
+          ],
           "deploymentModels": [
             "Local",
             "Self Hosted",
@@ -217,6 +270,63 @@
           {
             "constraintType": "Other",
             "description": "Quality depends on analyzers, embeddings, candidate pools and weights."
+          }
+        ]
+      },
+      {
+        "capabilityId": "cypher-full-text-vector-wrrf",
+        "name": "Cypher Full-Text and Vector WRRF",
+        "capabilityType": "Ranking Capability",
+        "statement": "Combines independently ranked full-text and vector candidate lists in Cypher using weighted reciprocal-rank fusion.",
+        "boundary": {
+          "behavior": "Executes full-text and vector retrieval branches and fuses their ranks in a user-authored Cypher query.",
+          "includedResponsibilities": [
+            "Independent source ranking",
+            "Weighted reciprocal-rank contribution calculation",
+            "Candidate deduplication and final ordering"
+          ],
+          "excludedResponsibilities": [
+            "A separate hybrid index type",
+            "Automatic DBMS-core fusion",
+            "Raw-score normalization"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Retrieval",
+            "Reranking"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Query-Language Composition",
+          "implementationBoundary": "User-authored Cypher combining Neo4j full-text and vector retrieval primitives",
+          "implementationName": "Weighted reciprocal-rank fusion Cypher pattern"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06",
+            "Cypher 25"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Source candidate counts, rrfConstant, source weights, tie-breaking and security filtering remain query-defined and workload-specific."
           }
         ]
       },
@@ -271,7 +381,17 @@
         "capabilityType": "Operational Capability",
         "statement": "Provides replicated primaries and read-scaling secondaries.",
         "boundary": {
-          "behavior": "Provides Enterprise cluster replication and causal-consistency support."
+          "behavior": "Provides Enterprise cluster replication and bookmark-mediated causal consistency.",
+          "includedResponsibilities": [
+            "Synchronous replication from the writer to enough primaries before commit",
+            "Asynchronous transaction-log replication to read-scaling secondaries",
+            "Read-your-own-writes routing through bookmarks when causal consistency is invoked"
+          ],
+          "excludedResponsibilities": [
+            "Universal replication across Community and all Aura plans",
+            "Immediate visibility of recent commits on an unbookmarked secondary",
+            "Automatic property sharding"
+          ]
         },
         "scope": {
           "ragStages": [
@@ -306,7 +426,117 @@
         "constraints": [
           {
             "constraintType": "Other",
-            "description": "Standard clustering must not be equated with automatic sharding."
+            "description": "Secondaries replicate asynchronously and can lag; standard clustering must not be equated with automatic sharding."
+          }
+        ]
+      },
+      {
+        "capabilityId": "infinigraph-property-sharding",
+        "name": "Infinigraph Property Sharding",
+        "capabilityType": "Operational Capability",
+        "statement": "Distributes graph property data across property shards while retaining a logical graph boundary.",
+        "boundary": {
+          "behavior": "Provides automatic property sharding through the specialized Infinigraph Enterprise offering.",
+          "excludedResponsibilities": [
+            "Standard Enterprise cluster replication",
+            "Community Edition scaling",
+            "Aura deployment"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Enterprise Edition with Infinigraph subscription",
+          "implementationName": "Infinigraph sharded property database"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Enterprise Edition with Infinigraph"
+          ],
+          "plansOrTiers": [
+            "Infinigraph subscription"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ],
+          "configurationRequired": true,
+          "notes": "Introduced in Neo4j 2025.12, requires a separate subscription, and is not available on Aura."
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Property sharding has feature-specific limitations and must be validated for the target vector-index and access-control workload."
+          }
+        ]
+      },
+      {
+        "capabilityId": "lucene-vector-index-storage-cache",
+        "name": "Lucene Vector-Index Storage and Filesystem Cache",
+        "capabilityType": "Storage Capability",
+        "statement": "Persists Lucene-backed vector-index files and serves them through the operating-system filesystem cache when resident.",
+        "boundary": {
+          "behavior": "Stores vector-index files on disk and relies on the operating-system filesystem cache for query-time residency.",
+          "includedResponsibilities": [
+            "Persistent Lucene vector-index files",
+            "Filesystem-cache warming",
+            "Disk reads on cache misses"
+          ],
+          "excludedResponsibilities": [
+            "A dedicated disk-oriented ANN architecture",
+            "A guarantee that vector queries avoid disk I/O",
+            "Neo4j page-cache residency for Lucene vector-index files"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Embedded External Component",
+          "implementationBoundary": "Lucene-backed Neo4j vector-index subsystem and host operating-system filesystem cache",
+          "implementationName": "Lucene vector-index files"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "notes": "Aura uses the same product-facing vector-index behavior, but its storage and cache provisioning are provider managed and are not characterized here."
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Insufficient RAM for the filesystem cache increases disk reads and can degrade search latency; restart clears the warm filesystem cache."
           }
         ]
       },
@@ -355,12 +585,66 @@
         ]
       },
       {
+        "capabilityId": "community-offline-dump-load",
+        "name": "Community Offline Dump and Load",
+        "capabilityType": "Operational Capability",
+        "statement": "Creates and restores offline database dump archives in Community Edition.",
+        "boundary": {
+          "behavior": "Provides offline full dump and load workflows for a Community database.",
+          "excludedResponsibilities": [
+            "Online backup",
+            "Differential backup",
+            "Aura snapshots"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Command Line"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Community neo4j-admin dump and load tooling"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Community Edition"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Other",
+            "description": "Dump requires an offline database and does not include users or roles metadata."
+          }
+        ]
+      },
+      {
         "capabilityId": "enterprise-backup-restore",
         "name": "Enterprise Backup and Restore",
         "capabilityType": "Operational Capability",
         "statement": "Provides full and differential backup and restore workflows.",
         "boundary": {
-          "behavior": "Creates and restores self-hosted Enterprise database backups."
+          "behavior": "Creates and restores self-hosted Enterprise database backups.",
+          "excludedResponsibilities": [
+            "Community offline dump and load",
+            "Aura provider-managed snapshots"
+          ]
         },
         "scope": {
           "ragStages": [
@@ -421,16 +705,388 @@
           "implementationBoundary": "Neo4j Aura managed service"
         },
         "availabilityScope": {
+          "plansOrTiers": [
+            "AuraDB Free",
+            "AuraDB Professional",
+            "AuraDB Business Critical",
+            "AuraDB Virtual Dedicated Cloud",
+            "AuraDS Professional",
+            "AuraDS Enterprise"
+          ],
           "deploymentModels": [
             "Managed Service"
           ],
-          "notes": "Retention and automation depend on the selected Aura service and tier."
+          "notes": "Free provides on-demand snapshots; scheduled cadence, retention, restore, export, and create-from-snapshot behavior vary across Professional, Business Critical, Virtual Dedicated Cloud, AuraDS Professional, and AuraDS Enterprise."
         },
-        "maturityStatus": "Unknown",
+        "maturityStatus": "Generally Available",
         "constraints": [
           {
             "constraintType": "Other",
             "description": "The capability depends on provider lifecycle, tier and region."
+          }
+        ]
+      },
+      {
+        "capabilityId": "enterprise-aura-advanced-access-control",
+        "name": "Enterprise and Applicable Aura Advanced Access Control",
+        "capabilityType": "Security Capability",
+        "statement": "Provides role-based and fine-grained graph privileges in Enterprise Edition and applicable Aura tiers.",
+        "boundary": {
+          "behavior": "Authorizes graph and administrative operations through roles and privileges.",
+          "excludedResponsibilities": [
+            "Community Edition feature parity",
+            "Automatic tenant isolation",
+            "A guarantee that vector or full-text indexes return the requested result count under security restrictions"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime",
+            "Managed Platform"
+          ],
+          "deploymentModels": [
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "accessModel": "Authorized"
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Enterprise authorization engine and applicable Aura database tiers"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Enterprise Edition",
+            "Enterprise Edition with Infinigraph"
+          ],
+          "plansOrTiers": [
+            "AuraDB Business Critical",
+            "AuraDB Virtual Dedicated Cloud"
+          ],
+          "deploymentModels": [
+            "Self Hosted",
+            "Managed Service"
+          ],
+          "configurationRequired": true,
+          "notes": "Community provides a smaller authentication and authorization subset; property-based access control is documented for Enterprise, AuraDB Business Critical, and AuraDB Virtual Dedicated Cloud and is not supported for sharded property databases."
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Governance Requirement",
+            "description": "Security privileges must be tested with vector and full-text retrieval because index-backed searches can return fewer results under restrictions."
+          }
+        ]
+      },
+      {
+        "capabilityId": "self-managed-transport-volume-protection",
+        "name": "Self-Managed Transport and Volume Protection",
+        "capabilityType": "Security Capability",
+        "statement": "Supports configurable TLS for Neo4j communication channels while relying on the operator for volume encryption at rest.",
+        "boundary": {
+          "behavior": "Configures TLS for Bolt, HTTPS, cluster, and backup channels and documents operator-managed protection for stored files.",
+          "excludedResponsibilities": [
+            "Provider-managed encryption at rest",
+            "Automatic certificate lifecycle management",
+            "Aura encryption"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "accessModel": "Authenticated"
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Neo4j SSL framework plus operator-managed host or storage volume encryption",
+          "notes": "TLS is a Neo4j configuration surface; volume encryption is supplied by the deployment platform or operator rather than by a universal Neo4j at-rest-encryption feature."
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Community Edition",
+            "Enterprise Edition",
+            "Enterprise Edition with Infinigraph"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Provider Dependency",
+            "description": "At-rest encryption strength, key management, backup protection and certificate operations depend on the host platform and operator configuration."
+          }
+        ]
+      },
+      {
+        "capabilityId": "aura-managed-encryption",
+        "name": "Aura Managed Encryption",
+        "capabilityType": "Security Capability",
+        "statement": "Encrypts Aura stored data, backups, intra-cluster traffic, and client connections inside the managed-service boundary.",
+        "boundary": {
+          "behavior": "Provides provider-managed encryption in transit and at rest for Aura instances and backups.",
+          "excludedResponsibilities": [
+            "Self-managed Neo4j deployments",
+            "Universal availability of customer-managed keys"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Managed Platform"
+          ],
+          "deploymentModels": [
+            "Managed Service"
+          ],
+          "accessModel": "Provider Managed"
+        },
+        "capabilityOrigin": {
+          "originType": "Managed-Service Capability",
+          "implementationBoundary": "Neo4j Aura and its underlying cloud-provider encryption services"
+        },
+        "availabilityScope": {
+          "plansOrTiers": [
+            "AuraDB Free",
+            "AuraDB Professional",
+            "AuraDB Business Critical",
+            "AuraDB Virtual Dedicated Cloud",
+            "AuraDS Professional",
+            "AuraDS Enterprise"
+          ],
+          "deploymentModels": [
+            "Managed Service"
+          ],
+          "notes": "Customer-managed key availability is tier- and cloud-dependent and is not generalized by this capability."
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Provider Dependency",
+            "description": "Key-management options and isolation controls depend on the selected Aura tier, cloud provider, region, and contract."
+          }
+        ]
+      },
+      {
+        "capabilityId": "self-managed-basic-logging",
+        "name": "Self-Managed Basic Logging",
+        "capabilityType": "Monitoring Capability",
+        "statement": "Writes general, debug, HTTP, garbage-collection, and edition-dependent operational logs for self-managed deployments.",
+        "boundary": {
+          "behavior": "Emits configured server log files for operational diagnosis.",
+          "excludedResponsibilities": [
+            "Enterprise metrics endpoints",
+            "Guaranteed external log aggregation",
+            "Aura managed monitoring"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Product Core",
+          "implementationBoundary": "Neo4j self-managed logging subsystem"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Community Edition",
+            "Enterprise Edition",
+            "Enterprise Edition with Infinigraph"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "configurationRequired": true,
+          "notes": "Query and security logs are Enterprise features; the exact enabled log set and defaults differ by log type."
+        },
+        "maturityStatus": "Generally Available"
+      },
+      {
+        "capabilityId": "enterprise-metrics-monitoring",
+        "name": "Enterprise Metrics Monitoring",
+        "capabilityType": "Monitoring Capability",
+        "statement": "Exposes DBMS and per-database metrics through Enterprise monitoring facilities.",
+        "boundary": {
+          "behavior": "Provides Enterprise metrics through CSV, JMX, Graphite, Prometheus, or Neo4j Ops Manager integrations.",
+          "excludedResponsibilities": [
+            "Community feature parity",
+            "Aura plan-specific monitoring",
+            "External monitoring-system operation"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ]
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j Enterprise metrics subsystem"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Enterprise Edition",
+            "Enterprise Edition with Infinigraph"
+          ],
+          "deploymentModels": [
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Provider Dependency",
+            "description": "Prometheus, Graphite, dashboards, alerting, retention and incident response require separately operated monitoring infrastructure."
+          }
+        ]
+      },
+      {
+        "capabilityId": "edition-scoped-database-partitioning",
+        "name": "Edition-Scoped Database Partitioning",
+        "capabilityType": "Operational Capability",
+        "statement": "Provides one standard database in Community and multiple standard or composite databases in Enterprise.",
+        "boundary": {
+          "behavior": "Partitions administrative and transaction domains through databases and Enterprise composite databases.",
+          "excludedResponsibilities": [
+            "Automatic tenant isolation",
+            "Cross-database write transactions",
+            "Infinigraph property sharding"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval"
+          ],
+          "runtimeEnvironments": [
+            "Database Runtime"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "accessModel": "Authorized"
+        },
+        "capabilityOrigin": {
+          "originType": "Edition-Specific Product Feature",
+          "implementationBoundary": "Neo4j database-administration subsystem"
+        },
+        "availabilityScope": {
+          "versions": [
+            "Neo4j 2026.06"
+          ],
+          "editions": [
+            "Community Edition: exactly one standard database",
+            "Enterprise Edition: any number of standard databases and composite databases"
+          ],
+          "deploymentModels": [
+            "Local",
+            "Self Hosted"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Governance Requirement",
+            "description": "A database boundary is an administrative and transaction boundary, not sufficient evidence of secure multi-tenancy by itself."
+          }
+        ]
+      },
+      {
+        "capabilityId": "aura-vdc-deployment-isolation",
+        "name": "Aura Virtual Dedicated Cloud Isolation",
+        "capabilityType": "Security Capability",
+        "statement": "Provides dedicated cloud-account or subscription boundaries and VPC isolation for AuraDB Virtual Dedicated Cloud.",
+        "boundary": {
+          "behavior": "Isolates an Aura deployment through dedicated cloud and network boundaries.",
+          "excludedResponsibilities": [
+            "Aura Free, Professional, or Business Critical equivalence",
+            "Application-level tenant authorization",
+            "Self-managed deployment isolation"
+          ]
+        },
+        "scope": {
+          "ragStages": [
+            "Indexing",
+            "Retrieval",
+            "Monitoring"
+          ],
+          "runtimeEnvironments": [
+            "Managed Platform"
+          ],
+          "deploymentModels": [
+            "Managed Service"
+          ],
+          "accessModel": "Tenant Scoped"
+        },
+        "capabilityOrigin": {
+          "originType": "Managed-Service Capability",
+          "implementationBoundary": "AuraDB Virtual Dedicated Cloud"
+        },
+        "availabilityScope": {
+          "plansOrTiers": [
+            "AuraDB Virtual Dedicated Cloud"
+          ],
+          "deploymentModels": [
+            "Managed Service"
+          ],
+          "configurationRequired": true
+        },
+        "maturityStatus": "Generally Available",
+        "constraints": [
+          {
+            "constraintType": "Provider Dependency",
+            "description": "Private endpoints, public-traffic settings, regions and cloud-network controls require plan-specific configuration."
           }
         ]
       }
@@ -446,8 +1102,7 @@
           ]
         },
         "licenseModel": "Open Source License",
-        "spdxExpression": "GPL-3.0-only",
-        "licenseName": "GNU General Public License v3.0",
+        "licenseName": "GPLv3",
         "referenceIds": [
           "REFERENCE-30013"
         ],
@@ -506,20 +1161,9 @@
     "hybridSearch": {
       "supported": true,
       "methods": [
-        "BM25 Plus Vector",
+        "Reciprocal Rank Fusion",
         "Weighted Score Fusion"
       ]
-    },
-    "scalability": {
-      "replicationSupported": true,
-      "diskBackedIndexingSupported": true
-    },
-    "consistency": {
-      "consistencyModel": "Configurable",
-      "upsertsSupported": true,
-      "deletesSupported": true,
-      "streamingUpdatesSupported": true,
-      "transactionSupport": "Limited"
     },
     "integration": {
       "apis": [
@@ -536,13 +1180,6 @@
         "Other"
       ]
     },
-    "operations": {
-      "accessControl": "Variable",
-      "encryption": "High",
-      "backupAndRestore": "High",
-      "observability": "High",
-      "multiTenancy": "Variable"
-    },
     "ragUsage": {
       "recommendedStages": [
         "Indexing",
@@ -558,16 +1195,16 @@
         "Long Term Memory"
       ],
       "indexingConsiderations": [
-        "Choose vector dimensions, coordinate type, cosine or Euclidean similarity, scalar or binary quantization, HNSW M, and ef_construction only after measuring recall, latency, memory, disk, and population time.",
+        "Choose vector dimensions, coordinate type, cosine or Euclidean similarity, quantization type, HNSW M, ef_construction, and the preview search-expansion factor only after measuring recall, latency, memory, disk, and population time.",
         "Model nodes, relationships, labels, relationship types, identifiers, provenance, and embedding ownership before creating vector and full-text indexes.",
         "Use native VECTOR values only where the selected Neo4j edition, store format, Cypher version, and driver path support them; otherwise use supported numeric-list properties.",
         "Declare additional filterable properties in the vector-index schema when in-index filtering is required, and preserve their type and null semantics across ingestion.",
-        "Plan page cache, heap, Lucene index storage, transaction logs, replicas, backups, and graph traversal working sets together rather than sizing vector indexes in isolation."
+        "For self-managed deployments, plan page cache, heap, persistent Lucene vector-index files, operating-system filesystem cache, transaction logs, replicas, backups, and graph traversal working sets together rather than treating Neo4j as a dedicated disk-oriented ANN system."
       ],
       "retrievalConsiderations": [
-        "Evaluate vector-only, full-text-only, graph traversal, hybrid full-text-vector, and vector-plus-Cypher retrieval on the same relevance set.",
+        "Evaluate vector-only, full-text-only, Cypher WRRF, neo4j-graphrag fusion, and Vector-Graph Composition on the same relevance set without treating graph traversal as lexical-vector hybrid retrieval.",
         "Distinguish SEARCH-clause in-index filters from outer Cypher WHERE post-filters because they change result completeness and query cost.",
-        "Tune top-k, search expansion, quantization, full-text candidate windows, linear fusion weights, and graph expansion depth under representative load.",
+        "Tune top-k, the preview vector.default_search_expansion_factor, quantization, full-text candidate windows, WRRF constants and weights, package fusion settings, and graph expansion depth under representative load.",
         "Treat vector, full-text, and graph scores as source-specific signals; rank or calibrate them explicitly instead of comparing heterogeneous raw scores directly.",
         "Measure vector-index freshness separately from transaction commit latency because changes made within the same transaction are not visible to the vector index."
       ]
@@ -576,18 +1213,22 @@
       "Neo4j vector indexes use approximate nearest-neighbor search and can return fewer than the requested k results for large k values.",
       "Only cosine and Euclidean similarity are configurable for vector indexes, and only one vector index can cover a given schema combination.",
       "Changes made within the same transaction are not visible to the vector index, so ACID commit does not imply same-transaction vector-search visibility.",
-      "Binary quantization and search-expansion controls are version-specific, and binary quantization is preview in Neo4j 2026.06.",
-      "Community, Enterprise, Aura, and Infinigraph differ in native VECTOR storage, clustering, backup, security, multi-database, monitoring, and sharding capabilities.",
-      "Standard Neo4j clustering primarily provides replicated primaries and read-scaling secondaries; automatic data sharding is edition-specific and must be validated for the target vector workload.",
-      "Hybrid full-text, vector, and graph traversal pipelines require workload-specific fusion, filtering, expansion, security, latency, and relevance evaluation.",
+      "Binary quantization and vector.default_search_expansion_factor are Preview in Neo4j 2026.06; their maturity does not make the generally available vector-index capability Preview.",
+      "Community supports exactly one standard database, numeric-list vector properties, offline dump/load, and a smaller security and observability surface; Enterprise adds native VECTOR storage with block format, multiple or composite databases, clustering, online backup, advanced access control, and detailed metrics.",
+      "Standard Enterprise clustering synchronously replicates writes among enough primaries for commit, while read-scaling secondaries replicate asynchronously and can lag; bookmarks are required when causal read-after-write behavior matters.",
+      "Infinigraph property sharding requires a separate subscription, is not standard Enterprise replication, is unavailable on Aura, and has feature-specific limitations that must be tested with vector indexes and access controls.",
+      "Self-managed TLS and volume encryption depend on explicit operator configuration, while Aura encrypts stored data, backups, inter-node traffic, and client connections inside the managed-service boundary.",
+      "Aura snapshot cadence, retention, export, restore, access control, monitoring, customer-managed keys, and deployment isolation vary by plan; AuraDB Virtual Dedicated Cloud isolation must not be generalized to other Aura tiers.",
+      "The neo4j-graphrag 1.17.0 package and pure-Cypher WRRF are separate lexical-vector fusion origins, and neither should be conflated with Vector-Graph Composition.",
       "Neo4j Community Edition is GPLv3, while Enterprise, Aura, and related services use commercial or service-specific terms."
     ],
     "usageGuidance": [
       "Use Neo4j when retrieval quality depends on both semantic similarity and explicit relationships, paths, provenance, or graph constraints.",
       "Prefer a simpler vector store when graph traversal and relationship-aware context do not justify the additional modeling and operational surface.",
-      "Record Neo4j server, Cypher, vector-index provider, driver, GraphRAG library, store format, and embedding-model versions for reproducibility.",
-      "Benchmark node and relationship vector indexes, filter selectivity, graph fan-out, full-text fusion, security rules, and cluster routing on production-like data.",
-      "Exercise backup, restore, cluster failover, Aura snapshot, index rebuild, and disaster-recovery procedures before treating Neo4j as authoritative RAG infrastructure."
+      "Record Neo4j server, Cypher, vector-index provider, driver, neo4j-graphrag package, store format, Aura tier, and embedding-model versions for reproducibility.",
+      "Choose Community, Enterprise, Infinigraph, or an Aura plan from the required database count, VECTOR storage, access-control, encryption, monitoring, recovery, isolation, replication, and sharding boundaries before benchmarking retrieval.",
+      "Benchmark node and relationship vector indexes, filesystem-cache warm-up, filter selectivity, graph fan-out, Cypher WRRF, package fusion, security rules, bookmarks, secondary lag, and cluster routing on production-like data.",
+      "Exercise the scoped recovery path—Community offline dump/load, Enterprise online backup/restore, or the selected Aura tier's snapshot workflow—plus index rebuild and disaster recovery before treating Neo4j as authoritative RAG infrastructure."
     ]
   },
   "references": [
@@ -616,7 +1257,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/cypher-manual/current/indexes/semantic-indexes/vector-indexes/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30003",
@@ -629,7 +1271,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/cypher-manual/current/clauses/search/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30004",
@@ -642,7 +1285,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30005",
@@ -655,7 +1299,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/neo4j-graphrag-python/current/user_guide_rag.html",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "neo4j-graphrag 1.17.0 documentation"
     },
     {
       "id": "REFERENCE-30006",
@@ -668,7 +1313,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/neo4j-graphrag-python/current/_modules/neo4j_graphrag/retrievers/hybrid.html",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "neo4j-graphrag 1.17.0 documentation"
     },
     {
       "id": "REFERENCE-30007",
@@ -681,7 +1327,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/neo4j-graphrag-python/current/index.html",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "neo4j-graphrag 1.17.0 documentation"
     },
     {
       "id": "REFERENCE-30008",
@@ -694,7 +1341,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/getting-started/whats-neo4j/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Documentation snapshot accessed 2026-07-18"
     },
     {
       "id": "REFERENCE-30009",
@@ -707,7 +1355,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/clustering/introduction/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30010",
@@ -720,7 +1369,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/query-api/current/transactions/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Query API documentation snapshot accessed 2026-07-18"
     },
     {
       "id": "REFERENCE-30011",
@@ -733,7 +1383,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/backup-restore/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30012",
@@ -746,7 +1397,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/aura/managing-instances/backup-restore-export/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Aura documentation snapshot accessed 2026-07-18"
     },
     {
       "id": "REFERENCE-30013",
@@ -759,7 +1411,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/introduction/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30014",
@@ -772,7 +1425,8 @@
       "sourceType": "Official Documentation",
       "sourcePriority": "Primary",
       "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/authentication-authorization/manage-privileges/",
-      "accessedAt": "2026-07-17"
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     },
     {
       "id": "REFERENCE-30015",
@@ -815,12 +1469,208 @@
       "updatedAt": "2026-03-18",
       "accessedAt": "2026-07-18",
       "canonicalUrl": "https://neo4j.com/legal-terms/aura-selfserve-terms/"
+    },
+    {
+      "id": "REFERENCE-30018",
+      "title": "Neo4j Developer Guide: Hybrid Search",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/developer/genai-ecosystem/hybrid-search/",
+      "accessedAt": "2026-07-18",
+      "version": "Documentation snapshot accessed 2026-07-18"
+    },
+    {
+      "id": "REFERENCE-30019",
+      "title": "Neo4j Operations Manual: Vector Index Memory Configuration",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/performance/vector-index-memory-configuration/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30020",
+      "title": "Neo4j Operations Manual: Security Checklist",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/security/checklist/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30021",
+      "title": "Neo4j Operations Manual: SSL Framework",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/security/ssl-framework/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30022",
+      "title": "Neo4j Aura: Encryption",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/aura/security/encryption/",
+      "accessedAt": "2026-07-18",
+      "version": "Aura documentation snapshot accessed 2026-07-18"
+    },
+    {
+      "id": "REFERENCE-30023",
+      "title": "Neo4j Operations Manual: Metrics Reference",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/monitoring/metrics/reference/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30024",
+      "title": "Neo4j Operations Manual: Logging",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/monitoring/logging/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30025",
+      "title": "Neo4j Operations Manual: Database Administration",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/database-administration/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30026",
+      "title": "Neo4j Operations Manual: Sharded Property Databases Overview",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/scalability/sharded-property-databases/overview/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30027",
+      "title": "neo4j-graphrag Python 1.17.0 Release",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Repository",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://github.com/neo4j/neo4j-graphrag-python/releases/tag/1.17.0",
+      "accessedAt": "2026-07-18",
+      "version": "1.17.0"
+    },
+    {
+      "id": "REFERENCE-30028",
+      "title": "Neo4j Operations Manual: Access-Control Limitations",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/authentication-authorization/limitations/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30029",
+      "title": "Neo4j Aura: Secure Connections",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/aura/security/secure-connections/",
+      "accessedAt": "2026-07-18",
+      "version": "Aura documentation snapshot accessed 2026-07-18"
+    },
+    {
+      "id": "REFERENCE-30030",
+      "title": "Neo4j Operations Manual: Backup Modes",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/backup-restore/modes/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
+    },
+    {
+      "id": "REFERENCE-30031",
+      "title": "Neo4j Operations Manual: Database Transactions",
+      "authors": [
+        {
+          "name": "Neo4j, Inc."
+        }
+      ],
+      "sourceType": "Official Documentation",
+      "sourcePriority": "Primary",
+      "canonicalUrl": "https://neo4j.com/docs/operations-manual/current/database-internals/transaction-management/",
+      "accessedAt": "2026-07-18",
+      "version": "Neo4j 2026.06 documentation snapshot"
     }
   ],
   "claims": [
     {
       "id": "CLAIM-30001",
-      "statement": "Neo4j 2026.06 stores embeddings on nodes or relationships and provides Lucene-powered HNSW vector indexes with cosine or Euclidean similarity, scalar quantization, preview binary quantization, filterable properties, and configurable HNSW construction and search-expansion controls.",
+      "statement": "Neo4j 2026.06 indexes numeric-list or eligible native VECTOR properties on nodes or relationships through Lucene HNSW with cosine or Euclidean similarity; scalar quantization is generally available, while binary quantization and vector.default_search_expansion_factor are Preview.",
       "claimType": "Factual",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
@@ -836,7 +1686,7 @@
         "REFERENCE-30002",
         "REFERENCE-30004"
       ],
-      "rationale": "The current Operations and Cypher manuals identify Neo4j 2026.06.0 and document vector values, node and relationship vector indexes, HNSW, similarity functions, quantization, dimensions, and advanced index controls."
+      "rationale": "The version-pinned Operations and Cypher documentation distinguishes the generally available vector-index capability, edition-scoped VECTOR property storage, and the Preview maturity of two 2026.06 controls."
     },
     {
       "id": "CLAIM-30002",
@@ -853,8 +1703,7 @@
       ],
       "referenceIds": [
         "REFERENCE-30002",
-        "REFERENCE-30003",
-        "REFERENCE-30007"
+        "REFERENCE-30003"
       ],
       "rationale": "The SEARCH-clause documentation explicitly distinguishes in-index filtering from outer Cypher post-filtering and documents supported predicate and version boundaries."
     },
@@ -873,9 +1722,7 @@
       ],
       "referenceIds": [
         "REFERENCE-30002",
-        "REFERENCE-30005",
-        "REFERENCE-30006",
-        "REFERENCE-30007"
+        "REFERENCE-30018"
       ],
       "rationale": "Vector and full-text retrieval primitives are product capabilities, while their fusion boundary must be represented separately from the underlying indexes."
     },
@@ -894,10 +1741,8 @@
       ],
       "referenceIds": [
         "REFERENCE-30001",
-        "REFERENCE-30008",
         "REFERENCE-30009",
-        "REFERENCE-30013",
-        "REFERENCE-30014"
+        "REFERENCE-30013"
       ],
       "rationale": "Cluster replication and read scaling are edition-scoped operational capabilities and must not be generalized to every Neo4j deployment."
     },
@@ -915,13 +1760,16 @@
         "EVIDENCE-30005"
       ],
       "referenceIds": [
-        "REFERENCE-30002"
+        "REFERENCE-30002",
+        "REFERENCE-30008",
+        "REFERENCE-30010",
+        "REFERENCE-30031"
       ],
       "rationale": "Database transaction atomicity and vector-index query visibility are distinct guarantees and must be represented separately."
     },
     {
       "id": "CLAIM-30006",
-      "statement": "The first-party neo4j-graphrag package can combine vector and full-text retrieval through configurable fusion or orchestration; this capability is package-scoped rather than DBMS-core.",
+      "statement": "The first-party neo4j-graphrag 1.17.0 package can combine vector and full-text retrieval through configurable fusion or orchestration; this separately installed capability is package-scoped rather than DBMS-core.",
       "claimType": "Implementation Specific",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
@@ -933,10 +1781,10 @@
         "EVIDENCE-30003"
       ],
       "referenceIds": [
-        "REFERENCE-30002",
         "REFERENCE-30005",
         "REFERENCE-30006",
-        "REFERENCE-30007"
+        "REFERENCE-30007",
+        "REFERENCE-30027"
       ],
       "rationale": "Vendor ownership does not make an independently installed and versioned first-party package part of the database engine."
     },
@@ -955,9 +1803,7 @@
       ],
       "referenceIds": [
         "REFERENCE-30002",
-        "REFERENCE-30005",
-        "REFERENCE-30006",
-        "REFERENCE-30007"
+        "REFERENCE-30018"
       ],
       "rationale": "This behavior is Vector-Graph Composition implemented through query-language composition, not canonical dense-sparse hybrid retrieval."
     },
@@ -975,17 +1821,14 @@
         "EVIDENCE-30004"
       ],
       "referenceIds": [
-        "REFERENCE-30001",
-        "REFERENCE-30008",
-        "REFERENCE-30009",
         "REFERENCE-30013",
-        "REFERENCE-30014"
+        "REFERENCE-30026"
       ],
       "rationale": "Standard cluster replication must not be conflated with automatic data partitioning or sharding."
     },
     {
       "id": "CLAIM-30009",
-      "statement": "Online backup and restore are scoped to eligible self-managed editions, while Aura provides managed snapshot and restore workflows with service- and plan-specific behavior.",
+      "statement": "Community provides offline dump/load, Enterprise provides online full and differential backup/restore, and Aura provides managed snapshot, export, and restore workflows whose cadence and actions vary by plan.",
       "claimType": "Implementation Specific",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
@@ -997,21 +1840,21 @@
         "EVIDENCE-30006"
       ],
       "referenceIds": [
-        "REFERENCE-30010",
         "REFERENCE-30011",
-        "REFERENCE-30012"
+        "REFERENCE-30012",
+        "REFERENCE-30030"
       ],
       "rationale": "Recovery behavior differs materially between self-managed Enterprise deployments and the Aura managed service."
     },
     {
       "id": "CLAIM-30010",
-      "statement": "Neo4j Community Edition is licensed under GPL-3.0-only, self-managed Enterprise editions use commercial software terms, and Aura is governed by cloud or self-service terms.",
+      "statement": "Neo4j documentation describes Community Edition as GPLv3, self-managed Enterprise editions as subject to commercial software terms, and Aura as governed by applicable cloud or self-service terms.",
       "claimType": "Factual",
       "subject": {
         "id": "VECTOR-DATABASE-10011",
         "type": "Entity"
       },
-      "confidence": "High",
+      "confidence": "Medium",
       "status": "Draft",
       "evidenceIds": [
         "EVIDENCE-30007"
@@ -1022,7 +1865,161 @@
         "REFERENCE-30016",
         "REFERENCE-30017"
       ],
-      "rationale": "Product licensing must be scoped separately from the Apache-2.0 license applying to the canonical RKM artifact."
+      "rationale": "Product licensing must be scoped separately from the Apache-2.0 license applying to the canonical RKM artifact, and the Community profile must not assert an SPDX suffix not established by the cited edition source."
+    },
+    {
+      "id": "CLAIM-30011",
+      "statement": "Neo4j documents a pure-Cypher lexical-vector hybrid pattern that independently ranks full-text and vector results and combines them with weighted reciprocal-rank fusion; it is a query-composition pattern rather than a separate index type.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30008"
+      ],
+      "referenceIds": [
+        "REFERENCE-30002",
+        "REFERENCE-30018"
+      ],
+      "rationale": "This first-party query-language path must remain distinct from the separately installed neo4j-graphrag package and from Vector-Graph Composition."
+    },
+    {
+      "id": "CLAIM-30012",
+      "statement": "Neo4j 2026.06 labels vector.default_search_expansion_factor Preview and documents that values above 1.0 can trade additional query time for increased accuracy without changing the maturity of vector indexes as a whole.",
+      "claimType": "Version Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30001"
+      ],
+      "referenceIds": [
+        "REFERENCE-30002"
+      ],
+      "rationale": "The subfeature requires its own Preview scope so its lifecycle status is not incorrectly inherited by or projected onto the enclosing vector capability."
+    },
+    {
+      "id": "CLAIM-30013",
+      "statement": "Self-managed Neo4j 2026.06 vector indexes persist as Lucene-backed files that use the operating-system filesystem cache; cache misses can cause disk reads, so this behavior is not equivalent to a dedicated disk-oriented ANN architecture.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30009"
+      ],
+      "referenceIds": [
+        "REFERENCE-30019"
+      ],
+      "rationale": "Persistent files, cache residency, and cache-miss disk I/O are separate semantics and do not support a product-wide disk-backed-indexing boolean."
+    },
+    {
+      "id": "CLAIM-30014",
+      "statement": "In an Enterprise cluster, primaries synchronously replicate enough writes before commit, secondaries replicate asynchronously and can lag, and bookmark-based routing provides causal read-after-write behavior when invoked.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30004"
+      ],
+      "referenceIds": [
+        "REFERENCE-30009"
+      ],
+      "rationale": "Transaction commit, secondary freshness, causal consistency, and vector-index visibility are different subsystem and topology guarantees."
+    },
+    {
+      "id": "CLAIM-30015",
+      "statement": "Neo4j 2026.06 advanced RBAC and fine-grained privileges are Enterprise and applicable Aura-tier capabilities, while Community has a smaller security subset and sharded property databases exclude some property-based controls.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30010"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30014",
+        "REFERENCE-30028"
+      ],
+      "rationale": "Access control must be selected by edition, Aura tier, database topology, and indexed-retrieval behavior rather than through one aggregate rating."
+    },
+    {
+      "id": "CLAIM-30016",
+      "statement": "Self-managed Neo4j provides configurable TLS and directs operators to protect data at rest with volume encryption, whereas Aura provides managed encryption for stored data, backups, inter-node traffic, and client connections.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30011"
+      ],
+      "referenceIds": [
+        "REFERENCE-30020",
+        "REFERENCE-30021",
+        "REFERENCE-30022"
+      ],
+      "rationale": "Transport encryption, operator-managed at-rest protection, and managed-service encryption have different implementation and responsibility boundaries."
+    },
+    {
+      "id": "CLAIM-30017",
+      "statement": "Self-managed Neo4j provides basic server logs across editions, while detailed metrics and some query or security logs are Enterprise-scoped; external collection, dashboards, alerting, and Aura monitoring remain separate operational boundaries.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30012"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30023",
+        "REFERENCE-30024"
+      ],
+      "rationale": "Logs, Enterprise metrics, managed monitoring, and third-party observability are distinct facilities and cannot support one product-wide observability rating."
+    },
+    {
+      "id": "CLAIM-30018",
+      "statement": "Community permits exactly one standard database, Enterprise permits multiple standard and composite databases, Infinigraph adds separately subscribed property sharding, and dedicated Aura network isolation is plan-specific rather than universal.",
+      "claimType": "Implementation Specific",
+      "subject": {
+        "id": "VECTOR-DATABASE-10011",
+        "type": "Entity"
+      },
+      "confidence": "High",
+      "status": "Draft",
+      "evidenceIds": [
+        "EVIDENCE-30013"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30025",
+        "REFERENCE-30026",
+        "REFERENCE-30029"
+      ],
+      "rationale": "Database count, composite access, sharding, and managed deployment isolation are different boundaries and do not establish generic multi-tenancy by themselves."
     }
   ],
   "evidence": [
@@ -1033,12 +2030,30 @@
       "summary": "Neo4j official manuals document the current server version, Lucene HNSW vector indexes for nodes and relationships, VECTOR or numeric-list properties, cosine and Euclidean similarity, scalar and binary quantization, dimensions, and HNSW settings.",
       "interpretation": "The RKM profile can classify Neo4j as a graph database with native graph-based ANN and quantization rather than as a dedicated vector database.",
       "claimIds": [
-        "CLAIM-30001"
+        "CLAIM-30001",
+        "CLAIM-30012"
       ],
       "referenceIds": [
         "REFERENCE-30001",
         "REFERENCE-30002",
         "REFERENCE-30004"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30001",
+          "section": "The Neo4j Operations Manual",
+          "locator": "Latest version of Neo4j is 2026.06.0"
+        },
+        {
+          "referenceId": "REFERENCE-30002",
+          "section": "Vector index capabilities per Neo4j version; vector.default_search_expansion_factor; vector.quantization.type; Limitations and known issues",
+          "locator": "Neo4j 2026.06 provider, Preview search expansion and binary quantization, ANN and same-transaction limitations"
+        },
+        {
+          "referenceId": "REFERENCE-30004",
+          "section": "Store vector values as properties",
+          "locator": "Enterprise block-format or Aura VECTOR storage boundary and Community numeric-list alternative"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1058,8 +2073,19 @@
       ],
       "referenceIds": [
         "REFERENCE-30002",
-        "REFERENCE-30003",
-        "REFERENCE-30007"
+        "REFERENCE-30003"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30002",
+          "section": "Vector index capabilities per Neo4j version; Learn more about the vector-2026.06 provider",
+          "locator": "Additional indexed properties and supported filterable property types"
+        },
+        {
+          "referenceId": "REFERENCE-30003",
+          "section": "Filter results; Post-filtering",
+          "locator": "SEARCH WHERE in-index predicates versus outer WHERE post-filtering, predicate restrictions, and 2026.06 IN support"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1072,8 +2098,8 @@
       "id": "EVIDENCE-30003",
       "role": "Supports",
       "strength": "Strong",
-      "summary": "Neo4j documentation describes vector and full-text indexes, Cypher composition with graph traversal, and first-party GraphRAG retrieval workflows.",
-      "interpretation": "The same source family supports three distinct claims: DBMS retrieval primitives, package-scoped vector and lexical fusion, and query-language Vector-Graph Composition.",
+      "summary": "Neo4j documentation describes separate vector and full-text primitives, Cypher composition with graph traversal, and fusion in the separately installed neo4j-graphrag 1.17.0 package.",
+      "interpretation": "The source family supports three distinct boundaries: DBMS retrieval primitives, package-scoped lexical-vector fusion, and query-language Vector-Graph Composition.",
       "claimIds": [
         "CLAIM-30003",
         "CLAIM-30006",
@@ -1083,7 +2109,41 @@
         "REFERENCE-30002",
         "REFERENCE-30005",
         "REFERENCE-30006",
-        "REFERENCE-30007"
+        "REFERENCE-30007",
+        "REFERENCE-30018",
+        "REFERENCE-30027"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30002",
+          "section": "Query vector indexes",
+          "locator": "Vector results must be ranked independently when combined with full-text or other scored sources"
+        },
+        {
+          "referenceId": "REFERENCE-30005",
+          "section": "Retrievers",
+          "locator": "HybridRetriever and VectorCypherRetriever usage boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-30006",
+          "section": "neo4j_graphrag.retrievers.hybrid module",
+          "locator": "HybridRetriever implementation and configurable ranker"
+        },
+        {
+          "referenceId": "REFERENCE-30007",
+          "section": "Installation and compatibility",
+          "locator": "Separately installed neo4j-graphrag package boundary"
+        },
+        {
+          "referenceId": "REFERENCE-30018",
+          "section": "Production notes",
+          "locator": "Graph expansion after fused retrieval is separate from lexical-vector fusion"
+        },
+        {
+          "referenceId": "REFERENCE-30027",
+          "section": "Release 1.17.0",
+          "locator": "Version tag 1.17.0 and commit 7b69354"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1099,14 +2159,36 @@
       "interpretation": "Replication and sharding are separate operational properties, and neither should be generalized beyond its documented edition or deployment scope.",
       "claimIds": [
         "CLAIM-30004",
-        "CLAIM-30008"
+        "CLAIM-30008",
+        "CLAIM-30014"
       ],
       "referenceIds": [
         "REFERENCE-30001",
-        "REFERENCE-30008",
         "REFERENCE-30009",
         "REFERENCE-30013",
-        "REFERENCE-30014"
+        "REFERENCE-30026"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30001",
+          "section": "The Neo4j Operations Manual",
+          "locator": "Neo4j 2026.06.0 documentation scope"
+        },
+        {
+          "referenceId": "REFERENCE-30009",
+          "section": "Database primaries; Database secondaries; Causal consistency",
+          "locator": "Synchronous primary replication, asynchronous secondary lag, and bookmark-mediated read-your-own-writes"
+        },
+        {
+          "referenceId": "REFERENCE-30013",
+          "section": "Neo4j editions",
+          "locator": "Enterprise clustering and Infinigraph automatic-sharding boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-30026",
+          "section": "Overview; What is property sharding?",
+          "locator": "Infinigraph subscription, not standard Enterprise, not Aura, introduced in 2025.12"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1124,7 +2206,32 @@
         "CLAIM-30005"
       ],
       "referenceIds": [
-        "REFERENCE-30002"
+        "REFERENCE-30002",
+        "REFERENCE-30008",
+        "REFERENCE-30010",
+        "REFERENCE-30031"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30002",
+          "section": "Limitations and known issues",
+          "locator": "Changes made within the same transaction are not visible to the vector index"
+        },
+        {
+          "referenceId": "REFERENCE-30008",
+          "section": "What is Neo4j?",
+          "locator": "Neo4j provides ACID transactions"
+        },
+        {
+          "referenceId": "REFERENCE-30010",
+          "section": "Run transactions",
+          "locator": "ACID-compliant all-or-nothing query execution within a transaction"
+        },
+        {
+          "referenceId": "REFERENCE-30031",
+          "section": "Database transactions",
+          "locator": "Graph, index, and schema operations use transactions to ensure ACID properties"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1142,9 +2249,26 @@
         "CLAIM-30009"
       ],
       "referenceIds": [
-        "REFERENCE-30010",
         "REFERENCE-30011",
-        "REFERENCE-30012"
+        "REFERENCE-30012",
+        "REFERENCE-30030"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30011",
+          "section": "Backup and restore",
+          "locator": "Community offline commands and additional Enterprise online backup and restore commands"
+        },
+        {
+          "referenceId": "REFERENCE-30012",
+          "section": "Snapshot types; Snapshot actions; Restore",
+          "locator": "Aura tier-specific scheduled and on-demand snapshots, export, create, and destructive restore behavior"
+        },
+        {
+          "referenceId": "REFERENCE-30030",
+          "section": "Full backup; Differential backup",
+          "locator": "Offline dump versus Enterprise online full and differential backup modes"
+        }
       ],
       "confidence": "High",
       "status": "Draft",
@@ -1155,7 +2279,7 @@
     {
       "id": "EVIDENCE-30007",
       "role": "Supports",
-      "strength": "Strong",
+      "strength": "Moderate",
       "summary": "Neo4j edition documentation, the Software Agreement, the Cloud Agreement, and Aura self-service terms establish distinct licensing scopes for Community, Enterprise, and Aura.",
       "interpretation": "The sources support separate productLicensing profiles and do not justify changing metadata.license for the RKM artifact.",
       "claimIds": [
@@ -1167,10 +2291,248 @@
         "REFERENCE-30016",
         "REFERENCE-30017"
       ],
-      "confidence": "High",
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30013",
+          "section": "Neo4j editions",
+          "locator": "Community Edition described as open source under GPLv3; Enterprise and Infinigraph boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-30015",
+          "section": "Neo4j Software Agreement",
+          "locator": "Self-managed commercial software agreement updated 2026-06-17"
+        },
+        {
+          "referenceId": "REFERENCE-30016",
+          "section": "Neo4j Cloud Agreement",
+          "locator": "Cloud-service terms updated 2026-06-17"
+        },
+        {
+          "referenceId": "REFERENCE-30017",
+          "section": "Aura Self-Serve Terms of Service",
+          "locator": "Self-service Aura terms updated 2026-03-18"
+        }
+      ],
+      "confidence": "Medium",
       "status": "Draft",
       "limitations": [
         "Applicable commercial rights and obligations depend on the executed agreement, order form, offering, and service terms."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30008",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j's official hybrid-search guide provides pure-Cypher full-text and vector branches whose independently ranked outputs are combined with weighted reciprocal-rank fusion.",
+      "interpretation": "The documented pattern supports lexical-vector hybrid retrieval through query-language composition without implying a separate hybrid index or automatic DBMS-core fusion operation.",
+      "claimIds": [
+        "CLAIM-30011"
+      ],
+      "referenceIds": [
+        "REFERENCE-30002",
+        "REFERENCE-30018"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30002",
+          "section": "Query vector indexes",
+          "locator": "Rank each source independently rather than comparing vector and full-text raw scores"
+        },
+        {
+          "referenceId": "REFERENCE-30018",
+          "section": "Lexical and semantic search; Production notes",
+          "locator": "Cypher UNION ALL source branches, WRRF contribution formula, sourceK/finalK, rrfConstant, sourceWeights, and hybrid as a retrieval pattern rather than an index type"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The guide documents a composition pattern, not benchmarked relevance improvement or automatic selection of fusion parameters.",
+        "The mutable developer guide is constrained by its recorded 2026-07-18 documentation snapshot and source locators."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30009",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j's vector-index memory documentation describes persistent Lucene index files, operating-system filesystem-cache residency, warming behavior, and disk reads under cache pressure or cold starts.",
+      "interpretation": "The evidence supports explicit storage and cache semantics but not an unqualified disk-backed-indexing classification comparable to a dedicated disk-oriented ANN design.",
+      "claimIds": [
+        "CLAIM-30013"
+      ],
+      "referenceIds": [
+        "REFERENCE-30019"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30019",
+          "section": "Vector index memory configuration; Optimal memory configuration for Neo4j with vector indexes",
+          "locator": "Lucene-backed files use OS filesystem cache; insufficient cache causes disk reads; physical index size is measured on disk; restart clears cache"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "The documentation provides capacity-planning guidance rather than workload-independent latency guarantees.",
+        "Aura storage and cache provisioning are provider managed and are not exposed with the same operator boundary."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30010",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j edition, RBAC, and authorization-limit documentation scopes advanced privileges to Enterprise and applicable Aura tiers and identifies index-result behavior under security restrictions.",
+      "interpretation": "Access-control capability and retrieval completeness must be evaluated by edition, Aura tier, topology, and query path rather than through an aggregate product rating.",
+      "claimIds": [
+        "CLAIM-30015"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30014",
+        "REFERENCE-30028"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30013",
+          "section": "Neo4j editions; Security feature comparison",
+          "locator": "Community security subset and Enterprise RBAC, property-based, and subgraph access-control features"
+        },
+        {
+          "referenceId": "REFERENCE-30014",
+          "section": "Role-based access control",
+          "locator": "AuraDB Business Critical, AuraDB Virtual Dedicated Cloud, and Enterprise Edition scope"
+        },
+        {
+          "referenceId": "REFERENCE-30028",
+          "section": "Access control and indexes",
+          "locator": "Full-text and vector indexes can return fewer results when restrictions prevent safe disclosure"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Authorization features and limitations vary by control type, edition, Aura tier, Cypher version, and sharded topology.",
+        "Documentation does not replace threat modeling or access-control tests on the target data model."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30011",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j self-managed security documentation separates configurable TLS and operator-managed volume encryption, while Aura documentation states that stored data, backups, inter-node traffic, and client connections are encrypted.",
+      "interpretation": "Self-managed and managed-service encryption responsibilities require separate capabilities and cannot support one product-wide encryption rating.",
+      "claimIds": [
+        "CLAIM-30016"
+      ],
+      "referenceIds": [
+        "REFERENCE-30020",
+        "REFERENCE-30021",
+        "REFERENCE-30022"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30020",
+          "section": "Protect data-at-rest; Protect data-in-transit",
+          "locator": "Operator volume encryption and encrypted Bolt, HTTPS, cluster, and backup guidance"
+        },
+        {
+          "referenceId": "REFERENCE-30021",
+          "section": "SSL framework",
+          "locator": "Configurable TLS for Bolt, HTTPS, cluster, and backup communication channels"
+        },
+        {
+          "referenceId": "REFERENCE-30022",
+          "section": "Encryption",
+          "locator": "Aura encryption at rest, intra-cluster encryption, required encrypted client connections, and encrypted backup buckets"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Self-managed at-rest protection and key lifecycle depend on the host platform and operator.",
+        "Aura customer-managed key availability depends on tier, provider, and region."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30012",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j documentation distinguishes basic server logs from Enterprise-only detailed metrics and edition-specific query and security logging facilities.",
+      "interpretation": "Logging and metrics are distinct observability surfaces, and externally operated collection or Aura monitoring must not be inferred from self-managed product documentation.",
+      "claimIds": [
+        "CLAIM-30017"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30023",
+        "REFERENCE-30024"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30013",
+          "section": "Neo4j editions; Monitoring and management feature comparison",
+          "locator": "Prometheus endpoints and Neo4j Operations Manager edition boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-30023",
+          "section": "Types of metrics",
+          "locator": "Enterprise Edition global and per-database metrics"
+        },
+        {
+          "referenceId": "REFERENCE-30024",
+          "section": "Log files",
+          "locator": "General and debug logs versus Enterprise query and security logs"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Metrics exposure does not provide dashboards, retention, alerting, or incident response without additional tooling.",
+        "Aura monitoring varies by service and plan and is not characterized as equivalent to self-managed Enterprise metrics."
+      ]
+    },
+    {
+      "id": "EVIDENCE-30013",
+      "role": "Supports",
+      "strength": "Strong",
+      "summary": "Neo4j documentation distinguishes Community's single standard database, Enterprise multiple and composite databases, Infinigraph property sharding, and Virtual Dedicated Cloud network isolation.",
+      "interpretation": "Database administration, sharding, and dedicated managed-service isolation are separate boundaries and do not prove generic multi-tenancy or identical isolation across offerings.",
+      "claimIds": [
+        "CLAIM-30018"
+      ],
+      "referenceIds": [
+        "REFERENCE-30013",
+        "REFERENCE-30025",
+        "REFERENCE-30026",
+        "REFERENCE-30029"
+      ],
+      "sourceFragments": [
+        {
+          "referenceId": "REFERENCE-30013",
+          "section": "Neo4j editions",
+          "locator": "Community, Enterprise, and Infinigraph edition boundaries"
+        },
+        {
+          "referenceId": "REFERENCE-30025",
+          "section": "Standard databases per Neo4j edition; Composite databases",
+          "locator": "Community exactly one standard database; Enterprise any number; database transaction-domain semantics"
+        },
+        {
+          "referenceId": "REFERENCE-30026",
+          "section": "Overview; What is property sharding?",
+          "locator": "Infinigraph property-shard architecture and subscription boundary"
+        },
+        {
+          "referenceId": "REFERENCE-30029",
+          "section": "VPC isolation; Private endpoints",
+          "locator": "AuraDB Virtual Dedicated Cloud dedicated account or subscription and network-isolation scope"
+        }
+      ],
+      "confidence": "High",
+      "status": "Draft",
+      "limitations": [
+        "Database boundaries do not automatically implement application tenant authorization or data-residency policy.",
+        "Aura isolation, private networking, regions, and public-traffic controls are plan- and configuration-specific."
       ]
     }
   ]

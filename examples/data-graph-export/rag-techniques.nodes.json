@@ -743,8 +743,8 @@
       "schema": "schema/vector-database.schema.json",
       "slug": "neo4j",
       "status": "Draft",
-      "summary": "Neo4j is a native property-graph database with Lucene-powered vector indexes for nodes and relationships, filtered ANN search, full-text and vector hybrid retrieval, and graph traversal through Cypher.",
-      "version": "1.3.0",
+      "summary": "Neo4j is a native property-graph database with Lucene HNSW vector indexes, Cypher filtering and graph traversal, and separately scoped lexical-vector fusion through Cypher or neo4j-graphrag.",
+      "version": "1.4.0",
       "visibility": "Public"
     }
   },
