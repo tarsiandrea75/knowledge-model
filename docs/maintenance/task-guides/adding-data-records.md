@@ -24,7 +24,7 @@ Use this guide when adding files under an existing `data/**` record set.
 - Include `data/manifest.json` and affected `examples/data-graph-export/*.nodes.json` or `examples/data-graph-export/*.edges.json` files in the explicit allowed file list for validated Codex commits when they are expected to change.
 - Treat manifest and data graph export updates as expected side effects of data-record work, especially when validation or graph export validation changes node or edge counts.
 - Run `make data-graph-export`.
-- Run `make data-graph-export-validate`.
+- Run `make graph-export-validate`.
 - Run `make validate`.
 
 ## Common Failure Modes
