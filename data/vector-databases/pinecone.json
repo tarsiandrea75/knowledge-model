@@ -49,7 +49,7 @@
         "role": "Evidence synthesis and seed data drafting"
       }
     ],
-    "license": "Proprietary",
+    "license": "Apache-2.0",
     "language": "en",
     "provenance": {
       "source": "Official Pinecone API reference, release notes, and documentation",
