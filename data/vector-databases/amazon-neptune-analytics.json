@@ -51,7 +51,7 @@
         "role": "Evidence synthesis and seed data drafting"
       }
     ],
-    "license": "LicenseRef-AWS-Service-Terms",
+    "license": "Apache-2.0",
     "language": "en",
     "provenance": {
       "source": "Official AWS Neptune Analytics product, vector-index, vector-algorithm, query, transaction, scaling, backup, security, networking, monitoring, and limits documentation",
