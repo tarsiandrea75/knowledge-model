@@ -1,5 +1,40 @@
 # Graph Plus Vector Independent Review Adjudication
 
+## Historical adjudication and current-state notice
+
+> **Historical scope.** This historical, commit-bound adjudication is bound to
+> commit `2979527681323a0704396b69afcdeed2c43e61ad` and to the historical Neo4j
+> content identified by Git blob `24082b87e8ae4aafe17aa7abd6d00a101c25e828`
+> and SHA-256 `8f59da948793cf956c78d1c5754608b4d38983b9d82b14d7640f17d12ccc85b7`.
+> Its `Not Reviewed`, `Changes Requested`, `REVISION REQUIRED`, and “must not
+> become `Approved` before re-review” language describes that historical review
+> and remediation stage. Those statements, together with the original findings,
+> review-state transitions, blocking requirements, correction plan, approval
+> preconditions, and conclusions below, remain authoritative historical evidence
+> and must not be interpreted as Neo4j's present lifecycle state. This
+> adjudication remains authoritative for its pinned baseline and is not erroneous
+> merely because later commits satisfied its conditions.
+>
+> **Current Neo4j state.** The required corrections and independent re-review
+> were subsequently completed. Neo4j is currently version `1.5.1` with review
+> state `Approved`. The canonical JSON record,
+> [data/vector-databases/neo4j.json](../../../data/vector-databases/neo4j.json),
+> is the authority for the current lifecycle state. That current record is bound
+> to SHA-256 `6ea8eb9ac34d995c3759a71ce7cf43e7c8ee6445947720bbb71354b3bb473e55`,
+> Git blob `c98ac1e352e216b712ccd2f3cdd84d9f9b986d82`, and approval commit
+> `a617864fff7f56b25f3a37ab259d727275648de4`.
+>
+> **Acceptance provenance and related snapshot.**
+> [docs/reviews/vector-databases/neo4j-1.5.1-independent-acceptance.md](neo4j-1.5.1-independent-acceptance.md)
+> records the durable independent acceptance, findings disposition, and approval
+> chain; this adjudication itself does not constitute that later acceptance.
+> The related historical Reviewer Pack,
+> [docs/reviews/vector-databases/independent-reviewer-pack.md](independent-reviewer-pack.md),
+> is likewise a historical, pinned comparison snapshot.
+>
+> **Approval scope.** Neo4j's current approval implies no approval for the other
+> sixteen `VectorDatabase` records.
+
 ## Purpose
 
 This document adjudicates three independently produced review reports for the
