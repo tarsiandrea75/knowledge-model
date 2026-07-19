@@ -54,7 +54,7 @@
         "role": "Evidence synthesis and seed data drafting"
       }
     ],
-    "license": "LicenseRef-Memgraph-Edition-Dependent",
+    "license": "Apache-2.0",
     "language": "en",
     "provenance": {
       "source": "Official Memgraph release notes, vector-search, single-store architecture, text-search, GraphRAG, durability, transaction, storage, replication, backup, security, monitoring, streaming, algorithms, client, deployment, source-code, and licensing documentation",
