@@ -285,13 +285,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-020`
 - `Title`: Vector database and graph database seed data.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Modeling
 - `Reason`: Storage systems are important RAG infrastructure and should be queryable as first-class entities or related components.
-- `Suggested implementation`: Add representative database records and relationships after confirming the intended entity model.
-- `Related files`: `data/`; `schema/`; `registries/`; `docs/architecture/`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented through the `VectorDatabase` architecture and schema contracts, 17 manifest-declared records under `data/vector-databases/`, deterministic data graph export coverage, and source-linked decision-query and comparison views. The current dataset includes graph-plus-vector systems such as Neo4j, Amazon Neptune Analytics, and Memgraph. Implementation status records delivery of the modeled dataset and tooling; it does not imply independent semantic approval of every record. Neo4j is currently `Approved`; the other sixteen records remain `Not Reviewed`.
+- `Related files`: `data/vector-databases/`; `data/manifest.json`; `docs/architecture/vector-database-model.md`; `schema/vector-database.schema.json`; `schema/definitions/capability.schema.json`; `scripts/rkm-decision-query.py`; `examples/data-graph-export/`
+- `Depends on`: Implemented across the VectorDatabase model, dataset-expansion, graph-export, and decision-query commits from `01df322 Add VectorDatabase decision view` through `74ca2d0 Add entity comparison view to decision query`, with capability, licensing, and lifecycle refinements through `a617864 Approve Neo4j vector database record`.
 
 ### GB-021 Query Transformation Technique Seed Data
 
