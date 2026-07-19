@@ -1,20 +1,22 @@
 # RKM Data
 
-The `data/` directory contains populated sample knowledge content for RAG Knowledge Model. It is distinct from `examples/fixtures/`, which contains minimal pedagogical examples used to demonstrate schema shape and validation mechanics.
+The `data/` directory contains populated RKM seed knowledge. It is distinct from `examples/fixtures/`, which contains minimal pedagogical examples used to demonstrate schema shape and validation mechanics.
 
-This first dataset is intentionally small. It exists to support early consumer testing, validation, and release packaging without claiming to be a complete catalog of RAG techniques or the broader RAG ecosystem.
+Seed data is intended for validation, consumer testing, graph export, and decision-query workflows. It is not a complete catalog of the RAG ecosystem, and record presence does not imply semantic approval.
 
-Data files are declared in `data/manifest.json`. Each manifest entry maps a repository-relative data file to the schema that validates it. `make validate` runs data instance validation after fixture validation, so malformed populated data fails the standard repository validation path.
+## Manifest and Validation
 
-`data/relationships/` contains declared relationship instances between populated data records. These relationship sets are validated through the same manifest and are exported as domain graph edges by the data graph exporter. Relationship edges are declared by data files, not inferred from technique names, descriptions, or stages.
+Every populated data file is declared in `data/manifest.json`. Each manifest entry maps a repository-relative data path to the schema that validates it.
 
-`data/relationship-support/` contains declared support objects for relationship instances. These files connect relationship IDs to references, claims, and evidence so consumers can inspect why a relationship appears in the seed dataset. Support is validated through the manifest and is not inferred.
+The standard validation pipeline checks:
 
-`data/components/` contains first-class seed Component records. These records validate against `schema/component.schema.json` and can be connected to techniques through declared relationship sets.
-
-`data/retrievers/` contains first-class seed Retriever records. These records validate against `schema/retriever.schema.json` and can be connected to components through declared relationship sets.
-
-`data/rerankers/` contains first-class seed Reranker records. These records validate against `schema/reranker.schema.json` and can be connected to components through declared relationship sets.
+- JSON Schema conformance;
+- identifier uniqueness;
+- manifest coverage;
+- relationship endpoints;
+- relationship-support links;
+- graph-export consistency;
+- entity-specific semantic rules.
 
 Run direct data validation from the repository root:
 
@@ -28,21 +30,99 @@ Run full repository validation:
 make validate
 ```
 
-Current populated data scope:
+## Current Manifest-Declared Scope
 
-- `data/components/cross-encoder-reranker.json`
-- `data/components/keyword-retriever.json`
-- `data/components/rank-fusion.json`
-- `data/components/semantic-retriever.json`
-- `data/rerankers/cross-encoder-reranker.json`
-- `data/rag-techniques/hybrid-retrieval.json`
-- `data/rag-techniques/query-rewriting.json`
-- `data/rag-techniques/reranking.json`
-- `data/retrievers/embedding-retriever.json`
-- `data/retrievers/lexical-retriever.json`
-- `data/relationships/component-specialization-relationships.json`
-- `data/relationships/rag-technique-component-relationships.json`
-- `data/relationships/rag-technique-relationships.json`
-- `data/relationship-support/component-specialization-relationship-support.json`
-- `data/relationship-support/rag-technique-component-relationship-support.json`
-- `data/relationship-support/rag-technique-relationship-support.json`
+The current manifest declares 36 populated data files:
+
+- 6 RAG technique records under `data/rag-techniques/`;
+- 4 Component records under `data/components/`;
+- 2 Retriever records under `data/retrievers/`;
+- 1 Reranker record under `data/rerankers/`;
+- 17 VectorDatabase records under `data/vector-databases/`;
+- 3 relationship sets under `data/relationships/`;
+- 3 relationship-support sets under `data/relationship-support/`.
+
+Directory-level README files provide local guidance for the established technique, component, retriever, reranker, relationship, and relationship-support record sets.
+
+## VectorDatabase Records
+
+`data/vector-databases/` contains first-class records that validate against `schema/vector-database.schema.json`.
+
+The current set covers:
+
+- Amazon Neptune Analytics;
+- Azure AI Search;
+- Chroma;
+- Elasticsearch;
+- LanceDB;
+- Memgraph;
+- Milvus;
+- MongoDB;
+- Neo4j;
+- OpenSearch;
+- pgvector;
+- Pinecone;
+- Qdrant;
+- Redis;
+- Vertex AI Vector Search;
+- Vespa;
+- Weaviate.
+
+These records model deployment forms, supported retrieval methods, structured capabilities, capability origins, availability scopes, operational characteristics, limitations, evidence, and references.
+
+All 17 records retain `Draft` status. Neo4j is the sole record whose `metadata.reviewState` is `Approved`; the other sixteen remain `Not Reviewed`. Consumers must inspect each record's lifecycle fields, claims, evidence, references, qualifiers, limitations, and guidance before using it for decisions.
+
+Use the decision-query CLI for source-linked entity views and same-type comparisons:
+
+```bash
+python3 scripts/rkm-decision-query.py --entity neo4j --detail full
+python3 scripts/rkm-decision-query.py --compare neo4j qdrant
+```
+
+The CLI is descriptive. It does not convert `Draft` or `Not Reviewed` records into recommendations or approved guidance.
+
+## Relationships and Support
+
+`data/relationships/` contains declared relationship instances between populated data records. These sets are validated through the manifest and exported as domain graph edges.
+
+`data/relationship-support/` contains support objects for relationship instances. These objects connect relationship IDs to references, claims, and evidence so consumers can inspect why a relationship appears in the seed dataset.
+
+Domain relationships and their support are declared explicitly. They are not inferred from names, descriptions, stages, component roles, capabilities, or other record fields.
+
+## Data Graph Export
+
+The populated dataset has a deterministic derived graph representation under `examples/data-graph-export/`.
+
+The current export includes Technique, Component, Retriever, Reranker, VectorDatabase, and Schema nodes; schema-validation provenance edges; and declared domain relationship edges. Generated graph artifacts are derived outputs and must remain consistent with the manifest-declared source data.
+
+Regenerate the data graph export:
+
+```bash
+make data-graph-export
+```
+
+Validate the committed graph export:
+
+```bash
+make graph-export-validate
+```
+
+## Changing Data
+
+Follow `data/AGENTS.md` and the applicable task guide before changing any populated record.
+
+For an existing entity type, use:
+
+```text
+docs/maintenance/task-guides/adding-data-records.md
+```
+
+A data-record change may require coordinated updates to:
+
+- `data/manifest.json`;
+- declared relationships;
+- relationship-support records;
+- `examples/data-graph-export/*.nodes.json`;
+- `examples/data-graph-export/*.edges.json`.
+
+Do not treat data files as loose examples, infer domain edges from prose, reuse stable IDs, or report readiness without running the routed validation commands.
