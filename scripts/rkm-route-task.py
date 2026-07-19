@@ -123,7 +123,7 @@ def route_one(path: str) -> RouteResult:
         add_unique(readings, ("data/AGENTS.md",))
         add_unique(guides, ("docs/maintenance/task-guides/adding-data-records.md",))
         add_unique(notes, (RISK_DATA, RISK_DATA_MANIFEST, RISK_DATA_GRAPH_EXPORT))
-        add_unique(checks, ("make data-validate", "make data-graph-export", "make data-graph-export-validate"))
+        add_unique(checks, ("make data-validate", "make data-graph-export", "make graph-export-validate"))
 
     if is_under(path, "data/relationships"):
         add_unique(readings, ("data/AGENTS.md",))
@@ -268,7 +268,7 @@ def run_self_test() -> None:
                 "examples/data-graph-export/*.edges.json",
                 "make data-validate",
                 "make data-graph-export",
-                "make data-graph-export-validate",
+                "make graph-export-validate",
             ),
         ),
         (
@@ -331,7 +331,7 @@ def run_self_test() -> None:
     assert_occurs_once(mixed_report, "make validate")
     assert_occurs_once(mixed_report, "make data-validate")
     assert_occurs_once(mixed_report, "make data-graph-export")
-    assert_occurs_once(mixed_report, "make data-graph-export-validate")
+    assert_occurs_once(mixed_report, "make graph-export-validate")
     assert_occurs_once(mixed_report, "make schema-duplicate-contracts-validate")
     assert_occurs_once(mixed_report, "docs/maintenance/task-guides/rule-routing-validation.md")
 
