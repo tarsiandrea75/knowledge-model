@@ -40,54 +40,38 @@ Snapshot date: 2026-07-19
 
 Operational branch: `experiment/codex-director`
 
-Committed `HEAD`: `3b3036f3158dcebbe242cde8b278ae99dd301e5c`
+Preparation baseline `HEAD`: `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f`
 
-Upstream: `origin/experiment/codex-director` at the same commit
+Preparation baseline upstream: `origin/experiment/codex-director` at the same commit
 
-Latest committed subject: `Add comprehensive RKM project handoff`
+Latest committed subject at preparation time: `Correct data-record task guide target`
 
 Protected local `main`: `e3e02681e287879e13819493b057e64a99b5c270`
 
 Protected `origin/main`: `e3e02681e287879e13819493b057e64a99b5c270`
 
-Commits on the operational branch after `main`: 79
+Commits on the operational branch after `main`: 83
 
-The comprehensive handoff reports 78 commits after `main` because it was written before its own commit. Commit `3b3036f` adds the seventy-ninth branch commit.
+The repository was clean at this preparation baseline. The live handoff itself had already been committed and published at `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5`.
 
-### Uncommitted candidate state
+### Recently published sequence
 
-The repository is not currently clean.
+The following four one-file operations were completed in order:
 
-Sole staged path:
+1. `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5` — add the canonical live handoff;
+2. `71b2d02d542a057a0c9ce2bc0592f51554c7cea0` — correct the Pinecone artifact license;
+3. `3d71f9371398e9b08e1ec15af50c6564640ccbb6` — correct the task router graph-export validation target;
+4. `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f` — correct the adding-data-records task-guide target.
 
-```text
-A  docs/maintenance/live-handoff.md
-```
+Each operation reported full validation success, one independent read-only Reviewer verdict of `ACCEPT`, safe publication, protected `main`, and a clean final worktree.
 
-The path does not exist in committed `HEAD`. It is an uncommitted candidate undergoing semantic review and must not be treated as canonical until accepted, committed, validated, and published.
-
-The exact whole-file SHA-256 of each candidate is recorded in its external run summary and independent-review baseline. A file cannot stably embed its own whole-file digest without changing that digest.
-
-### Reported recovery and validation state
-
-The last committed cockpit state before this candidate was reported as `NO_RECOVERY_NEEDED`.
-
-For the live-handoff candidate, run summary 28 reports:
-
-- exact one-file staged scope;
-- identical worktree and index bytes;
-- cached whitespace check success;
-- full `make validate` success;
-- candidate SHA-256 `31f03440185dc773ba1ec4d7183c330be81af866e8ed7d61852611ad2209c445`;
-- 269 lines.
-
-Those are attributed run claims, not substitutes for current read-only verification.
+These are attributed operational claims from external run summaries and review reports. Current Git state and executable repository contracts remain the source of truth.
 
 ## Last Completed Published Operation
 
-Task: Memgraph artifact-license correction
+Task: correct the graph-export validation target in the adding-data-records task guide
 
-Reported summary version: `24`
+Reported summary version: `35`
 
 Result: `SUCCESS`
 
@@ -95,19 +79,23 @@ Validation: `PASS`
 
 Independent review: `ACCEPT`
 
-Commit and published branch tip for that operation: `913e04fb41dc645e1eae3942b26a222bf54f50cd`
+Commit and published branch tip for that operation: `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f`
 
 Exact semantic change:
 
 ```text
-data/vector-databases/memgraph.json
-metadata.license:
-LicenseRef-Memgraph-Edition-Dependent -> Apache-2.0
+docs/maintenance/task-guides/adding-data-records.md
+incorrect data-prefixed graph-export validation target -> make graph-export-validate
 ```
 
-The operation did not invent `vectorDatabase.productLicensing`. All other JSON values and formatting were reported preserved.
+The operation changed one string in one file. It aligned the guide with the public Makefile target and the already-corrected task router.
 
-The current repository still records Memgraph as `Draft` and `Not Reviewed`. The artifact-license correction did not approve the entire product record.
+Immediately preceding related operations were:
+
+- Pinecone artifact-license correction at `71b2d02d542a057a0c9ce2bc0592f51554c7cea0`;
+- task-router correction at `3d71f9371398e9b08e1ec15af50c6564640ccbb6`.
+
+No obsolete operational target reference remained under `docs`, `scripts`, or `Makefile` after the final operation.
 
 ## Current Repository Meaning
 
@@ -123,33 +111,38 @@ The current experimental branch contains:
 - structured capability-origin and availability-scope modeling;
 - deterministic graph exports;
 - a deeply corrected and independently approved Neo4j record;
-- recent artifact-license corrections for Amazon Neptune Analytics and Memgraph;
+- recent artifact-license corrections for Amazon Neptune Analytics, Memgraph, and Pinecone;
+- corrected alignment between the data-path task router, task guide, and public graph-export validation target;
 - the comprehensive project handoff.
 
 Only Neo4j is currently an `Approved` VectorDatabase record. The other 16 remain `Draft` and `Not Reviewed` unless a later canonical lifecycle transition proves otherwise.
 
-## Open Tactical Issue
+## Completed Tactical and Governance Sequence
 
-`data/vector-databases/pinecone.json` currently records:
+The inherited Pinecone artifact-license placement anomaly is closed.
+
+`data/vector-databases/pinecone.json` now records:
 
 ```json
-"license": "Proprietary"
+"license": "Apache-2.0"
 ```
 
-The inherited release-readiness plan identifies this as the remaining artifact-license placement anomaly.
+The correction preserved product-level prose describing Pinecone as a proprietary managed service and did not add `vectorDatabase.productLicensing`.
 
-The proposed bounded correction is:
+During validation of that change, the routed data-prefixed graph-export validation target was found not to exist. Live inspection established that the public Makefile target is `make graph-export-validate`.
 
-```text
-metadata.license:
-Proprietary -> Apache-2.0
-```
+The mismatch was resolved in two separately authorized one-file operations:
 
-This must preserve product-level prose describing Pinecone as a proprietary managed service. It must not add `vectorDatabase.productLicensing` without a separate evidence-backed task.
+1. `scripts/rkm-route-task.py` changed one routing string and two built-in self-test expectations;
+2. `docs/maintenance/task-guides/adding-data-records.md` changed its single stale instruction.
 
-This is the next proposed tactical operation only after the live-handoff addition is accepted, committed, and published.
+The corrected router self-test, routing smoke test, agent-routing validation, graph-export validation, and full repository validation all reported success.
+
+No known artifact-license placement anomaly from the inherited tactical plan remains open.
 
 ## Strategic Fork After the Pinecone Correction
+
+The Pinecone correction and the discovered routing-governance defect are complete. No automation may choose the next strategic direction implicitly.
 
 ### Track A: Stabilize and Integrate
 
@@ -247,7 +240,7 @@ Trivial acknowledgements need no durable delta. Uncommitted or unreviewed conten
 
 Date: 2026-07-19
 
-Status: Accepted collaboration decision; repository adoption remains pending until commit and publication.
+Status: Accepted and published in commit `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5`.
 
 Decision:
 
@@ -278,15 +271,15 @@ A successor needs durable state, while repository governance forbids silently ex
 
 Date: 2026-07-19
 
-Status: Accepted.
+Status: Tactical correction completed; strategic choice remains pending.
 
 Decision:
 
-Close the known Pinecone artifact-license anomaly as the proposed next tactical correction after this handoff is adopted. Choose Track A, B, or C only through an explicit product-owner decision.
+The Pinecone artifact-license anomaly was closed in commit `71b2d02d542a057a0c9ce2bc0592f51554c7cea0`. Choose Track A, B, or C only through an explicit product-owner decision.
 
 Rationale:
 
-The Pinecone correction is defined and narrow. The broader branch direction is a product decision and must not be selected implicitly by automation.
+The Pinecone correction was narrow and is now complete. The broader branch direction remains a product decision and must not be selected implicitly by automation.
 
 ### LH-004 - Do Not Use Trailing-Space Markdown Hard Breaks
 
@@ -330,63 +323,73 @@ Rationale:
 
 During run summary 28, `codex exec` consumed the remaining shell script from standard input. The independent Reviewer still returned `STOP`, but the wrapper did not execute its verdict parser and incorrectly reported `RESULT=SUCCESS` with `REVIEW_VERDICT=NOT_RUN`.
 
+### LH-007 - Reconcile Routed Checks with Executable Make Targets
+
+Date: 2026-07-19
+
+Status: Accepted and implemented.
+
+Decision:
+
+When task-router output, task-guide prose, and executable Make targets disagree, verify the live Makefile contract, preserve the current bounded file scope, and correct each inconsistent source through separately authorized operations.
+
+Rationale:
+
+The Pinecone correction exposed a routed data-prefixed graph-export validation target that did not exist. The executable target was `make graph-export-validate`. Correcting the router and its self-tests first, then the task guide, restored alignment without contaminating the Pinecone commit or weakening validation.
+
 ## Current Review History
 
-### Formatting wrapper failure
+### Canonical live-handoff adoption
 
-An earlier wrapper created and validated the candidate, then stopped at `git diff --cached --check` because 18 Markdown hard-break lines contained trailing spaces.
+The first live-handoff candidate failed cached whitespace checks because 18 Markdown hard-break lines contained trailing spaces. After whitespace recovery, its first independent semantic review returned `STOP` for authority, attribution, scope, and stale-state problems.
 
-Whitespace recovery is complete:
-
-- the 18 trailing spaces were removed;
-- worktree and index were identical;
-- `git diff --cached --check` passed;
-- run summary 28 reported `make validate` passed.
-
-### Independent semantic review
-
-Exactly one independent read-only Reviewer reviewed candidate SHA-256:
+The revised 392-line candidate with SHA-256:
 
 ```text
-31f03440185dc773ba1ec4d7183c330be81af866e8ed7d61852611ad2209c445
+11ebe9d08ced4bd38dd1a3d3c67080b5c593c640d026e9a5beabbe34227664d5
 ```
 
-The Reviewer returned `STOP`.
+resolved all seven findings. One independent read-only Reviewer returned `ACCEPT`, full validation passed, and the file was committed and published as `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5`.
 
-The blocking findings were:
+### Pinecone artifact-license correction
 
-- unsafe and incomplete authority precedence;
-- external run summaries ranked above canonical repository contracts;
-- maintainer-specific conventions presented too globally;
-- update protocol incompatible with the one-file rule;
-- stale claim that the current worktree was clean;
-- incomplete attribution of run and validation evidence;
-- obsolete continuation instructions after whitespace recovery.
+One independent read-only Reviewer accepted the exact one-value change from `Proprietary` to `Apache-2.0`. Product-level proprietary-service evidence remained intact, `vectorDatabase.productLicensing` remained absent, full validation passed, and commit `71b2d02d542a057a0c9ce2bc0592f51554c7cea0` was published.
 
-This revision addresses those findings. It has not yet received an independent verdict.
+### Task-router correction
+
+The router implementation and its built-in self-tests contained three references to the nonexistent data-prefixed graph-export validation target. The exact three-string replacement to `make graph-export-validate` passed router self-tests, a data-path smoke test, full validation, and one independent read-only review. Commit `3d71f9371398e9b08e1ec15af50c6564640ccbb6` was published.
+
+### Adding-data-records task-guide correction
+
+The task guide contained the final stale target reference. Its exact one-string replacement passed agent-routing validation, representative routing checks, full validation, and one independent read-only review. Commit `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f` was published.
+
+No obsolete operational target reference remained under `docs`, `scripts`, or `Makefile` after that operation.
 
 ## Exact Continuation Point
+
+Preparation baseline:
+
+```text
+branch: experiment/codex-director
+HEAD and upstream: 0ce57b54deca81a08ca4de5153a0b6ceb3453d0f
+local main and origin/main: e3e02681e287879e13819493b057e64a99b5c270
+worktree: clean
+```
 
 Current bounded operation:
 
 ```text
-Add docs/maintenance/live-handoff.md
+Synchronize docs/maintenance/live-handoff.md
 ```
 
-Current state:
+This update must remain the sole repository file change, pass `make validate`, receive one independent read-only review, and be committed and published only on `ACCEPT`.
 
-- the file is the sole staged path;
-- it is not present in committed `HEAD`;
-- the preceding candidate received independent `STOP`;
-- this revised candidate addresses all seven required corrections;
-- no commit or push is authorized yet.
+Upon successful publication of this update, no tactical operation is selected automatically.
 
-Exact next action:
+The exact next project-level action is an explicit product-owner decision among:
 
-1. verify the revised one-file candidate and protected refs;
-2. run `git diff --cached --check`;
-3. run full repository validation;
-4. obtain one independent read-only review of the revised candidate;
-5. commit and publish only if the verdict is `ACCEPT`.
+1. Track A — stabilize and integrate;
+2. Track B — continue evidence-first VectorDatabase work;
+3. Track C — implement Autonomous Product Director v2.
 
-After successful adoption of the live handoff, the proposed next bounded repository operation is the Pinecone artifact-license correction.
+Andrea retains that decision. Until he selects a track, automation must stop at orientation and verification rather than inventing a strategic continuation.
