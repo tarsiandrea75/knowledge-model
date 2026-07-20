@@ -569,3 +569,14 @@ Each backlog entry uses this compact format:
 - `Suggested implementation`: Implemented through task router output and data-record task-guide guidance.
 - `Related files`: `scripts/rkm-route-task.py`; `docs/maintenance/task-guides/adding-data-records.md`; `data/manifest.json`; `examples/data-graph-export/`
 - `Depends on`: `GB-005 Task router CLI`.
+### GB-044 Adaptive Codex Model Routing And Token Budgeting
+
+- `ID`: `GB-044`
+- `Title`: Adaptive Codex model routing and token budgeting.
+- `Status`: `Proposed`
+- `Priority`: `High`
+- `Area`: Automation
+- `Reason`: Current Codex execution paths largely inherit the user-level `gpt-5.6-sol` model with `high` reasoning effort, while the configured Worker and Reviewer agents also default to `high`. This applies expensive reasoning to bounded documentation, mechanical inspection, and semantic architecture work alike. Deterministic repository checks already cover many factual invariants, but RKM has no execution-profile selector that separates zero-model checks, low-cost bounded work, standard engineering tasks, and high-risk strategic reasoning.
+- `Suggested implementation`: Define a deterministic-first execution policy; add a path- and task-aware selector for Creator, Reviewer, and escalation profiles; create configurable named Codex profiles; generate compact evidence bundles before semantic review; skip model calls when shell, Python, Git, Make, or schema validation can decide the result; require stronger profiles for architecture, schema, ontology, cross-cutting automation, and integration work; log selected model, reasoning effort, context budget, result, and escalation reason; and add self-tests plus integration coverage for cycle, discovery, recovery, commit, Director, and autopilot paths. Initial candidate bindings are GPT-5.4 Mini for strictly mechanical model-assisted work, GPT-5.6 Luna for low-risk bounded semantic work, GPT-5.6 Terra for standard engineering and semantic review, and GPT-5.6 Sol for architecture, strategy, conflicts, and high-risk decisions. Exact model bindings must remain configurable and be checked against current Codex availability rather than treated as permanent contracts.
+- `Related files`: `scripts/rkm-select-execution-profile.py`; `scripts/rkm-codex-exec.py`; `scripts/rkm-route-task.py`; `scripts/rkm-cycle.sh`; `scripts/rkm-discover.sh`; `scripts/rkm-recover-revise.sh`; `scripts/rkm-codex-commit.sh`; `scripts/rkm-director.sh`; `scripts/rkm-budget.py`; `.codex/config.toml`; `.codex/agents/`; `docs/maintenance/codex-execution-policy.md`; `docs/maintenance/automation-guardrails.md`; `Makefile`
+- `Depends on`: `GB-005 Task Router CLI`; `GB-035 Autopilot Mode Profiles`; `GB-036 Autopilot Risk Tiers`; existing token-budget and run-ledger tooling.
