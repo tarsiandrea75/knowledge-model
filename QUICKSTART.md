@@ -1,6 +1,6 @@
 # RKM Quickstart
 
-This quickstart gives a technical user the shortest practical path to inspect and validate the first internal alpha package for RAG Knowledge Model.
+This quickstart gives a technical user the shortest practical path to inspect and validate the current RAG Knowledge Model repository. `v0.1.0-alpha` remains the first internal alpha checkpoint; capabilities added later on the current experimental branch do not retroactively expand that historical release scope.
 
 ## 1. Clone the Repository
 
@@ -21,7 +21,7 @@ make validate
 
 ## 3. Query Evidence-Backed Decisions
 
-Use the decision-query CLI to turn the populated RKM data into source-linked decision views. The first evidence-backed decision records currently demonstrated by the CLI are Hybrid Retrieval and Reranking; this is limited alpha coverage, not comprehensive RAG ecosystem coverage, and the CLI is not a stable public API.
+Use the decision-query CLI to turn populated RKM data into source-linked entity views, technique pipeline views, and same-type comparisons. The current branch supports the existing technique examples and manifest-declared VectorDatabase records. This remains limited coverage, not comprehensive RAG ecosystem coverage, and the CLI is not a stable public API. VectorDatabase records and comparison mode were added after the alpha checkpoint.
 
 For a compact Hybrid Retrieval decision brief, run:
 
@@ -42,6 +42,16 @@ python3 scripts/rkm-decision-query.py \
 
 Full mode exposes all qualifiers, complete evidence interpretation, every recorded limitation, source-fragment locators, and complete source metadata.
 
+For a full VectorDatabase entity view, run:
+
+```bash
+python3 scripts/rkm-decision-query.py \
+  --entity neo4j \
+  --detail full
+```
+
+All 17 manifest-declared VectorDatabase records retain `Draft` status. Neo4j alone has `metadata.reviewState` set to `Approved`; the other sixteen remain `Not Reviewed`. That approval applies only to the exact Neo4j record and review scope and does not turn the record into release approval or product guidance.
+
 To inspect how the two techniques are modeled in a requested stage order, run:
 
 ```bash
@@ -50,6 +60,15 @@ python3 scripts/rkm-decision-query.py \
 ```
 
 The pipeline view presents the requested stage order, discovers direct canonical workflow relationships, and keeps each finding attributed to its technique. It does not numerically compare results from unrelated benchmarks, claim that the combined pipeline is universally superior, or imply that Reranking is mandatory after Hybrid Retrieval. Current relationship support is classified as `Maintainer rationale only`, not empirical validation.
+
+To compare two VectorDatabase records of the same canonical entity type, run:
+
+```bash
+python3 scripts/rkm-decision-query.py \
+  --compare neo4j qdrant
+```
+
+Comparison output is deterministic, descriptive, non-ranking, and evidence-traceable. It aligns recorded fields but does not select a winner or recommend a product. Matching values do not prove semantic equivalence, and an absent value means only that it is not recorded, not that the capability is unsupported.
 
 For complete machine-readable output suitable for scripts and downstream consumers, use JSON:
 
@@ -61,9 +80,13 @@ python3 scripts/rkm-decision-query.py \
 python3 scripts/rkm-decision-query.py \
   --pipeline hybrid-retrieval reranking \
   --format json
+
+python3 scripts/rkm-decision-query.py \
+  --compare neo4j qdrant \
+  --format json
 ```
 
-JSON always contains the complete decision model. `--detail compact` and `--detail full` affect text presentation only.
+JSON always contains the complete entity, pipeline, or comparison model. `--detail compact` and `--detail full` affect text presentation only.
 
 To inspect all CLI options, run:
 
