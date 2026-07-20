@@ -420,19 +420,28 @@ Git verifies the identity, order, scope, and upstream presence of these three co
 - `Governance effect`: This decision creates `GB-044 Adaptive Codex Model Routing And Token Budgeting`. It does not weaken one-file bounded operations, protected-main rules, semantic independence where required, validation gates, safe-push gates, or Andrea's authority over strategic direction and integration.
 - `Current operational constraint`: Codex credits were exhausted during the protected Track A documentation campaign. The campaign remains paused after published commit `5e24ca0631a7fbfdfc1494f4fc98500d304190f5`; the repository is clean, branch HEAD equals upstream, and protected local and remote `main` remain at `e3e02681e287879e13819493b057e64a99b5c270`.
 
+#### Adaptive Routing Implementation Progress
+
+Two bounded implementation increments are now durable:
+
+1. Commit `760fa2ffedb4c166b22d1135c12c62d0480ef7c7` added `docs/maintenance/codex-execution-policy.md`. The policy defines deterministic-first execution, Tiers 0 through 5, Creator and Reviewer asymmetry, risk signals, compact evidence bundles, escalation, context and output budgeting, model-availability handling, telemetry, integration requirements, implementation order, and non-goals. Full repository validation and safe publication passed without invoking Codex.
+2. Commit `261c62ad1bb00f41de8d622e69fa3faf3ed3e794` added `scripts/rkm-select-execution-profile.py`. The selector deterministically classifies paths and explicit task types, raises tiers for multi-file scope, external research, previous invalid outcomes, `REVISE`, `STOP`, and high-consequence work, and emits Creator, Reviewer, evidence-bundle, and escalation decisions in text or JSON. Built-in self-tests and representative routing checks passed. The first candidate exposed two mechanical repository-compatibility issues: its variadic tuple type annotation triggered the incomplete-content validator, and `py_compile` created `scripts/__pycache__/`. Recovery replaced those annotations with `Sequence[str]`, used in-memory compilation, removed the transient cache, reran full validation, and published the exact one-file selector change.
+
+These increments implement the policy and selection foundation only. They do not yet install Codex profiles, invoke selected profiles, generate evidence bundles, record model telemetry, or integrate existing cycle, discovery, recovery, commit, Director, or autopilot execution paths.
+
 ## Exact Continuation Point
 
-The selected strategic direction remains Track A, Stabilize and Integrate, but the next implementation increment is the adaptive Codex execution layer accepted in LH-009.
+The selected strategic direction remains Track A, Stabilize and Integrate. Adaptive routing implementation has completed the policy and deterministic selector foundations.
 
-Proceed in bounded, separately validated operations:
+Continue in bounded, separately validated operations:
 
-1. Add `docs/maintenance/codex-execution-policy.md` with deterministic-first rules, risk tiers, Creator and Reviewer asymmetry, escalation, evidence bundles, model-binding configurability, and usage telemetry.
-2. Add `scripts/rkm-select-execution-profile.py` with deterministic path- and task-based profile selection, machine-readable output, explanation output, and self-tests.
-3. Add named user or repository-supported Codex profile templates for mechanical, bounded semantic, engineering, and strategic work without embedding credentials or assuming permanent model availability.
-4. Add `scripts/rkm-codex-exec.py` as the unified wrapper that consumes selector output, applies model and reasoning configuration, redirects standard input safely, limits retries, records execution metadata, and preserves sandbox and approval contracts.
-5. Integrate the selector and wrapper incrementally into `rkm-cycle.sh`, `rkm-discover.sh`, `rkm-recover-revise.sh`, `rkm-codex-commit.sh`, and the Director or autopilot paths, one bounded integration at a time.
-6. Add validation and unit coverage for selection, escalation, invalid profile handling, unavailable models, `NO_CHANGE_REQUIRED`, deterministic-only tasks, Reviewer requirements, and protected-main behavior.
-7. Update the rule-coverage report, automation guardrails, task routing, Make targets, usage reporting, cockpit surfaces, maturity report, and this live handoff only when their corresponding implementation becomes durable.
-8. Resume the remaining protected Track A documentation campaign and final read-only integration-readiness audit after Codex access is restored and the adaptive routing layer has a validated minimal implementation.
+1. Add a deterministic profile-template renderer that can produce `rkm-mechanical`, `rkm-bounded`, `rkm-engineering`, and `rkm-strategic` `$CODEX_HOME` profile files from configurable model bindings without embedding credentials or assuming permanent model availability. Test generation only in an isolated temporary directory before any optional user installation.
+2. Add `scripts/rkm-codex-exec.py` as the unified wrapper that consumes selector output, applies the chosen profile and reasoning configuration, redirects standard input safely, limits retries, stops cleanly on quota or authentication failure, and records execution metadata.
+3. Add compact evidence-bundle generation with deterministic branch, ref, path, digest, routing, validation, lifecycle, and graph facts.
+4. Integrate the selector, profiles, wrapper, and evidence bundles incrementally into `rkm-cycle.sh`, `rkm-discover.sh`, `rkm-recover-revise.sh`, `rkm-codex-commit.sh`, and the Director or autopilot paths, one bounded integration at a time.
+5. Add validation and unit coverage for profile rendering, selector-wrapper compatibility, unavailable profiles and models, quota failure, `NO_CHANGE_REQUIRED`, deterministic-only tasks, Reviewer requirements, one-step escalation, and protected-main behavior.
+6. Update task routing, automation guardrails, rule coverage, Make targets, budget and usage reporting, cockpit surfaces, maturity reporting, `GB-044`, and this live handoff as the corresponding implementation becomes durable.
+7. Resume the remaining protected Track A documentation campaign only after Codex access is restored and the adaptive execution layer has a validated minimal end-to-end path.
+8. Perform the final read-only integration-readiness audit before Andrea chooses an integration form.
 
 Do not resume the old all-Sol/high campaign wrapper unchanged. Do not integrate into `main` without Andrea's explicit decision.
