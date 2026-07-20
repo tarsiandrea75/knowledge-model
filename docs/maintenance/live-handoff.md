@@ -398,33 +398,41 @@ Commit `0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad` published the one-file `data/R
 
 Git verifies the identity, order, scope, and upstream presence of these three commits. This subsection does not independently reconstruct their external wrapper logs or convert publication into semantic approval of the documented data.
 
+### LH-009 - Adopt Deterministic-First Adaptive Codex Routing
+
+- `Date`: 2026-07-20
+- `Status`: Accepted
+- `Decision owner`: Andrea, RKM product owner
+- `Decision`: RKM will optimize Codex use through deterministic-first execution and adaptive model routing rather than applying the same expensive model and reasoning effort to every task.
+- `Audit evidence`: A read-only audit on branch `experiment/codex-director` at commit `5e24ca0631a7fbfdfc1494f4fc98500d304190f5` found Codex CLI `0.144.4`; CLI support for per-run `--model`, named `--profile`, and configuration overrides; a user default of `gpt-5.6-sol` with `high` reasoning effort; `high` reasoning effort in both configured RKM Worker and Reviewer agents; and multiple repository Codex invocations that inherit those defaults. The audit also found existing deterministic routing, validation, budget, ledger, recovery, and cockpit foundations but no adaptive execution-profile selector or unified Codex wrapper.
+- `Operating policy`:
+  - Use Bash, Python, Git, Make, schemas, validators, and deterministic parsers before invoking any model.
+  - Do not ask a model to reconfirm facts already proven by deterministic checks unless semantic interpretation remains necessary.
+  - Use configurable low-cost profiles for bounded mechanical or low-risk semantic work.
+  - Use a standard engineering profile for code changes, governance changes, and semantic review.
+  - Reserve the strongest profile for architecture, ontology, schema design, cross-cutting automation, unresolved contradictions, strategic planning, and integration decisions.
+  - Allow Creator and Reviewer profiles to differ according to the risk and cost of a false acceptance.
+  - Skip independent semantic review for `NO_CHANGE_REQUIRED` outcomes and for operations fully decided by deterministic contracts.
+  - Build compact evidence bundles so Reviewers inspect the target, diff, proven invariants, and only the canonical sources needed for disputed claims.
+  - Escalate once when a lower profile reports uncertainty, contradiction, invalid output, or task complexity beyond its assigned tier; do not repeat expensive retries without new evidence.
+  - Log selected profile, model, reasoning effort, bounded context, validation result, verdict, token or credit use when available, and escalation reason.
+  - Keep exact model names configurable. The initial candidate mapping is GPT-5.4 Mini for strictly mechanical model-assisted work, GPT-5.6 Luna for low-risk bounded semantic work, GPT-5.6 Terra for standard engineering and semantic review, and GPT-5.6 Sol for architecture and strategic work.
+- `Governance effect`: This decision creates `GB-044 Adaptive Codex Model Routing And Token Budgeting`. It does not weaken one-file bounded operations, protected-main rules, semantic independence where required, validation gates, safe-push gates, or Andrea's authority over strategic direction and integration.
+- `Current operational constraint`: Codex credits were exhausted during the protected Track A documentation campaign. The campaign remains paused after published commit `5e24ca0631a7fbfdfc1494f4fc98500d304190f5`; the repository is clean, branch HEAD equals upstream, and protected local and remote `main` remain at `e3e02681e287879e13819493b057e64a99b5c270`.
+
 ## Exact Continuation Point
 
-Preparation baseline:
+The selected strategic direction remains Track A, Stabilize and Integrate, but the next implementation increment is the adaptive Codex execution layer accepted in LH-009.
 
-```text
-branch: experiment/codex-director
-HEAD and upstream: 0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad
-local main and origin/main: e3e02681e287879e13819493b057e64a99b5c270
-worktree: clean
-```
+Proceed in bounded, separately validated operations:
 
-Active direction:
+1. Add `docs/maintenance/codex-execution-policy.md` with deterministic-first rules, risk tiers, Creator and Reviewer asymmetry, escalation, evidence bundles, model-binding configurability, and usage telemetry.
+2. Add `scripts/rkm-select-execution-profile.py` with deterministic path- and task-based profile selection, machine-readable output, explanation output, and self-tests.
+3. Add named user or repository-supported Codex profile templates for mechanical, bounded semantic, engineering, and strategic work without embedding credentials or assuming permanent model availability.
+4. Add `scripts/rkm-codex-exec.py` as the unified wrapper that consumes selector output, applies model and reasoning configuration, redirects standard input safely, limits retries, records execution metadata, and preserves sandbox and approval contracts.
+5. Integrate the selector and wrapper incrementally into `rkm-cycle.sh`, `rkm-discover.sh`, `rkm-recover-revise.sh`, `rkm-codex-commit.sh`, and the Director or autopilot paths, one bounded integration at a time.
+6. Add validation and unit coverage for selection, escalation, invalid profile handling, unavailable models, `NO_CHANGE_REQUIRED`, deterministic-only tasks, Reviewer requirements, and protected-main behavior.
+7. Update the rule-coverage report, automation guardrails, task routing, Make targets, usage reporting, cockpit surfaces, maturity report, and this live handoff only when their corresponding implementation becomes durable.
+8. Resume the remaining protected Track A documentation campaign and final read-only integration-readiness audit after Codex access is restored and the adaptive routing layer has a validated minimal implementation.
 
-```text
-Track A — Stabilize and Integrate
-```
-
-The continuation is the protected documentation campaign accepted in LH-008:
-
-- ChatGPT directs the campaign and maintains its guardrails within Andrea's authorization.
-- One Codex Creator changes one bounded file for each candidate.
-- A separate read-only Reviewer reviews every changed candidate.
-- Only after `ACCEPT` may the wrapper validate, commit, and safe-push the candidate.
-- The wrapper stops on `REVISE`, `STOP`, failure, scope expansion, or protected-ref change.
-
-The current Creator candidate is the one-file synchronization of `docs/maintenance/live-handoff.md`. Its instruction expressly excludes Creator-side validation, staging, commit, push, and ref changes; those later gates belong to the separate Reviewer and wrapper workflow.
-
-After this candidate is accepted and published, continue Track A with the next bounded documentation candidate selected under ChatGPT's campaign direction and the applicable repository routing. Do not expand a candidate's file scope to capture the next natural step.
-
-Andrea retains authority over further strategic choices and any integration into `main`. No current decision authorizes promotion, merge, rebase, branch split, protected-ref mutation, or a switch to Track B or Track C.
+Do not resume the old all-Sol/high campaign wrapper unchanged. Do not integrate into `main` without Andrea's explicit decision.
