@@ -34,68 +34,64 @@ Never reconcile a contradiction silently. Identify the conflicting sources, veri
 
 ## Current Operational Snapshot
 
-Snapshot date: 2026-07-19
+Snapshot date: 2026-07-20
 
 ### Committed baseline
 
 Operational branch: `experiment/codex-director`
 
-Preparation baseline `HEAD`: `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f`
+Preparation baseline `HEAD`: `0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad`
 
 Preparation baseline upstream: `origin/experiment/codex-director` at the same commit
 
-Latest committed subject at preparation time: `Correct data-record task guide target`
+Latest committed subject at preparation time: `Update populated data documentation`
 
 Protected local `main`: `e3e02681e287879e13819493b057e64a99b5c270`
 
 Protected `origin/main`: `e3e02681e287879e13819493b057e64a99b5c270`
 
-Commits on the operational branch after `main`: 83
+Commits on the operational branch after `main`: 86
 
 The repository was clean at this preparation baseline. The live handoff itself had already been committed and published at `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5`.
 
 ### Recently published sequence
 
-The following four one-file operations were completed in order:
+The following seven one-file operations were completed in order:
 
 1. `6ea4d9310f8e7193cbd5b284fbfc8f843e8ce4e5` — add the canonical live handoff;
 2. `71b2d02d542a057a0c9ce2bc0592f51554c7cea0` — correct the Pinecone artifact license;
 3. `3d71f9371398e9b08e1ec15af50c6564640ccbb6` — correct the task router graph-export validation target;
-4. `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f` — correct the adding-data-records task-guide target.
+4. `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f` — correct the adding-data-records task-guide target;
+5. `f79bcd4de5b20ddc239803e0ce1be93cbfba5415` — synchronize the canonical live handoff;
+6. `44fb7c78dc5e58bae6ee9c7c7aab0a05d19f3d85` — reconcile the VectorDatabase backlog status;
+7. `0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad` — update populated data documentation.
 
-Each operation reported full validation success, one independent read-only Reviewer verdict of `ACCEPT`, safe publication, protected `main`, and a clean final worktree.
+The first four operations are documented below with attributed full-validation, independent-review, and safe-publication evidence. Current Git state verifies that all seven commits are present on the aligned local and upstream operational branch and that protected local and remote `main` remain unchanged.
 
-These are attributed operational claims from external run summaries and review reports. Current Git state and executable repository contracts remain the source of truth.
+Validation, Reviewer, and wrapper outcomes remain attributed operational claims unless established by their applicable durable evidence. Current Git state and executable repository contracts remain the source of truth.
 
 ## Last Completed Published Operation
 
-Task: correct the graph-export validation target in the adding-data-records task guide
+Task: update the populated-data documentation to match current manifest-declared scope
 
-Reported summary version: `35`
-
-Result: `SUCCESS`
-
-Validation: `PASS`
-
-Independent review: `ACCEPT`
-
-Commit and published branch tip for that operation: `0ce57b54deca81a08ca4de5153a0b6ceb3453d0f`
+Git-verified commit and published branch tip for that operation: `0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad`
 
 Exact semantic change:
 
 ```text
-docs/maintenance/task-guides/adding-data-records.md
-incorrect data-prefixed graph-export validation target -> make graph-export-validate
+data/README.md
+document the 36 manifest-declared files, 17 VectorDatabase records and lifecycle boundaries,
+decision-query entry points, and current data graph export coverage
 ```
 
-The operation changed one string in one file. It aligned the guide with the public Makefile target and the already-corrected task router.
+The operation synchronized consumer guidance without changing canonical data, lifecycle state, graph artifacts, or executable contracts.
 
-Immediately preceding related operations were:
+Immediately preceding published documentation operations were:
 
-- Pinecone artifact-license correction at `71b2d02d542a057a0c9ce2bc0592f51554c7cea0`;
-- task-router correction at `3d71f9371398e9b08e1ec15af50c6564640ccbb6`.
+- governance-backlog reconciliation at `44fb7c78dc5e58bae6ee9c7c7aab0a05d19f3d85`, which records GB-020 as implemented while preserving the distinction between implementation coverage and semantic approval;
+- canonical live-handoff synchronization at `f79bcd4de5b20ddc239803e0ce1be93cbfba5415`.
 
-No obsolete operational target reference remained under `docs`, `scripts`, or `Makefile` after the final operation.
+Git verifies these commits and their one-file scopes. This handoff does not independently elevate their documentation statements above canonical data, lifecycle records, or commit-bound review evidence.
 
 ## Current Repository Meaning
 
@@ -113,6 +109,7 @@ The current experimental branch contains:
 - a deeply corrected and independently approved Neo4j record;
 - recent artifact-license corrections for Amazon Neptune Analytics, Memgraph, and Pinecone;
 - corrected alignment between the data-path task router, task guide, and public graph-export validation target;
+- a reconciled GB-020 implementation record and current populated-data consumer guidance;
 - the comprehensive project handoff.
 
 Only Neo4j is currently an `Approved` VectorDatabase record. The other 16 remain `Draft` and `Not Reviewed` unless a later canonical lifecycle transition proves otherwise.
@@ -140,25 +137,25 @@ The corrected router self-test, routing smoke test, agent-routing validation, gr
 
 No known artifact-license placement anomaly from the inherited tactical plan remains open.
 
-## Strategic Fork After the Pinecone Correction
+The two most recent published documentation increments align with Track A stabilization work: they reconciled GB-020 and updated `data/README.md`. GB-020 now records implemented VectorDatabase modeling, data, graph-export, and decision-query coverage without implying semantic approval of all records. The data guide now records the 36 manifest-declared files, the lifecycle boundary across the 17 VectorDatabase records, and VectorDatabase graph-export coverage.
 
-The Pinecone correction and the discovered routing-governance defect are complete. No automation may choose the next strategic direction implicitly.
+Neither documentation increment changed canonical record content, lifecycle state, release history, or protected refs.
 
-### Track A: Stabilize and Integrate
+## Selected Strategic Direction
+
+Andrea explicitly selected Track A, Stabilize and Integrate, on 2026-07-20.
+
+### Track A: Stabilize and Integrate — Selected
 
 Review the experimental branch against `main` by product increment, synchronize stale consumer documentation, reconcile governance-backlog status, and decide whether the autonomous-loop specification and VectorDatabase expansion should land together.
 
-This is the safest integration-oriented path.
+The active protected documentation campaign advances the synchronization portion of this track through bounded one-file candidates. Track selection does not authorize integration into `main`, an automatic branch split, or any other strategic choice within the track.
 
-### Track B: Continue Evidence-First VectorDatabase Work
+### Tracks B and C — Not Selected
 
-Review one record or one bounded semantic family at a time, preserve capability and deployment scope, improve evidence granularity, and obtain independent read-only review before lifecycle changes.
+Track B would continue evidence-first VectorDatabase work. Track C would implement Autonomous Product Director v2. Neither is the active direction.
 
-### Track C: Implement Autonomous Product Director v2
-
-This requires an explicit branch-baseline decision and protected incremental implementation. The v2 contract is detailed, but its runtime does not exist.
-
-Automation must not select this strategic fork implicitly. Andrea retains the product-direction decision.
+Switching tracks, making further strategic choices, splitting or combining product increments, and integrating any work into `main` still require Andrea's explicit authorization.
 
 ## Known Documentation Drift
 
@@ -166,12 +163,10 @@ The experimental branch contains stale or incomplete consumer-facing description
 
 - `README.md`;
 - `QUICKSTART.md`;
-- `data/README.md`;
 - data graph-export documentation;
 - graph-export contract documentation;
 - `docs/maintenance/assistant-handoff.md`;
-- maturity documentation;
-- governance backlog entry GB-020.
+- maturity documentation.
 
 Historical alpha release notes must remain historical and must not be rewritten as though later branch features existed in `v0.1.0-alpha`.
 
@@ -271,11 +266,11 @@ A successor needs durable state, while repository governance forbids silently ex
 
 Date: 2026-07-19
 
-Status: Tactical correction completed; strategic choice remains pending.
+Status: Tactical correction completed; the strategic choice was later resolved by LH-008.
 
 Decision:
 
-The Pinecone artifact-license anomaly was closed in commit `71b2d02d542a057a0c9ce2bc0592f51554c7cea0`. Choose Track A, B, or C only through an explicit product-owner decision.
+The Pinecone artifact-license anomaly was closed in commit `71b2d02d542a057a0c9ce2bc0592f51554c7cea0`. At that point, choosing Track A, B, or C required an explicit product-owner decision.
 
 Rationale:
 
@@ -337,6 +332,30 @@ Rationale:
 
 The Pinecone correction exposed a routed data-prefixed graph-export validation target that did not exist. The executable target was `make graph-export-validate`. Correcting the router and its self-tests first, then the task guide, restored alignment without contaminating the Pinecone commit or weakening validation.
 
+### LH-008 - Select Track A and Accept the Protected Documentation Campaign
+
+Date: 2026-07-20
+
+Status: Accepted by Andrea; repository publication is established separately by Git and the governed campaign.
+
+Decision:
+
+- Track A, Stabilize and Integrate, is the selected strategic direction.
+- ChatGPT owns campaign direction and guardrails within Andrea's authorization.
+- One Codex Creator performs one bounded file update.
+- A separate read-only Reviewer reviews every changed candidate.
+- The wrapper validates, commits, and safe-pushes only after a Reviewer verdict of `ACCEPT`.
+- The wrapper stops on `REVISE`, `STOP`, failure, scope expansion, or any protected-ref change.
+- Further strategic choices and integration into `main` require Andrea's explicit authorization.
+
+Rationale:
+
+The campaign separates product direction, bounded creation, independent review, and publication gates while preserving the one-file protocol and protected-ref boundary.
+
+Authority boundary:
+
+This entry records Andrea's selected direction and accepted campaign workflow. It does not replace repository governance, executable contracts, current task authorization, or live inspection, and it creates no standing authority to integrate into `main`.
+
 ## Current Review History
 
 ### Canonical live-handoff adoption
@@ -365,31 +384,47 @@ The task guide contained the final stale target reference. Its exact one-string 
 
 No obsolete operational target reference remained under `docs`, `scripts`, or `Makefile` after that operation.
 
+### Canonical live-handoff synchronization
+
+Commit `f79bcd4de5b20ddc239803e0ce1be93cbfba5415` published the prior synchronization of this file as one file on the operational branch.
+
+### VectorDatabase backlog reconciliation
+
+Commit `44fb7c78dc5e58bae6ee9c7c7aab0a05d19f3d85` published the one-file GB-020 reconciliation. It records implementation of the VectorDatabase dataset and related tooling while expressly preserving the difference between implementation status and independent semantic approval.
+
+### Populated-data documentation update
+
+Commit `0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad` published the one-file `data/README.md` synchronization and is the current local and upstream branch tip at this preparation baseline.
+
+Git verifies the identity, order, scope, and upstream presence of these three commits. This subsection does not independently reconstruct their external wrapper logs or convert publication into semantic approval of the documented data.
+
 ## Exact Continuation Point
 
 Preparation baseline:
 
 ```text
 branch: experiment/codex-director
-HEAD and upstream: 0ce57b54deca81a08ca4de5153a0b6ceb3453d0f
+HEAD and upstream: 0ca2f3c39a11a6efb1ecf01c3dd678463a4414ad
 local main and origin/main: e3e02681e287879e13819493b057e64a99b5c270
 worktree: clean
 ```
 
-Current bounded operation:
+Active direction:
 
 ```text
-Synchronize docs/maintenance/live-handoff.md
+Track A — Stabilize and Integrate
 ```
 
-This update must remain the sole repository file change, pass `make validate`, receive one independent read-only review, and be committed and published only on `ACCEPT`.
+The continuation is the protected documentation campaign accepted in LH-008:
 
-Upon successful publication of this update, no tactical operation is selected automatically.
+- ChatGPT directs the campaign and maintains its guardrails within Andrea's authorization.
+- One Codex Creator changes one bounded file for each candidate.
+- A separate read-only Reviewer reviews every changed candidate.
+- Only after `ACCEPT` may the wrapper validate, commit, and safe-push the candidate.
+- The wrapper stops on `REVISE`, `STOP`, failure, scope expansion, or protected-ref change.
 
-The exact next project-level action is an explicit product-owner decision among:
+The current Creator candidate is the one-file synchronization of `docs/maintenance/live-handoff.md`. Its instruction expressly excludes Creator-side validation, staging, commit, push, and ref changes; those later gates belong to the separate Reviewer and wrapper workflow.
 
-1. Track A — stabilize and integrate;
-2. Track B — continue evidence-first VectorDatabase work;
-3. Track C — implement Autonomous Product Director v2.
+After this candidate is accepted and published, continue Track A with the next bounded documentation candidate selected under ChatGPT's campaign direction and the applicable repository routing. Do not expand a candidate's file scope to capture the next natural step.
 
-Andrea retains that decision. Until he selects a track, automation must stop at orientation and verification rather than inventing a strategic continuation.
+Andrea retains authority over further strategic choices and any integration into `main`. No current decision authorizes promotion, merge, rebase, branch split, protected-ref mutation, or a switch to Track B or Track C.
