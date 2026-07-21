@@ -88,6 +88,18 @@ printf '==> Running rkm-release-check self-test\n'
 printf '==> Running rkm-route-task self-test\n'
 "$PYTHON_BIN" scripts/rkm-route-task.py --self-test
 
+printf '==> Running execution-profile selector self-test\n'
+"$PYTHON_BIN" -B scripts/rkm-select-execution-profile.py --self-test
+
+printf '==> Running Codex profile renderer self-test\n'
+"$PYTHON_BIN" -B scripts/rkm-render-codex-profiles.py --self-test
+
+printf '==> Running adaptive Codex execution wrapper self-test\n'
+"$PYTHON_BIN" -B scripts/rkm-codex-exec.py --self-test
+
+printf '==> Running compact evidence bundle self-test\n'
+"$PYTHON_BIN" -B scripts/rkm-build-evidence-bundle.py --self-test
+
 printf '==> Running rkm-decision-query self-test\n'
 "$PYTHON_BIN" scripts/rkm-decision-query.py --self-test
 
