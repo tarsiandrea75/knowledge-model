@@ -124,6 +124,14 @@ Fixtures are not the populated RKM dataset and should not be interpreted as comp
 
 A fixture may intentionally be small, abstract, or pedagogical when that makes validation behavior clear.
 
+## Fixture Package Envelope
+
+A fixture package is the bounded consumer example formed by the fixture manifest and the fixture files it declares. The manifest is an orchestration document: it identifies fixture paths and the schema contracts, JSON Pointers, and validation expectations applied to those files. It does not add domain meaning to the nested entity, relationship, claim, evidence, or reference objects.
+
+The declared fixture files remain authoritative for their own instances, while the referenced schemas remain authoritative for their structure. A package-level manifest therefore coordinates existing contracts rather than replacing them with a second entity or relationship contract. Consumers should validate the manifest-declared members as a group and preserve the stable identifiers and cross-object links between them.
+
+The fixture package envelope is distinct from a graph export package. Fixture files are source examples used to exercise RKM contracts; graph export files are derived node-and-edge projections generated from selected fixtures or populated data.
+
 ---
 
 # Populated Data
