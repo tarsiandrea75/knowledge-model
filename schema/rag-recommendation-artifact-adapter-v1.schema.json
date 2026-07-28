@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/rag-recommendation-artifact-adapter-v1.schema.json",
+  "title": "RKM RAG Recommendation Artifact Adapter Envelope v1",
+  "description": "Strict RKM consumer envelope for a recommendation report emitted by the RAG Engineering Lab.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "adapterContractVersion",
+    "sourceArtifact",
+    "policyDecision"
+  ],
+  "properties": {
+    "adapterContractVersion": {
+      "const": "rkm-recommendation-artifact-adapter-v1"
+    },
+    "sourceArtifact": {
+      "$ref": "#/$defs/sourceArtifact"
+    },
+    "policyDecision": {
+      "$ref": "#/$defs/policyDecision"
+    }
+  },
+  "$defs": {
+    "sourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "artifactType",
+        "experimentId",
+        "policyVersion",
+        "qualityFloor"
+      ],
+      "properties": {
+        "contractVersion": {
+          "const": "rag-recommendation-report-v1"
+        },
+        "artifactType": {
+          "const": "RAG_RECOMMENDATION_REPORT"
+        },
+        "experimentId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualityFloor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "policyDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decisionId",
+        "decisionType",
+        "policyVersion",
+        "profiles"
+      ],
+      "properties": {
+        "decisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decisionType": {
+          "const": "RAG_STRATEGY_RECOMMENDATION"
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profiles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "economical",
+            "balanced",
+            "maximumQuality"
+          ],
+          "properties": {
+            "economical": {
+              "$ref": "#/$defs/economicalRecommendation"
+            },
+            "balanced": {
+              "$ref": "#/$defs/balancedRecommendation"
+            },
+            "maximumQuality": {
+              "$ref": "#/$defs/maximumQualityRecommendation"
+            }
+          }
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "available",
+        "pipelineId",
+        "qualityScore",
+        "latencyP95Ms",
+        "estimatedCost",
+        "costCurrency",
+        "reason"
+      ],
+      "properties": {
+        "profile": {
+          "enum": [
+            "ECONOMICAL",
+            "BALANCED",
+            "MAXIMUM_QUALITY"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "pipelineId": {
+          "type": "string",
+          "minLength": 0
+        },
+        "qualityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "latencyP95Ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimatedCost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "costCurrency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "available": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "pipelineId": {
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "economicalRecommendation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/recommendation"
+        },
+        {
+          "properties": {
+            "profile": {
+              "const": "ECONOMICAL"
+            }
+          }
+        }
+      ]
+    },
+    "balancedRecommendation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/recommendation"
+        },
+        {
+          "properties": {
+            "profile": {
+              "const": "BALANCED"
+            }
+          }
+        }
+      ]
+    },
+    "maximumQualityRecommendation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/recommendation"
+        },
+        {
+          "properties": {
+            "profile": {
+              "const": "MAXIMUM_QUALITY"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
