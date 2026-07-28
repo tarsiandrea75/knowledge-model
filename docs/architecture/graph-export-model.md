@@ -138,6 +138,25 @@ Important metadata includes:
 
 Metadata should not obscure domain knowledge. Export consumers should be able to separate graph semantics from operational bookkeeping.
 
+# Export Package Boundary
+
+A graph export package is the bounded consumer artifact formed by the exported nodes and edges together with the metadata needed to interpret that projection. The package is a derived view of canonical RKM sources; it is not a second entity, relationship, claim, evidence or reference contract.
+
+Package metadata should identify:
+
+* the export and its projection type
+* the RKM repository version or source snapshot
+* the source authority and source paths used for the projection
+* the node and edge members included in the package
+* the schema contracts and generator version used to produce it
+* the compatibility status and migration expectation for consumers
+
+The package boundary gives a consumer enough information to decide whether an export can be loaded and compared with an existing graph. It must not imply that package metadata, generated node properties or generated edges have authority over the canonical source. A consumer should return to the declared source records when it needs domain meaning, evidence, claims, references or current lifecycle state.
+
+Package compatibility has two distinct parts. Structural compatibility describes whether a consumer can parse and validate the package members. Semantic compatibility describes whether identifiers, entity types, relationship predicates, direction, provenance meaning and lifecycle interpretation remain usable for the consumer's existing graph. A package is not semantically compatible merely because its JSON remains parseable.
+
+The current committed RKM graph exports are alpha/internal node-and-edge artifacts rather than complete package-envelope contracts. They have deterministic member files and source provenance, but consumers must treat package metadata, broader version negotiation and loader-specific mappings as unresolved until an explicit package contract is added.
+
 ---
 
 # Format Independence
