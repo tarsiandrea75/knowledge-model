@@ -38,6 +38,18 @@ Do not create `.rkm-runs/` inside the repository. If `.rkm-runs/` exists inside 
 
 Repository-local runtime logs make the worktree dirty and can confuse recovery tooling, review state, and handoff readiness.
 
+The standard validator enforces this boundary for known artifact classes:
+
+```bash
+make runtime-artifacts-validate
+```
+
+It rejects runtime directory names, generated RKM or Codex run prefixes, and
+common runtime file suffixes while ignoring `.git` and ordinary project files.
+The check reports each offending path and does not delete anything. Move the
+output to `/tmp/rkm-runs`, remove the repository-local artifact, and rerun the
+validator.
+
 ## Failed Newly Added Files
 
 If a newly added file fails review or recovery and should be discarded, remove it from both the index and the filesystem:

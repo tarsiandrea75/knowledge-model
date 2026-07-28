@@ -212,6 +212,11 @@ if [[ -n "$temporary_review_matches" ]]; then
 fi
 pass_step
 
+start_step "Checking for repository-local runtime artifacts..."
+"$PYTHON_BIN" scripts/validate-runtime-artifacts.py --self-test
+"$PYTHON_BIN" scripts/validate-runtime-artifacts.py
+pass_step
+
 start_step "Running JSON Schema validation..."
 "$PYTHON_BIN" scripts/validate-schemas.py
 pass_step

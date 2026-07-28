@@ -129,13 +129,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-007`
 - `Title`: Runtime artifact detector for repository-local logs, scratch files, transcripts, and temporary run directories.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Validation
 - `Reason`: Generated runtime artifacts inside the repository can pollute status, recovery, and handoff decisions.
-- `Suggested implementation`: Add a validator that rejects known repository-local runtime artifact paths and common transcript or run-log patterns.
-- `Related files`: `AGENTS.md`; `docs/maintenance/automation-guardrails.md`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented by `scripts/validate-runtime-artifacts.py`, exposed through `make runtime-artifacts-validate`, and included in `make validate`.
+- `Related files`: `AGENTS.md`; `docs/maintenance/automation-guardrails.md`; `scripts/validate-runtime-artifacts.py`; `scripts/validate-rkm.sh`; `Makefile`; `docs/maintenance/rule-coverage-report.md`
+- `Depends on`: Implemented in the local GB-007 checkpoint; no schema or canonical-data dependency.
 
 ### GB-008 Rule Coverage Consistency Validator
 

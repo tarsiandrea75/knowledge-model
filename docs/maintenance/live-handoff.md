@@ -484,3 +484,23 @@ authorization; Codex must never run either target.
 The current handoff candidate includes the RKM-002 task packet, Makefile
 change, human-only push documentation, and this checkpoint. Validate the full
 RKM suite before staging. No push has been executed.
+
+## Current Checkpoint: GB-007 Runtime Artifact Detector
+
+Snapshot date: 2026-07-28
+
+GB-007 is complete on `codex/open-autonomy-era`. The repository now provides
+`scripts/validate-runtime-artifacts.py` and the public target
+`make runtime-artifacts-validate`. The standard `make validate` pipeline runs
+both the validator self-test and the clean-repository check.
+
+The detector rejects declared runtime directory names, generated RKM or Codex
+run prefixes, and common runtime file suffixes. It ignores `.git`, ordinary
+project files, and does not delete detected artifacts. Remediation is to move
+runtime output to `/tmp/rkm-runs`, remove the repository-local artifact, and
+rerun validation.
+
+The governance backlog marks GB-007 implemented and the rule-coverage report
+marks the runtime-artifact rule validated. Full RKM validation passed after
+each file change. No schema, canonical data, graph export, branch, tag, or
+remote was changed. The task creates a local commit only; no push is planned.

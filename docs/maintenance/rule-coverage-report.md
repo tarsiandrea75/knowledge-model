@@ -21,7 +21,7 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 | Rule | Primary Location | Coverage Level | Automated Check | Notes |
 | --- | --- | --- | --- | --- |
 | Clean worktree before push, autopilot, or handoff. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Partially Validated | `make safe-push`; release and automation tooling inspect status in specific flows | The general handoff rule still requires the operator or assistant to inspect `git status --short`. |
-| Runtime logs and scratch files must stay outside the repository. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Partially Validated | Dirty-worktree checks can expose generated repository artifacts | There is no dedicated detector for known runtime log or scratch directories. |
+| Runtime logs and scratch files must stay outside the repository. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Validated | `scripts/validate-runtime-artifacts.py`; `make runtime-artifacts-validate`; `make validate` | The detector rejects declared runtime directories, generated RKM or Codex run prefixes, and common runtime file suffixes without deleting artifacts. |
 | Root `AGENTS.md` must remain concise. | `AGENTS.md`; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator enforces the root line budget. |
 | Required local `AGENTS.md` files must exist. | `AGENTS.md`; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required local rule files. |
 | Required task guides must exist. | `AGENTS.md`; `docs/maintenance/task-guides/README.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required task guide inventory. |
@@ -52,7 +52,7 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 1. New entity type package validator.
 2. Relationship predicate reuse assistant or reviewer check.
 3. Recovery state validator that blocks autopilot when recovery failed.
-4. Runtime artifact detector for known log or scratch directories inside the repo.
+4. Recovery state validator that blocks autopilot when recovery failed.
 
 ## Maintenance Rules
 
