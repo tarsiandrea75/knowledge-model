@@ -157,6 +157,14 @@ Package compatibility has two distinct parts. Structural compatibility describes
 
 The current committed RKM graph exports are alpha/internal node-and-edge artifacts rather than complete package-envelope contracts. They have deterministic member files and source provenance, but consumers must treat package metadata, broader version negotiation and loader-specific mappings as unresolved until an explicit package contract is added.
 
+# Package Envelope Contract
+
+When RKM defines a package envelope for graph exports, the envelope should be a derived transport contract around the node and edge members, not a new domain entity. It should identify the export package, projection type, source snapshot, member locations or identities, schema contracts, generator version and compatibility status. The envelope should also state whether the package is structural-only, semantically compatible with a declared consumer contract, or requires migration before loading.
+
+The envelope must preserve the authority boundary of graph export. Its identifiers, compatibility statements and generator metadata describe the projection; they do not establish new entities, relationships, predicates, evidence, claims, references or lifecycle facts. A consumer must be able to validate the envelope and its members independently, then use the declared source authority to interpret domain meaning.
+
+Until a machine-readable envelope schema and deterministic package artifact are explicitly introduced, this section is an architectural contract for future package work rather than a claim that the current node-and-edge files already satisfy it.
+
 ---
 
 # Format Independence
