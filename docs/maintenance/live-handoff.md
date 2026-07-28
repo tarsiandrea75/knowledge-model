@@ -450,3 +450,37 @@ Continue in separately validated operations:
 8. Perform the final read-only integration-readiness audit before Andrea chooses an integration form.
 
 Do not resume the old all-Sol/high campaign wrapper unchanged. Do not install or overwrite user Codex profiles without an explicit, reviewed operation. Do not integrate into `main` without Andrea's explicit decision.
+
+## Current Checkpoint: Protected Autonomy and Consumer Walkthrough
+
+Snapshot date: 2026-07-28
+
+The active operational branch is `codex/open-autonomy-era`. The recent local
+commit sequence is:
+
+- `25e9ac9de84b5f58d49676264e96877123f00c13` — document the initial safe
+  autonomy launcher;
+- `d0b838cd09cd2ea226d686443d20ac7caeb32fec` — add the bounded RAG
+  recommendation consumer walkthrough;
+- `80c4b4d527be658d0eb5105778281601f6353076` — define repository language and
+  protected auto-commit policies.
+
+The RKM consumer walkthrough is complete and demonstrates provider-free
+adaptation and schema validation of a compatibility recommendation fixture.
+It does not persist recommendations into canonical RKM data or authorize
+production promotion. Deferred external evidence and recommendation
+persistence remain recorded as `GB-045`.
+
+The commit-enabled Codex mode is now documented. It may stage explicit paths
+and create normal commits through the protected add and commit wrappers. It
+must not invoke push, directly or indirectly.
+
+`RKM-002` changes the RKM `make safe-push` target to validate, require a clean
+working tree, and invoke only the machine-local protected push wrapper. The
+`make push` target is an alias for this human-only path. This convenience target
+must be run by the human operator from a normal WSL shell after explicit push
+authorization; Codex must never run either target.
+
+The current handoff candidate includes the RKM-002 task packet, Makefile
+change, human-only push documentation, and this checkpoint. Validate the full
+RKM suite before staging. No push has been executed.

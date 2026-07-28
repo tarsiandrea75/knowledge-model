@@ -84,8 +84,7 @@ discover:
 	git status --short; \
 	exit "$$exit_code"
 
-push:
-	git push
+push: safe-push
 
 safe-push: validate
 	@if [[ -n "$$(git status --porcelain)" ]]; then \
@@ -94,7 +93,8 @@ safe-push: validate
 		exit 1; \
 	fi
 	git log --oneline -n 5
-	git push
+	@printf 'Human-only publication: invoking the protected push wrapper.\n'
+	/home/andreatarsi/bin/codex-safe-git-push-current
 
 install-hooks:
 	git config core.hooksPath .githooks
@@ -201,8 +201,8 @@ help:
 	@printf '  make autocycle [N=3]             Run bash scripts/rkm-autocycle.sh N.\n'
 	@printf '                                   Examples: make autocycle N=5; make autocycle N=1 PER_CYCLE_TIMEOUT_SECONDS=1800.\n'
 	@printf '  make discover [N=5]              Run scripts/rkm-discover.sh N, save stdout to /tmp/rkm-discovery-output.txt, keep stderr visible, print exit code, output tail, and status.\n'
-	@printf '  make push                        Run git push.\n'
-	@printf '  make safe-push                   Validate, require clean git status, show recent commits, then push.\n'
+	@printf '  make push                        Human-only alias for make safe-push.\n'
+	@printf '  make safe-push                   Validate, require clean status, then invoke the protected human-only push wrapper.\n'
 	@printf '  make install-hooks               Configure Git to use hooks from .githooks.\n'
 	@printf '  make fix-eof FILE=path/to/file   Run scripts/rkm-fix-eof.sh on FILE.\n'
 	@printf '  make codex-commit PROMPT_FILE=path/to/prompt FILE=path/to/file MESSAGE="commit message"  Run scripts/rkm-codex-commit.sh for one file.\n'

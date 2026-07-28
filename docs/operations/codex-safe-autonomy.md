@@ -170,6 +170,13 @@ $HOME/bin/codex-safe-git-push-current
 
 This separation permits autonomous implementation and local commits while
 preserving human control over publication to the remote repository.
+
+In the RKM repository, `make safe-push` is a human-only convenience target. It
+validates the repository, requires a clean working tree, and then invokes
+`/home/andreatarsi/bin/codex-safe-git-push-current`. The `make push` target is
+an alias for the same protected path. Codex must not invoke either target,
+directly or indirectly; the human operator runs one of them from a normal WSL
+shell after explicit authorization.
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_END -->
 
 <!-- REPOSITORY_LANGUAGE_POLICY_BEGIN -->
