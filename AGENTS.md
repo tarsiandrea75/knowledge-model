@@ -151,3 +151,29 @@ manually when this launcher is available.
 Do not access credential material directly. Never print, inspect, disclose,
 modify, or copy the launcher, its token file, `GH_TOKEN`, or related secrets.
 Invoke the launcher only through its documented command.
+
+## Machine-local Codex safe autonomy
+
+This machine has a protected Codex launcher for autonomous work within the
+authorized repository boundary. Read [docs/operations/codex-safe-autonomy.md](docs/operations/codex-safe-autonomy.md)
+before using it. The recommended launcher is:
+
+```bash
+$HOME/bin/codex-safe-autonomy
+```
+
+When protected autonomous operation is desired, use this launcher instead of
+the normal `codex` command. Its safeguards do not remove the repository's
+branch, Git-wrapper, credential, or push-authorization rules.
+
+<!-- SAFE_GIT_EXECUTION_BOUNDARY_BEGIN -->
+## Safe Git execution boundary
+
+The machine-local safe-autonomy launcher permits autonomous edits and
+validations, but the `workspace-write` sandbox keeps `.git` read-only. Codex
+must prepare and validate changes, then ask the human operator to run the
+documented safe Git wrappers from a normal WSL shell. Codex must not escalate,
+bypass the sandbox, or use direct mutating Git commands.
+
+See `docs/operations/codex-safe-autonomy.md`.
+<!-- SAFE_GIT_EXECUTION_BOUNDARY_END -->
