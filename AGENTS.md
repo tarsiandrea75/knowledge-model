@@ -95,3 +95,33 @@ Reviewer output must include:
 ## Validation Standard
 
 `make validate` is the standard validation entry point for normal repository work unless the current task explicitly requires a narrower command. Validation failures must be fixed before work is reported as ready, except when the failure is clearly pre-existing and unrelated to the touched files.
+
+## Hosted fast-gate verification
+
+After an authorized push, the root agent must verify the GitHub Actions
+workflow for the exact current commit autonomously.
+
+Use only this user-managed, read-only launcher:
+
+```bash
+"$HOME/bin/with-fast-gate-token" gh run list \
+  --repo tarsiandrea75/knowledge-model \
+  --workflow "Fast gate" \
+  --commit "$(git rev-parse HEAD)" \
+  --limit 1 \
+  --json databaseId,workflowName,headSha,status,conclusion,url
+```
+
+Accept the hosted gate only when the returned run has:
+
+- `headSha` exactly equal to `git rev-parse HEAD`;
+- `workflowName` equal to `Fast gate`;
+- `status` equal to `completed`;
+- `conclusion` equal to `success`.
+
+If the run is pending, query it again. Do not ask the user to inspect GitHub
+manually when this launcher is available.
+
+Do not access credential material directly. Never print, inspect, disclose,
+modify, or copy the launcher, its token file, `GH_TOKEN`, or related secrets.
+Invoke the launcher only through its documented command.
