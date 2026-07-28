@@ -109,36 +109,78 @@ to each repository's current `AGENTS.md` and task instructions.
 - Keep machine-local policy and credential material outside the repositories.
 
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_BEGIN -->
-## Git commit boundary
+## Safe autonomy and commit modes
 
-The launcher intentionally separates autonomous repository work from Git
-metadata mutation:
+The machine provides two launch modes.
 
-- Codex may create, edit, move, delete, inspect, and validate ordinary files in
-  the two authorized repositories.
-- The `workspace-write` sandbox keeps `.git` read-only.
-- With `approval_policy = "never"`, Codex does not request permission to escape
-  the sandbox.
-- Consequently, Codex prepares and validates changes but does not stage,
-  commit, or push them from inside the session.
-
-After Codex reports that the changes are ready, the human operator runs the
-safe wrappers from a normal WSL shell, using the repository as the current
-directory:
+### Autonomous work without commits
 
 ```bash
-$HOME/bin/codex-safe-git-add <relative-path> [additional-relative-paths]
-$HOME/bin/codex-safe-git-commit "commit message"
+$HOME/bin/codex-safe-autonomy rag
+$HOME/bin/codex-safe-autonomy rkm
 ```
 
-A push is performed only after explicit user authorization:
+This mode uses `workspace-write` with `approval_policy = "never"`. Codex may
+edit and validate ordinary files in both authorized repositories but does not
+stage, commit, or push from inside the session.
+
+### Autonomous work with protected commits
+
+```bash
+$HOME/bin/codex-safe-autonomy-commit rag
+$HOME/bin/codex-safe-autonomy-commit rkm
+```
+
+A previous session can be resumed in commit-enabled mode:
+
+```bash
+$HOME/bin/codex-safe-autonomy-commit rag resume SESSION_ID_VALUE
+$HOME/bin/codex-safe-autonomy-commit rkm resume SESSION_ID_VALUE
+```
+
+This mode keeps the same `workspace-write` sandbox and authorized repository
+roots but overrides the approval policy to `on-request`. `.git` remains
+read-only inside the sandbox.
+
+After successful validation, Codex may request outside-sandbox execution only
+for the following exact, machine-local wrappers:
+
+```bash
+/home/andreatarsi/bin/codex-safe-git-add path/to/file
+/home/andreatarsi/bin/codex-safe-git-commit "formal technical commit message"
+```
+
+Execpolicy marks those wrappers as `allow`, so matching invocations run without
+prompting the human operator. The wrappers independently enforce the authorized
+repositories and the branch `codex/open-autonomy-era`.
+
+Codex must stage explicit relative paths, invoke the wrappers separately, and
+create only normal new commits. Direct mutating Git commands, commit amendment,
+branch changes, ref changes, history rewriting, worktree changes, remote
+changes, and force operations remain forbidden.
+
+### Human-only push boundary
+
+Codex cannot invoke the push wrapper. A push requires explicit human
+authorization and execution from a normal WSL shell:
 
 ```bash
 $HOME/bin/codex-safe-git-push-current
 ```
 
-The wrappers enforce the authorized repositories and the branch
-`codex/open-autonomy-era`. This is a deliberate safety boundary, not an error to
-work around. Codex must never use direct mutating Git commands or attempt to
-bypass the sandbox.
+This separation permits autonomous implementation and local commits while
+preserving human control over publication to the remote repository.
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_END -->
+
+<!-- REPOSITORY_LANGUAGE_POLICY_BEGIN -->
+## Repository language policy
+
+Human conversation may use Italian or Rioplatense Spanish. Repository-facing
+and persisted artifacts use formal, internationally understandable technical
+English by default.
+
+The policy applies to source code, identifiers, comments, docstrings,
+documentation, task packets, ADRs, schemas, fixtures, examples, tests, CLI
+text, filenames, error messages, and commit messages. Other languages are used
+only for explicit localization or translation requirements.
+<!-- REPOSITORY_LANGUAGE_POLICY_END -->

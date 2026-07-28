@@ -167,13 +167,35 @@ the normal `codex` command. Its safeguards do not remove the repository's
 branch, Git-wrapper, credential, or push-authorization rules.
 
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_BEGIN -->
-## Safe Git execution boundary
+## Safe Git execution modes
 
-The machine-local safe-autonomy launcher permits autonomous edits and
-validations, but the `workspace-write` sandbox keeps `.git` read-only. Codex
-must prepare and validate changes, then ask the human operator to run the
-documented safe Git wrappers from a normal WSL shell. Codex must not escalate,
-bypass the sandbox, or use direct mutating Git commands.
+The normal launcher permits autonomous edits and validations but not Git
+metadata mutation. The commit-enabled launcher
+`$HOME/bin/codex-safe-autonomy-commit` additionally permits staging explicit
+paths and creating normal commits through:
+
+- `/home/andreatarsi/bin/codex-safe-git-add`
+- `/home/andreatarsi/bin/codex-safe-git-commit`
+
+Use the wrappers directly and separately with the repository as the working
+directory. Do not use direct mutating Git commands, do not amend, and do not
+change branch or repository topology.
+
+Codex must never push. Pushes require explicit human authorization and
+execution from a normal WSL shell.
 
 See `docs/operations/codex-safe-autonomy.md`.
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_END -->
+
+<!-- REPOSITORY_LANGUAGE_POLICY_BEGIN -->
+## Repository language policy
+
+Use formal, internationally understandable technical English for every
+repository-facing or persisted artifact, including code, identifiers, comments,
+documentation, task packets, schemas, fixtures, tests, examples, CLI text,
+filenames, error messages, and commit messages.
+
+Conversation with the human operator may use Italian or Rioplatense Spanish,
+but those languages must not leak into repository artifacts unless a task
+explicitly requires localization or translated content.
+<!-- REPOSITORY_LANGUAGE_POLICY_END -->
