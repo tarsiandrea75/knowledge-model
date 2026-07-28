@@ -21,8 +21,8 @@ These invariants apply to all repository work:
 
 Unless the user explicitly instructs otherwise:
 
-1. Create or modify exactly one project file per run.
-2. Do not create batches of files.
+1. Create or modify exactly one project file per atomic cycle.
+2. Do not create batches of files within one atomic cycle.
 3. Do not create IDE configuration files.
 4. Do not create temporary review files.
 5. Do not modify existing files unless the requested task requires it.
@@ -33,8 +33,34 @@ Unless the user explicitly instructs otherwise:
 10. Report the validation command that was run and its result.
 11. Report the final `git status --short` output.
 12. Do not commit changes.
-13. Stop immediately after completing the single requested file and validation report.
-14. If the next natural step would require additional files, describe it instead of creating it.
+13. In autonomous execution mode, record a checkpoint after validation and
+    continue with the next ready atomic cycle instead of stopping.
+14. Outside autonomous execution mode, stop after the single requested file
+    and validation report.
+15. If the next natural step would require additional files, either begin the
+    next atomic cycle in autonomous execution mode or describe it to the user.
+
+## Autonomous Execution Mode
+
+When the user grants broad authorization to continue autonomously, the root
+agent may execute multiple ready atomic cycles in one session. Each cycle must
+still have one clear write scope, one project file, focused verification, and
+an inspectable checkpoint. The one-file rule protects reviewability; it is not
+an instruction to wait for user confirmation between cycles.
+
+During autonomous execution the agent should:
+
+- batch independent ready tasks while respecting dependencies and write scopes;
+- implement, test, document, and integrate complete task slices;
+- provide a concise checkpoint after a meaningful milestone or roughly every
+  20–30 minutes;
+- continue without asking for confirmation for routine local edits, tests,
+  documentation, repository inspection, or non-destructive Git operations.
+
+The agent must stop and report only for credentials, paid services,
+deployment/publication, destructive actions or history rewriting, breaking
+changes without a migration path, irreversible external messages, an unsafe
+product decision, or a genuine blocker after safe alternatives are exhausted.
 
 ## Distributed Agent Rule Routing
 

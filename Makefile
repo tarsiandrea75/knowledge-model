@@ -19,7 +19,7 @@ FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
 
-.PHONY: validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate release-check route-task status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -51,6 +51,9 @@ route-task:
 		exit 1; \
 	fi
 	python3 scripts/rkm-route-task.py --paths "$(PATHS)"
+
+rag-recommendation-adapter-test:
+	python3 scripts/import-rag-recommendation-artifact.py --self-test
 
 status:
 	git status --short
@@ -191,6 +194,7 @@ help:
 	@printf '  make agent-routing-validate      Validate distributed agent rule routing files and task guides.\n'
 	@printf '  make release-check               Run the strict pre-tag readiness check for v0.1.0-alpha.\n'
 	@printf '  make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"  Show required readings, task guides, risk notes, and checks for intended paths.\n'
+	@printf '  make rag-recommendation-adapter-test  Run the RAG Lab recommendation artifact adapter self-test.\n'
 	@printf '  make status                      Show git status --short.\n'
 	@printf '  make log                         Show the 10 most recent commits.\n'
 	@printf '  make cycle [N=3]                 Run scripts/rkm-cycle.sh N, save stdout to /tmp/rkm-cycle-output.txt, print exit code, output tail, and status.\n'
