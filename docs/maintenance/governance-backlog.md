@@ -580,3 +580,28 @@ Each backlog entry uses this compact format:
 - `Suggested implementation`: Define a deterministic-first execution policy; add a path- and task-aware selector for Creator, Reviewer, and escalation profiles; create configurable named Codex profiles; generate compact evidence bundles before semantic review; skip model calls when shell, Python, Git, Make, or schema validation can decide the result; require stronger profiles for architecture, schema, ontology, cross-cutting automation, and integration work; log selected model, reasoning effort, context budget, result, and escalation reason; and add self-tests plus integration coverage for cycle, discovery, recovery, commit, Director, and autopilot paths. Initial candidate bindings are GPT-5.4 Mini for strictly mechanical model-assisted work, GPT-5.6 Luna for low-risk bounded semantic work, GPT-5.6 Terra for standard engineering and semantic review, and GPT-5.6 Sol for architecture, strategy, conflicts, and high-risk decisions. Exact model bindings must remain configurable and be checked against current Codex availability rather than treated as permanent contracts.
 - `Related files`: `scripts/rkm-select-execution-profile.py`; `scripts/rkm-codex-exec.py`; `scripts/rkm-route-task.py`; `scripts/rkm-cycle.sh`; `scripts/rkm-discover.sh`; `scripts/rkm-recover-revise.sh`; `scripts/rkm-codex-commit.sh`; `scripts/rkm-director.sh`; `scripts/rkm-budget.py`; `.codex/config.toml`; `.codex/agents/`; `docs/maintenance/codex-execution-policy.md`; `docs/maintenance/automation-guardrails.md`; `Makefile`
 - `Depends on`: `GB-005 Task Router CLI`; `GB-035 Autopilot Mode Profiles`; `GB-036 Autopilot Risk Tiers`; existing token-budget and run-ledger tooling.
+
+### GB-045 External RAG Evidence And Recommendation Persistence
+
+- `ID`: `GB-045`
+- `Title`: External RAG evidence and recommendation persistence.
+- `Status`: `Proposed`
+- `Priority`: `High`
+- `Area`: Evidence
+- `Reason`: The RAG-to-RKM consumer walkthrough proves structural envelope
+  interoperability, but the current fixture is compatibility evidence rather
+  than a live externally sourced evaluation and the adapter does not persist
+  recommendations into canonical RKM Evaluation, Artifact, or Policy Decision
+  records.
+- `Suggested implementation`: Add a separately reviewed ingestion path for
+  immutable lab artifacts, preserve source and corpus hashes, record external
+  references and review state, validate compatibility before persistence, and
+  demonstrate at least one downstream loader using a real provider-free or
+  externally sourced report.
+- `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
+  `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
+  `scripts/import-rag-recommendation-artifact.py`;
+  `schema/rag-recommendation-artifact-adapter-v1.schema.json`;
+  `data/`; `schema/`; `docs/maintenance/maturity-report.md`
+- `Depends on`: `RKM-001`; explicit provenance, lifecycle, compatibility, and
+  review decisions; no automatic production promotion.

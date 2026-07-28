@@ -1,0 +1,37 @@
+{
+  "contractVersion": "rag-recommendation-report-v1",
+  "artifactType": "RAG_RECOMMENDATION_REPORT",
+  "experimentId": "rkm-consumer-walkthrough-001",
+  "policyVersion": "quality-cost-profiles-v1",
+  "qualityFloor": 0.8,
+  "economical": {
+    "profile": "ECONOMICAL",
+    "available": true,
+    "pipelineId": "NAIVE",
+    "qualityScore": 1.0,
+    "latencyP95Ms": 120,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "Compatibility fixture keeps the measured baseline for the economical profile."
+  },
+  "balanced": {
+    "profile": "BALANCED",
+    "available": true,
+    "pipelineId": "NAIVE",
+    "qualityScore": 1.0,
+    "latencyP95Ms": 120,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "Compatibility fixture keeps the measured baseline for the balanced profile."
+  },
+  "maximumQuality": {
+    "profile": "MAXIMUM_QUALITY",
+    "available": true,
+    "pipelineId": "NAIVE",
+    "qualityScore": 1.0,
+    "latencyP95Ms": 120,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "Compatibility fixture keeps the measured baseline for the maximum-quality profile."
+  }
+}
