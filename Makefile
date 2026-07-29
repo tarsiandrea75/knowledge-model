@@ -19,7 +19,7 @@ FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
 
-.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -44,6 +44,15 @@ graph-export-validate:
 
 schema-duplicate-contracts-validate:
 	python3 scripts/validate-schema-duplicate-contracts.py
+
+relationship-predicate-review:
+	@if [[ -z "$(strip $(TYPE))" || -z "$(strip $(LABEL))" || -z "$(strip $(DESCRIPTION))" || -z "$(strip $(CATEGORY))" ]]; then \
+		printf 'TYPE, LABEL, DESCRIPTION and CATEGORY are required.\n' >&2; \
+		exit 1; \
+	fi
+	python3 scripts/review-relationship-predicate-reuse.py \
+		--candidate-type "$(TYPE)" --candidate-label "$(LABEL)" \
+		--candidate-description "$(DESCRIPTION)" --candidate-category "$(CATEGORY)"
 
 agent-routing-validate:
 	python3 scripts/validate-agent-routing.py
@@ -197,6 +206,7 @@ help:
 	@printf '  make data-graph-export           Generate graph export files from validated seed data.\n'
 	@printf '  make graph-export-validate       Validate graph export node and edge files against schemas.\n'
 	@printf '  make schema-duplicate-contracts-validate  Validate same-name first-class schema and definition composition.\n'
+	@printf '  make relationship-predicate-review TYPE=... LABEL=... DESCRIPTION=... CATEGORY=...  Review a proposed predicate against the registry.\n'
 	@printf '  make agent-routing-validate      Validate distributed agent rule routing files and task guides.\n'
 	@printf '  make release-check               Run the strict pre-tag readiness check for v0.1.0-alpha.\n'
 	@printf '  make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"  Show required readings, task guides, risk notes, and checks for intended paths.\n'

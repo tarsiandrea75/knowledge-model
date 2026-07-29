@@ -81,13 +81,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-003`
 - `Title`: Relationship predicate reuse checker.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Validation
 - `Reason`: New predicates should not duplicate existing relationship semantics.
-- `Suggested implementation`: Add registry review tooling that flags new predicates similar to existing registered predicates and requires a rationale field or reviewer confirmation.
+- `Suggested implementation`: Implemented by `scripts/review-relationship-predicate-reuse.py` and exposed through `make relationship-predicate-review`. The advisory review reports lexical semantic candidates and requires explicit human justification before adding a new predicate. See `docs/maintenance/task-packets/GB-003-relationship-predicate-reuse.md`.
 - `Related files`: `registries/relationship-type-registry.json`; `registries/AGENTS.md`; `docs/maintenance/task-guides/adding-relationship-set.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in the GB-003 task packet; no canonical-data migration dependency.
 
 ### GB-004 Hard Dependency Predicate Justification Check
 
