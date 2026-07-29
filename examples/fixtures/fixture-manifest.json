@@ -24,6 +24,10 @@
           "schema": "schema/definitions/reference.schema.json"
         }
       ]
+    },
+    {
+      "fixture": "examples/fixtures/rkm-rag-recommendation-decision-v1.json",
+      "schema": "schema/rkm-rag-recommendation-decision-v1.schema.json"
     }
   ]
 }

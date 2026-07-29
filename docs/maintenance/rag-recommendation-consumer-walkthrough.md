@@ -54,6 +54,22 @@ policy `quality-cost-profiles-v1`, pipeline `naive`, and index profile
 `offline-fixture-index-v1`. It remains compatibility evidence; consuming it
 does not persist a canonical decision or promote a production route.
 
+## Create the review-ready decision record
+
+The persistence adapter creates an RKM-owned decision record only after the
+source envelope and explicit provenance metadata are available. Its default
+lifecycle is `Draft` and `Not Reviewed`, and production promotion is always
+false:
+
+```bash
+python3 scripts/persist-rag-recommendation-decision.py --self-test
+```
+
+The checked-in result is
+`examples/fixtures/rkm-rag-recommendation-decision-v1.json`. It is validated by
+the fixture manifest and remains a review-ready evidence projection, not a
+canonical production policy or automatic route change.
+
 ## Execute the walkthrough
 
 Use a temporary directory outside the repository for generated output:

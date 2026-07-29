@@ -54,6 +54,7 @@ Each backlog entry uses this compact format:
 - `RKM-013` Cross-index review fixture.
 - `RKM-014` Unavailable recommendation integrity.
 - `RKM-015` Generated RAG artifact consumer.
+- `RKM-016` Review-ready RAG decision record.
 
 ## Backlog Entries
 

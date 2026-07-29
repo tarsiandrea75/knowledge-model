@@ -1,0 +1,71 @@
+{
+  "contractVersion": "rkm-rag-recommendation-decision-v1",
+  "decisionId": "offline-rag-e2e-walkthrough-decision",
+  "decisionType": "RAG_STRATEGY_RECOMMENDATION",
+  "lifecycle": {
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "productionPromotionAllowed": false
+  },
+  "sourceArtifact": {
+    "adapterContractVersion": "rkm-recommendation-artifact-adapter-v1",
+    "sourceContractVersion": "rag-recommendation-report-v1",
+    "experimentId": "offline-rag-e2e-walkthrough",
+    "policyVersion": "quality-cost-profiles-v1",
+    "artifactSha256": "3f8a2e8e9296546b57aeda8904f9bf0db61127ce7bd09a17484f91089824927f"
+  },
+  "evaluationContext": {
+    "corpus": {
+      "id": "space-corpus",
+      "version": "1.0.0",
+      "sha256": "9d6a3cde3fe3f643bcf10d0445b9cea2a0c8bfa707dc850bb689331b904009ca"
+    },
+    "dataset": {
+      "id": "space-golden",
+      "version": "1.0.0",
+      "sha256": "d47a49d3366923b86f5bae687f078632c517c861ad3d2c6cefcc072440923355"
+    },
+    "indexProfiles": [
+      {
+        "id": "offline-fixture-index-v1",
+        "configurationSha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      }
+    ],
+    "pipelineCount": 3
+  },
+  "profiles": {
+    "economical": {
+      "profile": "ECONOMICAL",
+      "available": true,
+      "pipelineId": "naive",
+      "indexProfileId": "offline-fixture-index-v1",
+      "qualityScore": 1.0,
+      "latencyP95Ms": 10,
+      "estimatedCost": 0.001,
+      "costCurrency": "LOCAL",
+      "reason": "Lowest measured cost among eligible pipelines; latency and quality break ties. Quality score 1.0000."
+    },
+    "balanced": {
+      "profile": "BALANCED",
+      "available": true,
+      "pipelineId": "naive",
+      "indexProfileId": "offline-fixture-index-v1",
+      "qualityScore": 1.0,
+      "latencyP95Ms": 10,
+      "estimatedCost": 0.001,
+      "costCurrency": "LOCAL",
+      "reason": "Best bounded quality/cost/latency score: 0.60 quality + 0.20 cost efficiency + 0.20 latency efficiency. Quality score 1.0000."
+    },
+    "maximumQuality": {
+      "profile": "MAXIMUM_QUALITY",
+      "available": true,
+      "pipelineId": "naive",
+      "indexProfileId": "offline-fixture-index-v1",
+      "qualityScore": 1.0,
+      "latencyP95Ms": 10,
+      "estimatedCost": 0.001,
+      "costCurrency": "LOCAL",
+      "reason": "Highest measured quality among eligible pipelines; latency and cost break ties. Quality score 1.0000."
+    }
+  }
+}
