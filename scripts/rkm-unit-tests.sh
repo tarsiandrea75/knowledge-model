@@ -55,6 +55,9 @@ printf '==> Running validate-agent-routing self-test\n'
 printf '==> Running validate-rule-coverage self-test\n'
 "$PYTHON_BIN" scripts/validate-rule-coverage.py --self-test
 
+printf '==> Running validate-markdown-json self-test\n'
+"$PYTHON_BIN" scripts/validate-markdown-json.py --self-test
+
 printf '==> Running validate-schema-prerequisites self-test\n'
 "$PYTHON_BIN" scripts/validate-schema-prerequisites.py --self-test
 

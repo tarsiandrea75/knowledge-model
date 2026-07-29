@@ -19,7 +19,7 @@ FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
 
-.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -56,6 +56,9 @@ relationship-predicate-review:
 
 rule-coverage-validate:
 	python3 scripts/validate-rule-coverage.py
+
+markdown-json-validate:
+	python3 scripts/validate-markdown-json.py "$(or $(DOCS_PATH),docs)"
 
 agent-routing-validate:
 	python3 scripts/validate-agent-routing.py
@@ -211,6 +214,7 @@ help:
 	@printf '  make schema-duplicate-contracts-validate  Validate same-name first-class schema and definition composition.\n'
 	@printf '  make relationship-predicate-review TYPE=... LABEL=... DESCRIPTION=... CATEGORY=...  Review a proposed predicate against the registry.\n'
 	@printf '  make rule-coverage-validate             Validate governance coverage rows against repository checks.\n'
+	@printf '  make markdown-json-validate DOCS_PATH=docs    Validate JSON fenced examples in selected Markdown files.\n'
 	@printf '  make agent-routing-validate      Validate distributed agent rule routing files and task guides.\n'
 	@printf '  make release-check               Run the strict pre-tag readiness check for v0.1.0-alpha.\n'
 	@printf '  make route-task PATHS="schema/foo.schema.json data/rag-techniques/hybrid-retrieval.json"  Show required readings, task guides, risk notes, and checks for intended paths.\n'

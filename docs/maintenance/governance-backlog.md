@@ -153,13 +153,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-009`
 - `Title`: Markdown JSON example validator.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Validation
 - `Reason`: Documentation examples should remain parseable and avoid misleading concrete repository paths with invalid identifiers.
-- `Suggested implementation`: Extend documentation validation to parse JSON code fences and apply repository-specific example checks.
+- `Suggested implementation`: Implemented by `scripts/validate-markdown-json.py` and exposed through `make markdown-json-validate DOCS_PATH=docs`. The check remains path-targeted until the documentation inventory is audited. See `docs/maintenance/task-packets/GB-009-markdown-json-example-validator.md`.
 - `Related files`: `docs/`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in the GB-009 task packet; broad documentation inventory remains deferred.
 
 ### GB-010 Stronger Graph Export Provenance Consistency Validator
 
