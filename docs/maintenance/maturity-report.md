@@ -99,7 +99,11 @@ These criteria preserve the distinction between a strong foundation and a consum
 
 ## Recommended Immediate Next Step
 
-Broaden the existing consumable package with externally sourced evidence and one end-to-end loader walkthrough before expanding many more schemas. This will test whether the current data and export contracts work outside repository validation and will expose concrete modeling or compatibility gaps.
+The core consumable RAG evidence path is now complete: a deterministic RAG
+artifact is generated, consumed by RKM, and converted into a review-ready
+decision record with provenance and fail-closed lifecycle state. The next
+evidence milestone is authoritative external sourcing and review; it must not
+be conflated with the completed runtime-generated evidence path.
 
 ## Key Risks
 

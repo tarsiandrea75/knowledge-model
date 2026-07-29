@@ -56,6 +56,7 @@ Each backlog entry uses this compact format:
 - `RKM-015` Generated RAG artifact consumer.
 - `RKM-016` Review-ready RAG decision record.
 - `RKM-017` Fail-closed decision persistence.
+- `RKM-018` Phase C closure and evidence boundary.
 
 ## Backlog Entries
 
@@ -591,23 +592,21 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-045`
 - `Title`: External RAG evidence and recommendation persistence.
-- `Status`: `Proposed`
+- `Status`: `In Progress`
 - `Priority`: `High`
 - `Area`: Evidence
-- `Reason`: The RAG-to-RKM consumer walkthrough proves structural envelope
-  interoperability, but the current fixture is compatibility evidence rather
-  than a live externally sourced evaluation and the adapter does not persist
-  recommendations into canonical RKM Evaluation, Artifact, or Policy Decision
-  records.
-- `Suggested implementation`: Add a separately reviewed ingestion path for
-  immutable lab artifacts, preserve source and corpus hashes, record external
-  references and review state, validate compatibility before persistence, and
-  demonstrate at least one downstream loader using a real provider-free or
-  externally sourced report.
+- `Reason`: The RAG-to-RKM consumer walkthrough now consumes a deterministic
+  runtime-generated artifact and persists a review-ready decision record, but
+  authoritative external evidence and canonical ontology persistence still
+  require separate review.
+- `Suggested implementation`: Add a separately reviewed path for immutable
+  externally sourced reports, preserve source and corpus hashes, record
+  external references and review state, validate compatibility before any
+  canonical persistence, and retain the current non-promotion boundary.
 - `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
   `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
   `scripts/import-rag-recommendation-artifact.py`;
   `schema/rag-recommendation-artifact-adapter-v1.schema.json`;
   `data/`; `schema/`; `docs/maintenance/maturity-report.md`
-- `Depends on`: `RKM-001`; explicit provenance, lifecycle, compatibility, and
-  review decisions; no automatic production promotion.
+- `Depends on`: `RKM-001`; `RKM-015`; `RKM-016`; explicit provenance, lifecycle,
+  compatibility, and review decisions; no automatic production promotion.

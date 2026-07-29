@@ -453,6 +453,17 @@ Do not resume the old all-Sol/high campaign wrapper unchanged. Do not install or
 
 ## Current Checkpoint: Protected Autonomy and Consumer Walkthrough
 
+### Phase C evidence and decision checkpoint
+
+As of 2026-07-29, the RAG-to-RKM bridge produces a deterministic runtime
+artifact, consumes it through the strict adapter, and persists a review-ready
+decision record. The decision schema preserves artifact, corpus, dataset,
+index, policy and recommendation provenance while requiring `Draft`, `Not
+Reviewed` and `productionPromotionAllowed=false`. Cross-index unavailable
+recommendations remain unavailable after persistence. This closes the core
+Phase C evidence and decision layer. GB-045 remains open only for authoritative
+external evidence and any separately reviewed canonical ontology persistence.
+
 Snapshot date: 2026-07-28
 
 The active operational branch is `codex/open-autonomy-era`. The recent local
