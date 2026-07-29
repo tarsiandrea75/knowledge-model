@@ -180,7 +180,13 @@ ide_file_matches="$(
   find . \
     -path './.git' -prune -o \
     \( -path './.idea' -o -path './.idea/*' -o -path './.vscode' -o -path './.vscode/*' \) \
-    -print
+    -print \
+    | while IFS= read -r path; do
+        if git check-ignore -q -- "$path" && ! git ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+          continue
+        fi
+        printf '%s\n' "$path"
+      done
 )"
 if [[ -n "$ide_file_matches" ]]; then
   printf '%s\n' "$ide_file_matches" >&2

@@ -526,3 +526,24 @@ GB-002 is marked implemented in the governance backlog and validated in the
 rule-coverage report. No canonical data, schema, registry, graph export,
 branch, tag, or remote was changed. Full validation passed after each file
 change. The task creates a local commit only; no push is planned.
+
+## Current Checkpoint: RKM-003 Codex Execution Telemetry
+
+Snapshot date: 2026-07-29
+
+RKM-003 is complete on `codex/open-autonomy-era`. The repository now defines
+the shared response and event protocol in
+`docs/operations/codex-execution-telemetry.md` and routes future sessions to it
+through `AGENTS.md`. The companion RAG repository contains the same protocol
+and its task packet.
+
+The protocol reports UTC task and subtask start/end times, elapsed time,
+validation outcomes, and token usage. `TASK N` is cyan, successful statuses are
+green, failures are red, and intermediate or unresolved statuses are yellow;
+emoji and text fallbacks preserve meaning when ANSI color is unavailable.
+Exact model-token counts are never invented. When the platform does not expose
+them, the report says `unavailable`. No canonical data, schema, registry, graph
+export, runtime, branch, tag, or remote behavior changed. The Git-ignored
+`.idea/` directory is excluded from the IDE-file validation while tracked IDE
+files would still fail the gate. Full RKM validation now passes. The task
+creates a local commit only; no push is planned.

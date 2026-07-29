@@ -187,6 +187,16 @@ execution from a normal WSL shell.
 See `docs/operations/codex-safe-autonomy.md`.
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_END -->
 
+## Codex execution telemetry
+
+Use [docs/operations/codex-execution-telemetry.md](docs/operations/codex-execution-telemetry.md)
+for task and subtask reports. Include UTC start/end timestamps, elapsed time,
+validation outcome, and explicit token-usage disclosure at meaningful
+milestones. Render `TASK N` in cyan, successful statuses in green, failed
+statuses in red, and all other or unresolved statuses in yellow; use the
+documented emoji/text fallbacks when ANSI color is unavailable. Never invent
+token counts: use `unavailable` when the platform does not expose them.
+
 <!-- REPOSITORY_LANGUAGE_POLICY_BEGIN -->
 ## Repository language policy
 
