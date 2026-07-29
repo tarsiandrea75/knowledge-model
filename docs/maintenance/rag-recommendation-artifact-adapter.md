@@ -20,9 +20,11 @@ The adapter accepts exactly these source fields:
 - `experimentId`, `policyVersion`, and `qualityFloor`;
 - one recommendation each for `economical`, `balanced`, and `maximumQuality`.
 
-Each recommendation preserves availability, pipeline identity, quality,
-latency, estimated cost, currency, and the evidence-backed reason emitted by
-the Lab. Unknown fields and non-finite numeric values are rejected.
+Each recommendation preserves availability, pipeline identity, optional index
+profile identity, quality, latency, estimated cost, currency, and the
+evidence-backed reason emitted by the Lab. The index profile field is optional
+for compatibility with shared-index reports and required by future multi-index
+producers. Unknown fields and non-finite numeric values are rejected.
 
 ## Usage
 
@@ -68,4 +70,3 @@ After changing the adapter or this contract documentation, run:
 ```bash
 TMPDIR=/tmp make validate
 ```
-

@@ -38,12 +38,14 @@ RECOMMENDATION_FIELDS = {
     "profile",
     "available",
     "pipelineId",
+    "indexProfileId",
     "qualityScore",
     "latencyP95Ms",
     "estimatedCost",
     "costCurrency",
     "reason",
 }
+REQUIRED_RECOMMENDATION_FIELDS = RECOMMENDATION_FIELDS - {"indexProfileId"}
 
 
 class ArtifactError(ValueError):
@@ -70,7 +72,7 @@ def _recommendation(value: Any, field: str, expected_profile: str) -> dict[str, 
     if not isinstance(value, dict):
         raise ArtifactError(f"{field} must be an object")
     unknown = set(value) - RECOMMENDATION_FIELDS
-    missing = RECOMMENDATION_FIELDS - set(value)
+    missing = REQUIRED_RECOMMENDATION_FIELDS - set(value)
     if unknown:
         raise ArtifactError(f"{field} contains unknown fields: {', '.join(sorted(unknown))}")
     if missing:
@@ -82,6 +84,9 @@ def _recommendation(value: Any, field: str, expected_profile: str) -> dict[str, 
     pipeline_id = value["pipelineId"]
     if not isinstance(pipeline_id, str) or (value["available"] and not pipeline_id.strip()):
         raise ArtifactError(f"{field}.pipelineId must be non-empty when available")
+    index_profile_id = value.get("indexProfileId")
+    if index_profile_id is not None and (not isinstance(index_profile_id, str) or not index_profile_id.strip()):
+        raise ArtifactError(f"{field}.indexProfileId must be a non-empty string when present")
     latency = _number(value["latencyP95Ms"], f"{field}.latencyP95Ms", 0)
     cost = _number(value["estimatedCost"], f"{field}.estimatedCost", 0)
     quality = _number(value["qualityScore"], f"{field}.qualityScore", 0, 1)
@@ -89,7 +94,7 @@ def _recommendation(value: Any, field: str, expected_profile: str) -> dict[str, 
     reason = _text(value["reason"], f"{field}.reason")
     if latency != int(latency):
         raise ArtifactError(f"{field}.latencyP95Ms must be an integer")
-    return {
+    result = {
         "profile": value["profile"],
         "available": value["available"],
         "pipelineId": pipeline_id,
@@ -99,6 +104,9 @@ def _recommendation(value: Any, field: str, expected_profile: str) -> dict[str, 
         "costCurrency": currency,
         "reason": reason,
     }
+    if index_profile_id is not None:
+        result["indexProfileId"] = index_profile_id
+    return result
 
 
 def adapt(document: Any) -> dict[str, Any]:
@@ -166,9 +174,11 @@ def _self_test() -> None:
             "costCurrency": "LOCAL",
             "reason": "self-test",
         }
+    valid["balanced"]["indexProfileId"] = "offline-lexical-v1"
     envelope = adapt(valid)
     assert envelope["adapterContractVersion"] == ADAPTER_CONTRACT
     assert envelope["policyDecision"]["profiles"]["balanced"]["pipelineId"] == "naive"
+    assert envelope["policyDecision"]["profiles"]["balanced"]["indexProfileId"] == "offline-lexical-v1"
     invalid = dict(valid)
     invalid["unexpected"] = True
     try:

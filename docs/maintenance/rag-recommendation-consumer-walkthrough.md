@@ -89,6 +89,7 @@ The RKM envelope preserves:
 - experiment and policy identity;
 - quality floor;
 - all three quality/cost recommendation profiles;
+- index profile identity when supplied by a multi-index report;
 - a deterministic policy-decision identity derived from the experiment ID.
 
 The adapter does not persist the envelope into canonical RKM data. Persistence

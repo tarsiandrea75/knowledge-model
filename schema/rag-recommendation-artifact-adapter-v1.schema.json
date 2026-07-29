@@ -125,6 +125,10 @@
           "type": "string",
           "minLength": 0
         },
+        "indexProfileId": {
+          "type": "string",
+          "minLength": 1
+        },
         "qualityScore": {
           "type": "number",
           "minimum": 0,
