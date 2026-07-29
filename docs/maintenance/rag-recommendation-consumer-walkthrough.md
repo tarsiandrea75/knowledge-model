@@ -105,7 +105,8 @@ details and source contents are not echoed as public error output.
 
 This walkthrough proves structural interoperability only. It does not prove
 that a recommended pipeline is suitable for every corpus, authorize automatic
-production promotion, or replace independent evaluation evidence.
+production promotion, convert an unavailable recommendation into an available
+one, or replace independent evaluation evidence.
 
 ## Cleanup
 

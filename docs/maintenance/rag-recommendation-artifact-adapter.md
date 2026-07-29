@@ -26,6 +26,13 @@ evidence-backed reason emitted by the Lab. The index profile field is optional
 for compatibility with shared-index reports and required by future multi-index
 producers. Unknown fields and non-finite numeric values are rejected.
 
+When the Lab emits `available: false` with reason
+`INDEX_PROFILE_REVIEW_REQUIRED`, the consumer must preserve that unavailable
+decision. It must not select a pipeline, synthesize a replacement, or promote
+an index profile. This reason means that standard quality/cost profiles cannot
+rank eligible candidates spanning different index profiles without an explicit
+index-aware policy.
+
 ## Usage
 
 Run the adapter self-test:

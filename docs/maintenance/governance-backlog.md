@@ -50,6 +50,7 @@ Each backlog entry uses this compact format:
 - `GB-003` Relationship predicate reuse checker.
 - `GB-006` Recovery state validator or autopilot blocker.
 - `GB-038` `v0.2.0` planning document.
+- `RKM-012` Index-aware recommendation boundary.
 
 ## Backlog Entries
 

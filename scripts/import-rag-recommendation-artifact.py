@@ -179,6 +179,19 @@ def _self_test() -> None:
     assert envelope["adapterContractVersion"] == ADAPTER_CONTRACT
     assert envelope["policyDecision"]["profiles"]["balanced"]["pipelineId"] == "naive"
     assert envelope["policyDecision"]["profiles"]["balanced"]["indexProfileId"] == "offline-lexical-v1"
+    unavailable = dict(valid)
+    unavailable["balanced"] = {
+        **valid["balanced"],
+        "available": False,
+        "pipelineId": "",
+        "indexProfileId": "index-profile-a",
+        "reason": "INDEX_PROFILE_REVIEW_REQUIRED; explicit index-aware policy is required.",
+    }
+    unavailable_envelope = adapt(unavailable)
+    balanced = unavailable_envelope["policyDecision"]["profiles"]["balanced"]
+    assert balanced["available"] is False
+    assert balanced["pipelineId"] == ""
+    assert "INDEX_PROFILE_REVIEW_REQUIRED" in balanced["reason"]
     invalid = dict(valid)
     invalid["unexpected"] = True
     try:
