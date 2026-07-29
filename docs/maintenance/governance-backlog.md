@@ -51,6 +51,7 @@ Each backlog entry uses this compact format:
 - `GB-006` Recovery state validator or autopilot blocker.
 - `GB-038` `v0.2.0` planning document.
 - `RKM-012` Index-aware recommendation boundary.
+- `RKM-013` Cross-index review fixture.
 
 ## Backlog Entries
 

@@ -20,6 +20,7 @@ from typing import Any
 SOURCE_CONTRACT = "rag-recommendation-report-v1"
 SOURCE_ARTIFACT_TYPE = "RAG_RECOMMENDATION_REPORT"
 ADAPTER_CONTRACT = "rkm-recommendation-artifact-adapter-v1"
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PROFILES = ("economical", "balanced", "maximumQuality")
 PROFILE_NAMES = {
     "economical": "ECONOMICAL",
@@ -192,6 +193,11 @@ def _self_test() -> None:
     assert balanced["available"] is False
     assert balanced["pipelineId"] == ""
     assert "INDEX_PROFILE_REVIEW_REQUIRED" in balanced["reason"]
+    fixture = REPOSITORY_ROOT / "examples" / "fixtures" / "rag-recommendation-report-v1-index-review.json"
+    fixture_envelope = adapt(_load(fixture))
+    fixture_profiles = fixture_envelope["policyDecision"]["profiles"].values()
+    assert all(not profile["available"] for profile in fixture_profiles)
+    assert all("INDEX_PROFILE_REVIEW_REQUIRED" in profile["reason"] for profile in fixture_profiles)
     invalid = dict(valid)
     invalid["unexpected"] = True
     try:

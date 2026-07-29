@@ -1,0 +1,40 @@
+{
+  "contractVersion": "rag-recommendation-report-v1",
+  "artifactType": "RAG_RECOMMENDATION_REPORT",
+  "experimentId": "cross-index-review-fixture-001",
+  "policyVersion": "quality-cost-profiles-v1",
+  "qualityFloor": 0.8,
+  "economical": {
+    "profile": "ECONOMICAL",
+    "available": false,
+    "pipelineId": "",
+    "indexProfileId": "index-profile-a",
+    "qualityScore": 0.0,
+    "latencyP95Ms": 0,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "INDEX_PROFILE_REVIEW_REQUIRED; standard profiles cannot compare different index profiles."
+  },
+  "balanced": {
+    "profile": "BALANCED",
+    "available": false,
+    "pipelineId": "",
+    "indexProfileId": "index-profile-a",
+    "qualityScore": 0.0,
+    "latencyP95Ms": 0,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "INDEX_PROFILE_REVIEW_REQUIRED; standard profiles cannot compare different index profiles."
+  },
+  "maximumQuality": {
+    "profile": "MAXIMUM_QUALITY",
+    "available": false,
+    "pipelineId": "",
+    "indexProfileId": "index-profile-a",
+    "qualityScore": 0.0,
+    "latencyP95Ms": 0,
+    "estimatedCost": 0.0,
+    "costCurrency": "LOCAL",
+    "reason": "INDEX_PROFILE_REVIEW_REQUIRED; standard profiles cannot compare different index profiles."
+  }
+}

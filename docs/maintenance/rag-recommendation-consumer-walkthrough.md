@@ -26,6 +26,7 @@ The source contract and RKM adapter are intentionally separate:
 - source contract: `rag-recommendation-report-v1`;
 - adapter envelope: `rkm-recommendation-artifact-adapter-v1`;
 - source fixture: `examples/fixtures/rag-recommendation-report-v1.json`;
+- cross-index review fixture: `examples/fixtures/rag-recommendation-report-v1-index-review.json`;
 - adapter: `scripts/import-rag-recommendation-artifact.py`;
 - envelope schema: `schema/rag-recommendation-artifact-adapter-v1.schema.json`.
 
@@ -95,6 +96,10 @@ The RKM envelope preserves:
 The adapter does not persist the envelope into canonical RKM data. Persistence
 as Evaluation, Artifact, or Policy Decision entities requires a separate
 reviewed task with provenance, lifecycle, and compatibility decisions.
+
+The cross-index review fixture demonstrates the fail-closed case. Its three
+profiles remain unavailable and retain `INDEX_PROFILE_REVIEW_REQUIRED`; no
+consumer-side selection is allowed.
 
 ## Failure behavior and limits
 
