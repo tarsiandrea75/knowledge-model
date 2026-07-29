@@ -209,6 +209,14 @@ def validate_relationship_semantics(
             if not isinstance(target_data_file, str) or not target_data_file:
                 raise DataValidationError(f"{context}.targetDataFile must be a non-empty string")
 
+            if predicate == "REQUIRES":
+                properties = relationship.get("properties")
+                justification = properties.get("justification") if isinstance(properties, dict) else None
+                if not isinstance(justification, str) or len(justification.strip()) < 10:
+                    raise DataValidationError(
+                        f"{context}.properties.justification is required for REQUIRES relationships"
+                    )
+
             previous_relationship_file = relationship_ids.get(relationship_id)
             if previous_relationship_file is not None:
                 raise DataValidationError(
@@ -690,6 +698,30 @@ def run_self_test() -> None:
                 raise
         else:
             raise DataValidationError("self-test failed: duplicate semantic triple was not rejected")
+
+        missing_hard_dependency_justification = {
+            "relationships": [
+                {
+                    "id": "RELATIONSHIP-TEST-7",
+                    "predicate": "REQUIRES",
+                    "sourceId": "TECHNIQUE-TEST-1",
+                    "targetId": "COMPONENT-TEST-1",
+                    "sourceDataFile": "data/rag-techniques/source-test.json",
+                    "targetDataFile": "data/components/target-test.json",
+                }
+            ]
+        }
+        try:
+            validate_relationship_semantics(
+                [(REPOSITORY_ROOT / "data/relationships/test-relationships.json", missing_hard_dependency_justification)],
+                predicates,
+                entity_files,
+            )
+        except DataValidationError as exc:
+            if "justification is required for REQUIRES" not in str(exc):
+                raise
+        else:
+            raise DataValidationError("self-test failed: REQUIRES without justification was accepted")
 
         valid_relationship_support_set = {
             "references": [

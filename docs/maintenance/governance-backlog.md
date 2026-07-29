@@ -93,13 +93,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-004`
 - `Title`: Hard dependency predicate justification check.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Validation
 - `Reason`: Hard dependency predicates such as `REQUIRES` need explicit justification because they can overstate architectural necessity.
-- `Suggested implementation`: Add validation or reviewer tooling that requires justification metadata for hard dependency predicates.
-- `Related files`: `registries/relationship-type-registry.json`; `data/relationships/`; `docs/maintenance/task-guides/adding-relationship-set.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented by `scripts/validate-data.py`; every `REQUIRES` relationship must provide a non-empty structured `properties.justification` value of at least 10 characters.
+- `Related files`: `registries/relationship-type-registry.json`; `data/relationships/`; `scripts/validate-data.py`; `docs/maintenance/task-guides/adding-relationship-set.md`
+- `Depends on`: Implemented in the GB-004 task packet; no existing relationship data migration was required.
 
 ### GB-005 Task Router CLI
 
