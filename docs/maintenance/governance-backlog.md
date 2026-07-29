@@ -141,13 +141,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-008`
 - `Title`: Rule coverage consistency validator.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Governance
 - `Reason`: The coverage report should stay aligned with implemented validators and documented rules.
-- `Suggested implementation`: Add checks for known Make targets, scripts, coverage levels, and required references in the rule coverage report.
+- `Suggested implementation`: Implemented by `scripts/validate-rule-coverage.py`, exposed through `make rule-coverage-validate`, and included in `make validate`. See `docs/maintenance/task-packets/GB-008-rule-coverage-consistency.md`.
 - `Related files`: `docs/maintenance/rule-coverage-report.md`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in the GB-008 task packet; no schema or canonical-data dependency.
 
 ### GB-009 Markdown JSON Example Validator
 

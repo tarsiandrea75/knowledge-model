@@ -52,6 +52,9 @@ printf '==> Running validate-doc-relationships self-test\n'
 printf '==> Running validate-agent-routing self-test\n'
 "$PYTHON_BIN" scripts/validate-agent-routing.py --self-test
 
+printf '==> Running validate-rule-coverage self-test\n'
+"$PYTHON_BIN" scripts/validate-rule-coverage.py --self-test
+
 printf '==> Running validate-schema-prerequisites self-test\n'
 "$PYTHON_BIN" scripts/validate-schema-prerequisites.py --self-test
 
