@@ -57,6 +57,7 @@ Each backlog entry uses this compact format:
 - `RKM-016` Review-ready RAG decision record.
 - `RKM-017` Fail-closed decision persistence.
 - `RKM-018` Phase C closure and evidence boundary.
+- `RKM-019` External RAG evidence package and decision report.
 
 ## Backlog Entries
 
@@ -596,17 +597,19 @@ Each backlog entry uses this compact format:
 - `Priority`: `High`
 - `Area`: Evidence
 - `Reason`: The RAG-to-RKM consumer walkthrough now consumes a deterministic
-  runtime-generated artifact and persists a review-ready decision record, but
-  authoritative external evidence and canonical ontology persistence still
-  require separate review.
-- `Suggested implementation`: Add a separately reviewed path for immutable
-  externally sourced reports, preserve source and corpus hashes, record
-  external references and review state, validate compatibility before any
-  canonical persistence, and retain the current non-promotion boundary.
+  runtime-generated artifact and persists a review-ready decision record. A
+  review-ready NASA corpus evidence bundle and readable decision report now
+  preserve external source metadata, while human rights review and canonical
+  ontology persistence remain separate.
+- `Suggested implementation`: Review the immutable evidence bundle, verify
+  source rights and freshness, preserve source and corpus hashes, validate
+  compatibility before any canonical persistence, and retain the current
+  non-promotion boundary.
 - `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
   `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
   `scripts/import-rag-recommendation-artifact.py`;
   `schema/rag-recommendation-artifact-adapter-v1.schema.json`;
-  `data/`; `schema/`; `docs/maintenance/maturity-report.md`
+  `data/`; `schema/`; `docs/maintenance/external-rag-evidence-report.md`;
+  `docs/maintenance/maturity-report.md`
 - `Depends on`: `RKM-001`; `RKM-015`; `RKM-016`; explicit provenance, lifecycle,
   compatibility, and review decisions; no automatic production promotion.

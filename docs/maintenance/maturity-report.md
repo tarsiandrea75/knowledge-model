@@ -101,9 +101,11 @@ These criteria preserve the distinction between a strong foundation and a consum
 
 The core consumable RAG evidence path is now complete: a deterministic RAG
 artifact is generated, consumed by RKM, and converted into a review-ready
-decision record with provenance and fail-closed lifecycle state. The next
-evidence milestone is authoritative external sourcing and review; it must not
-be conflated with the completed runtime-generated evidence path.
+decision record with provenance and fail-closed lifecycle state. A bounded
+NASA-based external evidence bundle and readable decision report now connect
+that result to canonical source metadata. The next milestone is human review
+of source rights and freshness, followed by any separately approved canonical
+ontology persistence; neither changes production defaults.
 
 ## Key Risks
 

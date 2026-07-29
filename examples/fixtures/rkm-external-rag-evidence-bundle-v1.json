@@ -1,0 +1,109 @@
+{
+  "contractVersion": "rkm-external-rag-evidence-bundle-v1",
+  "bundleId": "nasa-space-exploration-rag-evidence-v1",
+  "lifecycle": {
+    "status": "Draft",
+    "reviewState": "Not Reviewed",
+    "productionPromotionAllowed": false
+  },
+  "sourceRepository": {
+    "repository": "BuildingRAGAgentsWithLLMs",
+    "commit": "c72cf50b70c145f922e2e07e3e0c3a9c9ed8bd06",
+    "corpusPath": "src/test/resources/evaluation/space-corpus-v1.json",
+    "datasetPath": "src/test/resources/evaluation/space-golden-dataset-v1.json"
+  },
+  "corpus": {
+    "id": "space-exploration-v1",
+    "version": "1.0.0",
+    "sha256": "3c5be7b94065f4e6e2ecdfbafde926f57b2b912741f2de61bcac42ba8db30d4b",
+    "path": "src/test/resources/evaluation/space-corpus-v1.json"
+  },
+  "dataset": {
+    "id": "space-exploration-golden-v1",
+    "version": "1.0.0",
+    "sha256": "7c7c59829502a9c087f31c5c637a4aa88b81c952be35482ee706542bb0945d03",
+    "path": "src/test/resources/evaluation/space-golden-dataset-v1.json"
+  },
+  "sources": [
+    {
+      "id": "nasa-sun-facts",
+      "kind": "text",
+      "title": "Our Sun: Facts",
+      "canonicalUrl": "https://science.nasa.gov/sun/facts/",
+      "rights": "NASA media and information; source attribution required; third-party material excluded",
+      "attribution": "NASA Science",
+      "retrievalDate": "2026-07-27",
+      "sourceIdentitySha256": "3c409e8cc1b652557580acb14b34192b0e389d81bd8b05336e0875aa6d9cf69f"
+    },
+    {
+      "id": "nasa-solar-system-facts",
+      "kind": "text",
+      "title": "Solar System Facts",
+      "canonicalUrl": "https://science.nasa.gov/solar-system/solar-system-facts/",
+      "rights": "NASA media and information; source attribution required; third-party material excluded",
+      "attribution": "NASA Science",
+      "retrievalDate": "2026-07-27",
+      "sourceIdentitySha256": "b9443019da3ade1d81fe2775371b2ab199240f30496783696ddcaaf7aa5f4921"
+    },
+    {
+      "id": "nasa-artemis-i-media",
+      "kind": "video",
+      "title": "Artemis I Media Resources",
+      "canonicalUrl": "https://www.nasa.gov/general/artemis-i-media-resources/",
+      "rights": "NASA media usage guidelines; third-party material and endorsements excluded",
+      "attribution": "NASA",
+      "retrievalDate": "2026-07-27",
+      "sourceIdentitySha256": "f2e85194f8fa4a7fdbb0dbce4ccac609e1d9875488a0085e02af1ac604e39c9e"
+    },
+    {
+      "id": "nasa-artemis-audio",
+      "kind": "audio",
+      "title": "Artemis Audio Library",
+      "canonicalUrl": "https://www.nasa.gov/artemisaudio/",
+      "rights": "NASA audio usage guidelines; no implied endorsement; third-party material excluded",
+      "attribution": "NASA",
+      "retrievalDate": "2026-07-27",
+      "sourceIdentitySha256": "8f57bb797d4de68160139b58049de4ff54d747347d4835f6b22610d6a90eb918"
+    },
+    {
+      "id": "nasa-artemis-media-resources",
+      "kind": "image",
+      "title": "Artemis Media Resources",
+      "canonicalUrl": "https://www.nasa.gov/humans-in-space/artemis-media-resources/",
+      "rights": "NASA media usage guidelines; third-party material and endorsements excluded",
+      "attribution": "NASA",
+      "retrievalDate": "2026-07-27",
+      "sourceIdentitySha256": "0acf2972369b55992f4a65a0d20bc0482cb042b47a1fd0122a35ad345e42dc59"
+    }
+  ],
+  "generatedArtifact": {
+    "id": "offline-rag-e2e-walkthrough",
+    "version": "1.0.0",
+    "sha256": "3f8a2e8e9296546b57aeda8904f9bf0db61127ce7bd09a17484f91089824927f",
+    "path": "examples/fixtures/rag-recommendation-report-v1-generated.json"
+  },
+  "decisionRecord": {
+    "id": "offline-rag-e2e-walkthrough-decision",
+    "version": "1.0.0",
+    "sha256": "f91f59006e668b02fac97e1443c7ed07db03ced2daf337db6332a22520f87d39",
+    "path": "examples/fixtures/rkm-rag-recommendation-decision-v1.json"
+  },
+  "recommendationSummary": {
+    "experimentId": "offline-rag-e2e-walkthrough",
+    "policyVersion": "quality-cost-profiles-v1",
+    "qualityScore": 1.0,
+    "latencyP95Ms": 10,
+    "estimatedCost": 0.001,
+    "costCurrency": "LOCAL",
+    "recommendedPipelineId": "naive",
+    "recommendedIndexProfileId": "offline-fixture-index-v1",
+    "interpretation": "Naive is selected for this provider-free walkthrough because all eligible pipelines reached the measured quality floor and it won the bounded latency and local estimated-cost tie-breaks. This is evidence for this corpus and experiment, not a universal strategy ranking."
+  },
+  "limitations": [
+    "Source identity hashes are based on canonical source URLs rather than downloaded payload bytes.",
+    "The RAG walkthrough is provider-free and does not measure live model generation quality or provider billing.",
+    "The local estimated cost is an experiment accounting value and is not an invoice or a cloud price.",
+    "The NASA source pages and rights statements require human review before redistribution or commercial use.",
+    "The decision remains Draft and Not Reviewed; no application default or production route may change."
+  ]
+}

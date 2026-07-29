@@ -70,6 +70,18 @@ The checked-in result is
 the fixture manifest and remains a review-ready evidence projection, not a
 canonical production policy or automatic route change.
 
+## Inspect the external evidence bundle
+
+The NASA-based real-corpus evidence is packaged separately from the decision
+record in `examples/fixtures/rkm-external-rag-evidence-bundle-v1.json`. It
+links the source URLs and rights metadata to the versioned corpus, golden
+dataset, generated RAG artifact, and persisted decision record. The readable
+interpretation is in `docs/maintenance/external-rag-evidence-report.md`.
+
+The bundle remains `Draft` and `Not Reviewed`. It records a provider-free
+experiment and local estimated cost; it does not prove live provider quality,
+invoice-grade billing, or suitability for another corpus.
+
 ## Execute the walkthrough
 
 Use a temporary directory outside the repository for generated output:

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rkm.org/schema/rkm-external-rag-evidence-bundle-v1.schema.json",
+  "title": "RKM External RAG Evidence Bundle v1",
+  "description": "Review-ready provenance for an openly sourced RAG corpus and its recommendation evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "bundleId",
+    "lifecycle",
+    "sourceRepository",
+    "corpus",
+    "dataset",
+    "sources",
+    "generatedArtifact",
+    "decisionRecord",
+    "recommendationSummary",
+    "limitations"
+  ],
+  "properties": {
+    "contractVersion": { "const": "rkm-external-rag-evidence-bundle-v1" },
+    "bundleId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewState", "productionPromotionAllowed"],
+      "properties": {
+        "status": { "const": "Draft" },
+        "reviewState": { "const": "Not Reviewed" },
+        "productionPromotionAllowed": { "const": false }
+      }
+    },
+    "sourceRepository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "corpusPath", "datasetPath"],
+      "properties": {
+        "repository": { "const": "BuildingRAGAgentsWithLLMs" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "corpusPath": { "type": "string", "minLength": 1 },
+        "datasetPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "corpus": { "$ref": "#/$defs/versionedFile" },
+    "dataset": { "$ref": "#/$defs/versionedFile" },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "title", "canonicalUrl", "rights", "attribution", "retrievalDate", "sourceIdentitySha256"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "kind": { "enum": ["text", "image", "audio", "video"] },
+          "title": { "type": "string", "minLength": 1 },
+          "canonicalUrl": { "type": "string", "format": "uri" },
+          "rights": { "type": "string", "minLength": 1 },
+          "attribution": { "type": "string", "minLength": 1 },
+          "retrievalDate": { "type": "string", "format": "date" },
+          "sourceIdentitySha256": { "$ref": "#/$defs/sha" }
+        }
+      }
+    },
+    "generatedArtifact": { "$ref": "#/$defs/hashedReference" },
+    "decisionRecord": { "$ref": "#/$defs/hashedReference" },
+    "recommendationSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["experimentId", "policyVersion", "qualityScore", "latencyP95Ms", "estimatedCost", "costCurrency", "recommendedPipelineId", "recommendedIndexProfileId", "interpretation"],
+      "properties": {
+        "experimentId": { "type": "string", "minLength": 1 },
+        "policyVersion": { "type": "string", "minLength": 1 },
+        "qualityScore": { "type": "number", "minimum": 0, "maximum": 1 },
+        "latencyP95Ms": { "type": "number", "minimum": 0 },
+        "estimatedCost": { "type": "number", "minimum": 0 },
+        "costCurrency": { "const": "LOCAL" },
+        "recommendedPipelineId": { "type": "string", "minLength": 1 },
+        "recommendedIndexProfileId": { "type": "string", "minLength": 1 },
+        "interpretation": { "type": "string", "minLength": 20 }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 10 }
+    }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "versionedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "sha256", "path"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha" },
+        "path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "hashedReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "sha256", "path"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha" },
+        "path": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

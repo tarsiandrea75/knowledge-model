@@ -461,8 +461,10 @@ decision record. The decision schema preserves artifact, corpus, dataset,
 index, policy and recommendation provenance while requiring `Draft`, `Not
 Reviewed` and `productionPromotionAllowed=false`. Cross-index unavailable
 recommendations remain unavailable after persistence. This closes the core
-Phase C evidence and decision layer. GB-045 remains open only for authoritative
-external evidence and any separately reviewed canonical ontology persistence.
+Phase C evidence and decision layer. RKM-019 now packages the NASA-based
+real-corpus source metadata, hashes, generated artifact, decision record, and
+readable interpretation. GB-045 remains open only for human rights/freshness
+review and any separately reviewed canonical ontology persistence.
 
 Snapshot date: 2026-07-28
 
