@@ -167,6 +167,22 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "available": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "pipelineId": {
+                "const": ""
+              }
+            }
+          }
         }
       ]
     },

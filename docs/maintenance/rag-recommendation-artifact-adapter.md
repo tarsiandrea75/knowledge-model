@@ -26,6 +26,10 @@ evidence-backed reason emitted by the Lab. The index profile field is optional
 for compatibility with shared-index reports and required by future multi-index
 producers. Unknown fields and non-finite numeric values are rejected.
 
+An unavailable recommendation must carry an empty `pipelineId`. The adapter
+rejects an unavailable profile that still identifies a pipeline, because such
+an artifact could be mistaken for an executable recommendation.
+
 When the Lab emits `available: false` with reason
 `INDEX_PROFILE_REVIEW_REQUIRED`, the consumer must preserve that unavailable
 decision. It must not select a pipeline, synthesize a replacement, or promote

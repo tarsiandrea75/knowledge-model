@@ -52,6 +52,7 @@ Each backlog entry uses this compact format:
 - `GB-038` `v0.2.0` planning document.
 - `RKM-012` Index-aware recommendation boundary.
 - `RKM-013` Cross-index review fixture.
+- `RKM-014` Unavailable recommendation integrity.
 
 ## Backlog Entries
 

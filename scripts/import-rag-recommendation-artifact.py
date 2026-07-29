@@ -85,6 +85,8 @@ def _recommendation(value: Any, field: str, expected_profile: str) -> dict[str, 
     pipeline_id = value["pipelineId"]
     if not isinstance(pipeline_id, str) or (value["available"] and not pipeline_id.strip()):
         raise ArtifactError(f"{field}.pipelineId must be non-empty when available")
+    if not value["available"] and pipeline_id:
+        raise ArtifactError(f"{field}.pipelineId must be empty when unavailable")
     index_profile_id = value.get("indexProfileId")
     if index_profile_id is not None and (not isinstance(index_profile_id, str) or not index_profile_id.strip()):
         raise ArtifactError(f"{field}.indexProfileId must be a non-empty string when present")
@@ -206,6 +208,19 @@ def _self_test() -> None:
         pass
     else:
         raise AssertionError("unknown artifact field was accepted")
+    invalid_unavailable = dict(valid)
+    invalid_unavailable["balanced"] = {
+        **valid["balanced"],
+        "available": False,
+        "pipelineId": "naive",
+        "reason": "invalid unavailable recommendation self-test",
+    }
+    try:
+        adapt(invalid_unavailable)
+    except ArtifactError:
+        pass
+    else:
+        raise AssertionError("unavailable recommendation retained a pipeline")
 
 
 def main() -> int:
