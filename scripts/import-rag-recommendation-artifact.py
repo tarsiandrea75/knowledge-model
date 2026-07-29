@@ -200,6 +200,11 @@ def _self_test() -> None:
     fixture_profiles = fixture_envelope["policyDecision"]["profiles"].values()
     assert all(not profile["available"] for profile in fixture_profiles)
     assert all("INDEX_PROFILE_REVIEW_REQUIRED" in profile["reason"] for profile in fixture_profiles)
+    generated_fixture = REPOSITORY_ROOT / "examples" / "fixtures" / "rag-recommendation-report-v1-generated.json"
+    generated_envelope = adapt(_load(generated_fixture))
+    assert generated_envelope["sourceArtifact"]["experimentId"] == "offline-rag-e2e-walkthrough"
+    assert generated_envelope["policyDecision"]["profiles"]["balanced"]["pipelineId"] == "naive"
+    assert generated_envelope["policyDecision"]["profiles"]["balanced"]["indexProfileId"] == "offline-fixture-index-v1"
     invalid = dict(valid)
     invalid["unexpected"] = True
     try:

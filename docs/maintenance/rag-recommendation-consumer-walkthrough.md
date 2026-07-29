@@ -26,9 +26,33 @@ The source contract and RKM adapter are intentionally separate:
 - source contract: `rag-recommendation-report-v1`;
 - adapter envelope: `rkm-recommendation-artifact-adapter-v1`;
 - source fixture: `examples/fixtures/rag-recommendation-report-v1.json`;
+- generated RAG fixture: `examples/fixtures/rag-recommendation-report-v1-generated.json`;
 - cross-index review fixture: `examples/fixtures/rag-recommendation-report-v1-index-review.json`;
 - adapter: `scripts/import-rag-recommendation-artifact.py`;
 - envelope schema: `schema/rag-recommendation-artifact-adapter-v1.schema.json`.
+
+## Consume the generated RAG artifact
+
+From the RAG repository, first run the provider-free walkthrough:
+
+```bash
+mvn -q -Dtest=OfflineRagExecutionWalkthroughTest test
+```
+
+It emits `target/rag-eval/rag-recommendation-report-v1-generated.json`. The
+same deterministic output is preserved in the RKM generated fixture and can
+be passed directly to the adapter:
+
+```bash
+python3 scripts/import-rag-recommendation-artifact.py \
+  examples/fixtures/rag-recommendation-report-v1-generated.json \
+  > /tmp/rkm-generated-envelope.json
+```
+
+The generated report identifies experiment `offline-rag-e2e-walkthrough`,
+policy `quality-cost-profiles-v1`, pipeline `naive`, and index profile
+`offline-fixture-index-v1`. It remains compatibility evidence; consuming it
+does not persist a canonical decision or promote a production route.
 
 ## Execute the walkthrough
 

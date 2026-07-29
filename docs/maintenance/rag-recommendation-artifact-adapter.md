@@ -26,6 +26,12 @@ evidence-backed reason emitted by the Lab. The index profile field is optional
 for compatibility with shared-index reports and required by future multi-index
 producers. Unknown fields and non-finite numeric values are rejected.
 
+The generated-runtime fixture
+`examples/fixtures/rag-recommendation-report-v1-generated.json` was produced
+by the provider-free RAG walkthrough. It demonstrates the adapter path with
+runtime-generated deterministic evidence rather than a hand-authored
+compatibility-only report.
+
 An unavailable recommendation must carry an empty `pipelineId`. The adapter
 rejects an unavailable profile that still identifies a pipeline, because such
 an artifact could be mistaken for an executable recommendation.
