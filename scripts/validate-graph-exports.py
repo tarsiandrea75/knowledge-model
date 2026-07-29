@@ -110,6 +110,11 @@ def validate_items(
     source_fixture_compatibility: bool,
 ) -> None:
     for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            raise GraphExportValidationError(
+                f"{display_path(path)}[{index}]: graph {item_name} must be a JSON object"
+            )
+        validate_provenance(item, path, index, source_fixture_compatibility)
         instance = validation_instance(item, source_fixture_compatibility)
         errors = sorted(validator.iter_errors(instance), key=lambda error: list(error.absolute_path))
         if errors:
@@ -133,6 +138,55 @@ def object_string_field(item: dict[str, Any], field: str, path: Path, index: int
             f"{display_path(path)}[{index}].{field}: graph {item_name} field must be a non-empty string"
         )
     return value
+
+
+def require_repository_file(value: Any, path: Path, index: int, field: str) -> None:
+    if not isinstance(value, str) or not value:
+        raise GraphExportValidationError(
+            f"{display_path(path)}[{index}].{field}: provenance path must be a non-empty string"
+        )
+    candidate = (REPOSITORY_ROOT / value).resolve()
+    try:
+        candidate.relative_to(REPOSITORY_ROOT)
+    except ValueError as exc:
+        raise GraphExportValidationError(
+            f"{display_path(path)}[{index}].{field}: provenance path escapes the repository"
+        ) from exc
+    if not candidate.is_file():
+        raise GraphExportValidationError(
+            f"{display_path(path)}[{index}].{field}: referenced file does not exist: {value}"
+        )
+
+
+def validate_provenance(
+    item: dict[str, Any], path: Path, index: int, source_fixture_compatibility: bool
+) -> None:
+    require_repository_file(
+        item.get("sourceFixture" if source_fixture_compatibility else "sourceDataFile"),
+        path,
+        index,
+        "sourceFixture" if source_fixture_compatibility else "sourceDataFile",
+    )
+    properties = item.get("properties")
+    if not isinstance(properties, dict):
+        return
+    for field in ("declaredInManifest", "declaredInRelationshipSet", "targetDataFile", "schema"):
+        if field in properties:
+            require_repository_file(properties[field], path, index, f"properties.{field}")
+    support_sets = properties.get("declaredInRelationshipSupportSets")
+    if support_sets is not None:
+        if not isinstance(support_sets, list):
+            raise GraphExportValidationError(
+                f"{display_path(path)}[{index}].properties.declaredInRelationshipSupportSets: "
+                "provenance paths must be an array"
+            )
+        for support_set in support_sets:
+            require_repository_file(
+                support_set,
+                path,
+                index,
+                "properties.declaredInRelationshipSupportSets",
+            )
 
 
 def unique_ids(items: list[Any], path: Path, item_name: str) -> set[str]:
@@ -229,6 +283,14 @@ def run_self_test() -> None:
             raise
     else:
         raise GraphExportValidationError("self-test failed: missing edge endpoint was accepted")
+
+    try:
+        require_repository_file("data/does-not-exist.json", Path("nodes.json"), 0, "sourceDataFile")
+    except GraphExportValidationError as exc:
+        if "does not exist" not in str(exc):
+            raise
+    else:
+        raise GraphExportValidationError("self-test failed: missing provenance path was accepted")
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

@@ -165,13 +165,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-010`
 - `Title`: Stronger graph export provenance consistency validator.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Validation
 - `Reason`: Graph export provenance should remain consistent with source data, fixture paths, and relationship support metadata.
-- `Suggested implementation`: Add deeper provenance checks to graph export validation for source file references, support links, and export origin fields.
+- `Suggested implementation`: Implemented by `scripts/validate-graph-exports.py`; the validator checks repository-local source files, manifest references, schema references, relationship-set references, and relationship-support-set references.
 - `Related files`: `examples/graph-export/`; `examples/data-graph-export/`; `scripts/validate-graph-exports.py`; `docs/maintenance/graph-export-contract.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in the GB-010 task packet; no canonical-data migration dependency.
 
 ### GB-011 Validation Weakening Detector
 

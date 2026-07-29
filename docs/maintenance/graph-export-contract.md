@@ -116,6 +116,12 @@ After schema validation, the validator checks graph integrity inside each export
 - every edge `sourceId` must exist as a node ID in the same export
 - every edge `targetId` must exist as a node ID in the same export
 
+It also validates provenance consistency for every node and edge:
+
+- `sourceFixture` and `sourceDataFile` must resolve to existing files inside the repository.
+- declared manifest, schema, relationship-set, target-data, and relationship-support-set paths must resolve to existing files.
+- provenance paths cannot escape the repository through absolute paths or parent traversal.
+
 These checks are intentionally separate from exporter-specific deterministic checks. The exporter `--check` commands prove committed files match generated output. The graph export schema validator proves the generated shape is loadable as a coherent node and edge graph.
 
 ## Stable Identifiers
