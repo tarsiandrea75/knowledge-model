@@ -137,6 +137,11 @@ The adapter does not persist the envelope into canonical RKM data. Persistence
 as Evaluation, Artifact, or Policy Decision entities requires a separate
 reviewed task with provenance, lifecycle, and compatibility decisions.
 
+The persistence self-test also covers the cross-index review case. When the
+source recommendation is unavailable, the persisted profiles retain an empty
+`pipelineId`, `INDEX_PROFILE_REVIEW_REQUIRED`, and
+`productionPromotionAllowed=false`.
+
 The cross-index review fixture demonstrates the fail-closed case. Its three
 profiles remain unavailable and retain `INDEX_PROFILE_REVIEW_REQUIRED`; no
 consumer-side selection is allowed.

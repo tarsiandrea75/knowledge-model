@@ -109,6 +109,23 @@ def _self_test() -> None:
     assert decision["lifecycle"]["productionPromotionAllowed"] is False
     assert decision["sourceArtifact"]["experimentId"] == "offline-rag-e2e-walkthrough"
     assert decision["profiles"]["balanced"]["pipelineId"] == "naive"
+    unavailable = {**recommendation, "available": False, "pipelineId": "", "reason": "INDEX_PROFILE_REVIEW_REQUIRED"}
+    unavailable_envelope = {
+        **envelope,
+        "sourceArtifact": {**envelope["sourceArtifact"], "experimentId": "cross-index-review"},
+        "policyDecision": {
+            **envelope["policyDecision"],
+            "profiles": {
+                "economical": {**unavailable, "profile": "ECONOMICAL"},
+                "balanced": {**unavailable, "profile": "BALANCED"},
+                "maximumQuality": {**unavailable, "profile": "MAXIMUM_QUALITY"},
+            },
+        },
+    }
+    unavailable_decision = persist(unavailable_envelope, metadata)
+    assert unavailable_decision["profiles"]["balanced"]["available"] is False
+    assert unavailable_decision["profiles"]["balanced"]["pipelineId"] == ""
+    assert unavailable_decision["lifecycle"]["productionPromotionAllowed"] is False
 
 
 def main() -> int:
