@@ -58,6 +58,7 @@ Each backlog entry uses this compact format:
 - `RKM-017` Fail-closed decision persistence.
 - `RKM-018` Phase C closure and evidence boundary.
 - `RKM-019` External RAG evidence package and decision report.
+- `RKM-020` External evidence review gate.
 
 ## Backlog Entries
 
@@ -605,6 +606,9 @@ Each backlog entry uses this compact format:
   source rights and freshness, preserve source and corpus hashes, validate
   compatibility before any canonical persistence, and retain the current
   non-promotion boundary.
+- `Implementation status`: RKM-019 packages the evidence and RKM-020 verifies
+  its schema, local hashes, source-commit reachability, and fail-closed
+  lifecycle without network access or production promotion.
 - `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
   `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
   `scripts/import-rag-recommendation-artifact.py`;

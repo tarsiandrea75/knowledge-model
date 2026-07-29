@@ -112,6 +112,9 @@ printf '==> Running compact evidence bundle self-test\n'
 printf '==> Running rkm-decision-query self-test\n'
 "$PYTHON_BIN" scripts/rkm-decision-query.py --self-test
 
+printf '==> Running external RAG evidence verifier self-test\n'
+"$PYTHON_BIN" scripts/verify-external-rag-evidence.py --self-test
+
 printf '==> Running Creator prompt semantic duplication guardrail self-test\n'
 creator_prompt_scripts=(scripts/rkm-cycle.sh scripts/rkm-discover.sh)
 creator_prompt_guardrails=(

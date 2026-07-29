@@ -82,6 +82,18 @@ The bundle remains `Draft` and `Not Reviewed`. It records a provider-free
 experiment and local estimated cost; it does not prove live provider quality,
 invoice-grade billing, or suitability for another corpus.
 
+From the RKM repository, verify the bundle against the local RAG repository
+without network access:
+
+```bash
+make external-rag-evidence-review \
+  RAG_ROOT=/mnt/c/Users/andrea.tarsi/projects/AI/BuildingRAGAgentsWithLLMs
+```
+
+The gate checks the strict schema, corpus and dataset hashes, generated
+artifact and decision-record hashes, and reachability of the declared RAG
+source commit. It never changes lifecycle state or promotes a route.
+
 ## Execute the walkthrough
 
 Use a temporary directory outside the repository for generated output:
