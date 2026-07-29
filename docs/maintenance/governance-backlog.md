@@ -117,13 +117,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-006`
 - `Title`: Recovery state validator or autopilot blocker.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Automation
 - `Reason`: Autopilot should stop when recovery state requires manual repair.
-- `Suggested implementation`: Add a preflight check to autopilot and validation tooling that rejects unsafe recovery states before more automation runs.
+- `Suggested implementation`: Implemented by `scripts/rkm-autopilot.py`; failed recovery states produce a zero-command manual-fix plan and block post-failure publication. See `docs/maintenance/task-packets/GB-006-recovery-state-autopilot-blocker.md`.
 - `Related files`: `docs/maintenance/automation-guardrails.md`; `docs/maintenance/task-guides/recovering-failed-new-file.md`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Depends on`: Implemented in the GB-006 task packet; no external dependency.
 
 ### GB-007 Runtime Artifact Detector
 
