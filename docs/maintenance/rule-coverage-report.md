@@ -22,6 +22,7 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 | --- | --- | --- | --- | --- |
 | Clean worktree before push, autopilot, or handoff. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Partially Validated | `make safe-push`; release and automation tooling inspect status in specific flows | The general handoff rule still requires the operator or assistant to inspect `git status --short`. |
 | Runtime logs and scratch files must stay outside the repository. | `AGENTS.md`; `docs/maintenance/automation-guardrails.md` | Validated | `scripts/validate-runtime-artifacts.py`; `make runtime-artifacts-validate`; `make validate` | The detector rejects declared runtime directories, generated RKM or Codex run prefixes, and common runtime file suffixes without deleting artifacts. |
+| Populated entity types must have a complete registry, schema, manifest, documentation, and graph-export package. | `data/AGENTS.md`; `docs/maintenance/task-guides/adding-new-entity-type.md` | Validated | `scripts/validate-entity-type-packages.py`; `make entity-type-package-validate`; `make validate` | The validator checks populated types and leaves registry-only abstract or planned types available without requiring data records. |
 | Root `AGENTS.md` must remain concise. | `AGENTS.md`; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator enforces the root line budget. |
 | Required local `AGENTS.md` files must exist. | `AGENTS.md`; `docs/maintenance/task-guides/rule-routing-validation.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required local rule files. |
 | Required task guides must exist. | `AGENTS.md`; `docs/maintenance/task-guides/README.md` | Validated | `scripts/validate-agent-routing.py`; `make agent-routing-validate`; `make validate` | The validator checks the required task guide inventory. |
@@ -49,10 +50,10 @@ Use `docs/maintenance/governance-backlog.md` for actionable deferred governance 
 
 ## Highest-Value Automation Candidates
 
-1. New entity type package validator.
-2. Relationship predicate reuse assistant or reviewer check.
-3. Recovery state validator that blocks autopilot when recovery failed.
-4. Recovery state validator that blocks autopilot when recovery failed.
+1. Relationship predicate reuse assistant or reviewer check.
+2. Recovery state validator that blocks autopilot when recovery failed.
+3. Rule coverage consistency validator.
+4. Markdown JSON example validator.
 
 ## Maintenance Rules
 

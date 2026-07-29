@@ -50,6 +50,21 @@ The check reports each offending path and does not delete anything. Move the
 output to `/tmp/rkm-runs`, remove the repository-local artifact, and rerun the
 validator.
 
+## Entity Type Package Completeness
+
+Populated entity types must be represented consistently across the registry,
+declared schema, data manifest, identity schema, architecture documentation,
+and deterministic data graph export. Check the package before adding or
+reviewing a new entity type:
+
+```bash
+make entity-type-package-validate
+```
+
+The validator covers populated types only; registry-only types may remain
+planned or abstract. It reports missing or inconsistent components and never
+modifies canonical data or generated graph artifacts.
+
 ## Failed Newly Added Files
 
 If a newly added file fails review or recovery and should be discarded, remove it from both the index and the filesystem:

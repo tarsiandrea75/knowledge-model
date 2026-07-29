@@ -504,3 +504,25 @@ The governance backlog marks GB-007 implemented and the rule-coverage report
 marks the runtime-artifact rule validated. Full RKM validation passed after
 each file change. No schema, canonical data, graph export, branch, tag, or
 remote was changed. The task creates a local commit only; no push is planned.
+
+## Current Checkpoint: GB-002 Entity Type Package Validator
+
+Snapshot date: 2026-07-29
+
+GB-002 is complete on `codex/open-autonomy-era`. The repository now provides
+`scripts/validate-entity-type-packages.py` and the public target
+`make entity-type-package-validate`. The standard `make validate` pipeline
+runs the validator self-test and the populated-package check.
+
+The validator covers every entity type represented by an entity record in the
+data manifest. It requires a registry entry, declared ontology directory,
+consistent operational storage below `data/`, matching schema declaration,
+identity-schema support, architecture documentation derived from the schema,
+and graph-export nodes for every entity ID. Relationship and relationship-
+support manifests remain outside this entity-package scan because they do not
+represent entity records.
+
+GB-002 is marked implemented in the governance backlog and validated in the
+rule-coverage report. No canonical data, schema, registry, graph export,
+branch, tag, or remote was changed. Full validation passed after each file
+change. The task creates a local commit only; no push is planned.

@@ -47,8 +47,8 @@ Each backlog entry uses this compact format:
 
 ## Suggested Next Items
 
-- `GB-002` New entity type package validator.
-- `GB-007` Runtime artifact detector.
+- `GB-003` Relationship predicate reuse checker.
+- `GB-006` Recovery state validator or autopilot blocker.
 - `GB-038` `v0.2.0` planning document.
 
 ## Backlog Entries
@@ -69,13 +69,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-002`
 - `Title`: New entity type package validator.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Validation
 - `Reason`: Adding a new entity type requires coordinated schema, registry, data, manifest, graph export, documentation, and validation support.
-- `Suggested implementation`: Add a validator that detects new entity type surfaces and checks the required package components.
-- `Related files`: `data/AGENTS.md`; `schema/`; `registries/`; `data/manifest.json`; `docs/maintenance/task-guides/adding-new-entity-type.md`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented by `scripts/validate-entity-type-packages.py`, exposed through `make entity-type-package-validate`, and included in `make validate`.
+- `Related files`: `data/AGENTS.md`; `schema/`; `registries/`; `data/manifest.json`; `examples/data-graph-export/`; `docs/maintenance/task-guides/adding-new-entity-type.md`; `scripts/validate-entity-type-packages.py`
+- `Depends on`: Implemented in the local GB-002 checkpoint; no canonical-data or schema migration dependency.
 
 ### GB-003 Relationship Predicate Reuse Checker
 

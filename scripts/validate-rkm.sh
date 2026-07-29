@@ -217,6 +217,11 @@ start_step "Checking for repository-local runtime artifacts..."
 "$PYTHON_BIN" scripts/validate-runtime-artifacts.py
 pass_step
 
+start_step "Checking populated entity type packages..."
+"$PYTHON_BIN" scripts/validate-entity-type-packages.py --self-test
+"$PYTHON_BIN" scripts/validate-entity-type-packages.py
+pass_step
+
 start_step "Running JSON Schema validation..."
 "$PYTHON_BIN" scripts/validate-schemas.py
 pass_step
