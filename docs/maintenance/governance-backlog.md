@@ -177,13 +177,13 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-011`
 - `Title`: Validation weakening detector.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `Medium`
 - `Area`: Validation
 - `Reason`: Validator changes should not silently narrow checks, remove cases, or lower enforcement.
-- `Suggested implementation`: Add self-test coverage and review tooling that compares validator behavior before and after validation script changes.
-- `Related files`: `scripts/AGENTS.md`; `docs/maintenance/task-guides/updating-validation-scripts.md`; `scripts/`; `Makefile`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented by `scripts/validate-validation-inventory.py`, exposed through `make validation-inventory-validate`, and included in `make validate`. The inventory fails when a critical validator, self-test hook, or main-pipeline hook is removed.
+- `Related files`: `scripts/validate-validation-inventory.py`; `scripts/rkm-unit-tests.sh`; `scripts/validate-rkm.sh`; `Makefile`
+- `Depends on`: Implemented in the GB-011 task packet; semantic behavior diffs remain a separate future capability.
 
 ### GB-012 Policy-As-Data Registry
 

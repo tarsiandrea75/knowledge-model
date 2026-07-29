@@ -58,6 +58,9 @@ printf '==> Running validate-rule-coverage self-test\n'
 printf '==> Running validate-markdown-json self-test\n'
 "$PYTHON_BIN" scripts/validate-markdown-json.py --self-test
 
+printf '==> Running validation inventory self-test\n'
+"$PYTHON_BIN" scripts/validate-validation-inventory.py --self-test
+
 printf '==> Running validate-schema-prerequisites self-test\n'
 "$PYTHON_BIN" scripts/validate-schema-prerequisites.py --self-test
 

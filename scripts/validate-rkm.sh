@@ -287,4 +287,8 @@ start_step "Running rule coverage consistency validation"
 "$PYTHON_BIN" scripts/validate-rule-coverage.py
 pass_step
 
+start_step "Running validation inventory consistency validation"
+"$PYTHON_BIN" scripts/validate-validation-inventory.py
+pass_step
+
 printf '\nRKM validation passed. Total elapsed: %ss\n' "$(elapsed_seconds "$TOTAL_STARTED_AT")"

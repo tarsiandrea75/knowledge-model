@@ -19,7 +19,7 @@ FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
 
-.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate validation-inventory-validate release-check route-task rag-recommendation-adapter-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -59,6 +59,9 @@ rule-coverage-validate:
 
 markdown-json-validate:
 	python3 scripts/validate-markdown-json.py "$(or $(DOCS_PATH),docs)"
+
+validation-inventory-validate:
+	python3 scripts/validate-validation-inventory.py
 
 agent-routing-validate:
 	python3 scripts/validate-agent-routing.py
