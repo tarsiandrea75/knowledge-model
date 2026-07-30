@@ -115,6 +115,15 @@ printf '==> Running rkm-decision-query self-test\n'
 printf '==> Running external RAG evidence verifier self-test\n'
 "$PYTHON_BIN" scripts/verify-external-rag-evidence.py --self-test
 
+printf '==> Running canonical RAG evidence projection self-test\n'
+"$PYTHON_BIN" scripts/build-canonical-rag-evidence-projection.py --self-test
+
+printf '==> Running canonical RAG evidence projection integrity self-test\n'
+"$PYTHON_BIN" scripts/validate-canonical-rag-evidence-projection.py --self-test
+
+printf '==> Running canonical RAG evidence projection query self-test\n'
+"$PYTHON_BIN" scripts/query-canonical-rag-evidence-projection.py --self-test
+
 printf '==> Running Creator prompt semantic duplication guardrail self-test\n'
 creator_prompt_scripts=(scripts/rkm-cycle.sh scripts/rkm-discover.sh)
 creator_prompt_guardrails=(

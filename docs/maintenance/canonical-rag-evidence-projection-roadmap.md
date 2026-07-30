@@ -131,3 +131,20 @@ The five NASA sources are approved for `INTERNAL_EVALUATION_ONLY` in
 `rkm-external-rag-source-review-v1`. That decision is sufficient to begin
 RKM-023, but it is not approval for redistribution, commercial use, canonical
 production policy, or automatic RAG promotion.
+
+## Implementation status
+
+RKM-023 through RKM-028 are now implemented as an internal read-only slice:
+
+- the versioned projection contract is schema-validated;
+- the provider-free builder is deterministic and idempotent;
+- the generated projection fixture is manifest-registered;
+- the integrity gate rejects tampering, duplicate identities and missing
+  relationship endpoints;
+- the downstream query consumer preserves scope and lifecycle boundaries;
+- the release-readiness report records technical coverage and unresolved
+  policy limitations.
+
+The projection remains an envelope fixture rather than a write into canonical
+`data/**`. Promoting projected records into the ontology requires a separate
+review of the existing entity and relationship contracts.

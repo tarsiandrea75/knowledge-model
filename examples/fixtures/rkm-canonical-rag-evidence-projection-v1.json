@@ -1,0 +1,580 @@
+{
+  "contractVersion": "rkm-canonical-rag-evidence-projection-v1",
+  "entities": [
+    {
+      "attributes": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "sha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "version": "1.0.0"
+      },
+      "entityType": "Artifact",
+      "id": "ARTIFACT-1001",
+      "name": "External RAG evidence bundle",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "external-evidence-bundle",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "id": "space-exploration-v1",
+        "path": "src/test/resources/evaluation/space-corpus-v1.json",
+        "sha256": "3c5be7b94065f4e6e2ecdfbafde926f57b2b912741f2de61bcac42ba8db30d4b",
+        "version": "1.0.0"
+      },
+      "entityType": "Dataset",
+      "id": "DATASET-1001",
+      "name": "Space exploration corpus",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "space-exploration-corpus",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "id": "space-exploration-golden-v1",
+        "path": "src/test/resources/evaluation/space-golden-dataset-v1.json",
+        "sha256": "7c7c59829502a9c087f31c5c637a4aa88b81c952be35482ee706542bb0945d03",
+        "version": "1.0.0"
+      },
+      "entityType": "Dataset",
+      "id": "DATASET-1002",
+      "name": "Space exploration golden dataset",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "space-exploration-golden-dataset",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "id": "offline-rag-e2e-walkthrough",
+        "path": "examples/fixtures/rag-recommendation-report-v1-generated.json",
+        "sha256": "3f8a2e8e9296546b57aeda8904f9bf0db61127ce7bd09a17484f91089824927f",
+        "version": "1.0.0"
+      },
+      "entityType": "Artifact",
+      "id": "ARTIFACT-1002",
+      "name": "Offline RAG generated artifact",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "offline-rag-e2e-walkthrough",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "id": "offline-rag-e2e-walkthrough-decision",
+        "path": "examples/fixtures/rkm-rag-recommendation-decision-v1.json",
+        "sha256": "f91f59006e668b02fac97e1443c7ed07db03ced2daf337db6332a22520f87d39",
+        "version": "1.0.0"
+      },
+      "entityType": "Artifact",
+      "id": "ARTIFACT-1003",
+      "name": "Offline RAG decision record",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "offline-rag-e2e-walkthrough-decision",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "costCurrency": "LOCAL",
+        "estimatedCost": 0.001,
+        "experimentId": "offline-rag-e2e-walkthrough",
+        "interpretation": "Naive is selected for this provider-free walkthrough because all eligible pipelines reached the measured quality floor and it won the bounded latency and local estimated-cost tie-breaks. This is evidence for this corpus and experiment, not a universal strategy ranking.",
+        "latencyP95Ms": 10,
+        "policyVersion": "quality-cost-profiles-v1",
+        "qualityScore": 1.0,
+        "recommendedIndexProfileId": "offline-fixture-index-v1",
+        "recommendedPipelineId": "naive"
+      },
+      "entityType": "Benchmark",
+      "id": "BENCHMARK-1001",
+      "name": "Offline RAG evaluation walkthrough",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "offline-rag-e2e-walkthrough",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "attribution": "NASA",
+        "canonicalUrl": "https://www.nasa.gov/artemisaudio/",
+        "id": "nasa-artemis-audio",
+        "kind": "audio",
+        "retrievalDate": "2026-07-27",
+        "rights": "NASA audio usage guidelines; no implied endorsement; third-party material excluded",
+        "sourceIdentitySha256": "8f57bb797d4de68160139b58049de4ff54d747347d4835f6b22610d6a90eb918",
+        "title": "Artemis Audio Library"
+      },
+      "entityType": "Reference",
+      "id": "REFERENCE-1001",
+      "name": "Artemis Audio Library",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-audio",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency.",
+        "decision": "APPROVED",
+        "sourceId": "nasa-artemis-audio"
+      },
+      "entityType": "Evidence",
+      "id": "EVIDENCE-1001",
+      "name": "Human review of Artemis Audio Library",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-audio-review",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "attribution": "NASA",
+        "canonicalUrl": "https://www.nasa.gov/general/artemis-i-media-resources/",
+        "id": "nasa-artemis-i-media",
+        "kind": "video",
+        "retrievalDate": "2026-07-27",
+        "rights": "NASA media usage guidelines; third-party material and endorsements excluded",
+        "sourceIdentitySha256": "f2e85194f8fa4a7fdbb0dbce4ccac609e1d9875488a0085e02af1ac604e39c9e",
+        "title": "Artemis I Media Resources"
+      },
+      "entityType": "Reference",
+      "id": "REFERENCE-1002",
+      "name": "Artemis I Media Resources",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-i-media",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency.",
+        "decision": "APPROVED",
+        "sourceId": "nasa-artemis-i-media"
+      },
+      "entityType": "Evidence",
+      "id": "EVIDENCE-1002",
+      "name": "Human review of Artemis I Media Resources",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-i-media-review",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "attribution": "NASA",
+        "canonicalUrl": "https://www.nasa.gov/humans-in-space/artemis-media-resources/",
+        "id": "nasa-artemis-media-resources",
+        "kind": "image",
+        "retrievalDate": "2026-07-27",
+        "rights": "NASA media usage guidelines; third-party material and endorsements excluded",
+        "sourceIdentitySha256": "0acf2972369b55992f4a65a0d20bc0482cb042b47a1fd0122a35ad345e42dc59",
+        "title": "Artemis Media Resources"
+      },
+      "entityType": "Reference",
+      "id": "REFERENCE-1003",
+      "name": "Artemis Media Resources",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-media-resources",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency.",
+        "decision": "APPROVED",
+        "sourceId": "nasa-artemis-media-resources"
+      },
+      "entityType": "Evidence",
+      "id": "EVIDENCE-1003",
+      "name": "Human review of Artemis Media Resources",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-artemis-media-resources-review",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "attribution": "NASA Science",
+        "canonicalUrl": "https://science.nasa.gov/solar-system/solar-system-facts/",
+        "id": "nasa-solar-system-facts",
+        "kind": "text",
+        "retrievalDate": "2026-07-27",
+        "rights": "NASA media and information; source attribution required; third-party material excluded",
+        "sourceIdentitySha256": "b9443019da3ade1d81fe2775371b2ab199240f30496783696ddcaaf7aa5f4921",
+        "title": "Solar System Facts"
+      },
+      "entityType": "Reference",
+      "id": "REFERENCE-1004",
+      "name": "Solar System Facts",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-solar-system-facts",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency.",
+        "decision": "APPROVED",
+        "sourceId": "nasa-solar-system-facts"
+      },
+      "entityType": "Evidence",
+      "id": "EVIDENCE-1004",
+      "name": "Human review of Solar System Facts",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-solar-system-facts-review",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "attribution": "NASA Science",
+        "canonicalUrl": "https://science.nasa.gov/sun/facts/",
+        "id": "nasa-sun-facts",
+        "kind": "text",
+        "retrievalDate": "2026-07-27",
+        "rights": "NASA media and information; source attribution required; third-party material excluded",
+        "sourceIdentitySha256": "3c409e8cc1b652557580acb14b34192b0e389d81bd8b05336e0875aa6d9cf69f",
+        "title": "Our Sun: Facts"
+      },
+      "entityType": "Reference",
+      "id": "REFERENCE-1005",
+      "name": "Our Sun: Facts",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-sun-facts",
+      "status": "Reviewed"
+    },
+    {
+      "attributes": {
+        "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency.",
+        "decision": "APPROVED",
+        "sourceId": "nasa-sun-facts"
+      },
+      "entityType": "Evidence",
+      "id": "EVIDENCE-1005",
+      "name": "Human review of Our Sun: Facts",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "slug": "nasa-sun-facts-review",
+      "status": "Reviewed"
+    }
+  ],
+  "lifecycle": {
+    "productionPromotionAllowed": false,
+    "reviewState": "Human Reviewed",
+    "scope": "INTERNAL_EVALUATION_ONLY",
+    "status": "Reviewed"
+  },
+  "limitations": [
+    "The projection is derived from reviewed metadata and does not assert new factual claims.",
+    "The projection is limited to internal evaluation and cannot authorize production promotion.",
+    "Source rights and redistribution decisions remain outside this technical projection."
+  ],
+  "projectionId": "nasa-space-exploration-rag-evidence-v1-canonical-projection",
+  "relationships": [
+    {
+      "id": "RELATIONSHIP-1001",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "ARTIFACT-1001",
+      "sourceType": "Artifact",
+      "status": "Reviewed",
+      "targetId": "DATASET-1001",
+      "targetType": "Dataset",
+      "type": "REFERENCES"
+    },
+    {
+      "id": "RELATIONSHIP-1002",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "ARTIFACT-1001",
+      "sourceType": "Artifact",
+      "status": "Reviewed",
+      "targetId": "DATASET-1002",
+      "targetType": "Dataset",
+      "type": "REFERENCES"
+    },
+    {
+      "id": "RELATIONSHIP-1003",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "ARTIFACT-1001",
+      "sourceType": "Artifact",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "REFERENCES"
+    },
+    {
+      "id": "RELATIONSHIP-1004",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "ARTIFACT-1001",
+      "sourceType": "Artifact",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1003",
+      "targetType": "Artifact",
+      "type": "REFERENCES"
+    },
+    {
+      "id": "RELATIONSHIP-1005",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "BENCHMARK-1001",
+      "sourceType": "Benchmark",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "EVALUATES"
+    },
+    {
+      "id": "RELATIONSHIP-1006",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "EVIDENCE-1001",
+      "sourceType": "Evidence",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "VALIDATES"
+    },
+    {
+      "id": "RELATIONSHIP-1007",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "EVIDENCE-1002",
+      "sourceType": "Evidence",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "VALIDATES"
+    },
+    {
+      "id": "RELATIONSHIP-1008",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "EVIDENCE-1003",
+      "sourceType": "Evidence",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "VALIDATES"
+    },
+    {
+      "id": "RELATIONSHIP-1009",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "EVIDENCE-1004",
+      "sourceType": "Evidence",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "VALIDATES"
+    },
+    {
+      "id": "RELATIONSHIP-1010",
+      "provenance": {
+        "bundleId": "nasa-space-exploration-rag-evidence-v1",
+        "bundleSha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+        "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+        "reviewSha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+        "reviewedAt": "2026-07-30",
+        "reviewer": "Andrea Tarsi",
+        "scope": "INTERNAL_EVALUATION_ONLY"
+      },
+      "sourceId": "EVIDENCE-1005",
+      "sourceType": "Evidence",
+      "status": "Reviewed",
+      "targetId": "ARTIFACT-1002",
+      "targetType": "Artifact",
+      "type": "VALIDATES"
+    }
+  ],
+  "sourceBundle": {
+    "id": "nasa-space-exploration-rag-evidence-v1",
+    "sha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d",
+    "version": "1.0.0"
+  },
+  "sourceReview": {
+    "id": "nasa-space-exploration-source-review-2026-07-30",
+    "sha256": "22f2c00f219767b9de584279f5a5fe03456e806726d9004a784f9cc01b4702be",
+    "version": "rkm-external-rag-source-review-v1"
+  }
+}
