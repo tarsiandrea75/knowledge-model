@@ -631,7 +631,7 @@ human-reviewed pilot decision.
 
 - `ID`: `GB-045`
 - `Title`: External RAG evidence and recommendation persistence.
-- `Status`: `In Progress`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Evidence
 - `Reason`: The RAG-to-RKM consumer walkthrough now consumes a deterministic
@@ -652,6 +652,12 @@ human-reviewed pilot decision.
 - `Review status`: RKM-022 records Andrea Tarsi's approval of all five NASA
   source records for internal evaluation only. Recommendation review,
   redistribution, commercial use, and production promotion remain separate.
+- `Closure`: The deterministic read-only projection delivered by RKM-023
+  through RKM-028 completes this backlog item's persistence boundary. It
+  retains immutable bundle, source-review, corpus, decision, and projection
+  provenance while preserving `productionPromotionAllowed=false`. Canonical
+  ontology persistence is not a deferred remainder of GB-045; it requires a
+  new, separately scoped task with explicit canonical-data review.
 - `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
   `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
   `scripts/import-rag-recommendation-artifact.py`;
