@@ -1,0 +1,51 @@
+{
+  "contractVersion": "rkm-external-rag-source-review-v1",
+  "reviewId": "nasa-space-exploration-source-review-2026-07-30",
+  "subjectBundle": {
+    "bundleId": "nasa-space-exploration-rag-evidence-v1",
+    "version": "1.0.0",
+    "sha256": "44e93c51f2dbb277dbf5bc29a8f844ab9bdd51c01c4d53327f2dff03f874fc8d"
+  },
+  "reviewer": {
+    "name": "Andrea Tarsi",
+    "reviewedAt": "2026-07-30",
+    "scope": "INTERNAL_EVALUATION_ONLY"
+  },
+  "lifecycle": {
+    "status": "Reviewed",
+    "reviewState": "Human Reviewed",
+    "productionPromotionAllowed": false
+  },
+  "sourceDecisions": [
+    {
+      "sourceId": "nasa-sun-facts",
+      "decision": "APPROVED",
+      "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency."
+    },
+    {
+      "sourceId": "nasa-solar-system-facts",
+      "decision": "APPROVED",
+      "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency."
+    },
+    {
+      "sourceId": "nasa-artemis-i-media",
+      "decision": "APPROVED",
+      "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency."
+    },
+    {
+      "sourceId": "nasa-artemis-audio",
+      "decision": "APPROVED",
+      "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency."
+    },
+    {
+      "sourceId": "nasa-artemis-media-resources",
+      "decision": "APPROVED",
+      "basis": "Official NASA source reviewed for internal evaluation metadata and attribution consistency."
+    }
+  ],
+  "limitations": [
+    "This approval is limited to internal evaluation use and is not a legal licence opinion.",
+    "The review does not authorize redistribution, commercial use, or third-party media reuse.",
+    "The RAG recommendation remains a separate Draft and non-promotable decision."
+  ]
+}

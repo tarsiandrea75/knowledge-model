@@ -70,6 +70,12 @@ reviewState: Not Reviewed
 productionPromotionAllowed: false
 ```
 
+The source metadata review is recorded separately in
+`examples/fixtures/rkm-external-rag-source-review-v1.json`. Andrea Tarsi
+approved all five source records for internal evaluation only on 2026-07-30.
+That human review does not approve the RAG recommendation, redistribution,
+commercial use, or production promotion.
+
 ## Limitations and next review
 
 - Source identity hashes identify canonical URLs, not downloaded payload bytes.

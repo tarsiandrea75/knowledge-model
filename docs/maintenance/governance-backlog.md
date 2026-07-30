@@ -60,6 +60,7 @@ Each backlog entry uses this compact format:
 - `RKM-019` External RAG evidence package and decision report.
 - `RKM-020` External evidence review gate.
 - `RKM-021` Source freshness and human-review readiness.
+- `RKM-022` Human source review record.
 
 ## Backlog Entries
 
@@ -613,6 +614,9 @@ Each backlog entry uses this compact format:
 - `Follow-up status`: RKM-021 verifies explicit source freshness thresholds
   and emits source-specific human review requirements; rights approval remains
   outside the automated gate.
+- `Review status`: RKM-022 records Andrea Tarsi's approval of all five NASA
+  source records for internal evaluation only. Recommendation review,
+  redistribution, commercial use, and production promotion remain separate.
 - `Related files`: `docs/maintenance/rag-recommendation-consumer-walkthrough.md`;
   `docs/maintenance/task-packets/RKM-001-downstream-consumer-walkthrough.md`;
   `scripts/import-rag-recommendation-artifact.py`;

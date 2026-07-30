@@ -32,6 +32,10 @@
     {
       "fixture": "examples/fixtures/rkm-external-rag-evidence-bundle-v1.json",
       "schema": "schema/rkm-external-rag-evidence-bundle-v1.schema.json"
+    },
+    {
+      "fixture": "examples/fixtures/rkm-external-rag-source-review-v1.json",
+      "schema": "schema/rkm-external-rag-source-review-v1.schema.json"
     }
   ]
 }
