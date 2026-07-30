@@ -601,9 +601,9 @@ Each backlog entry uses this compact format:
 - `Area`: Evidence
 - `Reason`: The RAG-to-RKM consumer walkthrough now consumes a deterministic
   runtime-generated artifact and persists a review-ready decision record. A
-  review-ready NASA corpus evidence bundle and readable decision report now
-  preserve external source metadata, while human rights review and canonical
-  ontology persistence remain separate.
+  review-ready NASA corpus evidence bundle, readable decision report,
+  freshness gate, and scoped human source review now preserve external source
+  metadata, while canonical ontology persistence remains separate.
 - `Suggested implementation`: Review the immutable evidence bundle, verify
   source rights and freshness, preserve source and corpus hashes, validate
   compatibility before any canonical persistence, and retain the current
@@ -612,8 +612,8 @@ Each backlog entry uses this compact format:
   its schema, local hashes, source-commit reachability, and fail-closed
   lifecycle without network access or production promotion.
 - `Follow-up status`: RKM-021 verifies explicit source freshness thresholds
-  and emits source-specific human review requirements; rights approval remains
-  outside the automated gate.
+  and emits source-specific human review requirements; RKM-022 records the
+  resulting internal-evaluation-only source review.
 - `Review status`: RKM-022 records Andrea Tarsi's approval of all five NASA
   source records for internal evaluation only. Recommendation review,
   redistribution, commercial use, and production promotion remain separate.

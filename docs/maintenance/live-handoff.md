@@ -463,8 +463,9 @@ Reviewed` and `productionPromotionAllowed=false`. Cross-index unavailable
 recommendations remain unavailable after persistence. This closes the core
 Phase C evidence and decision layer. RKM-019 now packages the NASA-based
 real-corpus source metadata, hashes, generated artifact, decision record, and
-readable interpretation. GB-045 remains open only for human rights/freshness
-review and any separately reviewed canonical ontology persistence.
+readable interpretation. RKM-021 verifies freshness and RKM-022 records the
+human source review for internal evaluation only. GB-045 remains open only
+for any separately reviewed canonical ontology persistence.
 
 Snapshot date: 2026-07-28
 
