@@ -18,6 +18,8 @@ AUTOPILOT_TARGET ?= $(AUTOCYCLE_N)
 FORCE ?= false
 WORKING_TARGET_MAX ?= 5
 PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYCLE_TIMEOUT_SECONDS),3600)
+EVIDENCE_AS_OF_DATE ?=
+EVIDENCE_MAX_AGE_DAYS ?= 365
 
 .PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate validation-inventory-validate release-check route-task rag-recommendation-adapter-test external-rag-evidence-review status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
@@ -84,7 +86,9 @@ external-rag-evidence-review:
 		printf 'RAG_ROOT is required. Usage: make external-rag-evidence-review RAG_ROOT=/path/to/BuildingRAGAgentsWithLLMs\n' >&2; \
 		exit 1; \
 	fi
-	python3 scripts/verify-external-rag-evidence.py --rag-root "$(RAG_ROOT)"
+	args=(--rag-root "$(RAG_ROOT)" --max-age-days "$(EVIDENCE_MAX_AGE_DAYS)"); \
+	if [[ -n "$(strip $(EVIDENCE_AS_OF_DATE))" ]]; then args+=(--as-of-date "$(EVIDENCE_AS_OF_DATE)"); fi; \
+	python3 scripts/verify-external-rag-evidence.py "$${args[@]}"
 
 status:
 	git status --short

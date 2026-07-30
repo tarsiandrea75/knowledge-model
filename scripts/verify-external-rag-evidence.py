@@ -8,8 +8,10 @@ import hashlib
 import json
 import subprocess
 import tempfile
+from datetime import date
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from jsonschema import Draft202012Validator
 
@@ -86,6 +88,39 @@ def _commit_is_reachable(rag_root: Path, commit: str) -> None:
         raise VerificationError(f"declared RAG source commit is not reachable from RAG HEAD: {commit}")
 
 
+def _check_source_readiness(sources: list[dict[str, Any]], as_of: date, max_age_days: int) -> dict[str, Any]:
+    if max_age_days < 0:
+        raise VerificationError("max source age must not be negative")
+    ages: list[int] = []
+    human_review_required: list[str] = []
+    for source in sources:
+        source_id = source.get("id", "<unknown>")
+        parsed_url = urlparse(source.get("canonicalUrl", ""))
+        if parsed_url.scheme != "https" or not parsed_url.netloc:
+            raise VerificationError(f"source {source_id} must use a canonical HTTPS URL")
+        if not source.get("rights") or not source.get("attribution"):
+            raise VerificationError(f"source {source_id} is missing rights or attribution metadata")
+        try:
+            retrieval_date = date.fromisoformat(source["retrievalDate"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise VerificationError(f"source {source_id} has an invalid retrieval date") from exc
+        age_days = (as_of - retrieval_date).days
+        if age_days < 0:
+            raise VerificationError(f"source {source_id} is dated in the future: {retrieval_date}")
+        if age_days > max_age_days:
+            raise VerificationError(
+                f"source {source_id} is stale: {retrieval_date} is {age_days} days before {as_of}"
+            )
+        ages.append(age_days)
+        human_review_required.append(f"{source_id}: verify rights and attribution before human review")
+    return {
+        "asOfDate": as_of.isoformat(),
+        "maxAgeDays": max_age_days,
+        "oldestAgeDays": max(ages, default=0),
+        "humanReviewRequired": human_review_required,
+    }
+
+
 def _validate_schema(bundle: dict[str, Any]) -> None:
     schema = _load(SCHEMA)
     errors = sorted(Draft202012Validator(schema).iter_errors(bundle), key=lambda error: list(error.path))
@@ -94,7 +129,7 @@ def _validate_schema(bundle: dict[str, Any]) -> None:
         raise VerificationError(f"bundle schema validation failed at {location}: {errors[0].message}")
 
 
-def verify(bundle_path: Path, rag_root: Path) -> dict[str, Any]:
+def verify(bundle_path: Path, rag_root: Path, as_of: date | None = None, max_age_days: int = 365) -> dict[str, Any]:
     bundle = _load(bundle_path)
     _validate_schema(bundle)
     lifecycle = bundle["lifecycle"]
@@ -109,6 +144,7 @@ def verify(bundle_path: Path, rag_root: Path) -> dict[str, Any]:
     _expect_hash(rag_root, bundle["dataset"], "dataset")
     _expect_hash(ROOT, bundle["generatedArtifact"], "generated artifact")
     _expect_hash(ROOT, bundle["decisionRecord"], "decision record")
+    source_readiness = _check_source_readiness(bundle["sources"], as_of or date.today(), max_age_days)
 
     return {
         "bundleId": bundle["bundleId"],
@@ -116,6 +152,7 @@ def verify(bundle_path: Path, rag_root: Path) -> dict[str, Any]:
         "sourceCommit": source_repository["commit"],
         "productionPromotionAllowed": False,
         "sourceCount": len(bundle["sources"]),
+        "sourceReadiness": source_readiness,
     }
 
 
@@ -132,6 +169,26 @@ def _self_test() -> None:
             pass
         else:
             raise AssertionError("path traversal must be rejected")
+        fresh_source = {
+            "id": "fresh-source",
+            "canonicalUrl": "https://example.org/source",
+            "rights": "Review required",
+            "attribution": "Example",
+            "retrievalDate": "2026-07-27",
+        }
+        readiness = _check_source_readiness([fresh_source], date(2026, 7, 30), 30)
+        assert readiness["oldestAgeDays"] == 3
+        for invalid_source in (
+            {**fresh_source, "retrievalDate": "2025-01-01"},
+            {**fresh_source, "retrievalDate": "2026-08-01"},
+            {**fresh_source, "canonicalUrl": "http://example.org/source"},
+        ):
+            try:
+                _check_source_readiness([invalid_source], date(2026, 7, 30), 30)
+            except VerificationError:
+                pass
+            else:
+                raise AssertionError("invalid source readiness must be rejected")
     _validate_schema(_load(BUNDLE))
 
 
@@ -139,6 +196,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bundle", type=Path, default=BUNDLE)
     parser.add_argument("--rag-root", type=Path)
+    parser.add_argument("--as-of-date", type=date.fromisoformat, default=date.today())
+    parser.add_argument("--max-age-days", type=int, default=365)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     try:
@@ -148,7 +207,7 @@ def main() -> int:
             return 0
         if args.rag_root is None:
             parser.error("--rag-root is required unless --self-test is used")
-        result = verify(args.bundle.resolve(), args.rag_root.resolve())
+        result = verify(args.bundle.resolve(), args.rag_root.resolve(), args.as_of_date, args.max_age_days)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     except VerificationError as exc:
