@@ -200,37 +200,37 @@ Each backlog entry uses this compact format:
 
 - `ID`: `GB-012`
 - `Title`: Policy-as-data registry.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Governance
 - `Reason`: Governance rules need stable structured metadata for automation, reporting, and traceability.
-- `Suggested implementation`: Add a registry that records rule identifiers, source files, enforcement level, related validators, and review owner.
-- `Related files`: `docs/maintenance/rule-coverage-report.md`; `registries/`; `schema/`; `scripts/`
-- `Depends on`: Repository maintainer prioritization.
+- `Suggested implementation`: Implemented by `registries/governance-policy-registry.json` and `schema/governance-policy-registry-v1.schema.json`, with executable reference validation in `scripts/validate-governance-policy-registry.py` and `make governance-policy-registry-validate`.
+- `Related files`: `registries/governance-policy-registry.json`; `schema/governance-policy-registry-v1.schema.json`; `scripts/validate-governance-policy-registry.py`; `Makefile`
+- `Depends on`: Implemented in the GB-012 task slice; policy semantics remain subject to maintainer review.
 
 ### GB-013 Stable Rule IDs
 
 - `ID`: `GB-013`
 - `Title`: Stable rule IDs.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Governance
 - `Reason`: Stable identifiers make governance rules easier to reference from validators, reports, reviews, and backlog entries.
-- `Suggested implementation`: Assign durable IDs to governance rules and use them in rule coverage, policy data, and validation output.
-- `Related files`: `AGENTS.md`; `docs/maintenance/rule-coverage-report.md`; `docs/maintenance/task-guides/`; `registries/`
-- `Depends on`: `GB-012`.
+- `Suggested implementation`: Implemented through `RKM-GOV-001` through `RKM-GOV-007` in the versioned policy registry. The IDs are stable registry keys and do not replace human-readable coverage prose.
+- `Related files`: `registries/governance-policy-registry.json`; `schema/governance-policy-registry-v1.schema.json`; `docs/maintenance/governance-backlog.md`
+- `Depends on`: Implemented through `GB-012`.
 
 ### GB-014 Link Rules To Validators
 
 - `ID`: `GB-014`
 - `Title`: Link rules to validators.
-- `Status`: `Proposed`
+- `Status`: `Implemented`
 - `Priority`: `High`
 - `Area`: Governance
 - `Reason`: Maintainers need to know which rule is enforced by which command or script.
-- `Suggested implementation`: Add explicit rule-to-validator links in structured policy data or the rule coverage report.
-- `Related files`: `docs/maintenance/rule-coverage-report.md`; `scripts/`; `Makefile`; `registries/`
-- `Depends on`: `GB-012`.
+- `Suggested implementation`: Implemented through each policy's `sourceFiles`, `validators`, and `commands` fields, validated for repository-local paths and existing Make targets by `scripts/validate-governance-policy-registry.py`.
+- `Related files`: `registries/governance-policy-registry.json`; `scripts/validate-governance-policy-registry.py`; `Makefile`
+- `Depends on`: Implemented through `GB-012`.
 
 ### GB-015 More Granular Local Rule Files
 

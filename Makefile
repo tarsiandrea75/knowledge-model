@@ -21,7 +21,7 @@ PER_CYCLE_TIMEOUT_SECONDS ?= $(if $(RKM_PER_CYCLE_TIMEOUT_SECONDS),$(RKM_PER_CYC
 EVIDENCE_AS_OF_DATE ?=
 EVIDENCE_MAX_AGE_DAYS ?= 365
 
-.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate validation-inventory-validate release-check route-task rag-recommendation-adapter-test external-rag-evidence-review canonical-rag-evidence-projection-test canonical-rag-evidence-projection-validate canonical-rag-evidence-projection-query-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
+.PHONY: validate runtime-artifacts-validate entity-type-package-validate data-validate graph-export data-graph-export graph-export-validate agent-routing-validate schema-duplicate-contracts-validate relationship-predicate-review rule-coverage-validate markdown-json-validate validation-inventory-validate governance-policy-registry-validate release-check route-task rag-recommendation-adapter-test external-rag-evidence-review canonical-rag-evidence-projection-test canonical-rag-evidence-projection-validate canonical-rag-evidence-projection-query-test status log cycle autocycle discover push safe-push install-hooks fix-eof codex-commit recover-revise recovery-plan clean-discovery-artifacts usage-report budget-init budget-report budget-check budget-reset-window next-action autopilot autopilot-dry-run autopilot-recover autopilot-status cockpit cockpit-summary help
 
 validate:
 	bash scripts/validate-rkm.sh
@@ -98,6 +98,9 @@ canonical-rag-evidence-projection-validate:
 
 canonical-rag-evidence-projection-query-test:
 	python3 scripts/query-canonical-rag-evidence-projection.py --self-test
+
+governance-policy-registry-validate:
+	python3 scripts/validate-governance-policy-registry.py
 
 status:
 	git status --short

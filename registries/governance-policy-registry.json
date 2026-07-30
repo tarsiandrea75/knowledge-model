@@ -1,0 +1,122 @@
+{
+  "contractVersion": "rkm-governance-policy-registry-v1",
+  "registryId": "rkm-core-governance-policies",
+  "registryVersion": "1.0.0",
+  "status": "Published",
+  "policies": [
+    {
+      "ruleId": "RKM-GOV-001",
+      "title": "Runtime artifacts remain outside the repository",
+      "area": "Validation",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "AGENTS.md",
+        "docs/maintenance/automation-guardrails.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-runtime-artifacts.py"],
+      "commands": ["make runtime-artifacts-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-002",
+      "title": "Populated entity types require complete packages",
+      "area": "Validation",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "data/AGENTS.md",
+        "docs/maintenance/task-guides/adding-new-entity-type.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-entity-type-packages.py"],
+      "commands": ["make entity-type-package-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-003",
+      "title": "Distributed rules route through required local guidance",
+      "area": "Governance",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "AGENTS.md",
+        "docs/maintenance/task-guides/rule-routing-validation.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-agent-routing.py"],
+      "commands": ["make agent-routing-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-004",
+      "title": "Duplicate schema contracts are rejected",
+      "area": "Validation",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "schema/AGENTS.md",
+        "docs/maintenance/task-guides/adding-schema-contract.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-schema-duplicate-contracts.py"],
+      "commands": ["make schema-duplicate-contracts-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-005",
+      "title": "Relationship endpoints and support references remain resolvable",
+      "area": "Validation",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "data/AGENTS.md",
+        "docs/maintenance/task-guides/adding-relationship-set.md",
+        "docs/maintenance/task-guides/adding-relationship-support.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-data.py"],
+      "commands": ["make data-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-006",
+      "title": "Critical validators remain present and wired into validation",
+      "area": "Validation",
+      "priority": "High",
+      "enforcementLevel": "Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "scripts/AGENTS.md",
+        "docs/maintenance/task-guides/updating-validation-scripts.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/validate-validation-inventory.py"],
+      "commands": ["make validation-inventory-validate", "make validate"],
+      "reviewOwner": "RKM Maintainers"
+    },
+    {
+      "ruleId": "RKM-GOV-007",
+      "title": "Relationship predicates are reviewed for semantic reuse",
+      "area": "Governance",
+      "priority": "High",
+      "enforcementLevel": "Partially Validated",
+      "status": "Implemented",
+      "sourceFiles": [
+        "registries/AGENTS.md",
+        "docs/maintenance/task-packets/GB-003-relationship-predicate-reuse.md",
+        "docs/maintenance/rule-coverage-report.md"
+      ],
+      "validators": ["scripts/review-relationship-predicate-reuse.py"],
+      "commands": ["make relationship-predicate-review"],
+      "reviewOwner": "RKM Maintainers",
+      "notes": ["The checker is advisory; semantic equivalence and justification remain review decisions."]
+    }
+  ]
+}
