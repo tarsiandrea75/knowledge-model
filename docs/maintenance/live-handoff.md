@@ -32,7 +32,80 @@ When sources disagree, use this order:
 
 Never reconcile a contradiction silently. Identify the conflicting sources, verify the applicable scope, and record the resolution.
 
-## Current Operational Snapshot
+## Current Product Planning Checkpoint
+
+Checkpoint date: 2026-07-30
+
+Operational branch: `codex/open-autonomy-era`
+
+Current implementation baseline: `c31ae67` (`feat: add governance policy
+registry`)
+
+The implementation baseline is synchronized with its remote and its exact
+hosted Fast gate completed successfully before this planning cycle.
+
+The active worktree contains planning documentation only:
+
+- `docs/maintenance/rag-decision-intelligence-product-plan.md` defines RKM's
+  role in a usable corpus-to-decision product with the RAG Engineering Lab;
+- `docs/maintenance/governance-backlog.md` aligns existing backlog priorities
+  with that product plan;
+- this handoff points future sessions at the new decision boundary.
+
+The product reconciliation is now confirmed. The long-term product is a
+private-enterprise knowledge system, while the near-term wedge remains a
+CLI-first corpus-to-decision Lab. The approved sequence is:
+
+```text
+financial-books decision-lab pilot
+  -> measured RAG recommendation and reviewable RKM decision
+  -> synthetic multi-workspace authorization pilot
+  -> private-enterprise trust boundary
+  -> evidence-driven business-data and multimodal expansion
+```
+
+The first pilot corpus is 16 English financial and investment PDFs kept outside
+both repositories. The companion Lab inventory records 6,970 pages, stable
+SHA-256 fingerprints, basic text-extraction health, and a required rights
+attestation. The human operator will review the first golden set while reading
+the source books. The repository must never receive PDFs, reconstructable book
+text, credentials, or derived artifacts that permit redistribution.
+
+RKM must treat workspace isolation, identity, authorization, egress,
+residency, retention, audit, and mutation policy as hard feasibility inputs.
+It may return `INAPPLICABLE`, `UNAVAILABLE`, or `INSUFFICIENT_EVIDENCE` before
+quality/cost ranking. It does not authenticate users or enforce runtime access
+control. The Lab must prove policy propagation through identity, source, chunk,
+index, retrieval, context, answer, citation, and audit before enterprise data
+is accepted.
+
+No schema, canonical data, registry, fixture, projection, validator,
+automation, release, provider, production route, or promotion behavior changed
+in this planning cycle.
+
+The central conclusion is that RKM's validation and governance foundation is
+more mature than its decision-critical populated knowledge. The next RKM
+campaign should not add broad model or automation surface. It should eventually
+support:
+
+```text
+corpus profile + user constraints + Lab capability manifest
+  -> bounded RKM candidate plan
+  -> Lab experiment result
+  -> reviewable RKM decision
+```
+
+All proposed RKM-029 through RKM-038 work remains planning-only. Do not create
+those task packets or begin canonical modeling until the proposed RAG-034
+runtime/evaluation parity gate and the relevant companion Lab product gates are
+complete. RKM-036 through RKM-038 are explicitly post-pilot and must not
+preempt Tier 1 technique knowledge or the first human-reviewed Lab decision.
+
+The existing canonical RAG evidence projection remains an internal, read-only
+fixture envelope. It is not a reason by itself to promote records into
+`data/**`.
+
+## Historical Operational Snapshot
 
 Snapshot date: 2026-07-20
 

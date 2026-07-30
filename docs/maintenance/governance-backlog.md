@@ -47,20 +47,55 @@ Each backlog entry uses this compact format:
 
 ## Suggested Next Items
 
-- `GB-003` Relationship predicate reuse checker.
-- `GB-006` Recovery state validator or autopilot blocker.
-- `GB-038` `v0.2.0` planning document.
-- `RKM-012` Index-aware recommendation boundary.
-- `RKM-013` Cross-index review fixture.
-- `RKM-014` Unavailable recommendation integrity.
-- `RKM-015` Generated RAG artifact consumer.
-- `RKM-016` Review-ready RAG decision record.
-- `RKM-017` Fail-closed decision persistence.
-- `RKM-018` Phase C closure and evidence boundary.
-- `RKM-019` External RAG evidence package and decision report.
-- `RKM-020` External evidence review gate.
-- `RKM-021` Source freshness and human-review readiness.
-- `RKM-022` Human source review record.
+- Review `docs/maintenance/rag-decision-intelligence-product-plan.md` together
+  with the RAG Engineering Lab product strategy and the financial-books pilot
+  plan.
+- Do not begin a new RKM modeling campaign before the proposed RAG-034
+  runtime/evaluation parity gate is complete.
+- Treat the first real pilot as a rights-scoped, internal-evaluation financial
+  books corpus. It is a product-evidence input, not canonical RKM source data.
+- After that gate, prioritize `GB-021` Query Transformation Technique Seed
+  Data, `GB-022` Evaluation Metric Seed Data, and `GB-027` External References
+  Pass as inputs to the proposed RKM-029 applicability profile.
+- Advance `GB-023` Benchmark Seed Data and `GB-024` Dataset Seed Data only for
+  metrics and evidence consumed by the first external corpus pilot.
+- Reconcile `GB-045` after reviewing whether the completed read-only
+  projection closes the current item or whether a narrower canonical
+  persistence task remains justified.
+- Start `GB-038` and `GB-039` only after a clean-checkout corpus-to-decision
+  pilot succeeds.
+- Defer enterprise constraint modeling until the companion Lab exposes a
+  concrete RAG-052 workspace-policy contract. RKM may model feasibility and
+  policy exclusions; it must not store credentials, enforce access control, or
+  become a runtime security boundary.
+
+## Product Plan Alignment
+
+The decision-intelligence plan changes backlog priority, not backlog history.
+Existing implemented governance and evidence work remains valid. Near-term
+selection should now favor work that answers a concrete product query:
+
+- which technique is applicable;
+- which implementation is executable;
+- which experiment can distinguish candidates;
+- which evidence supports the resulting decision.
+
+Governance refinements, broad provider expansion, generic agentic modeling,
+additional automation, and release mechanics remain legitimate backlog work,
+but they should not preempt the critical path unless they block a demonstrated
+pilot requirement.
+
+The proposed RKM-029 through RKM-035 sequence is intentionally documented only
+in `docs/maintenance/rag-decision-intelligence-product-plan.md`. Detailed task
+packets should be created one at a time after their dependencies and product
+gates pass. This avoids turning speculative task inventory into a substitute
+for external-user evidence.
+
+The same plan now records RKM-036 through RKM-038 as a deliberately later
+private-enterprise track. These tasks become relevant only after a measured
+financial-books decision workflow and a concrete Lab authorization contract.
+They must not preempt Tier 1 technique evidence, metric semantics, or the first
+human-reviewed pilot decision.
 
 ## Backlog Entries
 
