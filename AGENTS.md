@@ -15,7 +15,9 @@ These invariants apply to all repository work:
 - Prefer structured knowledge, stable identifiers, reusable definitions, registries, and explicit relationships over prose-only modeling.
 - Preserve the existing domain model, entity model, relationship model, evidence model, metadata model, ontology, naming conventions, and versioning rules.
 - Keep content directly usable. Do not add incomplete sections, filler content, unfinished-work markers, or invalid examples.
-- Do not commit changes unless the user explicitly requests a commit.
+- In protected auto-commit mode, create a normal local commit autonomously
+  after the complete required validation and review evidence pass. Push remains
+  human-only and requires explicit user authorization and execution.
 
 ## Mandatory Execution Protocol
 
@@ -32,7 +34,8 @@ Unless the user explicitly instructs otherwise:
 9. Report which file was created or modified.
 10. Report the validation command that was run and its result.
 11. Report the final `git status --short` output.
-12. Do not commit changes.
+12. In protected auto-commit mode, create a normal local commit after complete
+    required validation and review evidence pass; otherwise do not commit.
 13. In autonomous execution mode, record a checkpoint after validation and
     continue with the next ready atomic cycle instead of stopping.
 14. Outside autonomous execution mode, stop after the single requested file
@@ -169,17 +172,17 @@ branch, Git-wrapper, credential, or push-authorization rules.
 <!-- SAFE_GIT_EXECUTION_BOUNDARY_BEGIN -->
 ## Safe Git execution modes
 
-The normal launcher permits autonomous edits and validations but not Git
-metadata mutation. The commit-enabled launcher
-`$HOME/bin/codex-safe-autonomy-commit` additionally permits staging explicit
-paths and creating normal commits through:
+The recommended launcher `$HOME/bin/codex-safe-autonomy` is commit-capable.
+After complete required validation and review evidence pass, Codex autonomously
+stages explicit paths and creates normal commits through:
 
 - `/home/andreatarsi/bin/codex-safe-git-add`
 - `/home/andreatarsi/bin/codex-safe-git-commit`
 
-Use the wrappers directly and separately with the repository as the working
-directory. Do not use direct mutating Git commands, do not amend, and do not
-change branch or repository topology.
+The legacy `$HOME/bin/codex-safe-autonomy-commit` launcher has the same
+protected commit behavior. Use the wrappers directly and separately with the
+repository as the working directory. Do not use direct mutating Git commands,
+do not amend, and do not change branch or repository topology.
 
 Codex must never push. Pushes require explicit human authorization and
 execution from a normal WSL shell.

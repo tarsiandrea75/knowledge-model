@@ -4,9 +4,11 @@
 
 This machine-local configuration lets Codex work autonomously on ordinary
 files in the two authorized repositories without repeated approval prompts,
-while retaining technical protections around the filesystem and Git. It is a
-local operating aid for trusted maintenance sessions, not a repository-owned
-credential or unrestricted machine-access mechanism.
+while retaining technical protections around the filesystem and Git. After
+complete required validation and review evidence pass, the recommended launcher
+also permits an autonomous protected local commit. It is a local operating aid
+for trusted maintenance sessions, not a repository-owned credential or
+unrestricted machine-access mechanism.
 
 ## Launch commands
 
@@ -44,6 +46,9 @@ restrict work to a single repository.
 - Reset, rebase, merge, and history rewriting are forbidden.
 - Force pushes are forbidden.
 - No push is performed without explicit user authorization.
+- A normal local commit may be created automatically only after complete
+  required validation and review evidence pass, and only through the protected
+  wrappers with explicit paths.
 - A forbidden operation must fail without requesting permission expansion or
   broader access.
 
@@ -113,37 +118,39 @@ to each repository's current `AGENTS.md` and task instructions.
 
 The machine provides two launch modes.
 
-### Autonomous work without commits
+### Autonomous work with protected commits (default)
 
 ```bash
 $HOME/bin/codex-safe-autonomy rag
 $HOME/bin/codex-safe-autonomy rkm
 ```
 
-This mode uses `workspace-write` with `approval_policy = "never"`. Codex may
-edit and validate ordinary files in both authorized repositories but does not
-stage, commit, or push from inside the session.
+This mode uses `workspace-write` with `approval_policy = "on-request"` only
+to allow the narrowly allowlisted protected wrappers outside the read-only
+`.git` sandbox. Codex may edit and validate ordinary files in both authorized
+repositories. After all required validation and review evidence pass, it stages
+explicit paths and creates a normal local commit through those wrappers. The
+allowlisted wrapper invocations do not prompt the human operator.
 
-### Autonomous work with protected commits
+### Compatibility launcher
 
 ```bash
 $HOME/bin/codex-safe-autonomy-commit rag
 $HOME/bin/codex-safe-autonomy-commit rkm
 ```
 
-A previous session can be resumed in commit-enabled mode:
+A previous session can also be resumed through the compatibility launcher:
 
 ```bash
 $HOME/bin/codex-safe-autonomy-commit rag resume SESSION_ID_VALUE
 $HOME/bin/codex-safe-autonomy-commit rkm resume SESSION_ID_VALUE
 ```
 
-This mode keeps the same `workspace-write` sandbox and authorized repository
-roots but overrides the approval policy to `on-request`. `.git` remains
-read-only inside the sandbox.
+This compatibility launcher has the same commit-capable protected mode as the
+recommended launcher. `.git` remains read-only inside the sandbox.
 
-After successful validation, Codex may request outside-sandbox execution only
-for the following exact, machine-local wrappers:
+After successful validation, Codex must use outside-sandbox execution only for
+the following exact, machine-local wrappers:
 
 ```bash
 /home/andreatarsi/bin/codex-safe-git-add path/to/file
